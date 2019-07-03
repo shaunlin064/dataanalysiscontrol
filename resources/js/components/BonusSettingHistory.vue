@@ -14,9 +14,9 @@
 			<!-- /.input group -->
 		</div>
 		<!-- /.form group -->
-		<div class="box box-warning" :class="{'collapsed-box' : key > 0}" v-for='(item,key) in items' :data-history-range=formate(item.dateMonth)>
+		<div class="box box-warning" :class="{'collapsed-box' : key > 0}" v-for='(item,key) in items' :data-history-range=formate(item.set_date)>
 			<div class="box-header with-border">
-				<h3 class="box-title">{{item.dateMonth}}</h3>
+				<h3 class="box-title">{{item.set_date}}</h3>
 				
 				<div class="box-tools pull-right">
 					<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -41,10 +41,10 @@
 								<th>達成比例</th>
 								<th>獎金比例</th>
 							</tr>
-							<tr v-for='(children, index) in item.rateData'>
+							<tr v-for='(children, index) in item.levels'>
 								<td>{{index+1}}.</td>
-								<td><span class='badge bg-light-blue'>{{ children.achievingRate }}%</span></td>
-								<td><span class="badge bg-red">{{ children.bounsRate }}%</span></td>
+								<td><span class='badge bg-light-blue'>{{ children.achieving_rate }}%</span></td>
+								<td><span class="badge bg-red">{{ children.bouns_rate }}%</span></td>
 							</tr>
 							</tbody></table>
 					</div>
@@ -87,6 +87,7 @@
                 historyDom.hide();
                 historyDom.map(function(){
                     let date = $(this).data('history-range');
+                    
                     if((date > rangeStart && date < rangeEnd) || date == rangeStart || date == rangeEnd){
                         $(this).show();
                     }
@@ -98,7 +99,11 @@
 			  },
 		    methods:{
             formate(v){
-                return v.replace('-','')
+                
+                v = v.replace('-','');
+                v = v.replace('-01','');
+                
+                return v;
             }
 		    }
     }

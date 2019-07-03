@@ -1,0 +1,33 @@
+.customer-fit{
+	padding-bottom: 15px;
+}
+.customer-fit .info-box-icon{
+	height: 101px;
+}
+.box-footer-info{
+	position: relative;
+	text-align: center;
+	padding: 3px 0;
+	color: #fff;
+	color: rgba(255, 255, 255, 0.8);
+	display: block;
+	z-index: 10;
+	background: rgba(0, 0, 0, 0.1);
+	text-decoration: none;
+}
+.box-footer-info:hover {
+	color: #fff;
+	background: rgba(0, 0, 0, 0.15);
+}
+.box-footer-info:active,.box-footer-info:focus  {
+	color: #ffffff;
+}
+
+/* Small devices (tablets, 768px and up) */
+@media (min-width: 768px) {  }
+
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) {  }
+
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {  }

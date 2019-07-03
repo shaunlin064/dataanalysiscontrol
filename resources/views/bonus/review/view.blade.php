@@ -6,7 +6,6 @@
 	 * Time: 12:24
 	 */
 
-//	dd($dataTable);
 ?>
 
 @extends('layout')
@@ -57,7 +56,8 @@
                                 :color='"bg-aqua"'
                                 :icon='"fa fa-child"'
                                 :vuex_field='"profit"'
-                                :text='"預估毛利總計"'>
+                                :profit='{{ $boxData['profit'] }}'
+                                :text='"預估獎金總計"'>
                         </box-info-component>
                     </div>
                     <!-- ./col -->
@@ -65,8 +65,9 @@
                         <box-info-component
                                 :color='"bg-green"'
                                 :icon='"ion ion-stats-bars"'
-                                :vuex_field='"bounce_rate"'
-                                :text='"Bounce Rate"'>
+                                :vuex_field='"bonus_rate"'
+                                :bonus_rate='{{ $boxData['bonus_rate'] }}'
+                                :text='"bonus Rate"'>
                         </box-info-component>
                     </div>
                     <!-- ./col -->
@@ -74,7 +75,9 @@
                         <box-progress-component
                                 :color='"bg-aqua"'
                                 :icon='"fa fa-flag-o"'
-                                :vuex_field='"bounce_next_level"'
+                                :vuex_field='"bonus_next_level"'
+                                :bonus_next_amount='{{ $boxData['bonus_next_amount'] }}'
+                                :bonus_next_percentage='{{ $boxData['bonus_next_percentage'] }}'
                                 :title='"下一階段獎金差額"'
                         ></box-progress-component>
                         <!-- /.info-box -->
@@ -109,7 +112,7 @@
         </div>
         <!-- /.widget-user -->
         <div class="col-xs-12">
-            <data-table-component :box_title='"案件清單"' :data_table='{{ json_encode($dataTable) }}' :dom_id='"bonusTable"'></data-table-component>
+            <data-table-component :box_title='"案件清單"' :user_id='{{$userData['uId']}}' :data_table='{{ json_encode($dataTable) }}' :dom_id='"bonusTable"'></data-table-component>
         </div>
         <!-- /.box -->
         </div>
@@ -122,8 +125,8 @@
     <script>
         $(function () {
 
-            var data1 = '{!!  json_encode($dataTable) !!}';
-                // console.log(data1);
+            {{--var data1 = '{!! json_encode($dataTable['data']) !!}';--}}
+            {{--    console.log(data1);--}}
 
         });
     </script>

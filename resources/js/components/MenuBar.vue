@@ -9,7 +9,7 @@
 		</a>
 		<ul v-if='item.children' class='treeview-menu'>
 			<li  :class="{'treeview':children.children && Object.keys(children.children).length > 0 }" v-for="children in item.children">
-				<a :href="children.href ? children.href : '/#'">
+				<a :href="children.href ? (children.title == '個人檢視' ? children.href+user_id :  children.href ) : '/#'">
 					<i :class=children.iconClassName></i>{{children.title}}
 					<span v-if='children.children' class='pull-right-container'>
             <i class='fa fa-angle-left pull-right'></i>
@@ -25,7 +25,10 @@
 
 <script>
     export default {
-        props: {item : Object},
+        props: {
+            item : Object,
+		        user_id: Number
+        },
         mounted() {
         }
     }

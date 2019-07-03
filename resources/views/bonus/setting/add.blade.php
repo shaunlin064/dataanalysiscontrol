@@ -6,15 +6,6 @@
 	 * Time: 17:42
 	 */
 ?>
-<?php
-	/**
-	 * Created by PhpStorm.
-	 * User: shaun
-	 * Date: 2019-06-18
-	 * Time: 15:33
-	 */
-
-?>
 @extends('layout')
 
 @section('title','DAC | 責任額設定')
@@ -39,7 +30,7 @@
     <div class="row">
         <!-- /.col -->
         <div class="col-md-12">
-            <bonus-group-component :arg='{type:"add",add_user_lists:{{ json_encode($addUserLists) }},csrf_token:"{{ csrf_token()}}"}'></bonus-group-component>
+            <bonus-group-component :arg='{type:"add",add_user_lists:{{ json_encode($addUserLists) }},csrf_token:"{{ csrf_token()}}" ,alreadySetUserIds : {{ json_encode( $alreadySetUserIds ) }}}'></bonus-group-component>
         </div>
         <!-- /.col -->
     </div>

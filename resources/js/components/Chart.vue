@@ -101,7 +101,7 @@
                     let monthdata = [
                         vue_this.month_income,
 		                    vue_this.month_cost,
-                        vue_this.month_income-vue_this.month_cost,
+                        vue_this.month_income+vue_this.month_cost,
                     ];
                     vue_this.chart_obj.data.datasets.map( function(dataset,key){
 		                    dataset.data = [monthdata[key]];

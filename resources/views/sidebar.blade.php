@@ -36,7 +36,7 @@
             <!-- sidebar menu: : style can be found in sidebar.less -->
             <ul class='sidebar-menu' data-widget='tree'>
                 <li class='header'>主選單</li>
-                <menu-component :item='item' v-for='item in {{ json_encode($data['menus']) }}'></menu-component>
+                <menu-component :item='item' v-for='item in {{ json_encode($data['menus']) }}' :user_id='{{session('userData')['user']['id']}}'></menu-component>
             </ul>
         </section>
     </aside>

@@ -25,9 +25,9 @@
             },
             changeemit(value){
                 this.$store.commit('changeDate',value);
-                this.$store.commit('changeMoneyStatus',{'paid':this.getrand(1000),'unpaid':this.getrand(1000),'bPaid':this.getrand(1000),'bUnPaid':this.getrand(100)});
-                this.$store.commit('changeMonthBalancen',{'month_income':this.getrand(1000),'month_cost':this.getrand(1000)});
-                this.$store.commit('changeBox',{'profit':this.getrand(1000),'bounce_rate':this.getrand(100),'bounce_next_amount':this.getrand(1000),'bounce_next_percentage':this.getrand(100)});
+                // this.$store.commit('changeMoneyStatus',{'paid':this.getrand(1000),'unpaid':this.getrand(1000),'bPaid':this.getrand(1000),'bUnPaid':this.getrand(100)});
+                // this.$store.commit('changeMonthBalancen',{'month_income':this.getrand(1000),'month_cost':this.getrand(1000)});
+                // this.$store.commit('changeBox',{'profit':this.getrand(1000),'bonus_rate':this.getrand(100),'bonus_next_amount':this.getrand(1000),'bonus_next_percentage':this.getrand(100)});
             },
         },
         created: function(){

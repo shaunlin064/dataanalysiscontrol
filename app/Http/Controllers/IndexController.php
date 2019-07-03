@@ -10,6 +10,7 @@
 	
 use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
+use Route;
 
 class IndexController extends BaseController
 {
@@ -18,14 +19,16 @@ class IndexController extends BaseController
 	 *
 	 * @return \Illuminate\Http\Response
 	 */
-	public function index()
+	public function index(Request $request)
 	{
-		//
-//		$this->resources['jsPath'][] = asset('/dist/js/pages/dashboard2.js'); //		<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-//		$this->resources['menu'] = json_encode($this->resources['menu']);
+	
+//		foreach($this->resources['menus'] as $keys => $items){
+//			$return = array_search('責任額',$items);
+////			dd(Route::currentRouteName(),Route('index'),$return,$keys,$this->resources['menus']);
+//		}
 		
+//		dd($return,$this->resources['menus']);
 		return view('index',['data' => $this->resources]);
-//		return view('index');
 	}
 	
 	/**

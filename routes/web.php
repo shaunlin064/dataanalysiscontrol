@@ -10,25 +10,73 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('/', 'IndexController@index');
-//bonus start
- //setting
-	Route::get('/bonus/setting/list', 'Bonus\SettingController@list');
-	Route::get('/bonus/setting/edit/{id}', 'Bonus\SettingController@edit');
-	Route::get('/bonus/setting/view/{id}', 'Bonus\SettingController@view');
-	Route::get('/bonus/setting/add', 'Bonus\SettingController@add');
-	Route::POST('/bonus/setting/save', 'Bonus\SettingController@save');
- //review
-	Route::get('/bonus/review/list', 'Bonus\ReviewController@list');
-	Route::get('/bonus/review/edit/{id}', 'Bonus\ReviewController@edit');
-	Route::get('/bonus/review/view/{id}', 'Bonus\ReviewController@view');
+	Route::group(['middleware' => ['CheckLogin','CheckPermissions'] ], function(){
+		/*
+		 * handle page
+		 */
+		Route::get('/handle', 'Bonus\ReviewController@getdata');
+		/*
+		 * index home
+		 */
+		Route::get('/', [
+		 'as' => 'index',
+		 'uses' => 'IndexController@index'
+		]);
+		/*
+		 * 登入系統
+		 */
+		Route::get('/login', [
+		 'as'=> 'auth.index',
+		 'uses'=> 'AuthCustomerController@index' ,
+		 'parent'=> 'auth.index']);
+		
+		Route::post('/login', [
+		 'as'=> 'auth.login',
+		 'uses'=> 'AuthCustomerController@login' ,
+		 'parent'=> 'auth.login']);
+		
+		
+		//bonus start
+		//setting
+		Route::prefix('bonus/setting')->group(function(){
+		
+		Route::get('/list', 'Bonus\SettingController@list');
+		Route::get('/add', 'Bonus\SettingController@add');
+		Route::get('/edit/{id}',
+		 [
+			'as' => 'bonus.setting.edit',
+			'uses' => 'Bonus\SettingController@edit',
+			'parent' => 'bonus.setting.edit'
+		 ]);
+		Route::get('/view/{id}', 'Bonus\SettingController@view');
+		Route::any('/save',
+		 [
+			'as'=>'bonus.setting.save',
+			'uses'=>'Bonus\SettingController@save',
+			'parent'=> 'bonus.setting.save'
+		 ]);
+		Route::post('/update',
+		 [
+			'as'=>'bonus.setting.update',
+			'uses'=>'Bonus\SettingController@update',
+			'parent'=> 'bonus.setting.update'
+		 ]);
+	});
 	
-	Route::get('/bonus/review/getdata', 'Bonus\ReviewController@getdata');
-//Route::get('/', function () {
-//    return view('welcome');
-//});
+		/*
+	 * bonus/review
+	 */
+		Route::prefix('bonus/review')->group(function(){
+			//review
+			Route::get('/list', 'Bonus\ReviewController@list');
+			Route::get('/edit/{id}', 'Bonus\ReviewController@edit');
+			Route::get('/view/{id}', 'Bonus\ReviewController@view');
+			Route::any('/getdata', 'Bonus\ReviewController@getdata');
+			
+		});
+		
+	});
+	
+//Auth::routes();
 
-Auth::routes();
-
-Route::get('/home', 'HomeController@index')->name('home');
+//Route::get('/home', 'IndexController@index')->name('home');

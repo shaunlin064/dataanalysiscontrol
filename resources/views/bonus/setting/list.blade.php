@@ -5,7 +5,6 @@
 	 * Date: 2019-06-18
 	 * Time: 14:09
 	 */
-
 ?>
 
 @extends('layout')
@@ -76,6 +75,9 @@
     <!-- page script -->
     <script>
         $(function () {
+            var users = {!! json_encode(session('users')) !!};
+            {{--var departments = {!! json_encode(session('department')) !!};--}}
+
             var dataTable = $('#bonusTable').DataTable({
                 'paging'      : true,
                 'ordering'    : true,
@@ -101,8 +103,16 @@
                     }
                 },
                 columns: [
-                    { data: "name"},
-                    { data: 'depatment'},
+                    {
+                        data: "user_id",
+                        render: function(data){
+                            return users[data]['name'];
+                        }
+                    },
+                    { data: 'user_id',
+                        render: function(data){
+                            return users[data]['department_name'];
+                        }},
                     { data: 'boundary'},
                     { data: 'id',
                         render: function (data) {
@@ -114,6 +124,7 @@
                 ],
             });
             let listdata = {!! json_encode($row)  !!};
+
             dataTable.clear();
             dataTable.rows.add( listdata );
             dataTable.draw();

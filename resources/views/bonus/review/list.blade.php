@@ -96,7 +96,7 @@
                 },
                 columns: [
                     { data: "name"},
-                    { data: 'depatment'},
+                    { data: 'department_name'},
                     { data: 'id',
                         render: function (data) {
                             return `<a href='/bonus/review/view/${data}'>

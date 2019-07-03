@@ -5,7 +5,7 @@
 			<li :class="{'active':type == 'view'}" v-if="type == 'edit' || type == 'view'" ><a href="#hirstory" data-toggle="tab">歷史資料</a></li>
 		</ul>
 		<div class="tab-content">
-			<bonus-form-component v-if="type !== 'view'" :row='setting' :type='type' :add_user_lists='add_user_lists' :csrf_token='csrf_token'></bonus-form-component>
+			<bonus-form-component v-if="type !== 'view'" :row='setting' :already_set_user_ids='already_set_user_ids' :form_action='form_action' :type='type' :add_user_lists='add_user_lists' :csrf_token='csrf_token'></bonus-form-component>
 			<bonus-history-component v-if="type == 'edit' || type == 'view'" :items='history' :active="type != 'edit'"></bonus-history-component>
 		</div>
 		<!-- /.tab-content -->
@@ -22,7 +22,9 @@
                 setting: this.arg.setting ? this.arg.setting : {},
                 history: this.arg.history ? this.arg.history : {},
                 add_user_lists: this.arg.add_user_lists ? this.arg.add_user_lists : [],
-                csrf_token: this.arg.csrf_token
+		            form_action: this.arg.form_action ? this.arg.form_action : 'save',
+                csrf_token: this.arg.csrf_token,
+                already_set_user_ids : this.arg.alreadySetUserIds ? this.arg.alreadySetUserIds : [],
             }
         },
         mounted() {

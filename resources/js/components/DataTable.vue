@@ -34,14 +34,28 @@
 		    props: {
             dom_id: String,
 				    box_title: String,
-				    data_table: Object,
+				    data_table: Object
 		    },
-        computed: mapState(['change_date']),
+        computed: mapState(['change_date','user_id']),
         methods:{
-            getCampaignData(){
-                axios.get('/bonus/review/getdata').then(
+            getCampaignData(uId,dateYearMonth){
+                // dateYearMonth =  dateYearMonth.replace('/','');
+                axios.post('/bonus/review/getdata',{
+                  uId:uId,dateYearMonth:dateYearMonth
+                }).then(
                     response => {
-                        this.updataTable(response.data);
+                        let chartDataBar = response.data.chartDataBar;
+		                    let boxData = response.data.boxData;
+
+                        this.updataTable(response.data.erpReturnData);
+
+                        this.$store.commit('changeMonthBalancen',{'month_income':chartDataBar.totalIncome,'month_cost':chartDataBar.totalCost});
+
+                        this.$store.commit('changeBox',{value:boxData.profit,field:'profit'});
+                        this.$store.commit('changeBox',{value:boxData.bonus_rate,field:'bonus_rate'});
+                        this.$store.commit('changeBox',{value:boxData.bonus_next_amount,field:'bonus_next_amount'});
+                        this.$store.commit('changeBox',{value:boxData.bonus_next_percentage,field:'bonus_next_percentage'});
+		                    // console.log(response.data.erpReturnData);
                     },
                     err => {
                         reject(err);
@@ -52,13 +66,17 @@
                 this.dataTable.clear();
                 this.dataTable.rows.add( row );
                 this.dataTable.draw();
-                console.log(row);
+                // console.log(row);
 		        }
         },
         mounted: function(){
             // for((item,index)  in this.title){
             //     console.log(item,index);
             // }
+            if(this.$attrs.user_id !== undefined){
+                this.$store.commit('changeUserId',this.$attrs.user_id);
+            }
+            
 		        let columns = [];
             
             Object.keys(this.data_table.rowTitle).forEach(function(v,k,i){
@@ -68,7 +86,6 @@
                           data:v
                       });
             });
-            
             this.dataTable = $('#'+this.dom_id+'').DataTable({
                 'paging'      : true,
                 'ordering'    : true,
@@ -95,18 +112,18 @@
                 },
                 columns: columns,
             });
-            
             this.dataTable.clear();
             this.dataTable.rows.add( this.data_table.data );
             this.dataTable.draw();
+            // console.log(this.data_table.data);
         },
         watch:{
             change_date: {
                 immediate: true,    // 这句重要
                 handler (val, oldVal) {
                     if(oldVal !== undefined) {
-                        this.getCampaignData();
-                        console.log(val,'datatable update');
+                        this.getCampaignData(this.user_id,val);
+                        console.log(this.user_id,val,'datatable update');
                     }
                     
                 }

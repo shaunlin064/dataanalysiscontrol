@@ -5,6 +5,8 @@
 	 * Date: 2018/12/17
 	 * Time: 3:57 PM
 	 */
+
+//	dd(session('userData')['user']['id']);
 ?>
 
 @extends('layout')

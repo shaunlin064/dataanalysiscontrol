@@ -9,10 +9,18 @@
 	namespace App\Http\Controllers\Bonus;
 	
 	
+	use App\Http\Controllers\ApiController;
 	use App\Http\Controllers\BaseController;
+	use App\Http\Controllers\FinancialController;
+	use App\Bonus;
+	use App\BonusLevels;
+	use Illuminate\Http\Request;
+	use Illuminate\Support\Facades\Input;
 	
 	class ReviewController extends BaseController
 	{
+
+		
 		public function __construct ()
 		{
 			//
@@ -47,124 +55,213 @@
 		
 		public function list ()
 		{
-			$listdata = [
-			 [
-				'id' => 1,
-				'name' => 'Trident',
-				'depatment' => 'Internet Explorer 4.0',
-			 ],
-			 [
-				'id' => 2,
-				'name' => 'Trident',
-				'depatment' => 'Internet Explorer 4.0',
-			 ],
-			 [
-				'id' => 3,
-				'name' => 'Trident',
-				'depatment' => 'Internet Explorer 4.0',
-			 ],
-			];
+			$listdata = session('users');
+			sort($listdata);
 			return view('bonus.review.list',['data' => $this->resources,'row' => $listdata]);
 		}
 		
 		public function view($id)
 		{
 			
+			//return error
+			if(isset(session('users')[$id]) == false){
+				
+				$message= [
+				 'status' => 0,
+				 'status_string' => '',
+				 'message' => ''
+				];
+				$message['status_string'] = 'Error';
+				$message['message'] = '查無使用者';
+				
+				return view('handle',['message'=>$message,'data' => $this->resources,'returnUrl' => Route('index')]);
+			}
+			
+			// require css
 			$this->resources['cssPath'][] = '/css/bounsReviewView.css';
 			
+			// get api data
+			$bonus = new Bonus();
+			$date = new \DateTime();
+			$yearMonth = $date->format('Ym');
+			$financial = new FinancialController();
+			$erpReturnData = $financial->getErpMemberFinancial([$id],$yearMonth);
+			
+			// loop calculation total Amount
+			$totalIncome = 0;
+			$totalCost = 0;
+			$totalProfit = 0;
+			
+			foreach($erpReturnData as $key => $items){
+				if($items['income'] == 0 && $items['cost'] == 0){
+					unset($erpReturnData[$key]);
+					continue;
+				}
+				$totalIncome += $items['income'];
+				$totalCost += $items['cost'];
+				$totalProfit += $items['profit'];
+				
+				$erpReturnData[$key]['paymentStatus'] = 'no';
+				$erpReturnData[$key]['bonusStatus'] = 'no';
+			}
+			sort($erpReturnData);
+			// getUserBonus
+			
+			$dateYearMonthDay = $date->format('Y-m-01');
+			
+			$returnBonusData = $bonus->getUserBonus($id, $totalProfit, $dateYearMonthDay);
+			
+			// set output Data
 			$userData = [
-			 'name' => 'Toast',
-			 'title' => '業務',
-			 'lastMonthProfit' => 1000000,
-			 'thisMonthProfit' => 900000,
-			 'historyMonthProfit' => 1000000
+			 'uId' => $id,
+			 'name' => session('users')[$id]['name'],
+			 'title' => session('users')[$id]['department_name'],
 			];
+			
+			$boxData = [
+			 'profit' => $returnBonusData['estimateBonus'],
+				'bonus_rate' => isset($returnBonusData['reachLevle']['bouns_rate']) ? $returnBonusData['reachLevle']['bouns_rate'] : 0,
+				'bonus_next_amount' => isset($returnBonusData['nextLevel']['bonus_next_amount']) ? $returnBonusData['nextLevel']['bonus_next_amount'] : 0,
+				'bonus_next_percentage' => isset($returnBonusData['nextLevel']['bonus_next_percentage'])?  $returnBonusData['nextLevel']['bonus_next_percentage'] : 0,
+			];
+			
 			$chartData = [
 			  [ 'data' => [
-				   1000,
-				   500,
+				   1,
+				   1,
 				   0,
 				   0
 			  ]],
 			 [ 'data' => [
 					 0,
 					 0,
-					 1000,
-					 500]]
+					 1,
+					 1]]
 			];
 			
 			$chartDataBar = [
 				[
-				 'data' => [1000],
+				 'data' => [$totalIncome],
 				],
 			  [
-				 'data' => [-2000],
+				 'data' => ['-'.$totalCost],
 			  ],
 			  [
-				 'data' => [-1000],
+				 'data' => [$totalProfit],
 			  ],
 			];
 			
 			$dataTable = [
 			 'rowTitle' => [
-			  'yearMonth' => '月份',
-			  'campaignName' => '名稱',
-			  'mediaChannelName' =>	'媒體',
-			  'sellType' =>	'類型' ,
+			  'year_month' => '月份',
+			  'campaign_name' => '名稱',
+			  'media_channel_name' =>	'媒體',
+			  'sell_type_name' =>	'類型' ,
 			  'income' =>	'收入' ,
 			  'cost' =>	'成本' ,
 			  'profit'	=> '毛利',
 			  'paymentStatus' => '收款狀態',
 			  'bonusStatus'	=> '發放狀態',
 			 ],
-				'data' => [
-				 [
-					'yearMonth' => '201906',
-					'campaignName' => '測試1',
-					'mediaChannelName' => 'fb',
-					'sellType' => 'CPC',
-					'income' => 100000,
-					'cost' => 50000,
-					'profit' => 50000,
-					'paymentStatus' => '已收款',
-					'bonusStatus' => '已收款',
-				 ],[
-					'yearMonth' => '201906',
-					'campaignName' => '測試1',
-					'mediaChannelName' => 'fb',
-					'sellType' => 'CPC',
-					'income' => 100000,
-					'cost' => 50000,
-					'profit' => 50000,
-					'paymentStatus' => '未收款',
-					'bonusStatus' => 0,
-				 ]
-				]
+				'data' => $erpReturnData
 			];
 			
 			return view('bonus.review.view',[
-			 'data' => $this->resources,
+				'data' => $this->resources,
 				'userData' => $userData,
-			 'dataTable' => $dataTable,
-				 'chartData' => $chartData,
-				 'chartDataBar' => $chartDataBar
+				'dataTable' => $dataTable,
+				'chartData' => $chartData,
+				'chartDataBar' => $chartDataBar,
+				 'boxData' => $boxData,
 			]
 			);
 		}
+
+
 		
 		public function getdata ()
 		{
-			$dataTable = [
-				 ['yearMonth' => '201906',
-				 'campaignName' => '測試1',
-				 'mediaChannelName' => 'fb',
-				 'sellType' => 'CPC',
-				 'income' => 100000,
-				 'cost' => 50000,
-				 'profit' => 50000,
-				 'paymentStatus' => 0,
-				 'bonusStatus' => 0,]
+//			$dataTable = [
+//				 ['yearMonth' => '201906',
+//				 'campaignName' => '測試1',
+//				 'mediaChannelName' => 'fb',
+//				 'sellType' => 'CPC',
+//				 'income' => 100000,
+//				 'cost' => 50000,
+//				 'profit' => 50000,
+//				 'paymentStatus' => 0,
+//				 'bonusStatus' => 0,]
+//			];
+			$uId = Input::get('uId');
+			$inputDate = str_replace('/', '', Input::get('dateYearMonth'));
+			$inputDate .= '01';
+			$date = new \DateTime($inputDate);
+			
+			$yearMonth = $date->format('Ym');
+			$yearMonthDay = $date->format('Y-m-01');
+			// get api data
+			$financial = new FinancialController();
+			$erpReturnData = $financial->getErpMemberFinancial([$uId],$yearMonth);
+			
+			// loop calculation total Amount
+			$totalIncome = 0;
+			$totalCost = 0;
+			$totalProfit = 0;
+			
+			foreach($erpReturnData as $key => $items){
+				if($items['income'] == 0 && $items['cost'] == 0){
+					unset($erpReturnData[$key]);
+					continue;
+				}
+				$totalIncome += $items['income'];
+				$totalCost += $items['cost'] * -1;
+				$totalProfit += $items['profit'];
+				
+				$erpReturnData[$key]['paymentStatus'] = 'no';
+				$erpReturnData[$key]['bonusStatus'] = 'no';
+			}
+			sort($erpReturnData);
+			// getUserBonus
+			$bonus = new Bonus();
+			
+			$returnBonusData = $bonus->getUserBonus($uId, $totalProfit, $yearMonthDay);
+			
+			
+			// set output Data
+			
+			$boxData = [
+			 'profit' => $returnBonusData['estimateBonus'],
+			 'bonus_rate' => isset($returnBonusData['reachLevle']['bouns_rate']) ? $returnBonusData['reachLevle']['bouns_rate'] : 0,
+			 'bonus_next_amount' => isset($returnBonusData['nextLevel']['bonus_next_amount']) ? $returnBonusData['nextLevel']['bonus_next_amount'] : 0,
+			 'bonus_next_percentage' => isset($returnBonusData['nextLevel']['bonus_next_percentage'])?  $returnBonusData['nextLevel']['bonus_next_percentage'] : 0,
 			];
-			echo json_encode($dataTable);
+			
+//			$chartData = [
+//			 [ 'data' => [
+//				1,
+//				1,
+//				0,
+//				0
+//			 ]],
+//			 [ 'data' => [
+//				0,
+//				0,
+//				1,
+//				1]]
+//			];
+			
+			$chartDataBar = [
+			 'totalIncome' => $totalIncome,
+				'totalCost' => $totalCost,
+				'totalProfit' => $totalProfit
+			];
+			
+			echo json_encode([
+			 'erpReturnData' => $erpReturnData,
+			 'chartDataBar' => $chartDataBar,
+				'boxData' => $boxData
+			 ]);
 		}
 	}
+	
+	
