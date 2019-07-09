@@ -3,6 +3,8 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Route;
+use Session;
 
 class CheckLogin
 {
@@ -17,6 +19,8 @@ class CheckLogin
     {
     	
     	if ( session('userData') == null ){
+		    session(['retrunUrl' => $request->getRequestUri()]);
+		    
 		    return redirect('login');
 	    }
         return $next($request);

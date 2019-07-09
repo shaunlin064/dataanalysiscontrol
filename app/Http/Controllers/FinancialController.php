@@ -21,7 +21,7 @@
 		 't_cost' => 'cost'
 		];
 		
-		public function getErpMemberFinancial (Array $userIds,String $dateYearMonth = null ,String  $organizationStr = 'all')
+		public function getErpMemberFinancial (Array $userIds,String $dateYearMonth = null ,String  $organizationStr = 'all',$outgroup = null)
 		{
 			if($dateYearMonth){
 				$dateYearMonth = $dateYearMonth;
@@ -38,7 +38,8 @@
 			 'data' => [
 				'userIds' => $userIds,
 				'yearMonthStr' => $dateYearMonth,
-				'organizationStr' => $organizationStr
+				'organizationStr' => $organizationStr,
+			  'outgroup' => $outgroup
 			 ]
 			];
 			$url = env('API_GET_MEMBER_FINANCIAL_URL');

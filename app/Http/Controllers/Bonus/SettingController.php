@@ -9,6 +9,8 @@
 	namespace App\Http\Controllers\Bonus;
 	
 	use App\Http\Controllers\ApiController;
+	use App\Http\Controllers\Auth\Permission;
+	use App\Http\Controllers\FinancialController;
 	use Illuminate\Contracts\Session\Session;
 	use Illuminate\Http\Request;
 	use App\Http\Controllers\BaseController;
@@ -144,17 +146,31 @@
 		public function edit($id)
 		{
 			$bonus = Bonus::where('id',$id)->with('levels')->get()->toArray()[0];
+			$pageUid = $bonus['user_id'];
 			
+			$loginUserId = session('userData')['user']['id'];
+			$message = $this->permissionCheck($pageUid,$loginUserId);
+			
+			if($message['status'] == 0){
+				
+				return view('handle',['message'=>$message,'data' => $this->resources,'returnUrl' => Route('index') ]);
+				
+			}
+			
+//			dd($bonus,$id);
 			$userTmpData = session('users')[$bonus['user_id']];
 			
 			$editData = $bonus;
 			
+			$getlatelyMonth = $this->getUserLatelyProfit($bonus['user_id']);
+			extract($getlatelyMonth);
+			
 			$userData = [
 			 'name' => $userTmpData['name'],
 			  'title' => session('department')[$userTmpData['department_id']]['name'],
-				'lastMonthProfit' => 0,
-				'thisMonthProfit' => 0,
-				'historyMonthProfit' => 0
+				'lastMonthProfit' => $lastMonthProfit,
+				'thisMonthProfit' => $thisMonthProfit,
+				'historyMonthProfit' => $highestProfit
 			];
 			
 			$userBonusHistory = Bonus::where('user_id',$bonus['user_id'])->with('levels')->get()->toArray();
@@ -199,17 +215,53 @@
 //			 'thisMonthProfit' => 900000,
 //			 'historyMonthProfit' => 1000000
 //			];
-
+			$loginUserId = session('userData')['user']['id'];
+			$message = $this->permissionCheck($id,$loginUserId);
+			
+			if($message['status'] == 0){
+				return view('handle',['message'=>$message,'data' => $this->resources,'returnUrl' => Route('index') ]);
+			}
+			
 			$bonus = Bonus::where('user_id',$id)->with('levels')->get()->toArray();
 			
+			
+//			$bonus = Bonus::where('set_date','2019-07-01')->with('levels')->get()->toArray();
+//			$tests = collect($bonus);
+//
+//			foreach($tests  as $item){
+//				$unset = ['created_at','updated_at','id','set_date'];
+//				foreach($unset as $unt){
+//					unset($item[$unt]);
+//				}
+//				$item['set_date'] = '2019-09-01';
+//
+//
+//				$bonus = Bonus::create($item);
+//				if($item['levels']){
+//					foreach( $item['levels'] as $item){
+//						$item['bonus_id'] = $bonus->id;
+//						BonusLevels::create($item);
+//					}
+//				}
+//			}
+			
+			
+			
+			if(empty(session('users')[$id])){
+				abort(500,'訪問頁面資料錯誤請確認Url是否正確');
+			}
+			
+			$getlatelyMonth = $this->getUserLatelyProfit($id);
+			extract($getlatelyMonth);
+
 			
 			$userData = [
 			 'uId' => $id,
 			 'name' => session('users')[$id]['name'],
 			 'title' => session('users')[$id]['department_name'],
-			 'lastMonthProfit' => 0,
-			 'thisMonthProfit' => 0,
-			 'historyMonthProfit' => 0
+			 'lastMonthProfit' => $thisMonthProfit,
+			 'thisMonthProfit' => $lastMonthProfit,
+			 'historyMonthProfit' => $highestProfit
 			];
 			
 			$userBonusHistory = $bonus;
@@ -246,6 +298,22 @@
 			
 			$date = new \DateTime();
 			$request->merge(['set_date' => $date->format('Y-m-01')]);
+			
+		
+			if( !$this->checkBounsLevelsUni($request->bouns_levels) ){
+				
+				$message= [
+				 'status' => 0,
+				 'status_string' => '',
+				 'message' => ''
+				];
+				
+				$message['status_string'] = 'fail';
+				$message['message'] = '資料有誤 達成比例不能重複';
+				
+				return view('handle',['message'=>$message,'data' => $this->resources,'returnUrl' => Route('bonus.setting.add') ]);
+			}
+			
 			$bonus = Bonus::create($request->all());
 			if($request->bouns_levels){
 				foreach( $request->bouns_levels as $item){
@@ -287,10 +355,27 @@
 			if($bonus->set_date != $date->format('Y-m-01')){
 				$request->offsetUnset('bonus_id');
 				$request->merge(['user_id' => $bonus->user_id]);
+				
 				return $this->save($request);
 			}else{
 				$bonus->boundary = $request->boundary;
 				$bonus->save();
+				
+				
+				if( !$this->checkBounsLevelsUni($request->bouns_levels) ){
+					
+					$message= [
+					 'status' => 0,
+					 'status_string' => '',
+					 'message' => ''
+					];
+					
+					$message['status_string'] = 'fail';
+					$message['message'] = '資料有誤 達成比例不能重複';
+					
+					return view('handle',['message'=>$message,'data' => $this->resources,'returnUrl' => Route('bonus.setting.edit',['id' => $bonus->id]) ]);
+				}
+				
 				BonusLevels::where('bonus_id',$request->bonus_id)->delete();
 				if($request->bouns_levels){
 					foreach( $request->bouns_levels as $item){
@@ -298,16 +383,72 @@
 						BonusLevels::create($item);
 					}
 				}
+				
 				$message= [
 				 'status' => 0,
 				 'status_string' => '',
 				 'message' => ''
 				];
-				$message['status_string'] = '更新完成';
-				$message['message'] = '';
+				
+				$message['status_string'] = 'success';
+				$message['message'] = '更新成功';
 				
 				return view('handle',['message'=>$message,'data' => $this->resources,'returnUrl' => Route('bonus.setting.edit',['id' => $bonus->id]) ]);
 			}
 			
+		}
+		
+		public function permissionCheck ($id,$uid)
+		{
+			$permission = new Permission();
+			//check permission
+			
+			$message= [
+			 'status' => 1,
+			 'status_string' => '',
+			 'message' => ''
+			];
+			
+			if(!in_array($uid,$permission->admin) && $id != $uid){
+				$message['status'] = 0;
+				$message['status_string'] = '沒有權限';
+				$message['message'] = '已異常訪問紀錄'.session('userData')['user']['name'];
+				return $message;
+			};
+			
+			return $message;
+		}
+		
+		public function checkBounsLevelsUni ($children)
+		{
+			$tmp = collect($children);
+			return count($children) != count($tmp->keyBy('achieving_rate')) ? false : true ;
+		}
+		
+		public function getUserLatelyProfit ($uid)
+		{
+			$lastMonth = new \DateTime('last day of last month');
+			$lastMonth = $lastMonth->format('Ym');
+			$thisMonth = new \DateTime();
+			$thisMonth = $thisMonth->format('Ym');
+			
+			$financial = new FinancialController();
+			$erpReturnData = $financial->getErpMemberFinancial([$uid],'all','all','month');
+			$erpReturnData = collect($erpReturnData);
+			
+			$thisMonthProfit = $erpReturnData->filter(function($item) use($thisMonth) {
+				return $item['year_month'] == $thisMonth;
+			})->max('profit');
+			$lastMonthProfit = $erpReturnData->filter(function($item) use($lastMonth) {
+				return $item['year_month'] == $lastMonth;
+			})->max('profit');
+			$highestProfit =  $erpReturnData->max('profit');
+			
+			
+			return [
+			 'thisMonthProfit' => $thisMonthProfit,
+				'lastMonthProfit' => $lastMonthProfit,
+				'highestProfit' => $highestProfit
+			 ];
 		}
 	}

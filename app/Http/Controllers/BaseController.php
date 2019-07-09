@@ -32,6 +32,8 @@
 			'/css/skins/_all-skins.min.css',
 			 //	<!-- Google Font -->
 			'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic',
+			 // global css
+			 '/css/global.css'
 		 ],
 		 'jsPath' => [
 			'/js/app.js',
@@ -57,80 +59,80 @@
 			 //		<!-- AdminLTE for demo purposes -->
 			'/js/demo.js'
 		 ],
-		 'menus' => [
-			[
-			 "title" => "責任額",
-			 "iconClassName" => "fa fa-street-view",
-			 "children" => [
-				[
-				 "title" => "設定",
-				 "iconClassName" => "fa fa-circle-o",
-				 "href" => "/bonus/setting/list",
-				],
-				[
-				 "title" => "個人檢視",
-				 "iconClassName" => "fa fa-circle-o",
-				 "href" => "/bonus/setting/view/",
-				]
-			 ],
-			],
-			[
-			 "title" => "獎金",
-			 "iconClassName" => "fa  fa-usd",
-			 "children" => [
-				[
-				 "title" => "全體列表",
-				 "iconClassName" => "fa fa-circle-o",
-				 "href" => "/bonus/review/list",
-				],
-				[
-				 "title" => "個人檢視",
-				 "iconClassName" => "fa fa-circle-o",
-				 "href" => "/bonus/review/view/",
-				]
-			 ],
-			],
-		 ]
+//		 'menus' => [
+//			[
+//			 "title" => "責任額",
+//			 "iconClassName" => "fa fa-street-view",
+//			 "children" => [
+//				[
+//				 "title" => "設定",
+//				 "iconClassName" => "fa fa-circle-o",
+//				 "href" => "/bonus/setting/list",
+//				],
+//				[
+//				 "title" => "個人檢視",
+//				 "iconClassName" => "fa fa-circle-o",
+//				 "href" => "/bonus/setting/view/",
+//				]
+//			 ],
+//			],
+//			[
+//			 "title" => "獎金",
+//			 "iconClassName" => "fa  fa-usd",
+//			 "children" => [
+//				[
+//				 "title" => "全體列表",
+//				 "iconClassName" => "fa fa-circle-o",
+//				 "href" => "/bonus/review/list",
+//				],
+//				[
+//				 "title" => "個人檢視",
+//				 "iconClassName" => "fa fa-circle-o",
+//				 "href" => "/bonus/review/view/",
+//				]
+//			 ],
+//			],
+//		 ]
 		];
 		
 		public function __construct ()
 		{
 			
-			$tmp = [
-			 [
-				"title" => "責任額",
-				"iconClassName" => "fa fa-street-view",
-				"children" => [
-				 [
-					"title" => "設定",
-					"iconClassName" => "fa fa-circle-o",
-					"href" => "/bonus/setting/list",
-				 ],
-				 [
-					"title" => "個人檢視",
-					"iconClassName" => "fa fa-circle-o",
-					"href" => "/bonus/setting/view/",
-				 ]
-				],
-			 ],
-			 [
-				"title" => "獎金",
-				"iconClassName" => "fa  fa-usd",
-				"children" => [
-				 [
-					"title" => "全體列表",
-					"iconClassName" => "fa fa-circle-o",
-					"href" => "/bonus/review/list",
-				 ],
-				 [
-					"title" => "個人檢視",
-					"iconClassName" => "fa fa-circle-o",
-					"href" => "/bonus/review/view/",
-				 ]
-				],
-			 ],
-			];
-			$this->resources['menus'] = $tmp;
+//			$tmp = [
+//			 [
+//				"title" => "責任額",
+//				"iconClassName" => "fa fa-street-view",
+//				"children" => [
+//				 [
+//					"title" => "設定",
+//					"iconClassName" => "fa fa-circle-o",
+//					"href" => "/bonus/setting/list",
+//				 ],
+//				 [
+//					"title" => "個人檢視",
+//					"iconClassName" => "fa fa-circle-o",
+//					"href" => "/bonus/setting/view/",
+//				 ]
+//				],
+//			 ],
+//			 [
+//				"title" => "獎金",
+//				"iconClassName" => "fa  fa-usd",
+//				"children" => [
+//				 [
+//					"title" => "全體列表",
+//					"iconClassName" => "fa fa-circle-o",
+//					"href" => "/bonus/review/list",
+//				 ],
+//				 [
+//					"title" => "個人檢視",
+//					"iconClassName" => "fa fa-circle-o",
+//					"href" => "/bonus/review/view/",
+//				 ]
+//				],
+//			 ],
+//			];
+//			$this->resources['menus'] = $tmp;
 			
 			$userObj = new UserController();
 			$userObj->getErpUser();

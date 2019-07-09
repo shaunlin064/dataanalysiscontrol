@@ -1688,25 +1688,6 @@ module.exports = {
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BonusReView.vue?vue&type=script&lang=js&":
-/*!**********************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/BonusReView.vue?vue&type=script&lang=js& ***!
-  \**********************************************************************************************************************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-//
-//
-//
-//
-/* harmony default export */ __webpack_exports__["default"] = ({
-  name: "BonusReView"
-});
-
-/***/ }),
-
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BonusSettingForm.vue?vue&type=script&lang=js&":
 /*!***************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/BonusSettingForm.vue?vue&type=script&lang=js& ***!
@@ -1716,6 +1697,8 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+//
+//
 //
 //
 //
@@ -1833,6 +1816,13 @@ __webpack_require__.r(__webpack_exports__);
     return {
       has_error: false,
       editIndex: null,
+      detail_has_error: this.row.levels ? this.row.levels.map(function (v, k) {
+        return {
+          achieving_rate: false,
+          bouns_rate: false
+        };
+      }) : {},
+      detail_error_check: false,
       originalData: null,
       items: this.row.levels ? this.row.levels : [],
       boundary: this.row.boundary ? this.row.boundary : 0,
@@ -1850,10 +1840,15 @@ __webpack_require__.r(__webpack_exports__);
       console.log(this.boundary);
       this.originalData = null;
       this.items.push({
-        achieving_rate: '',
-        bouns_rate: ''
-      });
+        achieving_rate: '0',
+        bouns_rate: '0'
+      }); // this.detail_has_error.push({achieving_rate: false, bouns_rate: false});
+
       this.editIndex = this.items.length - 1;
+      this.detail_has_error[this.editIndex] = {
+        achieving_rate: false,
+        bouns_rate: false
+      };
     },
     edit: function edit(item, index) {
       this.originalData = Object.assign({}, item);
@@ -1877,18 +1872,58 @@ __webpack_require__.r(__webpack_exports__);
       return;
     },
     save: function save(item) {
-      this.originalData = null;
-      this.editIndex = null;
+      // this.detail_error_check =
+      this.has_error = true;
+      this.has_error = false;
+      this.detail_check();
+      console.log(this.detail_error_check);
+
+      if (!this.detail_error_check) {
+        this.originalData = null;
+        this.editIndex = null;
+      }
     },
     submit: function submit() {
-      var data = $('#bonusSettingForm').serializeArray();
+      var data = $('#bonusSettingForm').serializeArray(); // let detail_error_check = false;
 
       if (this.boundary == 0) {
         this.has_error = true;
       } else {
         this.has_error = false;
+      } // let detail_has_error = this.detail_has_error;
+      // const values = Object.values(this.items);
+      // values.map(function(v,k){
+      //     detail_has_error[k]['achieving_rate'] = v.achieving_rate == 0 ? true : false;
+      //     detail_has_error[k]['bouns_rate'] = v.bouns_rate == 0 ? true : false;
+      //     if(v.achieving_rate == 0 || v.bouns_rate == 0){
+      //         detail_error_check = true;
+      //     }
+      // });
+      // this.detail_has_error = detail_has_error;
+      // detail_error_check =
+
+
+      this.detail_check(); // console.log(!(this.has_error) && !(this.detail_error_check));
+
+      if (!this.has_error && !this.detail_error_check) {
         $('#bonusSettingForm').submit();
       }
+    },
+    detail_check: function detail_check() {
+      var detail_has_error = this.detail_has_error;
+      var values = Object.values(this.items);
+      var detail_error_check = false;
+      values.map(function (v, k) {
+        detail_has_error[k]['achieving_rate'] = v.achieving_rate == 0 ? true : false;
+        detail_has_error[k]['bouns_rate'] = v.bouns_rate == 0 ? true : false;
+
+        if (v.achieving_rate == 0 || v.bouns_rate == 0) {
+          detail_error_check = true;
+        }
+      });
+      this.detail_has_error = detail_has_error;
+      this.detail_error_check = detail_error_check;
+      return this.detail_error_check;
     },
     check_is_set: function check_is_set(id) {
       return this.alreadySetUserIds.indexOf(id * 1) < 0 ? null : true;
@@ -21877,7 +21912,7 @@ return src;
 
 /***/ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BonusSettingForm.vue?vue&type=style&index=0&lang=css&":
 /*!**********************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/BonusSettingForm.vue?vue&type=style&index=0&lang=css& ***!
+  !*** ./node_modules/css-loader??ref--7-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--7-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/BonusSettingForm.vue?vue&type=style&index=0&lang=css& ***!
   \**********************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -21887,7 +21922,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\ninput[type=\"number\"] {\n\ttext-align: right;\n}\n", ""]);
+exports.push([module.i, "\ninput[type=\"number\"] {\n\ttext-align: right;\n}\n.has-error span.help-block{\n\t\tcolor:#dd4b39;\n}\n.has-error input[type=\"number\"]{\n\tborder-color: #dd4b39;\n}\n", ""]);
 
 // exports
 
@@ -85803,13 +85838,13 @@ process.umask = function() { return 0; };
 
 /***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BonusSettingForm.vue?vue&type=style&index=0&lang=css&":
 /*!**************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/style-loader!./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/BonusSettingForm.vue?vue&type=style&index=0&lang=css& ***!
+  !*** ./node_modules/style-loader!./node_modules/css-loader??ref--7-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--7-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/BonusSettingForm.vue?vue&type=style&index=0&lang=css& ***!
   \**************************************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-var content = __webpack_require__(/*! !../../../node_modules/css-loader??ref--6-1!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/src??ref--6-2!../../../node_modules/vue-loader/lib??vue-loader-options!./BonusSettingForm.vue?vue&type=style&index=0&lang=css& */ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BonusSettingForm.vue?vue&type=style&index=0&lang=css&");
+var content = __webpack_require__(/*! !../../../node_modules/css-loader??ref--7-1!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/src??ref--7-2!../../../node_modules/vue-loader/lib??vue-loader-options!./BonusSettingForm.vue?vue&type=style&index=0&lang=css& */ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BonusSettingForm.vue?vue&type=style&index=0&lang=css&");
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 
@@ -86415,30 +86450,6 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BonusReView.vue?vue&type=template&id=2ca58bdc&scoped=true&":
-/*!**************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/BonusReView.vue?vue&type=template&id=2ca58bdc&scoped=true& ***!
-  \**************************************************************************************************************************************************************************************************************************/
-/*! exports provided: render, staticRenderFns */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div")
-}
-var staticRenderFns = []
-render._withStripped = true
-
-
-
-/***/ }),
-
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BonusSettingForm.vue?vue&type=template&id=623e3580&":
 /*!*******************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/BonusSettingForm.vue?vue&type=template&id=623e3580& ***!
@@ -86480,78 +86491,76 @@ var render = function() {
                 })
               ]),
               _vm._v(" "),
-              _c(
-                "div",
-                {
-                  staticClass: "form-group",
-                  class: { "has-error": _vm.has_error }
-                },
-                [
-                  _vm.type == "add"
-                    ? _c("div", [
+              _c("div", { staticClass: "form-group" }, [
+                _vm.type == "add"
+                  ? _c("div", [
+                      _c(
+                        "label",
+                        {
+                          staticClass: "col-sm-2 control-label pull-left",
+                          attrs: { for: "selectAddUserId" }
+                        },
+                        [_vm._v("新增業務")]
+                      ),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-sm-3" }, [
                         _c(
-                          "label",
+                          "select",
                           {
-                            staticClass: "col-sm-2 control-label pull-left",
-                            attrs: { for: "selectAddUserId" }
+                            staticClass: "form-control select2",
+                            staticStyle: { width: "100%" },
+                            attrs: { name: "user_id" }
                           },
-                          [_vm._v("新增業務")]
-                        ),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-sm-3" }, [
-                          _c(
-                            "select",
-                            {
-                              staticClass: "form-control select2",
-                              staticStyle: { width: "100%" },
-                              attrs: { name: "user_id" }
-                            },
-                            _vm._l(_vm.addUserList, function(user_groups) {
-                              return _c(
-                                "optgroup",
-                                { attrs: { label: user_groups["depName"] } },
-                                _vm._l(user_groups.data, function(
-                                  add_user_list
-                                ) {
-                                  return _c(
-                                    "option",
-                                    {
-                                      attrs: {
-                                        disabled: _vm.check_is_set(
-                                          add_user_list.id
-                                        )
-                                      },
-                                      domProps: { value: add_user_list.id }
+                          _vm._l(_vm.addUserList, function(user_groups) {
+                            return _c(
+                              "optgroup",
+                              { attrs: { label: user_groups["depName"] } },
+                              _vm._l(user_groups.data, function(add_user_list) {
+                                return _c(
+                                  "option",
+                                  {
+                                    attrs: {
+                                      disabled: _vm.check_is_set(
+                                        add_user_list.id
+                                      )
                                     },
-                                    [_vm._v(_vm._s(add_user_list.name))]
-                                  )
-                                }),
-                                0
-                              )
-                            }),
-                            0
-                          )
-                        ])
+                                    domProps: { value: add_user_list.id }
+                                  },
+                                  [_vm._v(_vm._s(add_user_list.name))]
+                                )
+                              }),
+                              0
+                            )
+                          }),
+                          0
+                        )
                       ])
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _vm.type == "edit"
-                    ? _c("input", {
-                        attrs: { type: "hidden", name: "bonus_id" },
-                        domProps: { value: this.row.id }
-                      })
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _c(
-                    "label",
-                    {
-                      staticClass: "col-sm-2 control-label pull-left",
-                      attrs: { for: "inputBoundary" }
-                    },
-                    [_vm._v("責任額")]
-                  ),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-sm-3" }, [
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.type == "edit"
+                  ? _c("input", {
+                      attrs: { type: "hidden", name: "bonus_id" },
+                      domProps: { value: this.row.id }
+                    })
+                  : _vm._e(),
+                _vm._v(" "),
+                _c(
+                  "label",
+                  {
+                    staticClass: "col-sm-2 control-label pull-left",
+                    attrs: { for: "inputBoundary" }
+                  },
+                  [_vm._v("責任額")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  {
+                    staticClass: "col-sm-3",
+                    class: { "has-error": _vm.has_error }
+                  },
+                  [
                     _c("input", {
                       directives: [
                         {
@@ -86587,9 +86596,9 @@ var render = function() {
                       },
                       [_vm._v("個人責任額 不能為0")]
                     )
-                  ])
-                ]
-              ),
+                  ]
+                )
+              ]),
               _vm._v(" "),
               _c("div", { staticClass: "form-group" }, [
                 _c("div", { staticClass: "box-body" }, [
@@ -86605,81 +86614,131 @@ var render = function() {
                           return _c("tr", { key: index }, [
                             _c("td", [_vm._v(_vm._s(index + 1))]),
                             _vm._v(" "),
-                            _c("td", [
-                              _vm.editIndex !== index
-                                ? _c("span", [
-                                    _vm._v(_vm._s(item.achieving_rate))
-                                  ])
-                                : _vm._e(),
-                              _vm._v(" "),
-                              _vm.editIndex === index
-                                ? _c("span", [
-                                    _c("input", {
-                                      directives: [
-                                        {
-                                          name: "model",
-                                          rawName: "v-model",
-                                          value: item.achieving_rate,
-                                          expression: "item.achieving_rate"
-                                        }
-                                      ],
-                                      staticClass:
-                                        "form-control form-control-sm",
-                                      attrs: { type: "number" },
-                                      domProps: { value: item.achieving_rate },
-                                      on: {
-                                        input: function($event) {
-                                          if ($event.target.composing) {
-                                            return
+                            _c(
+                              "td",
+                              {
+                                class: {
+                                  "has-error":
+                                    _vm.detail_has_error[index][
+                                      "achieving_rate"
+                                    ]
+                                }
+                              },
+                              [
+                                _vm.editIndex !== index
+                                  ? _c("span", [
+                                      _vm._v(_vm._s(item.achieving_rate))
+                                    ])
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                _vm.editIndex === index
+                                  ? _c("span", [
+                                      _c("input", {
+                                        directives: [
+                                          {
+                                            name: "model",
+                                            rawName: "v-model",
+                                            value: item.achieving_rate,
+                                            expression: "item.achieving_rate"
                                           }
-                                          _vm.$set(
-                                            item,
-                                            "achieving_rate",
-                                            $event.target.value
-                                          )
+                                        ],
+                                        staticClass:
+                                          "form-control form-control-sm",
+                                        attrs: { type: "number" },
+                                        domProps: {
+                                          value: item.achieving_rate
+                                        },
+                                        on: {
+                                          input: function($event) {
+                                            if ($event.target.composing) {
+                                              return
+                                            }
+                                            _vm.$set(
+                                              item,
+                                              "achieving_rate",
+                                              $event.target.value
+                                            )
+                                          }
                                         }
-                                      }
-                                    })
-                                  ])
-                                : _vm._e()
-                            ]),
+                                      })
+                                    ])
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                _c(
+                                  "span",
+                                  {
+                                    staticClass: "help-block",
+                                    class: {
+                                      hidden: !_vm.detail_has_error[index][
+                                        "achieving_rate"
+                                      ]
+                                    }
+                                  },
+                                  [_vm._v("達成比例不能為0")]
+                                )
+                              ]
+                            ),
                             _vm._v(" "),
-                            _c("td", [
-                              _vm.editIndex !== index
-                                ? _c("span", [_vm._v(_vm._s(item.bouns_rate))])
-                                : _vm._e(),
-                              _vm._v(" "),
-                              _vm.editIndex === index
-                                ? _c("span", [
-                                    _c("input", {
-                                      directives: [
-                                        {
-                                          name: "model",
-                                          rawName: "v-model",
-                                          value: item.bouns_rate,
-                                          expression: "item.bouns_rate"
-                                        }
-                                      ],
-                                      staticClass:
-                                        "form-control form-control-sm",
-                                      attrs: { type: "number" },
-                                      domProps: { value: item.bouns_rate },
-                                      on: {
-                                        input: function($event) {
-                                          if ($event.target.composing) {
-                                            return
+                            _c(
+                              "td",
+                              {
+                                class: {
+                                  "has-error":
+                                    _vm.detail_has_error[index]["bouns_rate"]
+                                }
+                              },
+                              [
+                                _vm.editIndex !== index
+                                  ? _c("span", [
+                                      _vm._v(_vm._s(item.bouns_rate))
+                                    ])
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                _vm.editIndex === index
+                                  ? _c("span", [
+                                      _c("input", {
+                                        directives: [
+                                          {
+                                            name: "model",
+                                            rawName: "v-model",
+                                            value: item.bouns_rate,
+                                            expression: "item.bouns_rate"
                                           }
-                                          _vm.$set(
-                                            item,
-                                            "bouns_rate",
-                                            $event.target.value
-                                          )
+                                        ],
+                                        staticClass:
+                                          "form-control form-control-sm",
+                                        attrs: { type: "number" },
+                                        domProps: { value: item.bouns_rate },
+                                        on: {
+                                          input: function($event) {
+                                            if ($event.target.composing) {
+                                              return
+                                            }
+                                            _vm.$set(
+                                              item,
+                                              "bouns_rate",
+                                              $event.target.value
+                                            )
+                                          }
                                         }
-                                      }
-                                    })
-                                  ])
-                                : _vm._e()
-                            ]),
+                                      })
+                                    ])
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                _c(
+                                  "span",
+                                  {
+                                    staticClass: "help-block",
+                                    class: {
+                                      hidden: !_vm.detail_has_error[index][
+                                        "bouns_rate"
+                                      ]
+                                    }
+                                  },
+                                  [_vm._v("獎金比例不能為0")]
+                                )
+                              ]
+                            ),
                             _vm._v(" "),
                             _c("td", [
                               _vm.editIndex !== index
@@ -87508,11 +87567,6 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "box box-primary" }, [
     _c("div", { staticClass: "box-body box-profile" }, [
-      _c("img", {
-        staticClass: "profile-user-img img-responsive img-circle",
-        attrs: { src: "/img/user4-128x128.jpg", alt: "User profile picture" }
-      }),
-      _vm._v(" "),
       _c("h3", { staticClass: "profile-username text-center" }, [
         _vm._v(_vm._s(_vm.user_data.name))
       ]),
@@ -106179,8 +106233,8 @@ vue__WEBPACK_IMPORTED_MODULE_1___default.a.component('example-component', __webp
 vue__WEBPACK_IMPORTED_MODULE_1___default.a.component('menu-component', __webpack_require__(/*! ./components/MenuBar.vue */ "./resources/js/components/MenuBar.vue")["default"]);
 vue__WEBPACK_IMPORTED_MODULE_1___default.a.component('bonus-group-component', __webpack_require__(/*! ./components/BonusSettingGroup.vue */ "./resources/js/components/BonusSettingGroup.vue")["default"]);
 vue__WEBPACK_IMPORTED_MODULE_1___default.a.component('bonus-form-component', __webpack_require__(/*! ./components/BonusSettingForm.vue */ "./resources/js/components/BonusSettingForm.vue")["default"]);
-vue__WEBPACK_IMPORTED_MODULE_1___default.a.component('bonus-history-component', __webpack_require__(/*! ./components/BonusSettingHistory.vue */ "./resources/js/components/BonusSettingHistory.vue")["default"]);
-vue__WEBPACK_IMPORTED_MODULE_1___default.a.component('bonus-review-component', __webpack_require__(/*! ./components/BonusReView.vue */ "./resources/js/components/BonusReView.vue")["default"]);
+vue__WEBPACK_IMPORTED_MODULE_1___default.a.component('bonus-history-component', __webpack_require__(/*! ./components/BonusSettingHistory.vue */ "./resources/js/components/BonusSettingHistory.vue")["default"]); // Vue.component('bonus-review-component', require('./components/BonusReView.vue').default);
+
 vue__WEBPACK_IMPORTED_MODULE_1___default.a.component('profile-component', __webpack_require__(/*! ./components/PersonProfile.vue */ "./resources/js/components/PersonProfile.vue")["default"]);
 vue__WEBPACK_IMPORTED_MODULE_1___default.a.component('data-table-component', __webpack_require__(/*! ./components/DataTable.vue */ "./resources/js/components/DataTable.vue")["default"]);
 vue__WEBPACK_IMPORTED_MODULE_1___default.a.component('date-picker-component', __webpack_require__(/*! ./components/Datepicker.vue */ "./resources/js/components/Datepicker.vue")["default"]); //box
@@ -106262,75 +106316,6 @@ if (token) {
 
 /***/ }),
 
-/***/ "./resources/js/components/BonusReView.vue":
-/*!*************************************************!*\
-  !*** ./resources/js/components/BonusReView.vue ***!
-  \*************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _BonusReView_vue_vue_type_template_id_2ca58bdc_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BonusReView.vue?vue&type=template&id=2ca58bdc&scoped=true& */ "./resources/js/components/BonusReView.vue?vue&type=template&id=2ca58bdc&scoped=true&");
-/* harmony import */ var _BonusReView_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BonusReView.vue?vue&type=script&lang=js& */ "./resources/js/components/BonusReView.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
-
-
-
-
-
-/* normalize component */
-
-var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _BonusReView_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _BonusReView_vue_vue_type_template_id_2ca58bdc_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _BonusReView_vue_vue_type_template_id_2ca58bdc_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
-  false,
-  null,
-  "2ca58bdc",
-  null
-  
-)
-
-/* hot reload */
-if (false) { var api; }
-component.options.__file = "resources/js/components/BonusReView.vue"
-/* harmony default export */ __webpack_exports__["default"] = (component.exports);
-
-/***/ }),
-
-/***/ "./resources/js/components/BonusReView.vue?vue&type=script&lang=js&":
-/*!**************************************************************************!*\
-  !*** ./resources/js/components/BonusReView.vue?vue&type=script&lang=js& ***!
-  \**************************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_BonusReView_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./BonusReView.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BonusReView.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_BonusReView_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
-
-/***/ }),
-
-/***/ "./resources/js/components/BonusReView.vue?vue&type=template&id=2ca58bdc&scoped=true&":
-/*!********************************************************************************************!*\
-  !*** ./resources/js/components/BonusReView.vue?vue&type=template&id=2ca58bdc&scoped=true& ***!
-  \********************************************************************************************/
-/*! exports provided: render, staticRenderFns */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BonusReView_vue_vue_type_template_id_2ca58bdc_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./BonusReView.vue?vue&type=template&id=2ca58bdc&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BonusReView.vue?vue&type=template&id=2ca58bdc&scoped=true&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BonusReView_vue_vue_type_template_id_2ca58bdc_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
-
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BonusReView_vue_vue_type_template_id_2ca58bdc_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
-
-
-
-/***/ }),
-
 /***/ "./resources/js/components/BonusSettingForm.vue":
 /*!******************************************************!*\
   !*** ./resources/js/components/BonusSettingForm.vue ***!
@@ -106393,10 +106378,10 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_BonusSettingForm_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader!../../../node_modules/css-loader??ref--6-1!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/src??ref--6-2!../../../node_modules/vue-loader/lib??vue-loader-options!./BonusSettingForm.vue?vue&type=style&index=0&lang=css& */ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BonusSettingForm.vue?vue&type=style&index=0&lang=css&");
-/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_BonusSettingForm_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_BonusSettingForm_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__);
-/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_BonusSettingForm_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_BonusSettingForm_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
- /* harmony default export */ __webpack_exports__["default"] = (_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_BonusSettingForm_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0___default.a); 
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_7_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_7_2_node_modules_vue_loader_lib_index_js_vue_loader_options_BonusSettingForm_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader!../../../node_modules/css-loader??ref--7-1!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/src??ref--7-2!../../../node_modules/vue-loader/lib??vue-loader-options!./BonusSettingForm.vue?vue&type=style&index=0&lang=css& */ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BonusSettingForm.vue?vue&type=style&index=0&lang=css&");
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_7_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_7_2_node_modules_vue_loader_lib_index_js_vue_loader_options_BonusSettingForm_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_7_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_7_2_node_modules_vue_loader_lib_index_js_vue_loader_options_BonusSettingForm_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_7_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_7_2_node_modules_vue_loader_lib_index_js_vue_loader_options_BonusSettingForm_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_7_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_7_2_node_modules_vue_loader_lib_index_js_vue_loader_options_BonusSettingForm_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_7_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_7_2_node_modules_vue_loader_lib_index_js_vue_loader_options_BonusSettingForm_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0___default.a); 
 
 /***/ }),
 
@@ -107329,15 +107314,27 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/sass/global.scss":
+/*!************************************!*\
+  !*** ./resources/sass/global.scss ***!
+  \************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+
 /***/ 0:
-/*!*************************************************************!*\
-  !*** multi ./resources/js/app.js ./resources/sass/app.scss ***!
-  \*************************************************************/
+/*!******************************************************************************************!*\
+  !*** multi ./resources/js/app.js ./resources/sass/app.scss ./resources/sass/global.scss ***!
+  \******************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(/*! /Users/shaun/Applications/project/dataAnalysisControl/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /Users/shaun/Applications/project/dataAnalysisControl/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! /Users/shaun/Applications/project/dataAnalysisControl/resources/sass/app.scss */"./resources/sass/app.scss");
+module.exports = __webpack_require__(/*! /Users/shaun/Applications/project/dataAnalysisControl/resources/sass/global.scss */"./resources/sass/global.scss");
 
 
 /***/ })

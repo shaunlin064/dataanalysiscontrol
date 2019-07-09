@@ -6,8 +6,7 @@
 	 * Time: 17:00
 	 */
 	
-	namespace App\Http\Controllers;
-	
+	namespace App\Http\Controllers\Auth;
 	
 	use App\Http\Controllers\ApiController;
 	use Illuminate\Http\Request;
@@ -24,7 +23,6 @@
 			
 			$key = $request->key;
 			if( $key == null ){
-				
 				return view('auth.login');
 			}
 			
@@ -50,6 +48,7 @@
 		
 		public function login (Request $request)
 		{
+			
 			if(empty($request->auto)){
 				$request->password = md5($request->password);
 			}
@@ -66,9 +65,20 @@
 			
 			session(['userData'=> $message['data']]);
 			
+			if( !empty(session('retrunUrl')) ){
+				$returnUrl = session('retrunUrl');
+				session()->forget('retrunUrl');
+				return redirect($returnUrl);
+			}
 			return redirect()->action('IndexController@index');
 			
 		}
 		
+		public function logout ()
+		{
+			
+			session()->forget('userData');
+			return Redirect::route('auth.login');
+		}
 		
 	}

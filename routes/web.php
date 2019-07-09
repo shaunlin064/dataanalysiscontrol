@@ -10,6 +10,28 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+	
+	/*
+			 * 登入系統
+			 */
+	
+	Route::group(['namespace' => '\App\Http\Controllers\Auth'], function() {
+		Route::get('/login', [
+		 'as' => 'auth.index',
+		 'uses' => 'AuthCustomerController@index',
+		 'parent' => 'auth.index']);
+		
+		Route::post('/login', [
+		 'as' => 'auth.login',
+		 'uses' => 'AuthCustomerController@login',
+		 'parent' => 'auth.login']);
+		
+		Route::any('/logout', [
+		 'as' => 'auth.logout',
+		 'uses' => 'AuthCustomerController@logout',
+		 'parent' => 'auth.logout']);
+	});
+	
 	Route::group(['middleware' => ['CheckLogin','CheckPermissions'] ], function(){
 		/*
 		 * handle page
@@ -22,59 +44,53 @@
 		 'as' => 'index',
 		 'uses' => 'IndexController@index'
 		]);
-		/*
-		 * 登入系統
-		 */
-		Route::get('/login', [
-		 'as'=> 'auth.index',
-		 'uses'=> 'AuthCustomerController@index' ,
-		 'parent'=> 'auth.index']);
-		
-		Route::post('/login', [
-		 'as'=> 'auth.login',
-		 'uses'=> 'AuthCustomerController@login' ,
-		 'parent'=> 'auth.login']);
 		
 		
-		//bonus start
-		//setting
-		Route::prefix('bonus/setting')->group(function(){
-		
-		Route::get('/list', 'Bonus\SettingController@list');
-		Route::get('/add', 'Bonus\SettingController@add');
-		Route::get('/edit/{id}',
-		 [
-			'as' => 'bonus.setting.edit',
-			'uses' => 'Bonus\SettingController@edit',
-			'parent' => 'bonus.setting.edit'
-		 ]);
-		Route::get('/view/{id}', 'Bonus\SettingController@view');
-		Route::any('/save',
-		 [
-			'as'=>'bonus.setting.save',
-			'uses'=>'Bonus\SettingController@save',
-			'parent'=> 'bonus.setting.save'
-		 ]);
-		Route::post('/update',
-		 [
-			'as'=>'bonus.setting.update',
-			'uses'=>'Bonus\SettingController@update',
-			'parent'=> 'bonus.setting.update'
-		 ]);
-	});
-	
-		/*
-	 * bonus/review
-	 */
-		Route::prefix('bonus/review')->group(function(){
-			//review
-			Route::get('/list', 'Bonus\ReviewController@list');
-			Route::get('/edit/{id}', 'Bonus\ReviewController@edit');
-			Route::get('/view/{id}', 'Bonus\ReviewController@view');
-			Route::any('/getdata', 'Bonus\ReviewController@getdata');
-			
+		Route::group(['namespace' => '\App\Http\Controllers\Bonus'], function() {
+			//bonus start
+			//setting
+			Route::prefix('bonus/setting')->group(function(){
+				
+					Route::get('/list', 'SettingController@list');
+					Route::get('/add',[
+					 'as' => 'bonus.setting.add',
+						'uses' => 'SettingController@add',
+					 'parent' => 'bonus.setting.add'
+					]);
+					Route::get('/edit/{id}',
+					 [
+						'as' => 'bonus.setting.edit',
+						'uses' => 'SettingController@edit',
+						'parent' => 'bonus.setting.edit'
+					 ]);
+					Route::get('/view/{id}', 'SettingController@view');
+					Route::any('/save',
+					 [
+						'as' => 'bonus.setting.save',
+						'uses' => 'SettingController@save',
+						'parent' => 'bonus.setting.save'
+					 ]);
+					Route::post('/update',
+					 [
+						'as' => 'bonus.setting.update',
+						'uses' => 'SettingController@update',
+						'parent' => 'bonus.setting.update'
+					 ]);
+				
 		});
 		
+			/*
+		 * bonus/review
+		 */
+			Route::prefix('bonus/review')->group(function(){
+				//review
+				Route::get('/list', 'ReviewController@list');
+				Route::get('/edit/{id}', 'ReviewController@edit');
+				Route::get('/view/{id}', 'ReviewController@view');
+				Route::any('/getdata', 'ReviewController@getdata');
+				
+			});
+		});
 	});
 	
 //Auth::routes();

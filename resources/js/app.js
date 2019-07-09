@@ -62,7 +62,7 @@ Vue.component('bonus-group-component', require('./components/BonusSettingGroup.v
 Vue.component('bonus-form-component', require('./components/BonusSettingForm.vue').default);
 Vue.component('bonus-history-component', require('./components/BonusSettingHistory.vue').default);
 
-Vue.component('bonus-review-component', require('./components/BonusReView.vue').default);
+// Vue.component('bonus-review-component', require('./components/BonusReView.vue').default);
 
 Vue.component('profile-component', require('./components/PersonProfile.vue').default);
 

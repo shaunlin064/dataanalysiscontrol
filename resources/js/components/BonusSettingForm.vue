@@ -13,7 +13,7 @@
 					<div class="form-group">
 						<input type='hidden' name="_token" :value='csrf'>
 					</div>
-					<div class="form-group" :class="{'has-error' : has_error}">
+					<div class="form-group">
 						<div v-if='type == "add"'>
 							<label for="selectAddUserId" class="col-sm-2 control-label pull-left">新增業務</label>
 							<div class="col-sm-3">
@@ -26,7 +26,7 @@
 						</div>
 						<input type='hidden' name='bonus_id' :value='this.row.id' v-if='type == "edit"'>
 						<label for="inputBoundary" class="col-sm-2 control-label pull-left">責任額</label>
-						<div class="col-sm-3">
+						<div class="col-sm-3" :class="{'has-error' : has_error}">
 							<input type='number' name='boundary' class="form-control" id="inputBoundary" placeholder="個人責任額" v-model='boundary' >
 							<span class="help-block" :class="{'hidden' : !has_error }">個人責任額 不能為0</span>
 						</div>
@@ -45,31 +45,33 @@
 								<tbody>
 								<tr v-for="(item, index) in items" :key="index">
 									<td>{{ index + 1 }}</td>
-									<td>
+									<td :class="{'has-error' : detail_has_error[index]['achieving_rate']}">
 										<span v-if="editIndex !== index">{{ item.achieving_rate }}</span>
 										<span v-if="editIndex === index">
-              <input type='number' class="form-control form-control-sm" v-model="item.achieving_rate">
-            </span>
+				              <input type='number' class="form-control form-control-sm" v-model="item.achieving_rate">
+				            </span>
+										<span class="help-block" :class="{'hidden' : !detail_has_error[index]['achieving_rate'] }">達成比例不能為0</span>
 									</td>
-									<td>
+									<td :class="{'has-error' : detail_has_error[index]['bouns_rate']}">
 										<span v-if="editIndex !== index">{{ item.bouns_rate }}</span>
 										<span v-if="editIndex === index">
-              <input type='number' class="form-control form-control-sm" v-model="item.bouns_rate">
-            </span>
+				              <input type='number' class="form-control form-control-sm" v-model="item.bouns_rate">
+				            </span>
+										<span class="help-block" :class="{'hidden' : !detail_has_error[index]['bouns_rate'] }">獎金比例不能為0</span>
 									</td>
 									<td>
-            <span v-if="editIndex !== index">
-		            <div v-for='(item, index ) in items'>
-		              <input type='hidden' :name='"bouns_levels["+index+"][achieving_rate]"' :value='item.achieving_rate'>
-			            <input type='hidden' :name='"bouns_levels["+index+"][bouns_rate]"' :value='item.bouns_rate'>
-		            </div>
-	              <button type="button" @click="edit(item, index)" class="btn btn-info">編輯</button>
-	              <button type="button" @click="remove(item, index)" class="btn btn-danger">刪除</button>
-            </span>
+				            <span v-if="editIndex !== index">
+						            <div v-for='(item, index ) in items'>
+						              <input type='hidden' :name='"bouns_levels["+index+"][achieving_rate]"' :value='item.achieving_rate'>
+							            <input type='hidden' :name='"bouns_levels["+index+"][bouns_rate]"' :value='item.bouns_rate'>
+						            </div>
+					              <button type="button" @click="edit(item, index)" class="btn btn-info">編輯</button>
+					              <button type="button" @click="remove(item, index)" class="btn btn-danger">刪除</button>
+				            </span>
 										<span v-else>
-							<button type="button" class="btn btn-info" @click="save(item)">儲存</button>
-              <button type="button" class="btn btn-danger" @click="cancel(item)">取消</button>
-            </span>
+											<button type="button" class="btn btn-info" @click="save(item)">儲存</button>
+				              <button type="button" class="btn btn-danger" @click="cancel(item)">取消</button>
+				            </span>
 									</td>
 								</tr>
 								</tbody>
@@ -111,6 +113,10 @@
             return {
                 has_error: false,
                 editIndex: null,
+                detail_has_error: this.row.levels ? this.row.levels.map(function(v,k){
+                    return {achieving_rate: false,bouns_rate:false};
+                }) : {},
+                detail_error_check: false,
                 originalData: null,
                 items: this.row.levels ? this.row.levels : [],
                 boundary: this.row.boundary ? this.row.boundary : 0,
@@ -129,8 +135,11 @@
 		            add() {
 		                console.log(this.boundary);
 		                this.originalData = null
-		                this.items.push({ achieving_rate: '', bouns_rate: '', })
-		                this.editIndex = this.items.length - 1
+		                this.items.push({ achieving_rate: '0', bouns_rate: '0', });
+                    // this.detail_has_error.push({achieving_rate: false, bouns_rate: false});
+                    
+		                this.editIndex = this.items.length - 1;
+                    this.detail_has_error[this.editIndex]= {achieving_rate: false, bouns_rate: false};
 		            },
 		
 		            edit(item, index) {
@@ -158,19 +167,64 @@
 		            },
 		
 		            save(item) {
-		                this.originalData = null
-		                this.editIndex = null
+                    // this.detail_error_check =
+                    this.has_error = true;
+                    this.has_error = false;
+                    this.detail_check();
+                    console.log(this.detail_error_check);
+                    if(!this.detail_error_check){
+                        this.originalData = null
+                        this.editIndex = null
+                    }
+                    
 		            },
 				    
 		            submit(){
 		                let data = $('#bonusSettingForm').serializeArray();
+                    // let detail_error_check = false;
+                    
 		                if(this.boundary == 0 ){
 		                  this.has_error = true;
 		                }else{
-		                    this.has_error = false;
+                        this.has_error = false;
+		                }
+		                
+                    // let detail_has_error = this.detail_has_error;
+                    // const values = Object.values(this.items);
+                    // values.map(function(v,k){
+                    //     detail_has_error[k]['achieving_rate'] = v.achieving_rate == 0 ? true : false;
+                    //     detail_has_error[k]['bouns_rate'] = v.bouns_rate == 0 ? true : false;
+                    //     if(v.achieving_rate == 0 || v.bouns_rate == 0){
+                    //         detail_error_check = true;
+                    //     }
+                    // });
+                    // this.detail_has_error = detail_has_error;
+				            
+				            // detail_error_check =
+						            this.detail_check();
+		                
+                    // console.log(!(this.has_error) && !(this.detail_error_check));
+                    if( !(this.has_error) && !(this.detail_error_check) ){
+
                         $('#bonusSettingForm').submit();
                     }
 		            },
+				        detail_check(){
+                    let detail_has_error = this.detail_has_error;
+                    const values = Object.values(this.items);
+                    let detail_error_check = false;
+                    values.map(function(v,k){
+                        detail_has_error[k]['achieving_rate'] = v.achieving_rate == 0 ? true : false;
+                        detail_has_error[k]['bouns_rate'] = v.bouns_rate == 0 ? true : false;
+                        if(v.achieving_rate == 0 || v.bouns_rate == 0){
+                            detail_error_check = true;
+                        }
+                    });
+                    this.detail_has_error = detail_has_error;
+                    this.detail_error_check = detail_error_check;
+                    
+		                return this.detail_error_check;
+                },
 				        check_is_set(id){
                     return (this.alreadySetUserIds.indexOf(id*1) < 0) ? null : true;
 				        }
@@ -187,5 +241,11 @@
 <style>
 	input[type="number"] {
 		text-align: right;
+	}
+	.has-error span.help-block{
+			color:#dd4b39;
+	}
+	.has-error input[type="number"]{
+		border-color: #dd4b39;
 	}
 </style>

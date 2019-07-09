@@ -11,7 +11,7 @@
 
 @extends('layout')
 
-@section('title','AdminLTE 2 | Dashboard')
+@section('title','Jsadways | DAC')
 
 {{--導航 麵包屑--}}
 @section('content-header')

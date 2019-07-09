@@ -101,7 +101,7 @@
                                 :dom_id='"chart-bar"'
                                 :type='"bar"'
                                 :title='"業績統計"'
-                                :labels='["六月"]'
+                                :labels='[" "]'
                                 :chart_data='{{ json_encode($chartDataBar) }}'
                         ></chart-component>
                         <!-- /.box -->

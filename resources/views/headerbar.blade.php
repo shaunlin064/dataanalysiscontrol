@@ -29,16 +29,22 @@
 				<!-- User Account: style can be found in dropdown.less -->
 				<li class='dropdown user user-menu'>
 					<a href='/#' class='dropdown-toggle' data-toggle='dropdown'>
-						<img src='/img/avatar5.png' class='user-image' alt='User Image'>
-						<span class='hidden-xs'>Alexander Pierce</span>
+						<div class='user-image customer-font-1e'>
+							<i class='fa fa fa-user-circle'></i>
+						</div>
+{{--						<img src='/img/avatar5.png' class='user-image' alt='User Image'>--}}
+						<span class='hidden-xs'>{{session('userData')['user']['name']}}</span>
 					</a>
 					<ul class='dropdown-menu'>
 						<!-- User image -->
 						<li class='user-header'>
-							<img src='/img/avatar5.png' class='img-circle' alt='User Image'>
+							<div class='user-circle customer-font-6e'>
+								<i class='fa fa fa-user-circle block'></i>
+							</div>
+{{--							<img src='/img/avatar5.png' class='img-circle' alt='User Image'>--}}
 
 							<p>
-								Alexander Pierce - Web Developer
+								{{session('userData')['user']['name']}} - {{session('userData')['user']['department']}}
 {{--								<small>Member since Nov. 2012</small>--}}
 							</p>
 						</li>
@@ -63,7 +69,7 @@
 								<a href='/#' class='btn btn-default btn-flat'>Profile</a>
 							</div>
 							<div class='pull-right'>
-								<a href='/#' class='btn btn-default btn-flat'>Sign out</a>
+								<a href='/logout' class='btn btn-default btn-flat'>登出</a>
 							</div>
 						</li>
 					</ul>
