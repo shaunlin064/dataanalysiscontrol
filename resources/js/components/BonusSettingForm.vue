@@ -37,9 +37,10 @@
 								<thead class="thead-light">
 								<tr>
 									<th width="1">#</th>
-									<th width="30%">達成比例</th>
-									<th width="30%">獎金比例</th>
-									<th width="40%">Action</th>
+									<th width="25%">達成比例</th>
+									<th width="25%">獎金比例</th>
+									<th width="25%">額外獎金</th>
+									<th width="25%">Action</th>
 								</tr>
 								</thead>
 								<tbody>
@@ -52,18 +53,25 @@
 				            </span>
 										<span class="help-block" :class="{'hidden' : !detail_has_error[index]['achieving_rate'] }">達成比例不能為0</span>
 									</td>
-									<td :class="{'has-error' : detail_has_error[index]['bouns_rate']}">
-										<span v-if="editIndex !== index">{{ item.bouns_rate }}</span>
+									<td :class="{'has-error' : detail_has_error[index]['bonus_rate']}">
+										<span v-if="editIndex !== index">{{ item.bonus_rate }}</span>
 										<span v-if="editIndex === index">
-				              <input type='number' class="form-control form-control-sm" v-model="item.bouns_rate">
+				              <input type='number' class="form-control form-control-sm" v-model="item.bonus_rate">
 				            </span>
-										<span class="help-block" :class="{'hidden' : !detail_has_error[index]['bouns_rate'] }">獎金比例不能為0</span>
+										<span class="help-block" :class="{'hidden' : !detail_has_error[index]['bonus_rate'] }">獎金比例不能為0</span>
+									</td>
+									<td :class="{'has-error' : detail_has_error[index]['bonus_direct']}">
+										<span v-if="editIndex !== index">{{ item.bonus_direct }}</span>
+										<span v-if="editIndex === index">
+				              <input type='number' class="form-control form-control-sm" v-model="item.bonus_direct">
+				            </span>
 									</td>
 									<td>
 				            <span v-if="editIndex !== index">
 						            <div v-for='(item, index ) in items'>
-						              <input type='hidden' :name='"bouns_levels["+index+"][achieving_rate]"' :value='item.achieving_rate'>
-							            <input type='hidden' :name='"bouns_levels["+index+"][bouns_rate]"' :value='item.bouns_rate'>
+						              <input type='hidden' :name='"bonus_levels["+index+"][achieving_rate]"' :value='item.achieving_rate'>
+							            <input type='hidden' :name='"bonus_levels["+index+"][bonus_rate]"' :value='item.bonus_rate'>
+							            <input type='hidden' :name='"bonus_levels["+index+"][bonus_direct]"' :value='item.bonus_direct'>
 						            </div>
 					              <button type="button" @click="edit(item, index)" class="btn btn-info">編輯</button>
 					              <button type="button" @click="remove(item, index)" class="btn btn-danger">刪除</button>
@@ -114,7 +122,7 @@
                 has_error: false,
                 editIndex: null,
                 detail_has_error: this.row.levels ? this.row.levels.map(function(v,k){
-                    return {achieving_rate: false,bouns_rate:false};
+                    return {achieving_rate: false,bonus_rate:false};
                 }) : {},
                 detail_error_check: false,
                 originalData: null,
@@ -135,11 +143,11 @@
 		            add() {
 		                console.log(this.boundary);
 		                this.originalData = null
-		                this.items.push({ achieving_rate: '0', bouns_rate: '0', });
-                    // this.detail_has_error.push({achieving_rate: false, bouns_rate: false});
+		                this.items.push({ achieving_rate: '0', bonus_rate: '0', bonus_direct: '0'});
+                    // this.detail_has_error.push({achieving_rate: false, bonus_rate: false});
                     
 		                this.editIndex = this.items.length - 1;
-                    this.detail_has_error[this.editIndex]= {achieving_rate: false, bouns_rate: false};
+                    this.detail_has_error[this.editIndex]= {achieving_rate: false, bonus_rate: false};
 		            },
 		
 		            edit(item, index) {
@@ -193,8 +201,8 @@
                     // const values = Object.values(this.items);
                     // values.map(function(v,k){
                     //     detail_has_error[k]['achieving_rate'] = v.achieving_rate == 0 ? true : false;
-                    //     detail_has_error[k]['bouns_rate'] = v.bouns_rate == 0 ? true : false;
-                    //     if(v.achieving_rate == 0 || v.bouns_rate == 0){
+                    //     detail_has_error[k]['bonus_rate'] = v.bonus_rate == 0 ? true : false;
+                    //     if(v.achieving_rate == 0 || v.bonus_rate == 0){
                     //         detail_error_check = true;
                     //     }
                     // });
@@ -215,8 +223,8 @@
                     let detail_error_check = false;
                     values.map(function(v,k){
                         detail_has_error[k]['achieving_rate'] = v.achieving_rate == 0 ? true : false;
-                        detail_has_error[k]['bouns_rate'] = v.bouns_rate == 0 ? true : false;
-                        if(v.achieving_rate == 0 || v.bouns_rate == 0){
+                        detail_has_error[k]['bonus_rate'] = v.bonus_rate == 0 ? true : false;
+                        if(v.achieving_rate == 0 || v.bonus_rate == 0){
                             detail_error_check = true;
                         }
                     });

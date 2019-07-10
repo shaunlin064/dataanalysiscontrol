@@ -6,6 +6,7 @@ export default {
         bonus_rate: 0,
         bonus_next_amount: 0,
         bonus_next_percentage: 0,
+        bonus_direct:50,
         money_status_paid: 0,
         money_status_unpaid: 0,
         money_status_bonus_paid: 0,
@@ -39,6 +40,8 @@ export default {
                 case 'bonus_next_percentage':
                     state.bonus_next_percentage = arg.value;
                     break;
+                case 'bonus_direct':
+                    state.bonus_direct = arg.value;
             }
         },
         changeMoneyStatus(state,arg){

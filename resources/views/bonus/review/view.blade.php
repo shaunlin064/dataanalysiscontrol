@@ -67,6 +67,7 @@
                                 :icon='"ion ion-stats-bars"'
                                 :vuex_field='"bonus_rate"'
                                 :bonus_rate='{{ $boxData['bonus_rate'] }}'
+                                :bonus_direct='{{ $boxData['bonus_direct'] }}'
                                 :text='"bonus Rate"'>
                         </box-info-component>
                     </div>

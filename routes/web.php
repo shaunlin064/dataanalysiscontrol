@@ -93,6 +93,8 @@
 		});
 	});
 	
+	
+	Route::get('/import','Bonus\SettingController@importbonusSetting');
 //Auth::routes();
 
 //Route::get('/home', 'IndexController@index')->name('home');

@@ -12,21 +12,21 @@
 				<input type="text" class="form-control pull-right" id="reservation">
 			</div>
 			<!-- /.input group -->
-		</div>
-		<!-- /.form group -->
-		<div class="box box-warning" :class="{'collapsed-box' : key > 0}" v-for='(item,key) in items' :data-history-range=formate(item.set_date)>
-			<div class="box-header with-border">
-				<h3 class="box-title">{{item.set_date}}</h3>
-				
-				<div class="box-tools pull-right">
-					<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-					</button>
-				</div>
-				<!-- /.box-tools -->
 			</div>
-			<!-- /.box-header -->
-			<div class="box-body">
-				<h4>責任額
+			<!-- /.form group -->
+			<div class="box box-warning" :class="{'collapsed-box' : key > 0}" v-for='(item,key) in items' :data-history-range=formate(item.set_date)>
+				<div class="box-header with-border">
+					<h3 class="box-title">{{item.set_date}}</h3>
+					
+					<div class="box-tools pull-right">
+						<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa" :class="{'fa-minus' : key == 0 , 'fa-plus' : key > 0}"></i>
+						</button>
+					</div>
+					<!-- /.box-tools -->
+				</div>
+				<!-- /.box-header -->
+				<div class="box-body">
+					<h4>責任額
 					<span class="pull-right">{{item.boundary | money}}</span>
 				</h4>
 				<div class="box">
@@ -40,11 +40,13 @@
 								<th style="width: 10px">#</th>
 								<th>達成比例</th>
 								<th>獎金比例</th>
+								<th>額外獎金</th>
 							</tr>
 							<tr v-for='(children, index) in item.levels'>
 								<td>{{index+1}}.</td>
 								<td><span class='badge bg-light-blue'>{{ children.achieving_rate }}%</span></td>
-								<td><span class="badge bg-red">{{ children.bouns_rate }}%</span></td>
+								<td><span class="badge bg-red">{{ children.bonus_rate }}%</span></td>
+								<td><span>${{ children.bonus_direct }}</span></td>
 							</tr>
 							</tbody></table>
 					</div>

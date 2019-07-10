@@ -161,8 +161,8 @@
 			$userTmpData = session('users')[$bonus['user_id']];
 			
 			$editData = $bonus;
-			
-			$getlatelyMonth = $this->getUserLatelyProfit($bonus['user_id']);
+			$financial = new FinancialController();
+			$getlatelyMonth = $financial->getUserLatelyProfit($bonus['user_id']);
 			extract($getlatelyMonth);
 			
 			$userData = [
@@ -173,32 +173,31 @@
 				'historyMonthProfit' => $highestProfit
 			];
 			
-			$userBonusHistory = Bonus::where('user_id',$bonus['user_id'])->with('levels')->get()->toArray();
+			$userBonusHistory = Bonus::where('user_id',$bonus['user_id'])->orderBy('id','DESC')->with('levels')->get()->toArray();
 			
 			$userBonusHistory = $userBonusHistory;
-			
 			
 //			$userBonusHistory = [
 //			 [
 //			  'set_date' => '2019-05',
 //			  'boundary' => '1000000',
 //			  'levels' => [
-//			   ['id'=>1,'achieving_rate' => '10', 'bouns_rate' => '10'],
-//			   ['id'=>2,'achieving_rate' => '10', 'bouns_rate' => '10']
+//			   ['id'=>1,'achieving_rate' => '10', 'bonus_rate' => '10'],
+//			   ['id'=>2,'achieving_rate' => '10', 'bonus_rate' => '10']
 //			  ]
 //			 ],[
 //				'set_date' => '2019-04',
 //				'boundary' => '1000000',
 //				'levels' => [
-//				 ['id'=>1,'achieving_rate' => '10', 'bouns_rate' => '10'],
-//				 ['id'=>2,'achieving_rate' => '10', 'bouns_rate' => '10']
+//				 ['id'=>1,'achieving_rate' => '10', 'bonus_rate' => '10'],
+//				 ['id'=>2,'achieving_rate' => '10', 'bonus_rate' => '10']
 //				]
 //			 ],[
 //				'set_date' => '2019-03',
 //				'boundary' => '1000000',
 //				'levels' => [
-//				 ['id'=>1,'achieving_rate' => '10', 'bouns_rate' => '10'],
-//				 ['id'=>2,'achieving_rate' => '10', 'bouns_rate' => '10']
+//				 ['id'=>1,'achieving_rate' => '10', 'bonus_rate' => '10'],
+//				 ['id'=>2,'achieving_rate' => '10', 'bonus_rate' => '10']
 //				]
 //			 ]
 //			];
@@ -225,8 +224,17 @@
 			$bonus = Bonus::where('user_id',$id)->with('levels')->get()->toArray();
 			
 			
+			// 排程儲存
 //			$bonus = Bonus::where('set_date','2019-07-01')->with('levels')->get()->toArray();
 //			$tests = collect($bonus);
+			
+//				$importData = $this->importbonusSetting();
+//				foreach($importData as $item){
+//					$request = new Request($item);
+//					$this->save($request,$request->set_date);
+//				}
+//				dd($importData);
+			
 //
 //			foreach($tests  as $item){
 //				$unset = ['created_at','updated_at','id','set_date'];
@@ -250,8 +258,8 @@
 			if(empty(session('users')[$id])){
 				abort(500,'訪問頁面資料錯誤請確認Url是否正確');
 			}
-			
-			$getlatelyMonth = $this->getUserLatelyProfit($id);
+			$financial = new FinancialController();
+			$getlatelyMonth = $financial->getUserLatelyProfit($id);
 			extract($getlatelyMonth);
 
 			
@@ -270,22 +278,22 @@
 //				'set_date' => '2019-05',
 //				'boundary' => '1000000',
 //				'levels' => [
-//				 ['id'=>1,'achieving_rate' => '10', 'bouns_rate' => '10'],
-//				 ['id'=>2,'achieving_rate' => '10', 'bouns_rate' => '10']
+//				 ['id'=>1,'achieving_rate' => '10', 'bonus_rate' => '10'],
+//				 ['id'=>2,'achieving_rate' => '10', 'bonus_rate' => '10']
 //				]
 //			 ],[
 //				'set_date' => '2019-04',
 //				'boundary' => '1000000',
 //				'levels' => [
-//				 ['id'=>1,'achieving_rate' => '10', 'bouns_rate' => '10'],
-//				 ['id'=>2,'achieving_rate' => '10', 'bouns_rate' => '10']
+//				 ['id'=>1,'achieving_rate' => '10', 'bonus_rate' => '10'],
+//				 ['id'=>2,'achieving_rate' => '10', 'bonus_rate' => '10']
 //				]
 //			 ],[
 //				'set_date' => '2019-03',
 //				'boundary' => '1000000',
 //				'levels' => [
-//				 ['id'=>1,'achieving_rate' => '10', 'bouns_rate' => '10'],
-//				 ['id'=>2,'achieving_rate' => '10', 'bouns_rate' => '10']
+//				 ['id'=>1,'achieving_rate' => '10', 'bonus_rate' => '10'],
+//				 ['id'=>2,'achieving_rate' => '10', 'bonus_rate' => '10']
 //				]
 //			 ]
 //			];
@@ -293,14 +301,13 @@
 			return view('bonus.setting.view',['data' => $this->resources,'userData' => $userData,'userBonusHistory' => $userBonusHistory ]);
 		}
 		
-		public function save (Request $request)
+		public function save (Request $request,$setDate = null)
 		{
 			
 			$date = new \DateTime();
-			$request->merge(['set_date' => $date->format('Y-m-01')]);
+			$request->merge(['set_date' => isset($setDate) ? $setDate :$date->format('Y-m-01') ]);
 			
-		
-			if( !$this->checkBounsLevelsUni($request->bouns_levels) ){
+			if( !$this->checkbonusLevelsUni($request->bonus_levels) ){
 				
 				$message= [
 				 'status' => 0,
@@ -315,8 +322,9 @@
 			}
 			
 			$bonus = Bonus::create($request->all());
-			if($request->bouns_levels){
-				foreach( $request->bouns_levels as $item){
+			
+			if($request->bonus_levels){
+				foreach( $request->bonus_levels as $item){
 					$item['bonus_id'] = $bonus->id;
 					BonusLevels::create($item);
 				}
@@ -362,7 +370,7 @@
 				$bonus->save();
 				
 				
-				if( !$this->checkBounsLevelsUni($request->bouns_levels) ){
+				if( !$this->checkbonusLevelsUni($request->bonus_levels) ){
 					
 					$message= [
 					 'status' => 0,
@@ -377,8 +385,8 @@
 				}
 				
 				BonusLevels::where('bonus_id',$request->bonus_id)->delete();
-				if($request->bouns_levels){
-					foreach( $request->bouns_levels as $item){
+				if($request->bonus_levels){
+					foreach( $request->bonus_levels as $item){
 						$item['bonus_id'] = $bonus->id;
 						BonusLevels::create($item);
 					}
@@ -419,7 +427,7 @@
 			return $message;
 		}
 		
-		public function checkBounsLevelsUni ($children)
+		public function checkbonusLevelsUni ($children)
 		{
 			$tmp = collect($children);
 			return count($children) != count($tmp->keyBy('achieving_rate')) ? false : true ;
@@ -433,7 +441,7 @@
 			$thisMonth = $thisMonth->format('Ym');
 			
 			$financial = new FinancialController();
-			$erpReturnData = $financial->getErpMemberFinancial([$uid],'all','all','month');
+			$erpReturnData = $financial->getErpMemberFinancial([$uid],'all','all');
 			$erpReturnData = collect($erpReturnData);
 			
 			$thisMonthProfit = $erpReturnData->filter(function($item) use($thisMonth) {
@@ -450,5 +458,84 @@
 				'lastMonthProfit' => $lastMonthProfit,
 				'highestProfit' => $highestProfit
 			 ];
+		}
+		
+		public function importbonusSetting(){
+			
+			//			$importData = $this->importbonusSetting();
+			//			foreach($importData as $item){
+			//				$request = new Request($item);
+			//				$this->save($request,$request->set_date);
+			//			}
+			//			dd($importData);
+			
+			//讀檔案
+			$file = fopen(asset('storage/bonus.csv'), "r");
+			$i=0;
+			//確認奇怪字元
+			$cheeckStr = [];
+			//空白資料
+			$emptyData = [];
+			//output
+			$objfileArr = [];
+			while(! feof($file))
+			{
+				foreach(fgetcsv($file) as $item){
+					// 轉碼 去空白
+					//					$item = trim(mb_convert_encoding($item,'utf-8','big5'));
+					//					$item = trim(mb_convert_encoding($item,'utf-8','auto'));
+					// 驗證如有 無法辨識字元
+					if(strpos($item,'?')){
+						$cheeckStr[]=$i;
+					};
+					if(empty($item)){
+						$emptyData[$i] = isset($objfileArr[$i]) ? $objfileArr[$i] : [];
+						$emptyData[$i][] =  $item;
+						unset($objfileArr[$i]);
+					}else{
+						$objfileArr[$i][] = $item;
+					}
+				}
+				$i++;
+			};
+			
+			$userData = collect(session('users'));
+			//去標題
+			unset($objfileArr[0]);
+			$newtmp = [];
+			//替換keyName 與 user id
+			foreach($objfileArr as $key => $item){
+				$newtmp[$key]['set_date'] = $item[0];
+				$newtmp[$key]['user_id'] = $userData->where('account',$item[1])->max('id');
+				$newtmp[$key]['boundary'] = $item[2];
+				$childrenKey = 0 ;
+				//分裝 levels children
+				for( $i = 3; $i < count($item);$i++ ){
+					$cloumStr = $i%2 == 1 ? 'achieving_rate' : 'bonus_rate';
+					$newtmp[$key]['bonus_levels'][$childrenKey][$cloumStr] = $item[$i];
+					if($i%2 == 0){
+						$childrenKey++;
+					}
+				}
+			}
+			$setDateArr = ['2018-05-01','2018-06-01','2018-07-01','2018-08-01','2018-09-01','2018-10-01','2018-11-01','2018-12-01','2019-01-01','2019-02-01','2019-03-01','2019-04-01','2019-05-01','2019-06-01','2019-07-01'];
+			$importDatas = $newtmp;
+			foreach($importDatas as $importData){
+				foreach($importData['bonus_levels'] as $key => $item){
+						if($key <= 2 ){
+							$bonusDirect = 0;
+						}else if( $key == 3){
+							$bonusDirect = 15000;
+						}else{
+							$bonusDirect = 20000;
+						}
+					$importData['bonus_levels'][$key]['bonus_direct'] = $bonusDirect;
+				}
+				foreach($setDateArr as $set_date){
+					$request = new Request($importData);
+					$this->save($request,$set_date);
+				}
+			}
+			return $importData;
 		}
 	}

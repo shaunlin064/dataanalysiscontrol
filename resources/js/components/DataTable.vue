@@ -55,6 +55,7 @@
                         this.$store.commit('changeBox',{value:boxData.bonus_rate,field:'bonus_rate'});
                         this.$store.commit('changeBox',{value:boxData.bonus_next_amount,field:'bonus_next_amount'});
                         this.$store.commit('changeBox',{value:boxData.bonus_next_percentage,field:'bonus_next_percentage'});
+                        this.$store.commit('changeBox',{value:boxData.bonus_direct,field:'bonus_direct'});
 		                    // console.log(response.data.erpReturnData);
                     },
                     err => {

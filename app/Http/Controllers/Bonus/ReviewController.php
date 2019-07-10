@@ -78,7 +78,7 @@
 			}
 			
 			// require css
-			$this->resources['cssPath'][] = '/css/bounsReviewView.css';
+//			$this->resources['cssPath'][] = '/css/bonusReviewView.css';
 			
 			// get api data
 			$bonus = new Bonus();
@@ -120,9 +120,10 @@
 			
 			$boxData = [
 			 'profit' => $returnBonusData['estimateBonus'],
-				'bonus_rate' => isset($returnBonusData['reachLevle']['bouns_rate']) ? $returnBonusData['reachLevle']['bouns_rate'] : 0,
+				'bonus_rate' => isset($returnBonusData['reachLevle']['bonus_rate']) ? $returnBonusData['reachLevle']['bonus_rate'] : 0,
 				'bonus_next_amount' => isset($returnBonusData['nextLevel']['bonus_next_amount']) ? $returnBonusData['nextLevel']['bonus_next_amount'] : 0,
 				'bonus_next_percentage' => isset($returnBonusData['nextLevel']['bonus_next_percentage'])?  $returnBonusData['nextLevel']['bonus_next_percentage'] : 0,
+			  'bonus_direct' => $returnBonusData['bonusDirect']
 			];
 			
 			$chartData = [
@@ -231,9 +232,10 @@
 			
 			$boxData = [
 			 'profit' => $returnBonusData['estimateBonus'],
-			 'bonus_rate' => isset($returnBonusData['reachLevle']['bouns_rate']) ? $returnBonusData['reachLevle']['bouns_rate'] : 0,
+			 'bonus_rate' => isset($returnBonusData['reachLevle']['bonus_rate']) ? $returnBonusData['reachLevle']['bonus_rate'] : 0,
 			 'bonus_next_amount' => isset($returnBonusData['nextLevel']['bonus_next_amount']) ? $returnBonusData['nextLevel']['bonus_next_amount'] : 0,
 			 'bonus_next_percentage' => isset($returnBonusData['nextLevel']['bonus_next_percentage'])?  $returnBonusData['nextLevel']['bonus_next_percentage'] : 0,
+			 'bonus_direct' => $returnBonusData['bonusDirect']
 			];
 			
 //			$chartData = [

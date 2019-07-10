@@ -7,7 +7,7 @@ use App\Bonus;
 class BonusLevels extends Model
 {
     //
-	protected $fillable = ['bonus_id','achieving_rate','bouns_rate'];
+	protected $fillable = ['bonus_id','achieving_rate','bonus_rate','bonus_direct'];
 	
 	public function bonus()
 	{
