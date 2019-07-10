@@ -214,7 +214,7 @@
 					continue;
 				}
 				$totalIncome += $items['income'];
-				$totalCost += $items['cost'] * -1;
+				$totalCost += $items['cost'];
 				$totalProfit += $items['profit'];
 				
 				$erpReturnData[$key]['paymentStatus'] = 'no';

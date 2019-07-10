@@ -74,11 +74,12 @@
                 }else if (vue_this.type == 'bar'){
                     v.label = vue_this.bar_label[k];
                     v.backgroundColor = vue_this.bar_color[k];
-                    if(k <= 1){
-                        v.stack = '0';
-                    }else{
-                        v.stack = '1';
-                    }
+                    // if(k <= 1){
+                    //     v.stack = '0';
+                    // }else{
+                    //     v.stack = '1';
+                    // }
+                    v.stack = `${k}`;
                 }
             });
         },
@@ -101,7 +102,7 @@
                     let monthdata = [
                         vue_this.month_income,
 		                    vue_this.month_cost,
-                        vue_this.month_income+vue_this.month_cost,
+                        vue_this.month_income-vue_this.month_cost,
                     ];
                     vue_this.chart_obj.data.datasets.map( function(dataset,key){
 		                    dataset.data = [monthdata[key]];

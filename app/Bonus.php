@@ -30,13 +30,11 @@ class Bonus extends Model
 			])->with('levels')->get()->first()->toArray();
 			
 		}else{
-			if($this->where([
-			 'user_id' => $uid,
-			])->with('levels')->exists()){
-				$userbonus = $this->where([
-				 'user_id' => $uid,
-				])->with('levels')->OrderBy('id','desc')->get()->first()->toArray();
-			}else{
+			//抓取 最新一筆設定資料
+//			if( $this->where(['user_id' => $uid,])->with('levels')->exists() ){
+//				$userbonus = $this->where(['user_id' => $uid,])->with('levels')->OrderBy('id','desc')->get()->first()->toArray();
+//
+//			}else{
 				$userbonus = [
 				 'boundary' => 0,
 				'levels' => [
@@ -46,7 +44,7 @@ class Bonus extends Model
 						]
 					]
 				];
-			}
+//			}
 		}
 		$reachLevle = null;
 		$nextLevel = null;
