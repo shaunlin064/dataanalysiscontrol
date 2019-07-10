@@ -92,7 +92,7 @@
                                 :dom_id='"chart-pie"'
                                 :type='"pie"'
                                 :title='"金流狀態"'
-                                :labels='["未收款","已收款","未發獎金","已發獎金"]'
+                                :labels='["未收款","已收款"]'
                                 :chart_data='{{ json_encode($chartData) }}'
                         ></chart-component>
                     </div>

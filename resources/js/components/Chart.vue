@@ -93,10 +93,11 @@
                 if(vue_this.type == 'pie'){
                     vue_this.chart_obj.data.datasets.map( function(dataset,key){
                         if(key == 0){
-                            dataset.data = [vue_this.money_status_paid,vue_this.money_status_unpaid,0,0];
-                        }else{
-                            dataset.data = [0,0,vue_this.money_status_bonus_paid,vue_this.money_status_bonus_unpaid];
+                            dataset.data = [vue_this.money_status_unpaid,vue_this.money_status_paid,0,0];
                         }
+                        // else{
+                        //     dataset.data = [0,0,vue_this.money_status_bonus_paid,vue_this.money_status_bonus_unpaid];
+                        // }
                     });
                 }else if(vue_this.type == 'bar'){
                     let monthdata = [

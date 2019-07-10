@@ -125,19 +125,26 @@
 				'bonus_next_percentage' => isset($returnBonusData['nextLevel']['bonus_next_percentage'])?  $returnBonusData['nextLevel']['bonus_next_percentage'] : 0,
 			  'bonus_direct' => $returnBonusData['bonusDirect']
 			];
-			
+			$erpReturnDataCollect = collect($erpReturnData);
+//
+			$erpReturnData[0]['campaign_name'] = '<a>123</a>';
+			$erpReturnDataCollect = $erpReturnDataCollect->map(function($item,$key){
+				$item['campaign_name'] = sprintf('<a href="http://jsadways.test2/jsadwaysN2/campaign_view.php?id=%d" target="_blank">%s</a>',$item['cam_id'],$item['campaign_name']);
+				return  $item;
+			});
+			$erpReturnData = $erpReturnDataCollect->toArray();
 			$chartData = [
 			  [ 'data' => [
-				   1,
-				   1,
+			   $totalIncome,
+				   0,
 				   0,
 				   0
 			  ]],
-			 [ 'data' => [
-					 0,
-					 0,
-					 1,
-					 1]]
+//			 [ 'data' => [
+//					 0,
+//					 0,
+//					 1,
+//					 1]]
 			];
 			
 			$chartDataBar = [

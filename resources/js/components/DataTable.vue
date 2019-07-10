@@ -56,6 +56,8 @@
                         this.$store.commit('changeBox',{value:boxData.bonus_next_amount,field:'bonus_next_amount'});
                         this.$store.commit('changeBox',{value:boxData.bonus_next_percentage,field:'bonus_next_percentage'});
                         this.$store.commit('changeBox',{value:boxData.bonus_direct,field:'bonus_direct'});
+
+                        this.$store.commit('changeMoneyStatus',{paid:0,unpaid:chartDataBar.totalIncome});
 		                    // console.log(response.data.erpReturnData);
                     },
                     err => {
