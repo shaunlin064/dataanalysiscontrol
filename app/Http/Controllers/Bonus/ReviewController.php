@@ -126,10 +126,8 @@
 			  'bonus_direct' => $returnBonusData['bonusDirect']
 			];
 			$erpReturnDataCollect = collect($erpReturnData);
-//
-			$erpReturnData[0]['campaign_name'] = '<a>123</a>';
 			$erpReturnDataCollect = $erpReturnDataCollect->map(function($item,$key){
-				$item['campaign_name'] = sprintf('<a href="http://jsadways.test2/jsadwaysN2/campaign_view.php?id=%d" target="_blank">%s</a>',$item['cam_id'],$item['campaign_name']);
+				$item['campaign_name'] = sprintf('<a href="http://%s/jsadwaysN2/campaign_view.php?id=%d" target="_blank">%s</a>',env('ERP_URL'),$item['cam_id'],$item['campaign_name']);
 				return  $item;
 			});
 			$erpReturnData = $erpReturnDataCollect->toArray();
@@ -229,6 +227,14 @@
 				$erpReturnData[$key]['bonusStatus'] = 'no';
 			}
 			sort($erpReturnData);
+			$erpReturnDataCollect = collect($erpReturnData);
+			
+			$erpReturnDataCollect = $erpReturnDataCollect->map(function($item,$key){
+				$item['campaign_name'] = sprintf('<a href="http://%s/jsadwaysN2/campaign_view.php?id=%d" target="_blank">%s</a>',env('ERP_URL'),$item['cam_id'],$item['campaign_name']);
+				return  $item;
+			});
+			$erpReturnData = $erpReturnDataCollect->toArray();
+			
 			// getUserBonus
 			$bonus = new Bonus();
 			
