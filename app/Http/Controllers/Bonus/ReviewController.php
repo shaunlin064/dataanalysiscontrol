@@ -140,7 +140,7 @@
 				 'data' => [$totalIncome],
 				],
 			  [
-				 'data' => ['-'.$totalCost],
+				 'data' => [$totalCost],
 			  ],
 			  [
 				 'data' => [$totalProfit],
