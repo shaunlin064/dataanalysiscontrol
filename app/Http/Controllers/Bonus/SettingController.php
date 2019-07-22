@@ -126,10 +126,10 @@
 		public function edit($id)
 		{
 			$bonus = Bonus::where('id',$id)->with('levels')->get()->toArray()[0];
-			$pageUid = $bonus['user_id'];
+			$uid = $bonus['user_id'];
 			
 			$loginUserId = session('userData')['user']['id'];
-			$message = $this->permissionCheck($pageUid,$loginUserId);
+			$message = $this->permissionCheck($uid,$loginUserId);
 			
 			if($message['status'] == 0){
 				
@@ -153,9 +153,8 @@
 				'historyMonthProfit' => $highestProfit
 			];
 			
-			$userBonusHistory = Bonus::where('user_id',$bonus['user_id'])->orderBy('id','DESC')->with('levels')->get()->toArray();
+			$userBonusHistory = $this->getBonusHistory($uid);
 			
-			$userBonusHistory = $userBonusHistory;
 			
 //			$userBonusHistory = [
 //			 [
@@ -185,9 +184,9 @@
 			return view('bonus.setting.edit',['data' => $this->resources,'row'=>$editData,'userData' => $userData,'userBonusHistory' => $userBonusHistory ]);
 		}
 		
-		public function view($id = null)
+		public function view($uid = null)
 		{
-			$id = $id ?? session('userData')['user']['id'];
+			$uid = $uid ?? session('userData')['user']['id'];
 //			$userData = [
 //			 'name' => '小米',
 //			 'title' => '業務',
@@ -196,13 +195,13 @@
 //			 'historyMonthProfit' => 1000000
 //			];
 			$loginUserId = session('userData')['user']['id'];
-			$message = $this->permissionCheck($id,$loginUserId);
+			$message = $this->permissionCheck($uid,$loginUserId);
 			
 			if($message['status'] == 0){
 				return view('handle',['message'=>$message,'data' => $this->resources,'returnUrl' => Route('index') ]);
 			}
 			
-			$bonus = Bonus::where('user_id',$id)->with('levels')->get()->toArray();
+//			$bonus = Bonus::where('user_id',$uid)->with('levels')->get()->toArray();
 			
 			
 			// 排程儲存
@@ -236,25 +235,25 @@
 			
 			
 			
-			if(empty(session('users')[$id])){
+			if(empty(session('users')[$uid])){
 				abort(500,'訪問頁面資料錯誤請確認Url是否正確');
 			}
 			$financial = new FinancialController();
-			$getlatelyMonth = $financial->getUserLatelyProfit($id);
+			$getlatelyMonth = $financial->getUserLatelyProfit($uid);
 			extract($getlatelyMonth);
 
 			
 			$userData = [
-			 'uId' => $id,
-			 'name' => session('users')[$id]['name'],
-			 'title' => session('users')[$id]['department_name'],
+			 'uId' => $uid,
+			 'name' => session('users')[$uid]['name'],
+			 'title' => session('users')[$uid]['department_name'],
 			 'lastMonthProfit' => $thisMonthProfit,
 			 'thisMonthProfit' => $lastMonthProfit,
 			 'historyMonthProfit' => $highestProfit
 			];
+			$userBonusHistory = $this->getBonusHistory($uid);
 			
-			$userBonusHistory = $bonus;
-//			$userBonusHistory = [
+			//			$userBonusHistory = [
 //			 [
 //				'set_date' => '2019-05',
 //				'boundary' => '1000000',
@@ -518,5 +517,15 @@
 				}
 			}
 			return $importData;
+		}
+		
+		/**
+		 * @param $uid
+		 * @return mixed
+		 */
+		private function getBonusHistory ($uid)
+		{
+			$userBonusHistory = Bonus::where('user_id', $uid)->orderBy('id', 'DESC')->with('levels')->get()->toArray();
+			return $userBonusHistory;
 		}
 	}
