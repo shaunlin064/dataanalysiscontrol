@@ -14,54 +14,38 @@
 	use App\Http\Controllers\FinancialController;
 	use App\Bonus;
 	use App\BonusLevels;
-	use Illuminate\Http\Request;
-	use Illuminate\Support\Facades\Input;
+	use Gate;
 	
 	class ReviewController extends BaseController
 	{
-
-		
+//
 		public function __construct ()
 		{
-			//
-			//			<!-- DataTables -->
-			$this->resources['cssPath'][] = '/adminLte_componets/datatables.net-bs/css/dataTables.bootstrap.min.css';
-			//		<!-- daterange picker -->
-			$this->resources['cssPath'][] = '/adminLte_componets/bootstrap-daterangepicker/daterangepicker.css';
-			//		<!-- bootstrap datepicker -->
-			$this->resources['cssPath'][] = '/adminLte_componets/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css';
-			//			<!-- iCheck for checkboxes and radio inputs -->
-			$this->resources['cssPath'][] = '/adminLte_componets/plugins/iCheck/all.css';
-			//			<!-- Bootstrap Color Picker -->
-			$this->resources['cssPath'][] = '/adminLte_componets/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css';
-			//			<!-- Bootstrap time Picker -->
-			$this->resources['cssPath'][] = '/adminLte_componets/plugins/timepicker/bootstrap-timepicker.min.css';
-			//			<!-- Select2 -->
-			$this->resources['cssPath'][] = '/adminLte_componets/select2/dist/css/select2.min.css';
-			
-			$this->resources['jsPath'][] = '/adminLte_componets/datatables.net/js/jquery.dataTables.min.js';
-			$this->resources['jsPath'][] = '/adminLte_componets/datatables.net-bs/js/dataTables.bootstrap.min.js';
-			$this->resources['jsPath'][] = '/adminLte_componets/select2/dist/js/select2.full.min.js';
-			$this->resources['jsPath'][] = '/adminLte_componets/plugins/input-mask/jquery.inputmask.js';
-			$this->resources['jsPath'][] = '/adminLte_componets/plugins/input-mask/jquery.inputmask.extensions.js';
-			$this->resources['jsPath'][] = '/adminLte_componets/bootstrap-daterangepicker/daterangepicker.js';
-			$this->resources['jsPath'][] = '/adminLte_componets/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js';
-			$this->resources['jsPath'][] = '/adminLte_componets/bootstrap-datepicker/js/locales/bootstrap-datepicker.zh-TW.js';
-			$this->resources['jsPath'][] = '/adminLte_componets/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js';
-			$this->resources['jsPath'][] = '/adminLte_componets/plugins/timepicker/bootstrap-timepicker.min.js';
-			$this->resources['jsPath'][] = '/adminLte_componets/plugins/iCheck/icheck.min.js';
-//			$this->resources['jsPath'][] = '/adminLte_componets/chart.js/Chart.js';
+			parent::__construct();
 		}
 		
 		public function list ()
 		{
+//			Gate::define('bonus.setting.list', 'App\Http\Controllers\Bonus\SettingController@list');
+//			Gate::forUser('157')->allows('bonus.setting.list', '123');
+//			dd();
+//
+//			$aaa = collect(Route::getRoutes())->map(function($v,$k){
+//				return [$v->getName(),$v->getAction()];
+//			});
+//			foreach ($routes as $route) {
+//
+//				$aaa[] = [$route->getName(),$route->getAction()];
+//			}
+//			dd($aaa);
 			$listdata = session('users');
 			sort($listdata);
 			return view('bonus.review.list',['data' => $this->resources,'row' => $listdata]);
 		}
 		
-		public function view($id)
+		public function view($id = null)
 		{
+			$id = $id ?? session('userData')['user']['id'];
 			
 			//return error
 			if(isset(session('users')[$id]) == false){

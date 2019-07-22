@@ -11,6 +11,9 @@
 	use App\Http\Controllers\ApiController;
 	use App\Http\Controllers\Auth\Permission;
 	use App\Http\Controllers\FinancialController;
+
+	use Illuminate\Contracts\Auth\Access\Gate;
+	use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 	use Illuminate\Contracts\Session\Session;
 	use Illuminate\Http\Request;
 	use App\Http\Controllers\BaseController;
@@ -21,48 +24,15 @@
 	use Validator;
 	use App\Exceptions\Handler;
 	use Illuminate\Support\Arr;
+	use App\Role;
+	use Auth;
 	
 	class SettingController extends BaseController
 	{
+		
 		public function __construct ()
 		{
-			//
-			//			<!-- DataTables -->
-			$this->resources['cssPath'][] = '/adminLte_componets/datatables.net-bs/css/dataTables.bootstrap.min.css';
-			//		<!-- daterange picker -->
-			$this->resources['cssPath'][] = '/adminLte_componets/bootstrap-daterangepicker/daterangepicker.css';
-			//		<!-- bootstrap datepicker -->
-			$this->resources['cssPath'][] = '/adminLte_componets/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css';
-			//			<!-- iCheck for checkboxes and radio inputs -->
-			$this->resources['cssPath'][] = '/adminLte_componets/plugins/iCheck/all.css';
-			//			<!-- Bootstrap Color Picker -->
-			$this->resources['cssPath'][] = '/adminLte_componets/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css';
-			//			<!-- Bootstrap time Picker -->
-			$this->resources['cssPath'][] = '/adminLte_componets/plugins/timepicker/bootstrap-timepicker.min.css';
-			//			<!-- Select2 -->
-			$this->resources['cssPath'][] = '/adminLte_componets/select2/dist/css/select2.min.css';
-			
-			$this->resources['jsPath'][] = '/adminLte_componets/datatables.net/js/jquery.dataTables.min.js';
-			$this->resources['jsPath'][] = '/adminLte_componets/datatables.net-bs/js/dataTables.bootstrap.min.js';
-			$this->resources['jsPath'][] = '/adminLte_componets/fastclick/lib/fastclick.js';
-			
-			$this->resources['jsPath'][] = '/adminLte_componets/select2/dist/js/select2.full.min.js';
-			$this->resources['jsPath'][] = '/adminLte_componets/plugins/input-mask/jquery.inputmask.js';
-			$this->resources['jsPath'][] = '/adminLte_componets/plugins/input-mask/jquery.inputmask.extensions.js';
-			
-			$this->resources['jsPath'][] = '/adminLte_componets/moment/min/moment.min.js';
-			$this->resources['jsPath'][] = '/adminLte_componets/bootstrap-daterangepicker/daterangepicker.js';
-			$this->resources['jsPath'][] = '/adminLte_componets/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js';
-			$this->resources['jsPath'][] = '/adminLte_componets/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js';
-			$this->resources['jsPath'][] = '/adminLte_componets/plugins/timepicker/bootstrap-timepicker.min.js';
-			$this->resources['jsPath'][] = '/adminLte_componets/plugins/iCheck/icheck.min.js';
-			
-			$userObj = new UserController();
-			$userObj->getErpUser();
-			session(['department' => $userObj->department]);
-			session(['users' => $userObj->users]);
-//			dd(session()->all());
-//
+			parent::__construct();
 		}
 		
 		public function add ()
@@ -114,6 +84,16 @@
 		
 		public function list ()
 		{
+//				$role = new Role();
+//			  $role->
+//			$role = Role::first();
+//			$permission = \App\Permission::first();
+//			$role->givePermissionTo($permission);
+			
+//			Auth::loginUsingId(1, true);
+//			app(\Illuminate\Contracts\Auth\Access\Gate::class)->abilities();
+//			dd(Auth::user());
+
 			$date = new \DateTime();
 			
 			$bonus = Bonus::where('set_date','=',$date->format('Y-m-01'))->get()->toArray();
@@ -205,8 +185,9 @@
 			return view('bonus.setting.edit',['data' => $this->resources,'row'=>$editData,'userData' => $userData,'userBonusHistory' => $userBonusHistory ]);
 		}
 		
-		public function view($id)
+		public function view($id = null)
 		{
+			$id = $id ?? session('userData')['user']['id'];
 //			$userData = [
 //			 'name' => '小米',
 //			 'title' => '業務',
@@ -417,7 +398,7 @@
 			 'message' => ''
 			];
 			
-			if(!in_array($uid,$permission->admin) && $id != $uid){
+			if(!in_array($uid,$permission->role['admin']['ids']) && $id != $uid){
 				$message['status'] = 0;
 				$message['status_string'] = '沒有權限';
 				$message['message'] = '已異常訪問紀錄'.session('userData')['user']['name'];

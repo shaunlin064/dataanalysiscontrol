@@ -25,8 +25,6 @@
 
 @extends('headerbar')
 
-@extends('sidebar')
-
 @section('content')
     <div class="row" id='row1'>
         <div class="box box-widget widget-user">

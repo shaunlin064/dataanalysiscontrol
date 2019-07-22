@@ -9,13 +9,20 @@
 	namespace App\Http\Controllers\Auth;
 	
 	use App\Http\Controllers\ApiController;
+	use App\Http\Controllers\UserController;
+	use Illuminate\Foundation\Auth\AuthenticatesUsers;
+	use App\User;
 	use Illuminate\Http\Request;
+	use Illuminate\Support\Facades\Hash;
 	use Illuminate\Support\Facades\Redirect;
 	use App\Http\Controllers\Help\Crypt;
 	use Session;
+	use Auth;
 	
 	class AuthCustomerController
 	{
+		use AuthenticatesUsers;
+		
 		public static $encrypt = "FAA2C53CA77AEF2F77C6E3C83C81B798";
 		
 		public function index (Request $request)
@@ -34,7 +41,7 @@
 			
 			$newRequest = new Request();
 			$newRequest->merge([
-			 'username' => $result[0],
+			 'name' => $result[0],
 			 'password' => $result[1],
 				'auto' => 1
 			]);
@@ -46,24 +53,44 @@
 			
 		}
 		
-		public function login (Request $request)
+		static function erpLogin (Request $request)
 		{
-			
 			if(empty($request->auto)){
 				$request->password = md5($request->password);
 			}
 			$apiObj = new ApiController();
-			$data = 'username='.$request->username.'&password='.$request->password.'&apikey='.self::$encrypt;
+			$data = 'username='.$request->name.'&password='.$request->password.'&apikey='.self::$encrypt;
 			
 			$url = env('API_LOGIN_URL');
 			
-			$message = $apiObj->curlPost($data,$url,'form',false);
+			return $apiObj->curlPost($data,$url,'form',false);
+			
+		}
+		
+		static function dacLogin (Request $request){
+			
+			$userObj = User::where('name',$request->name)->first();
+			
+			if(empty($userObj)){
+				$request->merge(['password'=>Hash::make($request->get('password'))]);
+				$userObj = User::create($request->toArray());
+				$userObj->fresh();
+			}
+//			Auth::attempt($request->only('name', 'password'));
+			Auth::loginUsingId($userObj->id);
+		}
+		
+		public function login (Request $request)
+		{
+			
+			$message = $this->erpLogin($request);
 			
 			if($message['status'] != 1){
 				return view('handle',['message'=>$message,'returnUrl' => Route('auth.index')]);
 			}
-			
-			session(['userData'=> $message['data']]);
+			$request->merge($message['data']['user']);
+			$this->dacLogin($request);
+			$message = $this->setUserSession($message);
 			
 			if( !empty(session('retrunUrl')) ){
 				$returnUrl = session('retrunUrl');
@@ -81,4 +108,20 @@
 			return Redirect::route('auth.login');
 		}
 		
+		public function setUserSession ($message)
+		{
+			
+			$userObj = new UserController();
+			$userObj->getErpUser();
+			session(['department' => $userObj->department]);
+			session(['users' => $userObj->users]);
+			
+			session(['userData'=> $message['data']]);
+			
+			return $message;
+		}
+		public function username()
+		{
+			return 'name';
+		}
 	}

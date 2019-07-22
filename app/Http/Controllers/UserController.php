@@ -37,7 +37,6 @@
 			$this->users = $returnData['data']['member'];
 			return $returnData;
 		}
-		
 		public function sortUserData($select = null){
 			
 			$newTmp = [];
@@ -59,4 +58,6 @@
 			
 			return $newTmp;
 		}
+		
+		
 	}

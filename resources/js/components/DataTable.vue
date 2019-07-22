@@ -94,6 +94,7 @@
                 'ordering'    : true,
                 'info'        : true,
                 'autoWidth'   : false,
+                "scrollX": true,
                 "aLengthMenu" : [25, 50, 100], //更改顯示記錄數選項
                 "oLanguage": {
                     "emptyTable"    : "目前沒有任何（匹配的）資料。",

@@ -26,7 +26,6 @@ class IndexController extends BaseController
 //			$return = array_search('責任額',$items);
 ////			dd(Route::currentRouteName(),Route('index'),$return,$keys,$this->resources['menus']);
 //		}
-		
 //		dd($return,$this->resources['menus']);
 		return view('index',['data' => $this->resources]);
 	}

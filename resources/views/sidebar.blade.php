@@ -6,7 +6,7 @@
 	 * Time: 16:05
 	 */
 ?>
-@section('sidebar')
+
     <aside class='main-sidebar'>
         <!-- sidebar: style can be found in sidebar.less -->
         <section class='sidebar'>
@@ -39,8 +39,10 @@
             <!-- sidebar menu: : style can be found in sidebar.less -->
             <ul class='sidebar-menu' data-widget='tree'>
                 <li class='header'>主選單</li>
-                <menu-component :item='item' v-for='item in {{ json_encode(session('menus')) }}' :user_id='{{session('userData')['user']['id']}}'></menu-component>
+                @include('menu')
+
+{{--                <menu-component :item='item' v-for='item in {{ json_encode(session('menus')) }}' :user_id='{{session('userData')['user']['id']}}'></menu-component>--}}
             </ul>
         </section>
     </aside>
-@endsection
+

@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Role;
 
 class User extends Authenticatable
 {
@@ -36,4 +37,29 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+	public function generateToken()
+	{
+		$this->api_token = str_random(60);
+		$this->save();
+		
+		return $this->api_token;
+	}
+	public function role()
+	{
+		return $this->belongsToMany(Role::class);
+	}
+	
+	public function hasRole($role){
+		//如果包含某一個 就說明有這個角色
+		
+		if (is_string($role)) {
+			return $this->role()->contains('name', $role);
+		}
+		
+		//如果是Collection
+		return !!$role->intersect($this->role)->count();//是否相同 ＞0
+		
+	}
+
+	
 }

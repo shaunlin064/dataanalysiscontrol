@@ -24,10 +24,12 @@
 
 @extends('headerbar')
 
-@extends('sidebar')
 
 <!-- Content Wrapper. Contains page content -->
 @section('content')
+    @can('bonus.setting.list')
+        <h1>test</h1>
+    @endcan
     <div class="row" id='bonusSetting'>
     <div class="col-xs-12">
         <div class="box">
