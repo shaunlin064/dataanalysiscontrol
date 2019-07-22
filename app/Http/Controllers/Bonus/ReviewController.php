@@ -15,6 +15,8 @@
 	use App\Bonus;
 	use App\BonusLevels;
 	use Gate;
+	use Illuminate\Support\Facades\Input;
+	
 	
 	class ReviewController extends BaseController
 	{
@@ -75,8 +77,8 @@
 			$totalIncome = 0;
 			$totalCost = 0;
 			$totalProfit = 0;
-			
-			foreach($erpReturnData as $key => $items){
+			if(!empty($erpReturnData)){
+				foreach($erpReturnData as $key => $items){
 				if($items['income'] == 0 && $items['cost'] == 0){
 					unset($erpReturnData[$key]);
 					continue;
@@ -88,7 +90,11 @@
 				$erpReturnData[$key]['paymentStatus'] = 'no';
 				$erpReturnData[$key]['bonusStatus'] = 'no';
 			}
-			sort($erpReturnData);
+				sort($erpReturnData);
+			}else{
+				$erpReturnData = [];
+			}
+			
 			// getUserBonus
 			
 			$dateYearMonthDay = $date->format('Y-m-01');
@@ -167,7 +173,6 @@
 			);
 		}
 
-
 		
 		public function getdata ()
 		{
@@ -182,6 +187,7 @@
 //				 'paymentStatus' => 0,
 //				 'bonusStatus' => 0,]
 //			];
+			
 			$uId = Input::get('uId');
 			$inputDate = str_replace('/', '', Input::get('dateYearMonth'));
 			$inputDate .= '01';
@@ -197,20 +203,23 @@
 			$totalIncome = 0;
 			$totalCost = 0;
 			$totalProfit = 0;
-			
-			foreach($erpReturnData as $key => $items){
-				if($items['income'] == 0 && $items['cost'] == 0){
-					unset($erpReturnData[$key]);
-					continue;
+			if(!empty($erpReturnData)) {
+				foreach ($erpReturnData as $key => $items) {
+					if ($items['income'] == 0 && $items['cost'] == 0) {
+						unset($erpReturnData[$key]);
+						continue;
+					}
+					$totalIncome += $items['income'];
+					$totalCost += $items['cost'];
+					$totalProfit += $items['profit'];
+					
+					$erpReturnData[$key]['paymentStatus'] = 'no';
+					$erpReturnData[$key]['bonusStatus'] = 'no';
 				}
-				$totalIncome += $items['income'];
-				$totalCost += $items['cost'];
-				$totalProfit += $items['profit'];
-				
-				$erpReturnData[$key]['paymentStatus'] = 'no';
-				$erpReturnData[$key]['bonusStatus'] = 'no';
+				sort($erpReturnData);
+			}else{
+				$erpReturnData = [];
 			}
-			sort($erpReturnData);
 			$erpReturnDataCollect = collect($erpReturnData);
 			
 			$erpReturnDataCollect = $erpReturnDataCollect->map(function($item,$key){
