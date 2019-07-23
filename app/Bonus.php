@@ -48,6 +48,7 @@ class Bonus extends Model
 		}
 		$reachLevle = null;
 		$nextLevel = null;
+		
 		foreach($userbonus['levels'] as $key => $items){
 			$thisLevelAchieving = $userbonus['boundary'] * $items['achieving_rate'] * 0.01;
 			if( $totalProfit >  $thisLevelAchieving){
@@ -71,13 +72,17 @@ class Bonus extends Model
 				$nextLevel['bonus_next_percentage'] = round($totalProfit / $userbonus['boundary'] * 100 );
 			}
 		}else{
+			
+			$reachLevle['bonus_direct'] = $reachLevle['bonus_direct'] ?? 0;
 			$estimateBonus =  round($totalProfit * $reachLevle['bonus_rate'] * 0.01) + $reachLevle['bonus_direct'];
 			if($nextLevel){
 				$nextLevel['bonus_next_amount'] = $userbonus['boundary'] * $nextLevel['achieving_rate'] * 0.01 - $totalProfit;
 //				$nextLevel['bonus_next_percentage'] = round($totalProfit/ ($userbonus['boundary'] * $nextLevel['achieving_rate'] * 0.01)*100);
 			}
-			$nextLevel['bonus_next_percentage'] = round($totalProfit / $userbonus['boundary'] * 100 );
+			
+			$nextLevel['bonus_next_percentage'] = $userbonus['boundary'] != 0 ?round($totalProfit / $userbonus['boundary'] * 100 ) : 0;
 		}
+		
 		$bonusDirect = isset($reachLevle['bonus_direct']) ? $reachLevle['bonus_direct'] : 0;
 		
 		
