@@ -68,7 +68,7 @@
 					 'as' => 'bonus.setting.add',
 					 'uses' => 'SettingController@add',
 					]);
-					Route::get('/edit/{id}',
+					Route::get('/edit/{id?}',
 					 [
 						'as' => 'bonus.setting.edit',
 						'uses' => 'SettingController@edit',
