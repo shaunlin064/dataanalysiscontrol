@@ -46,7 +46,6 @@
                     response => {
                         let chartDataBar = response.data.chartDataBar;
 		                    let boxData = response.data.boxData;
-
                         this.updataTable(response.data.erpReturnData);
 
                         this.$store.commit('changeMonthBalancen',{'month_income':chartDataBar.totalIncome,'month_cost':chartDataBar.totalCost});
@@ -127,7 +126,7 @@
                 handler (val, oldVal) {
                     if(oldVal !== undefined) {
                         this.getCampaignData(this.user_id,val);
-                        console.log(this.user_id,val,'datatable update');
+                        // console.log(this.user_id,val,'datatable update');
                     }
                     
                 }

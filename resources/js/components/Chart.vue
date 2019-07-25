@@ -89,7 +89,7 @@
 		    },
 		    methods:{
             update(vue_this){
-
+                
                 if(vue_this.type == 'pie'){
                     vue_this.chart_obj.data.datasets.map( function(dataset,key){
                         if(key == 0){
@@ -100,16 +100,17 @@
                         // }
                     });
                 }else if(vue_this.type == 'bar'){
+                    
                     let monthdata = [
                         vue_this.month_income,
 		                    vue_this.month_cost,
                         vue_this.month_income-vue_this.month_cost,
                     ];
+                    
                     vue_this.chart_obj.data.datasets.map( function(dataset,key){
 		                    dataset.data = [monthdata[key]];
                     });
                 }
-
                 vue_this.chart_obj.update();
             },
             ...mapActions({
@@ -126,6 +127,14 @@
                 }
             },
             month_income:{
+                immediate: true,
+                handler (val, oldVal) {
+                    if(oldVal !== undefined){
+                        this.update(this);
+                    }
+                }
+            },
+            month_cost:{
                 immediate: true,
                 handler (val, oldVal) {
                     if(oldVal !== undefined){
