@@ -14,7 +14,7 @@
 	/*
 			 * 登入系統
 			 */
-	Route::get('/home', 'HomeController@index')->name('home');
+//	Route::get('/home', 'HomeController@index')->name('home');
 	
 	Route::group(['namespace' => '\App\Http\Controllers\Auth'], function() {
 		Route::get('/login', [

@@ -134,7 +134,7 @@
             }
         },
         mounted: function() {
-            console.log(this.check_is_set(1));
+            // console.log(this.check_is_set(1));
 						$('.select2').select2();
 						
 				},

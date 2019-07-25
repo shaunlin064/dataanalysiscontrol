@@ -10,13 +10,14 @@
 	
 	
 	use App\Http\Controllers\ApiController;
+	use App\Http\Controllers\Auth\Permission;
 	use App\Http\Controllers\BaseController;
 	use App\Http\Controllers\FinancialController;
 	use App\Bonus;
 	use App\BonusLevels;
 	use Gate;
 	use Illuminate\Support\Facades\Input;
-	
+	use Auth;
 	
 	class ReviewController extends BaseController
 	{
@@ -51,17 +52,13 @@
 			
 			//return error
 			if(isset(session('users')[$id]) == false){
-				
-				$message= [
-				 'status' => 0,
-				 'status_string' => '',
-				 'message' => ''
-				];
-				$message['status_string'] = 'Error';
-				$message['message'] = '查無使用者';
-				
-				return view('handle',['message'=>$message,'data' => $this->resources,'returnUrl' => Route('index')]);
+				abort(404);
 			}
+			
+			$loginUserId = session('userData')['user']['id'];
+			//check permission
+			$permission = new Permission();
+			$permission->permissionCheck($id,$loginUserId);
 			
 			// require css
 //			$this->resources['cssPath'][] = '/css/bonusReviewView.css';

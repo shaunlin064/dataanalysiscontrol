@@ -28,7 +28,7 @@
             }
         },
         mounted() {
-            console.log(this.arg);
+            // console.log(this.arg);
         }
     }
 </script>

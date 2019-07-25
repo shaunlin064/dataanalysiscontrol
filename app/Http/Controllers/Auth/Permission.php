@@ -52,4 +52,10 @@
 //			$this->admin = [15,17,157,172,179,187];
 		
 		}
+		public function permissionCheck ($id,$uid)
+		{
+			if(!in_array($uid,$this->role['admin']['ids']) && $id != $uid){
+				abort(403);
+			};
+		}
 	}

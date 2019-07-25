@@ -97,7 +97,7 @@
 			$date = new \DateTime();
 			
 			$bonus = Bonus::where('set_date','=',$date->format('Y-m-01'))->get()->toArray();
-	
+			
 			$listdata = $bonus;
 			
 //			$listdata = [
@@ -125,19 +125,19 @@
 		
 		public function edit($id)
 		{
+			//exists check
+			if( Bonus::where('id',$id)->with('levels')->exists() === false){
+				abort(404);
+			};
+			
 			$bonus = Bonus::where('id',$id)->with('levels')->get()->toArray()[0];
 			$uid = $bonus['user_id'];
 			
 			$loginUserId = session('userData')['user']['id'];
-			$message = $this->permissionCheck($uid,$loginUserId);
 			
-			if($message['status'] == 0){
-				
-				return view('handle',['message'=>$message,'data' => $this->resources,'returnUrl' => Route('index') ]);
-				
-			}
-			
-//			dd($bonus,$id);
+			$permission = new Permission();
+			$permission->permissionCheck($uid,$loginUserId);
+
 			$userTmpData = session('users')[$bonus['user_id']];
 			
 			$editData = $bonus;
@@ -195,11 +195,14 @@
 //			 'historyMonthProfit' => 1000000
 //			];
 			$loginUserId = session('userData')['user']['id'];
-			$message = $this->permissionCheck($uid,$loginUserId);
 			
-			if($message['status'] == 0){
-				return view('handle',['message'=>$message,'data' => $this->resources,'returnUrl' => Route('index') ]);
-			}
+			//check permission
+			$permission = new Permission();
+			$permission->permissionCheck($uid,$loginUserId);
+			if(empty(session('users')[$uid])){
+				abort(404);
+			};
+			
 			
 //			$bonus = Bonus::where('user_id',$uid)->with('levels')->get()->toArray();
 			
@@ -233,11 +236,6 @@
 //				}
 //			}
 			
-			
-			
-			if(empty(session('users')[$uid])){
-				abort(500,'訪問頁面資料錯誤請確認Url是否正確');
-			}
 			$financial = new FinancialController();
 			$getlatelyMonth = $financial->getUserLatelyProfit($uid);
 			extract($getlatelyMonth);
@@ -386,26 +384,21 @@
 			
 		}
 		
-		public function permissionCheck ($id,$uid)
-		{
-			$permission = new Permission();
-			//check permission
-			
-			$message= [
-			 'status' => 1,
-			 'status_string' => '',
-			 'message' => ''
-			];
-			
-			if(!in_array($uid,$permission->role['admin']['ids']) && $id != $uid){
-				$message['status'] = 0;
-				$message['status_string'] = '沒有權限';
-				$message['message'] = '已異常訪問紀錄'.session('userData')['user']['name'];
-				return $message;
-			};
-			
-			return $message;
-		}
+//		public function permissionCheck ($id,$uid)
+//		{
+//			$permission = new Permission();
+//			//check permission
+//
+//			$message= [
+//			 'status' => 1,
+//			 'status_string' => '',
+//			 'message' => ''
+//			];
+//
+//			if(!in_array($uid,$permission->role['admin']['ids']) && $id != $uid){
+//				abort(403);
+//			};
+//		}
 		
 		public function checkbonusLevelsUni ($children)
 		{
@@ -442,12 +435,74 @@
 		
 		public function importbonusSetting(){
 			
-			//			$importData = $this->importbonusSetting();
-			//			foreach($importData as $item){
-			//				$request = new Request($item);
-			//				$this->save($request,$request->set_date);
-			//			}
-			//			dd($importData);
+			//讀檔案
+			$file = fopen(asset('storage/bonus.csv'), "r");
+			
+			$bonusLevels = [
+			 0 => [
+				"achieving_rate" => "30",
+				"bonus_rate" => "5",
+				'bonus_direct' => 0,
+			 ],
+			 1 => [
+				"achieving_rate" => "50",
+				"bonus_rate" => "7",
+				'bonus_direct' => 0,
+			 ],
+			 2 => [
+				"achieving_rate" => "80",
+				"bonus_rate" => "9",
+				'bonus_direct' => 0,
+			 ],
+			 3 => [
+				"achieving_rate" => "100",
+				"bonus_rate" => "9",
+				'bonus_direct' => 15000,
+			 ],
+			 4 => [
+				"achieving_rate" => "150",
+				"bonus_rate" => "9",
+				'bonus_direct' => 20000,
+			 ]
+			];
+			
+			//output
+			$objfileArr = [];
+			while(! feof($file))
+			{
+				$objfileArr[] = fgetcsv($file);
+			};
+			
+			$userData = collect(session('users'));
+			//去標題
+			unset($objfileArr[0]);
+			$importDatas = [];
+			//替換keyName 與 user id
+			foreach($objfileArr as $key => $item){
+				$importDatas[$key]['user_id'] = $userData->where('account',$item[1])->max('id');
+				$importDatas[$key]['boundary'] = $item[2];
+			}
+			$nextMonth = date('Y-m-01',strtotime("+1 month"));
+			
+			
+			foreach($importDatas as $importData){
+				
+				$dateStart = new \DateTime('2018-05-01');
+				$importData['bonus_levels'] = $bonusLevels;
+				
+				while($nextMonth != $dateStart->format('Y-m-01')) {
+					$request = new Request($importData);
+
+					$this->save($request,$dateStart->format('Y-m-01'));
+
+					$dateStart = $dateStart->modify('+1 Month');
+				}
+			}
+			return $importData;
+		}
+		
+		
+		public function importbonusSetting1(){
 			
 			//讀檔案
 			$file = fopen(asset('storage/bonus.csv'), "r");
@@ -460,6 +515,7 @@
 			$objfileArr = [];
 			while(! feof($file))
 			{
+				
 				foreach(fgetcsv($file) as $item){
 					// 轉碼 去空白
 					//					$item = trim(mb_convert_encoding($item,'utf-8','big5'));
@@ -498,27 +554,33 @@
 					}
 				}
 			}
-			$setDateArr = ['2018-05-01','2018-06-01','2018-07-01','2018-08-01','2018-09-01','2018-10-01','2018-11-01','2018-12-01','2019-01-01','2019-02-01','2019-03-01','2019-04-01','2019-05-01','2019-06-01','2019-07-01'];
+			$nextMonth = date('Y-m-01',strtotime("+1 month"));
+			
 			$importDatas = $newtmp;
+
 			foreach($importDatas as $importData){
 				foreach($importData['bonus_levels'] as $key => $item){
-						if($key <= 2 ){
-							$bonusDirect = 0;
-						}else if( $key == 3){
-							$bonusDirect = 15000;
-						}else{
-							$bonusDirect = 20000;
-						}
+					//簡單區分一下匯入資料 因後面最後兩個增加 直接收入的部分
+					if($key <= 2 ){
+						$bonusDirect = 0;
+					}else if( $key == 3){
+						$bonusDirect = 15000;
+					}else{
+						$bonusDirect = 20000;
+					}
 					$importData['bonus_levels'][$key]['bonus_direct'] = $bonusDirect;
 				}
-				foreach($setDateArr as $set_date){
+				$dateStart = new \DateTime('2018-05-01');
+				while($nextMonth != $dateStart->format('Y-m-01')) {
 					$request = new Request($importData);
-					$this->save($request,$set_date);
+					
+					$this->save($request,$dateStart->format('Y-m-01'));
+					
+					$dateStart = $dateStart->modify('+1 Month');
 				}
 			}
 			return $importData;
 		}
-		
 		/**
 		 * @param $uid
 		 * @return mixed
