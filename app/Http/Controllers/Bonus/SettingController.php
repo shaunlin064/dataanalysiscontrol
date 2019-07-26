@@ -279,23 +279,23 @@
 			return view('bonus.setting.view',['data' => $this->resources,'userData' => $userData,'userBonusHistory' => $userBonusHistory ]);
 		}
 		
-		public function save (Request $request,$setDate = null)
+		public function save (Request $request,$setDate = null)/**/
 		{
 			
 			$date = new \DateTime();
 			$request->merge(['set_date' => isset($setDate) ? $setDate :$date->format('Y-m-01') ]);
 			
 			if( !$this->checkbonusLevelsUni($request->bonus_levels) ){
-				
+
 				$message= [
 				 'status' => 0,
 				 'status_string' => '',
 				 'message' => ''
 				];
-				
+
 				$message['status_string'] = 'fail';
 				$message['message'] = '資料有誤 達成比例不能重複';
-				
+
 				return view('handle',['message'=>$message,'data' => $this->resources,'returnUrl' => Route('bonus.setting.add') ]);
 			}
 			
@@ -384,22 +384,6 @@
 			
 		}
 		
-//		public function permissionCheck ($id,$uid)
-//		{
-//			$permission = new Permission();
-//			//check permission
-//
-//			$message= [
-//			 'status' => 1,
-//			 'status_string' => '',
-//			 'message' => ''
-//			];
-//
-//			if(!in_array($uid,$permission->role['admin']['ids']) && $id != $uid){
-//				abort(403);
-//			};
-//		}
-		
 		public function checkbonusLevelsUni ($children)
 		{
 			$tmp = collect($children);
@@ -482,6 +466,7 @@
 				$importDatas[$key]['user_id'] = $userData->where('account',$item[1])->max('id');
 				$importDatas[$key]['boundary'] = $item[2];
 			}
+			
 			$nextMonth = date('Y-m-01',strtotime("+1 month"));
 			
 			
@@ -501,86 +486,6 @@
 			return $importData;
 		}
 		
-		
-		public function importbonusSetting1(){
-			
-			//讀檔案
-			$file = fopen(asset('storage/bonus.csv'), "r");
-			$i=0;
-			//確認奇怪字元
-			$cheeckStr = [];
-			//空白資料
-			$emptyData = [];
-			//output
-			$objfileArr = [];
-			while(! feof($file))
-			{
-				
-				foreach(fgetcsv($file) as $item){
-					// 轉碼 去空白
-					//					$item = trim(mb_convert_encoding($item,'utf-8','big5'));
-					//					$item = trim(mb_convert_encoding($item,'utf-8','auto'));
-					// 驗證如有 無法辨識字元
-					if(strpos($item,'?')){
-						$cheeckStr[]=$i;
-					};
-					if(empty($item)){
-						$emptyData[$i] = isset($objfileArr[$i]) ? $objfileArr[$i] : [];
-						$emptyData[$i][] =  $item;
-						unset($objfileArr[$i]);
-					}else{
-						$objfileArr[$i][] = $item;
-					}
-				}
-				$i++;
-			};
-			
-			$userData = collect(session('users'));
-			//去標題
-			unset($objfileArr[0]);
-			$newtmp = [];
-			//替換keyName 與 user id
-			foreach($objfileArr as $key => $item){
-				$newtmp[$key]['set_date'] = $item[0];
-				$newtmp[$key]['user_id'] = $userData->where('account',$item[1])->max('id');
-				$newtmp[$key]['boundary'] = $item[2];
-				$childrenKey = 0 ;
-				//分裝 levels children
-				for( $i = 3; $i < count($item);$i++ ){
-					$cloumStr = $i%2 == 1 ? 'achieving_rate' : 'bonus_rate';
-					$newtmp[$key]['bonus_levels'][$childrenKey][$cloumStr] = $item[$i];
-					if($i%2 == 0){
-						$childrenKey++;
-					}
-				}
-			}
-			$nextMonth = date('Y-m-01',strtotime("+1 month"));
-			
-			$importDatas = $newtmp;
-
-			foreach($importDatas as $importData){
-				foreach($importData['bonus_levels'] as $key => $item){
-					//簡單區分一下匯入資料 因後面最後兩個增加 直接收入的部分
-					if($key <= 2 ){
-						$bonusDirect = 0;
-					}else if( $key == 3){
-						$bonusDirect = 15000;
-					}else{
-						$bonusDirect = 20000;
-					}
-					$importData['bonus_levels'][$key]['bonus_direct'] = $bonusDirect;
-				}
-				$dateStart = new \DateTime('2018-05-01');
-				while($nextMonth != $dateStart->format('Y-m-01')) {
-					$request = new Request($importData);
-					
-					$this->save($request,$dateStart->format('Y-m-01'));
-					
-					$dateStart = $dateStart->modify('+1 Month');
-				}
-			}
-			return $importData;
-		}
 		/**
 		 * @param $uid
 		 * @return mixed
