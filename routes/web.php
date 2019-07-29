@@ -46,13 +46,6 @@
 		 'uses' => 'IndexController@index'
 		]);
 		
-		/*
-		 * menu Post
-		 */
-		Route::post('/menu/create', [
-		 'as' => 'menu.create',
-		 'uses' => 'MenuController@create'
-		]);
 		
 		Route::group(['namespace' => '\App\Http\Controllers\Bonus'], function() {
 			//bonus start
@@ -101,6 +94,26 @@
 				Route::get('/view/{id?}', 'ReviewController@view')->name('bonus.review.view');
 				Route::any('/getdata', 'ReviewController@getdata')->name('bonus.review.getdata');
 				
+			});
+		});
+		
+		
+		Route::group(['namespace' => '\App\Http\Controllers'], function() {
+			Route::prefix('financial')->group(function() {
+				Route::get('/exchangeRateSetting', 'FinancialController@exchangeRateSetting')->name('financial.exchangeRate.setting');
+				Route::post('/add', 'FinancialController@add')->name('financial.exchangeRate.add');
+			});
+		});
+		/*
+		 * system
+		 */
+		
+		Route::group(['namespace' => '\App\Http\Controllers\System'], function() {
+			Route::prefix('system')->group(function(){
+				Route::get('/index', [
+				 'as' => 'system.index',
+				 'uses' => 'SystemController@index',
+				]);
 			});
 		});
 	});

@@ -48,14 +48,14 @@
 		
 		public function view($id = null)
 		{
-			$id = $id ?? session('userData')['user']['id'];
+			$id = $id ?? session('userData')['id'];
 			
 			//return error
 			if(isset(session('users')[$id]) == false){
 				abort(404);
 			}
 			
-			$loginUserId = session('userData')['user']['id'];
+			$loginUserId = session('userData')['id'];
 			//check permission
 			$permission = new Permission();
 			$permission->permissionCheck($id,$loginUserId);

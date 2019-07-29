@@ -19,8 +19,8 @@
 {{--                    <img src='/img/avatar5.png' class='img-circle' alt='User Image'>--}}
                 </div>
                 <div class='pull-left info'>
-                    <p>{{session('userData')['user']['name']}}</p>
-                    <p>{{session('userData')['user']['department']}}</p>
+                    <p>{{session('userData')['name']}}</p>
+                    <p>{{session('userData')['department']}}</p>
 {{--                    <a href='/#'><i class='fa fa-circle text-success'></i> Online</a>--}}
                 </div>
             </div>
@@ -41,7 +41,7 @@
                 <li class='header'>主選單</li>
                 @include('menu')
 
-{{--                <menu-component :item='item' v-for='item in {{ json_encode(session('menus')) }}' :user_id='{{session('userData')['user']['id']}}'></menu-component>--}}
+{{--                <menu-component :item='item' v-for='item in {{ json_encode(session('menus')) }}' :user_id='{{session('userData')['id']}}'></menu-component>--}}
             </ul>
         </section>
     </aside>

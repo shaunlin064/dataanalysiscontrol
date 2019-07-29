@@ -90,6 +90,7 @@
 			}
 			$request->merge($message['data']['user']);
 			$this->dacLogin($request);
+			
 			$message = $this->setUserSession($message);
 			
 			if( !empty(session('retrunUrl')) ){
@@ -116,7 +117,7 @@
 			session(['department' => $userObj->department]);
 			session(['users' => $userObj->users]);
 			
-			session(['userData'=> $message['data']]);
+			session(['userData'=> $message['data']['user']]);
 			
 			return $message;
 		}

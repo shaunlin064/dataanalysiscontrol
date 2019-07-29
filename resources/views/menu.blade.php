@@ -8,6 +8,9 @@
 
 ?>
 	@foreach(session('menus') as $menu)
+		@if( session('userRoleType') == 'admin'
+						||
+						in_array( $menu->id , session('role')[session('userRoleType')]['purview']['menus'] ) )
 			<li class="treeview {{ $menu['new_class'] }}">
 			<a href="#">
 				<i class='{{$menu['icon'] }}'></i>
@@ -54,5 +57,5 @@
 				</ul>
 			@endif
 		</li>
-
+		@endif
 	@endforeach

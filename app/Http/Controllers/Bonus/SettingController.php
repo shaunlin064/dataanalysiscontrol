@@ -133,7 +133,7 @@
 			$bonus = Bonus::where('id',$id)->with('levels')->get()->toArray()[0];
 			$uid = $bonus['user_id'];
 			
-			$loginUserId = session('userData')['user']['id'];
+			$loginUserId = session('userData')['id'];
 			
 			$permission = new Permission();
 			$permission->permissionCheck($uid,$loginUserId);
@@ -186,7 +186,7 @@
 		
 		public function view($uid = null)
 		{
-			$uid = $uid ?? session('userData')['user']['id'];
+			$uid = $uid ?? session('userData')['id'];
 //			$userData = [
 //			 'name' => '小米',
 //			 'title' => '業務',
@@ -194,7 +194,7 @@
 //			 'thisMonthProfit' => 900000,
 //			 'historyMonthProfit' => 1000000
 //			];
-			$loginUserId = session('userData')['user']['id'];
+			$loginUserId = session('userData')['id'];
 			
 			//check permission
 			$permission = new Permission();

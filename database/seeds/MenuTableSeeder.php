@@ -18,6 +18,8 @@
 	     [
 		    "name" => "責任額",
 		    "icon" => "fa fa-street-view",
+	      "region" => "user",
+	      "catalogue" => "bonus.setting",
 		    "subMenu" => [
 		     [
 			    "name" => "設定",
@@ -34,6 +36,8 @@
 	     [
 		    "name" => "獎金",
 		    "icon" => "fa fa-usd",
+	      "region" => "user",
+	      "catalogue" => "bonus.review",
 		    "subMenu" => [
 		     [
 			    "name" => "全體列表",
@@ -47,12 +51,24 @@
 		     ]
 		    ],
 	     ],
+	     [
+		    "name" => "財務",
+		    "icon" => "fa fa-calculator",
+		    "region" => "user",
+		    "catalogue" => "financial",
+		    "subMenu" => [
+		     [
+			    "name" => "匯率設定",
+			    "icon" => "fa fa-circle-o",
+			    "url" => "financial.exchangeRate.setting",
+		     ],
+		    ],
+	     ],
 	    ];
 	    foreach($menus as $item){
-		    $menuItem = ['name'=>$item['name'],'icon'=>$item['icon']];
+		    $menuItem = ['name'=>$item['name'],'icon'=>$item['icon'],'region' => $item['region'],'catalogue'=>$item['catalogue']];
 		    
 		    $menu = Menu::create($menuItem);
-
 		    $menu->subMenu()->createMany($item['subMenu']);
 
 		    $menu->push();

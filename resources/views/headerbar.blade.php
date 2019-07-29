@@ -33,7 +33,7 @@
 							<i class='fa fa fa-user-circle'></i>
 						</div>
 {{--						<img src='/img/avatar5.png' class='user-image' alt='User Image'>--}}
-						<span class='hidden-xs'>{{session('userData')['user']['name']}}</span>
+						<span class='hidden-xs'>{{session('userData')['name']}}</span>
 					</a>
 					<ul class='dropdown-menu'>
 						<!-- User image -->
@@ -44,7 +44,7 @@
 {{--							<img src='/img/avatar5.png' class='img-circle' alt='User Image'>--}}
 
 							<p>
-								{{session('userData')['user']['name']}} - {{session('userData')['user']['department']}}
+								{{session('userData')['name']}} - {{session('userData')['department']}}
 {{--								<small>Member since Nov. 2012</small>--}}
 							</p>
 						</li>
@@ -66,7 +66,10 @@
 						<!-- Menu Footer-->
 						<li class='user-footer'>
 							<div class='pull-left'>
-								<a href='/#' class='btn btn-default btn-flat'>Profile</a>
+								<a href='/#' class='btn btn-default btn-flat'>業績管理</a>
+							</div>
+							<div class='pull-left'>
+								<a href='/system' class='btn btn-default btn-flat'>系統管理</a>
 							</div>
 							<div class='pull-right'>
 								<a href='/logout' class='btn btn-default btn-flat'>登出</a>

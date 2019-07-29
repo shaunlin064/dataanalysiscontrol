@@ -9,8 +9,13 @@
 	namespace App\Http\Controllers;
 	use App\Http\Controllers\ApiController;
 	use App\Http\Controllers\Controller;
+	use Illuminate\Http\Request;
+	use Illuminate\Support\Facades\Auth;
+	use App\ExchangeRate;
+	use DateTime;
+	use Illuminate\Support\Str;
 	
-	class FinancialController extends Controller
+	class FinancialController extends BaseController
 	{
 		const CUSTOMER_FIELDS_LOCAL_API_DIFFERENCE = [
 		 'accounting_month' => 'year_month',
@@ -20,6 +25,11 @@
 		 't_revenue' => 'income',
 		 't_cost' => 'cost'
 		];
+		
+		const CURRENCY_TYPE = [
+			'USD','JPY'
+		];
+		
 		
 		public function getErpMemberFinancial (Array $userIds,String $dateYearMonth = null ,String  $organizationStr = 'all',$outgroup = null)
 		{
@@ -94,13 +104,22 @@
 		
 		public function exchangeMoney ($items)
 		{
+			$exchangeRate = ExchangeRate::where(['set_date'=>date('Y-m-01',strtotime($items['year_month'].'01')),'currency'=>$items['currency_id']])->first();
 			
 			switch($items['currency_id']){
 				case 'USD':
-					$exchangeRate = 31;
+					if(empty($exchangeRate)){
+						$exchangeRate = 31;
+					}else{
+						$exchangeRate = $exchangeRate->rate;
+					}
 					break;
 				case 'JPY':
-					$exchangeRate = 0.2875;
+					if(empty($exchangeRate)){
+						$exchangeRate = 0.2875;
+					}else{
+						$exchangeRate = $exchangeRate->rate;
+					}
 					break;
 				default:
 					$exchangeRate = 1;
@@ -127,5 +146,31 @@
 				}
 			}
 			return $items;
+		}
+		
+		public function exchangeRateSetting ()
+		{
+			
+			$row = ExchangeRate::all();
+			return view('financial.exchangeRate.setting',['data' => $this->resources,'currencys'=> self::CURRENCY_TYPE,'row'=>$row]);
+		}
+		
+		public function add (Request $request)
+		{
+			$date = new DateTime($request->set_date.'/01');
+			$date = $date->format('Y-m-01');
+			$request->request->set('set_date',$date);
+			$request->request->set('created_by_erp_user_id',session('userData')['id']);
+			
+			// exists check
+			if(ExchangeRate::where(['set_date'=>$date,'currency'=>$request->currency])->exists()){
+				return redirect('financial/exchangeRateSetting')->withErrors("資料重複設定");
+			}
+			
+			ExchangeRate::create($request->all());
+			
+			$row = ExchangeRate::all();
+			
+			return view('financial.exchangeRate.setting',['data' => $this->resources,'currencys'=> self::CURRENCY_TYPE,'row'=>$row]);
 		}
 	}

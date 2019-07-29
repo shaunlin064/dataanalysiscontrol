@@ -5,6 +5,7 @@
 	 * Date: 2019-06-19
 	 * Time: 12:24
 	 */
+
 ?>
 
 @extends('layout')

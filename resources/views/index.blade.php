@@ -6,7 +6,7 @@
 	 * Time: 3:57 PM
 	 */
 
-//	dd(session('userData')['user']['id']);
+//	dd(session('userData')['id']);
 ?>
 
 @extends('layout')

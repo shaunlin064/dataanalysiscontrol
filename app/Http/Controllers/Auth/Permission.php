@@ -27,7 +27,7 @@
 			$this->role['user']['purview']['menu_subs'] = [2,4];
 			$this->role['user']['purview']['menu_sub_level2s'] = [];
 			
-			$uid = session('userData')['user']['id'];
+			$uid = session('userData')['id'];
 			$collect = collect($this->role);
 			$this->userRoleType = in_array($uid,$this->role['admin']['ids']) ? 'admin' : 'user';
 			
