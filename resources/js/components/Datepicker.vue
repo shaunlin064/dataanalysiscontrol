@@ -3,7 +3,7 @@
 		<div class="input-group-addon">
 			<i class="fa fa-calendar"></i>
 		</div>
-		<input type="text" class="form-control pull-right" :id=dom_id :value=change_date>
+		<input type="text" class="form-control pull-right" :id=dom_id :value=change_date :name=dom_id>
 	</div>
 </template>
 
