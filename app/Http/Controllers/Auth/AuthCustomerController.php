@@ -73,6 +73,8 @@
 			
 			if(empty($userObj)){
 				$request->merge(['password'=>Hash::make($request->get('password'))]);
+				$request->merge(['erp_id'=>$request->id]);
+				
 				$userObj = User::create($request->toArray());
 				$userObj->fresh();
 			}
