@@ -59,5 +59,24 @@
 			return $newTmp;
 		}
 		
+		static function isConvener($erp_id = null){
+			
+			$erp_id = $erp_id ?? auth()->user()->erp_id;
+			$users = collect(session('users'));
+			$convener = $users->firstWhere('id', $erp_id)['is_convener'];
+			
+			return $convener == 0 ? false : true;
+		}
+		
+		static function getSameDepartmentUsers($erp_id = null){
+			
+			$erp_id = $erp_id ?? auth()->user()->erp_id;
+			$users = collect(session('users'));
+			$departmentId = $users->firstWhere('id', $erp_id)['department_id'];
+			
+			$sameDepartmentUsers = $users->where('department_id', $departmentId);
+			
+			return $sameDepartmentUsers->all();
+		}
 		
 	}
