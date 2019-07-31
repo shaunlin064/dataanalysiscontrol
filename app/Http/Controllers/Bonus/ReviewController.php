@@ -8,16 +8,19 @@
 	
 	namespace App\Http\Controllers\Bonus;
 	
-	
+	use App\FinancialList;
 	use App\Http\Controllers\ApiController;
 	use App\Http\Controllers\Auth\Permission;
 	use App\Http\Controllers\BaseController;
+	use App\Http\Controllers\Financial\FinancialListController;
 	use App\Http\Controllers\FinancialController;
 	use App\Bonus;
 	use App\BonusLevels;
+	use DateTime;
 	use Gate;
 	use Illuminate\Support\Facades\Input;
 	use Auth;
+	use App\Http\Controllers\UserController;
 	
 	class ReviewController extends BaseController
 	{
@@ -60,64 +63,21 @@
 			$permission = new Permission();
 			$permission->permissionCheck($id,$loginUserId);
 			
-			// require css
-//			$this->resources['cssPath'][] = '/css/bonusReviewView.css';
-			
-			// get api data
 			$bonus = new Bonus();
 			$date = new \DateTime();
 			$yearMonth = $date->format('Ym');
-			$financial = new FinancialController();
-			$erpReturnData = $financial->getErpMemberFinancial([$id],$yearMonth);
+			$yearMonthDay = $date->format('Y-m-01');
+			
+			//get financialData
+			$erpReturnData = $this->getFinancialData($id, $yearMonthDay, $yearMonth);
 			
 			// loop calculation total Amount
-			$totalIncome = 0;
-			$totalCost = 0;
-			$totalProfit = 0;
-			if(!empty($erpReturnData)){
-				foreach($erpReturnData as $key => $items){
-				if($items['income'] == 0 && $items['cost'] == 0){
-					unset($erpReturnData[$key]);
-					continue;
-				}
-				$totalIncome += $items['income'];
-				$totalCost += $items['cost'];
-				$totalProfit += $items['profit'];
-				
-				$erpReturnData[$key]['paymentStatus'] = 'no';
-				$erpReturnData[$key]['bonusStatus'] = 'no';
-			}
-				sort($erpReturnData);
-			}else{
-				$erpReturnData = [];
-			}
+			list($totalIncome, $totalCost, $totalProfit, $erpReturnData) = $this->calculationTotal($erpReturnData);
 			
-			// getUserBonus
+			// getUserBonus set output Data
+			$boxData = $this->getUserBonus($id, $totalProfit, $yearMonthDay);
 			
-			$dateYearMonthDay = $date->format('Y-m-01');
 			
-			$returnBonusData = $bonus->getUserBonus($id, $totalProfit, $dateYearMonthDay);
-			
-			// set output Data
-			$userData = [
-			 'uId' => $id,
-			 'name' => session('users')[$id]['name'],
-			 'title' => session('users')[$id]['department_name'],
-			];
-			
-			$boxData = [
-			 'profit' => $returnBonusData['estimateBonus'],
-				'bonus_rate' => isset($returnBonusData['reachLevle']['bonus_rate']) ? $returnBonusData['reachLevle']['bonus_rate'] : 0,
-				'bonus_next_amount' => isset($returnBonusData['nextLevel']['bonus_next_amount']) ? $returnBonusData['nextLevel']['bonus_next_amount'] : 0,
-				'bonus_next_percentage' => isset($returnBonusData['nextLevel']['bonus_next_percentage'])?  $returnBonusData['nextLevel']['bonus_next_percentage'] : 0,
-			  'bonus_direct' => $returnBonusData['bonusDirect']
-			];
-			$erpReturnDataCollect = collect($erpReturnData);
-			$erpReturnDataCollect = $erpReturnDataCollect->map(function($item,$key){
-				$item['campaign_name'] = sprintf('<a href="http://%s/jsadwaysN2/campaign_view.php?id=%d" target="_blank">%s</a>',env('ERP_URL'),$item['cam_id'],$item['campaign_name']);
-				return  $item;
-			});
-			$erpReturnData = $erpReturnDataCollect->toArray();
 			$chartData = [
 			  [ 'data' => [
 			   $totalIncome,
@@ -159,6 +119,12 @@
 				'data' => $erpReturnData
 			];
 			
+			$userData = [
+			 'uId' => $id,
+			 'name' => session('users')[$id]['name'],
+			 'title' => session('users')[$id]['department_name'],
+			];
+			
 			return view('bonus.review.view',[
 				'data' => $this->resources,
 				'userData' => $userData,
@@ -189,71 +155,17 @@
 			$inputDate = str_replace('/', '', Input::get('dateYearMonth'));
 			$inputDate .= '01';
 			$date = new \DateTime($inputDate);
-			
 			$yearMonth = $date->format('Ym');
 			$yearMonthDay = $date->format('Y-m-01');
-			// get api data
-			$financial = new FinancialController();
-			$erpReturnData = $financial->getErpMemberFinancial([$uId],$yearMonth);
+			
+			//get financialData
+			$erpReturnData = $this->getFinancialData($uId, $yearMonthDay, $yearMonth);
 			
 			// loop calculation total Amount
-			$totalIncome = 0;
-			$totalCost = 0;
-			$totalProfit = 0;
-			if(!empty($erpReturnData)) {
-				foreach ($erpReturnData as $key => $items) {
-					if ($items['income'] == 0 && $items['cost'] == 0) {
-						unset($erpReturnData[$key]);
-						continue;
-					}
-					$totalIncome += $items['income'];
-					$totalCost += $items['cost'];
-					$totalProfit += $items['profit'];
-					
-					$erpReturnData[$key]['paymentStatus'] = 'no';
-					$erpReturnData[$key]['bonusStatus'] = 'no';
-				}
-				sort($erpReturnData);
-			}else{
-				$erpReturnData = [];
-			}
-			$erpReturnDataCollect = collect($erpReturnData);
+			list($totalIncome, $totalCost, $totalProfit, $erpReturnData) = $this->calculationTotal($erpReturnData);
 			
-			$erpReturnDataCollect = $erpReturnDataCollect->map(function($item,$key){
-				$item['campaign_name'] = sprintf('<a href="http://%s/jsadwaysN2/campaign_view.php?id=%d" target="_blank">%s</a>',env('ERP_URL'),$item['cam_id'],$item['campaign_name']);
-				return  $item;
-			});
-			$erpReturnData = $erpReturnDataCollect->toArray();
-			
-			// getUserBonus
-			$bonus = new Bonus();
-			
-			$returnBonusData = $bonus->getUserBonus($uId, $totalProfit, $yearMonthDay);
-			
-			
-			// set output Data
-			
-			$boxData = [
-			 'profit' => $returnBonusData['estimateBonus'],
-			 'bonus_rate' => isset($returnBonusData['reachLevle']['bonus_rate']) ? $returnBonusData['reachLevle']['bonus_rate'] : 0,
-			 'bonus_next_amount' => isset($returnBonusData['nextLevel']['bonus_next_amount']) ? $returnBonusData['nextLevel']['bonus_next_amount'] : 0,
-			 'bonus_next_percentage' => isset($returnBonusData['nextLevel']['bonus_next_percentage'])?  $returnBonusData['nextLevel']['bonus_next_percentage'] : 0,
-			 'bonus_direct' => $returnBonusData['bonusDirect']
-			];
-			
-//			$chartData = [
-//			 [ 'data' => [
-//				1,
-//				1,
-//				0,
-//				0
-//			 ]],
-//			 [ 'data' => [
-//				0,
-//				0,
-//				1,
-//				1]]
-//			];
+			// getUserBonus set output Data
+			$boxData = $this->getUserBonus($uId, $totalProfit, $yearMonthDay);
 			
 			$chartDataBar = [
 			 'totalIncome' => $totalIncome,
@@ -266,6 +178,87 @@
 			 'chartDataBar' => $chartDataBar,
 				'boxData' => $boxData
 			 ]);
+		}
+		
+		/**
+		 * @param $erpReturnData
+		 * @return array
+		 */
+		private function calculationTotal ($erpReturnData): array
+		{
+			$totalIncome = 0;
+			$totalCost = 0;
+			$totalProfit = 0;
+			
+			if (!empty($erpReturnData)) {
+				foreach ($erpReturnData as $key => $items) {
+					if ($items['income'] == 0 && $items['cost'] == 0) {
+						unset($erpReturnData[$key]);
+						continue;
+					}
+					$totalIncome += $items['income'];
+					$totalCost += $items['cost'];
+					$totalProfit += $items['profit'];
+					
+					$erpReturnData[$key]['campaign_name'] = sprintf('<a href="http://%s/jsadwaysN2/campaign_view.php?id=%d" target="_blank">%s</a>',env('ERP_URL'),$items['cam_id'],$items['campaign_name']);
+					
+					$erpReturnData[$key]['paymentStatus'] = 'no';
+					$erpReturnData[$key]['bonusStatus'] = 'no';
+				}
+				sort($erpReturnData);
+			} else {
+				$erpReturnData = [];
+			}
+			return array($totalIncome, $totalCost, $totalProfit, $erpReturnData);
+		}
+		
+		/**
+		 * @param $uId
+		 * @param $totalProfit
+		 * @param string $yearMonthDay
+		 * @return array
+		 */
+		private function getUserBonus ($uId, $totalProfit, string $yearMonthDay): array
+		{
+			// getUserBonus
+			$bonus = new Bonus();
+			$returnBonusData = $bonus->getUserBonus($uId, $totalProfit, $yearMonthDay);
+			
+			// set output Data
+			$boxData = [
+			 'profit' => $returnBonusData['estimateBonus'],
+			 'bonus_rate' => isset($returnBonusData['reachLevle']['bonus_rate']) ? $returnBonusData['reachLevle']['bonus_rate'] : 0,
+			 'bonus_next_amount' => isset($returnBonusData['nextLevel']['bonus_next_amount']) ? $returnBonusData['nextLevel']['bonus_next_amount'] : 0,
+			 'bonus_next_percentage' => isset($returnBonusData['nextLevel']['bonus_next_percentage']) ? $returnBonusData['nextLevel']['bonus_next_percentage'] : 0,
+			 'bonus_direct' => $returnBonusData['bonusDirect']
+			];
+			return $boxData;
+		}
+		
+		/**
+		 * @param $id
+		 * @param string $yearMonthDay
+		 * @param string $yearMonth
+		 * @return bool|mixed|string
+		 */
+		private function getFinancialData ($id, string $yearMonthDay, string $yearMonth)
+		{
+			//確認是否已有資料 反之call API
+			$financialList = FinancialList::where(['erp_id' => $id, 'set_date' => $yearMonthDay])->get();
+			$financial = new FinancialController();
+			if ($financialList->count() == 0) {
+				// get api data
+				$erpReturnData = collect($financial->getErpMemberFinancial([$id], $yearMonth));
+				$erpReturnData = $erpReturnData->map(function ($v) use($financial) {
+					return $financial->exchangeMoney($v);
+				});
+			} else {
+				$erpReturnData = $financialList->map(function ($v) use($financial){
+					return $financial->exchangeMoney($v->revertKeyChange()->revertValueChange());
+				});
+			}
+			
+			return $erpReturnData->toArray();
 		}
 	}
 	

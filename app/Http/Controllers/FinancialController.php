@@ -56,13 +56,12 @@
 			
 			$returnData = $apiObj->curlPost(json_encode($data),$url,'json');
 			
-			
 			foreach($returnData as $key => $items){
 				
 				$items = $this->apiKeyFieldNameChange($items);
 
-				$returnData[$key] = $this->exchangeMoney($items);
-				
+//				$returnData[$key] = $this->exchangeMoney($items);
+				$returnData[$key] = $items;
 			}
 			
 			return $returnData;
@@ -109,14 +108,16 @@
 			switch($items['currency_id']){
 				case 'USD':
 					if(empty($exchangeRate)){
-						$exchangeRate = 31;
+//						$exchangeRate = 31;
+						$exchangeRate = 1;
 					}else{
 						$exchangeRate = $exchangeRate->rate;
 					}
 					break;
 				case 'JPY':
 					if(empty($exchangeRate)){
-						$exchangeRate = 0.2875;
+//						$exchangeRate = 0.2875;
+						$exchangeRate = 1;
 					}else{
 						$exchangeRate = $exchangeRate->rate;
 					}
@@ -151,6 +152,9 @@
 		public function exchangeRateSetting ()
 		{
 			
+			if(!in_array(session('userData')['id'],session('role')['admin']['ids'])){
+				abort(403);
+			};
 			$row = ExchangeRate::all();
 			return view('financial.exchangeRate.setting',['data' => $this->resources,'currencys'=> self::CURRENCY_TYPE,'row'=>$row]);
 		}
