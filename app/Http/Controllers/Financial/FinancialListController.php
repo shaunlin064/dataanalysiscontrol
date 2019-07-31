@@ -13,6 +13,7 @@
 	use App\Http\Controllers\BaseController;
 	use App\Http\Controllers\FinancialController;
 	use DateTime;
+	use DB;
 	
 	class FinancialListController extends BaseController
 	{
@@ -37,10 +38,22 @@
 			$financial = new FinancialController();
 			$erpReturnData = collect($financial->getErpMemberFinancial(['all'],'all'));
 			$erpReturnData = $erpReturnData->where('year_month' ,'<=' ,$this->acceptDate->format('Ym'))->toArray();
-			foreach ($erpReturnData as $erpReturnDatum) {
-				$financeList = new FinancialList();
-				$financeList->fill($erpReturnDatum)->dataFormat()->save();
+			
+			DB::beginTransaction();
+			try{
+				
+				foreach ($erpReturnData as $erpReturnDatum) {
+					$financeList = new FinancialList();
+					$financeList->fill($erpReturnDatum)->dataFormat()->save();
+				}
+				
+				DB::commit();
+				
+			} catch (\Exception $ex) {
+				DB::rollback();
+				\Log::error($ex->getMessage());
 			}
+			
 		}
 		
 		//存入現在已完成結帳月份的資料
@@ -52,10 +65,18 @@
 			
 			$erpReturnData = $erpReturnData->whereNotIn('cp_detail_id', $alreadySetData->pluck('cp_detail_id'));
 			
-			$erpReturnData->each(function($v){
-				$financeList = new FinancialList();
-				$financeList->fill($v)->dataFormat()->save();
-			});
+			DB::beginTransaction();
 			
+			try{
+				$erpReturnData->each(function($v){
+					$financeList = new FinancialList();
+					$financeList->fill($v)->dataFormat()->save();
+				});
+				DB::commit();
+				
+			} catch (\Exception $ex) {
+				DB::rollback();
+				\Log::error($ex->getMessage());
+			}
 		}
 	}
