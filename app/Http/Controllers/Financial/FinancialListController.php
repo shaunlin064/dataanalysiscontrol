@@ -51,9 +51,8 @@
 				
 			} catch (\Exception $ex) {
 				DB::rollback();
-				\Log::error($ex->getMessage());
+				dd(\Log::error($ex->getMessage()));
 			}
-			
 		}
 		
 		//存入現在已完成結帳月份的資料

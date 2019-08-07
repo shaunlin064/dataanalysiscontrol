@@ -19,6 +19,7 @@ class FinancialList extends Model
 		'currency_id' => 'currency',
 		'year_month' => 'set_date',
 		'cam_id' => 'campaign_id',
+		'o_id' => 'cp_detail_id'
 	];
 	
 	
