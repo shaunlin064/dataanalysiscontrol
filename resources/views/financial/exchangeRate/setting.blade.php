@@ -147,6 +147,7 @@
                             "sLast":     "尾頁"
                         }
                     },
+                    "order": [[ 0, 'desc' ]],
                     columns: [
                         {
                             data: "set_date"
