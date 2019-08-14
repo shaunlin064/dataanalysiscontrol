@@ -21,8 +21,7 @@ class ExchangeRatesController extends BaseController
 		if(!in_array(session('userData')['id'],session('role')['admin']['ids'])){
 			abort(403);
 		};
-		$row = ExchangeRate::all()->sortByDesc('set_date');
-		
+		$row = ExchangeRate::orderBy('set_date','DESC')->get();
 		return view('financial.exchangeRate.setting',['data' => $this->resources,'currencys'=> self::CURRENCY_TYPE,'row'=>$row]);
 	}
 	
