@@ -31,8 +31,8 @@ class CheckPermissions
 //		    });
 //
 //		    $menu['new_class'] = $new_class->first();
-		    
-		    if(str_is($menu->catalogue.'*',Route::currentRouteName())){
+		   
+		    if(!empty($menu->subMenu->where('url',Route::currentRouteName())->toArray())){
 			    $new_class = 'active menu-open';
 		    }else{
 			    $new_class = null;
