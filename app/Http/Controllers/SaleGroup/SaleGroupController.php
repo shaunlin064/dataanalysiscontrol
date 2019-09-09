@@ -47,8 +47,7 @@ class SaleGroupController extends BaseController
 		$row['groups_bonus']  = $saleGroups->groupsBonus->where('set_date',$datenow)->values()->toArray();
 		$row['groups_users']  = $saleGroups->groupsUsers->where('set_date',$datenow)->values()->toArray();
 		$groupsBonusHistory = $saleGroups->groupsBonus->groupBy('set_date')->toArray();
-		$groupsUsersHistory = $saleGroups->groupsUsers->groupBy('set_date')->toArray();
-		
+		$groupsUsersHistory = $saleGroups->groupsUsers->groupBy('set_date');
 		$tmpUser = collect($row['groups_users']);
 		// get already select
 		$userNowSelect = $tmpUser->pluck('erp_user_id');
@@ -67,7 +66,6 @@ class SaleGroupController extends BaseController
 			$user[$key]['groups_is_convener'] = in_array($item['id'],$userNowIsConvenerArray) ? 1 : 0;
 		}
 		sort($user);
-		
 		return view('saleGroup.setting.edit',[
 		 'data' => $this->resources,
 		 'user'=> $user,
