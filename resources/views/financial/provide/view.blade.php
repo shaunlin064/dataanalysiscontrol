@@ -114,6 +114,7 @@
                 :table_head='"獎金清單"'
                 :table_title='["發放月份","月份","案件名稱","業務","部門","媒體","類型","獎金"]'
                 :row = '{{ json_encode($row) }}'
+                :ex_buttons= '["excel"]'
                 :columns = {!!json_encode($columns)!!}
         ></simple-data-table-componet>
     </div>

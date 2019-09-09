@@ -111,10 +111,10 @@
                                 <!-- /.box -->
                                 @if(isset($groupsUsersHistory[$key]))
                                     @foreach($groupsUsersHistory[$key] as $users)
-                                        @if($users['is_convener'] == 0)
-                                            <span class='badge bg-light-blue'>{{session('users')[$users['erp_user_id']]['org_name']}}</span>
+                                        @if($users->is_convener == 0)
+                                            <span class='badge bg-light-blue'>{{$users->user['name']}}</span>
                                         @else
-                                            <span class='badge bg-red'>{{session('users')[$users['erp_user_id']]['org_name']}}</span>
+                                            <span class='badge bg-red'>{{$users->user['name']}}</span>
                                         @endif
                                     @endforeach
                                 @endif
@@ -138,6 +138,7 @@
     <!-- page script -->
     <script>
         $(function () {
+
         });
     </script>
 @endsection

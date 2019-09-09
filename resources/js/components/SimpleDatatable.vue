@@ -37,7 +37,8 @@
             table_head : String,
 		        table_title : Array,
 		        row : Array,
-            columns : Array
+            columns : Array,
+            ex_buttons : Array,
         },
         data() {
             return {
@@ -83,43 +84,45 @@
 		        var columns = this.columns;
 		        var rowData = this.row;
 		        var tableId = this.table_id;
-		        
+		        var ex_buttons = this.ex_buttons;
             $(document).ready(function() {
-                var dataTable = $('#'+tableId+'').DataTable({
-                    dom: 'Bfrtip',
-                    buttons: [
-		                    { extend: 'excel', className: 'btn btn-success btn-flat' , text: 'excel匯出'}
-                    ],
-                    paging      : true,
-                    ordering    : true,
-                    info        : true,
-                    autoWidth   : true,
-                    aaSorting : [[0, 'desc']], //預設的排序方式，第2列，升序排列
-                    // columnDefs:[{
-                    //     targets : [0,1,4],    //除第六，第七兩列外，都預設不排序
-                    //     orderable : false,
-                    // }],
-                    aLengthMenu : [25, 50, 100], //更改顯示記錄數選項
-                    oLanguage: {
-                        emptyTable    : "目前沒有任何（匹配的）資料。",
-                        sProcessing:   "處理中...",
-                        sLengthMenu:   "顯示 _MENU_ 項結果",
-                        sZeroRecords:  "沒有資料",
-                        sInfo:         "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
-                        sInfoEmpty:    "顯示第 0 至 0 項結果，共 0 項",
-                        sInfoFiltered: "(從 _MAX_ 項結果過濾)",
-                        sInfoPostFix:  "",
-                        sSearch:       "搜索:",
-                        sUrl:          "",
-                        oPaginate: {
-                            sFirst:    "首頁",
-                            sPrevious: "上頁",
-                            sNext:     "下頁",
-                            sLast:     "尾頁"
-                        }
-                    },
-                    columns: columns,
-                });
+                let dataTableConfig =
+                    {
+                        paging      : true,
+                        ordering    : true,
+                        info        : true,
+                        autoWidth   : true,
+                        aaSorting : [[0, 'desc']], //預設的排序方式，第2列，升序排列
+                        aLengthMenu : [25, 50, 100], //更改顯示記錄數選項
+                        oLanguage: {
+                            emptyTable    : "目前沒有任何（匹配的）資料。",
+                            sProcessing:   "處理中...",
+                            sLengthMenu:   "顯示 _MENU_ 項結果",
+                            sZeroRecords:  "沒有資料",
+                            sInfo:         "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
+                            sInfoEmpty:    "顯示第 0 至 0 項結果，共 0 項",
+                            sInfoFiltered: "(從 _MAX_ 項結果過濾)",
+                            sInfoPostFix:  "",
+                            sSearch:       "搜索:",
+                            sUrl:          "",
+                            oPaginate: {
+                                sFirst:    "首頁",
+                                sPrevious: "上頁",
+                                sNext:     "下頁",
+                                sLast:     "尾頁"
+                            }
+                        },
+                        columns: columns,
+                    };
+                if(ex_buttons){
+                    dataTableConfig.dom = 'Bfrtip';
+                    ex_buttons.map(function(v){
+                        console.log(v);
+                        dataTableConfig.buttons = [{ extend: v , className: 'btn btn-success btn-flat' , text: `${v}匯出`}];
+                    });
+                }
+								
+                var dataTable = $('#'+tableId+'').DataTable(dataTableConfig);
                 dataTable.clear();
                 dataTable.rows.add( rowData );
                 dataTable.draw();
