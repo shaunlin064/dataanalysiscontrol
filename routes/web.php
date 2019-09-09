@@ -97,11 +97,37 @@
 			});
 		});
 		
-		
+		// financial
 		Route::group(['namespace' => '\App\Http\Controllers'], function() {
 			Route::prefix('financial')->group(function() {
-				Route::get('/exchangeRateSetting', 'FinancialController@exchangeRateSetting')->name('financial.exchangeRate.setting');
-				Route::post('/add', 'FinancialController@add')->name('financial.exchangeRate.add');
+				Route::group(['namespace' => '\App\Http\Controllers\Financial'], function() {
+					
+					Route::get('/exchangeRateSetting', 'ExchangeRatesController@setting')->name('financial.exchangeRate.setting');
+					Route::post('/add', 'ExchangeRatesController@add')->name('financial.exchangeRate.add');
+					
+					
+					Route::prefix('/provide')->group(function () {
+						Route::get('/list', 'ProvideController@list')->name('financial.provide.list');
+						Route::get('/view/{id?}', 'ProvideController@view')->name('financial.provide.view');
+						Route::any('/getAllSelectId', 'ProvideController@getAllSelectId')->name('financial.provide.getAllSelectId');
+						Route::any('/getAjaxData', 'ProvideController@getAjaxData')->name('financial.provide.getAjaxData');
+						Route::any('/ajaxCalculatFinancialBonus', 'ProvideController@ajaxCalculatFinancialBonus')->name('financial.provide.ajaxCalculatFinancialBonus');
+						Route::post('/post', 'ProvideController@post')->name('financial.provide.post');
+					});
+				});
+			});
+		});
+		
+		//sale groups setting
+		Route::group(['namespace' => '\App\Http\Controllers'], function() {
+			Route::prefix('saleGroup/setting')->group(function() {
+				Route::group(['namespace' => '\App\Http\Controllers\SaleGroup'], function() {
+						Route::get('/list', 'SaleGroupController@list')->name('saleGroup.setting.list');
+						Route::get('/add', 'SaleGroupController@add')->name('saleGroup.setting.add');
+						Route::get('/edit/{id?}', 'SaleGroupController@edit')->name('saleGroup.setting.edit');
+						Route::get('/view/{id?}', 'SaleGroupController@view')->name('saleGroup.setting.view');
+						Route::post('/post', 'SaleGroupController@post')->name('saleGroup.setting.post');
+				});
 			});
 		});
 		/*
@@ -110,7 +136,7 @@
 		
 		Route::group(['namespace' => '\App\Http\Controllers\System'], function() {
 			Route::prefix('system')->group(function(){
-				Route::get('/index', [
+				Route::get('/', [
 				 'as' => 'system.index',
 				 'uses' => 'SystemController@index',
 				]);

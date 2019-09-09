@@ -73,9 +73,10 @@
 			
 			if(empty($userObj)){
 				$request->merge(['password'=>Hash::make($request->get('password'))]);
-				$request->merge(['erp_id'=>$request->id]);
+				$request->merge(['erp_user_id'=>$request->id]);
 				
 				$userObj = User::create($request->toArray());
+				
 				$userObj->fresh();
 			}
 //			Auth::attempt($request->only('name', 'password'));
@@ -84,12 +85,12 @@
 		
 		public function login (Request $request)
 		{
-			
 			$message = $this->erpLogin($request);
-			
+			//
 			if($message['status'] != 1){
 				return view('handle',['message'=>$message,'returnUrl' => Route('auth.index')]);
 			}
+			
 			$request->merge($message['data']['user']);
 			$this->dacLogin($request);
 			

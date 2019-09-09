@@ -32,18 +32,6 @@
 		
 		public function list ()
 		{
-//			Gate::define('bonus.setting.list', 'App\Http\Controllers\Bonus\SettingController@list');
-//			Gate::forUser('157')->allows('bonus.setting.list', '123');
-//			dd();
-//
-//			$aaa = collect(Route::getRoutes())->map(function($v,$k){
-//				return [$v->getName(),$v->getAction()];
-//			});
-//			foreach ($routes as $route) {
-//
-//				$aaa[] = [$route->getName(),$route->getAction()];
-//			}
-//			dd($aaa);
 			$listdata = session('users');
 			sort($listdata);
 			return view('bonus.review.list',['data' => $this->resources,'row' => $listdata]);
@@ -63,11 +51,11 @@
 			$permission = new Permission();
 			$permission->permissionCheck($id,$loginUserId);
 			
-			$bonus = new Bonus();
 			$date = new \DateTime();
 			$yearMonth = $date->format('Ym');
 			$yearMonthDay = $date->format('Y-m-01');
-			
+			//$yearMonth = '201907';
+			//$yearMonthDay ='2019-07-01';
 			//get financialData
 			$erpReturnData = $this->getFinancialData($id, $yearMonthDay, $yearMonth);
 			
@@ -77,11 +65,11 @@
 			// getUserBonus set output Data
 			$boxData = $this->getUserBonus($id, $totalProfit, $yearMonthDay);
 			
-			
+			$tmpCollect = collect($erpReturnData);
 			$chartData = [
 			  [ 'data' => [
-			   $totalIncome,
-				   0,
+			   $tmpCollect->where('status','=',0 )->sum('income'),
+			   $tmpCollect->where('status','>=',1 )->sum('income'),
 				   0,
 				   0
 			  ]],
@@ -110,6 +98,8 @@
 			  'campaign_name' => '名稱',
 			  'media_channel_name' =>	'媒體',
 			  'sell_type_name' =>	'類型' ,
+			  'currency_id' => '原幣別',
+			  'organization' => '公司',
 			  'income' =>	'收入' ,
 			  'cost' =>	'成本' ,
 			  'profit'	=> '毛利',
@@ -118,7 +108,6 @@
 			 ],
 				'data' => $erpReturnData
 			];
-			
 			$userData = [
 			 'uId' => $id,
 			 'name' => session('users')[$id]['name'],
@@ -167,6 +156,13 @@
 			// getUserBonus set output Data
 			$boxData = $this->getUserBonus($uId, $totalProfit, $yearMonthDay);
 			
+			$tmpCollect = collect($erpReturnData);
+			
+			$chartMoneyStatus = [
+			 'unpaid' => $tmpCollect->where('status','=',0 )->sum('income'),
+				'paid' =>$tmpCollect->where('status','>=',1 )->sum('income')
+				 ];
+			
 			$chartDataBar = [
 			 'totalIncome' => $totalIncome,
 				'totalCost' => $totalCost,
@@ -176,7 +172,8 @@
 			echo json_encode([
 			 'erpReturnData' => $erpReturnData,
 			 'chartDataBar' => $chartDataBar,
-				'boxData' => $boxData
+				'boxData' => $boxData,
+				'chartMoneyStatus' => $chartMoneyStatus,
 			 ]);
 		}
 		
@@ -184,30 +181,38 @@
 		 * @param $erpReturnData
 		 * @return array
 		 */
-		private function calculationTotal ($erpReturnData): array
+		public function calculationTotal ($erpReturnData): array
 		{
 			$totalIncome = 0;
 			$totalCost = 0;
 			$totalProfit = 0;
-			
-			if (!empty($erpReturnData)) {
+			if (empty($erpReturnData)) {
+				$erpReturnData = [];
+			} else {
 				foreach ($erpReturnData as $key => $items) {
+					$items = gettype($items) == 'object' ? get_object_vars($items) : $items;
+					
 					if ($items['income'] == 0 && $items['cost'] == 0) {
 						unset($erpReturnData[$key]);
 						continue;
 					}
+					
 					$totalIncome += $items['income'];
 					$totalCost += $items['cost'];
+					
 					$totalProfit += $items['profit'];
+					
+					if($items['organization'] == 'hk'){
+						$erpReturnData[$key]['profit'] = sprintf('<p style="color:red">%d</p>',$items['profit']);
+					}
 					
 					$erpReturnData[$key]['campaign_name'] = sprintf('<a href="http://%s/jsadwaysN2/campaign_view.php?id=%d" target="_blank">%s</a>',env('ERP_URL'),$items['cam_id'],$items['campaign_name']);
 					
-					$erpReturnData[$key]['paymentStatus'] = 'no';
-					$erpReturnData[$key]['bonusStatus'] = 'no';
+					$erpReturnData[$key]['paymentStatus'] = $erpReturnData[$key]['receipt']['created_at'] ?? 'no';
+					$erpReturnData[$key]['bonusStatus'] = $erpReturnData[$key]['provide']['created_at'] ??'no';
+					
 				}
 				sort($erpReturnData);
-			} else {
-				$erpReturnData = [];
 			}
 			return array($totalIncome, $totalCost, $totalProfit, $erpReturnData);
 		}
@@ -218,7 +223,7 @@
 		 * @param string $yearMonthDay
 		 * @return array
 		 */
-		private function getUserBonus ($uId, $totalProfit, string $yearMonthDay): array
+		public function getUserBonus ($uId, $totalProfit, string $yearMonthDay): array
 		{
 			// getUserBonus
 			$bonus = new Bonus();
@@ -241,14 +246,16 @@
 		 * @param string $yearMonth
 		 * @return bool|mixed|string
 		 */
-		private function getFinancialData ($id, string $yearMonthDay, string $yearMonth)
+		public function getFinancialData ($id, string $yearMonthDay, string $yearMonth)
 		{
 			//確認是否已有資料 反之call API
-			$financialList = FinancialList::where(['erp_id' => $id, 'set_date' => $yearMonthDay])->get();
+			$financialList = FinancialList::where(['erp_user_id' => $id, 'set_date' => $yearMonthDay])->with('receipt')->with('provide')->get();
+			
 			$financial = new FinancialController();
 			if ($financialList->count() == 0) {
 				// get api data
 				$erpReturnData = collect($financial->getErpMemberFinancial([$id], $yearMonth));
+				
 				$erpReturnData = $erpReturnData->map(function ($v) use($financial) {
 					return $financial->exchangeMoney($v);
 				});

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Bonus;
 use App\BonusLevels;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class UpdateUserBonus extends Command
 {
@@ -42,7 +43,7 @@ class UpdateUserBonus extends Command
         //
 	    $thisMonth = date('Y-m-01');
 	    $lastMonth = date('Y-m-01',strtotime("-1 month"));
-	    $bonus = Bonus::where('set_date',$lastMonth)->select(['id','user_id','boundary'])->with('levels')->get();
+	    $bonus = Bonus::where('set_date',$lastMonth)->select(['id','erp_user_id','boundary'])->with('levels')->get();
 	    
 	    DB::beginTransaction();
 	    try{

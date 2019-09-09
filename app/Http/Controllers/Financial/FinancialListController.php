@@ -10,6 +10,7 @@
 	
 	
 	use App\FinancialList;
+	use App\FinancialReceipt;
 	use App\Http\Controllers\BaseController;
 	use App\Http\Controllers\FinancialController;
 	use DateTime;
@@ -32,6 +33,20 @@
 			};
 		}
 		
+		public function updateFinancialMoneyReceipt ($type='select')
+		{
+			$financial = new FinancialController();
+			
+			$erpReturnData = collect($financial->getBalancePayMentIds($type));
+			$v = FinancialList::whereIn('cp_detail_id',$erpReturnData)->get();
+			FinancialList::whereIn('cp_detail_id',$erpReturnData)->update(['status' => 1]);
+			
+			$v->map(function ($v){
+				if(!FinancialReceipt::where('financial_lists_id',$v->id)->exists()){
+					FinancialReceipt::create(['financial_lists_id' => $v->id]);
+				}
+			});
+		}
 		//存入所有資料 資料重抓使用 （慎）
 		public function saveUntilNowAllData ()
 		{
@@ -51,7 +66,7 @@
 				
 			} catch (\Exception $ex) {
 				DB::rollback();
-				dd(\Log::error($ex->getMessage()));
+				dd($ex->getMessage());
 			}
 		}
 		
@@ -59,10 +74,25 @@
 		public function saveCloseData ()
 		{
 			$financial = new FinancialController();
-			$erpReturnData = collect($financial->getErpMemberFinancial(['all'],$this->acceptDate->format('Ym')));
-			$alreadySetData = collect(FinancialList::where('set_date',$this->acceptDate->format('Y-m-d'))->get()->toArray());
 			
-			$erpReturnData = $erpReturnData->whereNotIn('cp_detail_id', $alreadySetData->pluck('cp_detail_id'));
+			$erpReturnData = collect($financial->getErpMemberFinancial(['all'],'all'));
+			$alreadySetData = collect(FinancialList::where('set_date','>=',$this->acceptDate->format('Y-m-d'))->get()->toArray());
+			$financeList = new FinancialList();
+			$updateDataTmp = [];
+			
+			// 先過濾已新增過的資料 做 UPDATA 為新增的資料做 insert
+			$erpReturnData = $erpReturnData->filter(function($v,$k) use($financeList,$alreadySetData,&$updateDataTmp){
+				
+				$data = $alreadySetData->where('cp_detail_id',$v['o_id'])->where('set_date',date("Y-m-01",strtotime($v['year_month'].'01')))->first();
+				
+				if(empty($data) && $financeList->where(['cp_detail_id' => $v['o_id']],[ 'set_date' => date("Y-m-01",strtotime($v['year_month'].'01')) ])->doesntExist()){
+					return $v;
+				}else if(!empty($data)){
+					//debug check
+					$updateDataTmp[]= $v;
+					$financeList->updateSet($data['id'],$v);
+				}
+			});
 			
 			DB::beginTransaction();
 			
@@ -78,4 +108,5 @@
 				\Log::error($ex->getMessage());
 			}
 		}
+
 	}

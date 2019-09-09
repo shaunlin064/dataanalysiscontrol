@@ -12,7 +12,7 @@ require('./bootstrap');
 
 import Vue from 'vue';
 import Vuex from 'vuex';
-//
+
 
 Vue.use(Vuex);
 
@@ -23,7 +23,14 @@ let store1 =  new Vuex.Store(test);
 // jquery
 window.$ = window.jQuery = require('jquery');
 //datatable
-import DataTable from 'datatables.net-bs';
+// // import buttons and plugins
+// import '../../public/plugins/datatables.net-buttons/js/dataTables.buttons.js';
+// import '../../public/plugins/datatables.net-buttons/js/buttons.html5.js';
+// import '../../public/plugins/datatables.net-buttons/js/buttons.print.js';
+// // // import the rest
+// import '../../public/plugins/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css';
+
+import DataTable from 'datatables.net-bs4';
 window.DataTable = DataTable;
 
 //chart.js
@@ -80,11 +87,32 @@ Vue.component('chart-component', require('./components/Chart').default);
 
 Vue.component('test-component', require('./components/test.vue').default);
 Vue.component('test2-component', require('./components/test2.vue').default);
+
+// saleGroup
+Vue.component('sale-group-form-component', require('./components/SaleGroupForm').default);
+
+//simple dataTalbe
+Vue.component('simple-data-table-componet',require('./components/SimpleDatatable').default);
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
+
+
+//provide Bonus Table
+Vue.component('provide-data-table-component', require('./components/ProvideDataTable').default);
+
+//pagination
+Vue.component('pagination-component', require('./components/Pagination').default);
+
+Vue.component('pagination', require('laravel-vue-pagination'));
+
+//date range
+Vue.component('date-range', require('./components/DateRange').default);
+
+Vue.component('testbutton', require('./components/testbutton').default);
+
 
 const app = new Vue({
     el: '#app',

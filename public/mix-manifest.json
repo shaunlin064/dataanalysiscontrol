@@ -1,5 +1,12 @@
 {
     "/js/app.js": "/js/app.js",
     "/css/app.css": "/css/app.css",
-    "/css/global.css": "/css/global.css"
+    "/css/global.css": "/css/global.css",
+    "/js/helper.js": "/js/helper.js",
+    "/plugins/material/material.min.css": "/plugins/material/material.min.css",
+    "/plugins/datatables.net": "/plugins/datatables.net",
+    "/plugins/datatables.net-bs": "/plugins/datatables.net-bs",
+    "/plugins/datatables.net-bs4": "/plugins/datatables.net-bs4",
+    "/plugins/datatables.net-buttons": "/plugins/datatables.net-buttons",
+    "/plugins/datatables.net-buttons-bs4": "/plugins/datatables.net-buttons-bs4"
 }

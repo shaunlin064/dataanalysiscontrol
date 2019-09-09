@@ -192,7 +192,6 @@ throw new Error('AdminLTE requires jQuery')
 
   BoxWidget.prototype.toggle = function () {
     var isOpen = !$(this.element).is(Selector.collapsed);
-
     if (isOpen) {
       this.collapse();
     } else {

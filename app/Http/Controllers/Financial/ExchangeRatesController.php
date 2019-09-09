@@ -17,6 +17,8 @@ class ExchangeRatesController extends BaseController
 	
 	public function setting ()
 	{
+		$fin = new FinancialListController();
+		$fin->updateFinancialMoneyReceipt();
 		
 		if(!in_array(session('userData')['id'],session('role')['admin']['ids'])){
 			abort(403);

@@ -237,6 +237,20 @@ class ExchangeRatesSeeder extends Seeder
 		     'currency' => 'USD',
 		     'rate' => '31.0261'
 		    ]
+	     ],
+	     '201908' => [
+		    [
+		     'currency' => 'CNY',
+		     'rate' => '4.4099'
+		    ],
+		    [
+		     'currency' => 'JPY',
+		     'rate' => '0.2934'
+		    ],
+		    [
+		     'currency' => 'USD',
+		     'rate' => '31.3468'
+		    ]
 	     ]
 	    ];
 	    

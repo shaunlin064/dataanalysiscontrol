@@ -17,7 +17,7 @@
 						<div v-if='type == "add"'>
 							<label for="selectAddUserId" class="col-sm-2 control-label pull-left">新增業務</label>
 							<div class="col-sm-3">
-								<select class="form-control select2" style="width: 100%;" name='user_id'>
+								<select class="form-control select2" style="width: 100%;" name='erp_user_id'>
 									<optgroup v-for='user_groups in addUserList' :label='user_groups["depName"]'>
 										<option v-for='add_user_list in user_groups.data' :disabled='check_is_set(add_user_list.id)' :value='add_user_list.id'>{{ add_user_list.name }}</option>
 									</optgroup>
@@ -136,13 +136,13 @@
         mounted: function() {
             // console.log(this.check_is_set(1));
 						$('.select2').select2();
-						
+						console.log(this.items);
 				},
 		    methods: {
 		
 		            add() {
-		                console.log(this.boundary);
-		                this.originalData = null
+		                console.log(this.items);
+		                this.originalData = null;
 		                this.items.push({ achieving_rate: '0', bonus_rate: '0', bonus_direct: '0'});
                     // this.detail_has_error.push({achieving_rate: false, bonus_rate: false});
                     

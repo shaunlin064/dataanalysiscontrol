@@ -42,7 +42,30 @@
 		    'bonus_direct' => 20000,
 	     ]
 	    ];
-	    
+	    // anther rule
+	    $exileRuleLevels = [
+	     0 => [
+		    "achieving_rate" => "50",
+		    "bonus_rate" => "5",
+		    'bonus_direct' => 0,
+	     ],
+	     1 => [
+		    "achieving_rate" => "70",
+		    "bonus_rate" => "10",
+		    'bonus_direct' => 0,
+	     ],
+	     2 => [
+		    "achieving_rate" => "100",
+		    "bonus_rate" => "10",
+		    'bonus_direct' => 15000,
+	     ],
+	     3 => [
+		    "achieving_rate" => "150",
+		    "bonus_rate" => "10",
+		    'bonus_direct' => 20000,
+	     ]
+	    ];
+	    $exileUserId = [133,153,188];
 	    $userdata[] = ['set_date'=>'2018-05-01','user_id' => 186,'boundary' => 400000];
 	    $userdata[] = ['set_date'=>'2018-05-01','user_id' => 170,'boundary' => 400000];
 	    $userdata[] = ['set_date'=>'2018-05-01','user_id' => 131,'boundary' => 500000];
@@ -72,8 +95,14 @@
 			    
 			    $request = new Request($importData);
 			    $bonus = Bonus::create($request->all());
+			    $setBonusLevels = $bonusLevels;
 			    
-			    collect($bonusLevels)->map(function($v) use($bonus){
+					if( $importData['set_date'] >= '2019-07-01' && in_array($importData['user_id'],$exileUserId)){
+						$setBonusLevels = $exileRuleLevels;
+					};
+			    
+			    
+			    collect($setBonusLevels)->map(function($v) use($bonus){
 				    $v['bonus_id'] = $bonus->id;
 				    BonusLevels::create($v);
 			    });

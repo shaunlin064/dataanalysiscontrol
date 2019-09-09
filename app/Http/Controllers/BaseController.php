@@ -29,19 +29,21 @@
 			 //	<!-- jvectormap --
 			'/adminLte_componets/jvectormap/jquery-jvectormap.css',
 			 //			<!-- DataTables -->
-		  '/adminLte_componets/datatables.net-bs/css/dataTables.bootstrap.min.css',
+			//'/adminLte_componets/datatables.net/css/jquery.dataTables.css',
+			'/plugins/datatables.net-bs4/css/dataTables.bootstrap4.css',
+			'/plugins/datatables.net-buttons-bs4/css/buttons.bootstrap4.css',
 			 //		<!-- daterange picker -->
-		  '/adminLte_componets/bootstrap-daterangepicker/daterangepicker.css',
+			'/adminLte_componets/bootstrap-daterangepicker/daterangepicker.css',
 			 //		<!-- bootstrap datepicker -->
-		  '/adminLte_componets/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css',
+			'/adminLte_componets/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css',
 			 //			<!-- iCheck for checkboxes and radio inputs -->
-		  '/adminLte_componets/plugins/iCheck/all.css',
+			'/adminLte_componets/plugins/iCheck/all.css',
 			 //			<!-- Bootstrap Color Picker -->
-		  '/adminLte_componets/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css',
+			'/adminLte_componets/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css',
 			 //			<!-- Bootstrap time Picker -->
-		  '/adminLte_componets/plugins/timepicker/bootstrap-timepicker.min.css',
+			'/adminLte_componets/plugins/timepicker/bootstrap-timepicker.min.css',
 			 //			<!-- Select2 -->
-		  '/adminLte_componets/select2/dist/css/select2.min.css',
+			'/adminLte_componets/select2/dist/css/select2.min.css',
 			 //	<!-- Theme style --
 			'/css/AdminLTE.css',
 			 //	<!-- AdminLTE Skins. Choose a skin from the css/skins
@@ -50,19 +52,21 @@
 			 //	<!-- Google Font -->
 			'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic',
 			 // global css
-			 '/css/global.css'
+			'/css/global.css'
 		 ],
 		 'jsPath' => [
+			
 			'/js/app.js',
+			 
 			 //     <!-- jQuery 3 -->
 			'/adminLte_componets/jquery/dist/jquery.js',
 			 //		<!-- Bootstrap 3.3.7 -->
 			'/adminLte_componets/bootstrap/dist/js/bootstrap.min.js',
 			 //		<!-- ChartJS -->
-//		  '/adminLte_componets/chart.js/Chart.js',
+			 //		  '/adminLte_componets/chart.js/Chart.js',
 			 //		<!-- FastClick -->
 			'/adminLte_componets/fastclick/lib/fastclick.js',
-		  '/adminLte_componets/moment/moment.js',
+			'/adminLte_componets/moment/moment.js',
 			 //		<!-- AdminLTE App -->
 			'/js/adminlte.js',
 			 //		<!-- Sparkline -->
@@ -72,20 +76,32 @@
 			'/adminLte_componets/plugins/jvectormap/jquery-jvectormap-world-mill-en.js',
 			 //		<!-- SlimScroll -->
 			'/adminLte_componets/jquery-slimscroll/jquery.slimscroll.min.js',
-			 '/adminLte_componets/datatables.net/js/jquery.dataTables.min.js',
-		  '/adminLte_componets/datatables.net-bs/js/dataTables.bootstrap.min.js',
-		  '/adminLte_componets/fastclick/lib/fastclick.js',
-		  '/adminLte_componets/select2/dist/js/select2.full.min.js',
-		  '/adminLte_componets/plugins/input-mask/jquery.inputmask.js',
-		  '/adminLte_componets/plugins/input-mask/jquery.inputmask.extensions.js',
-		  '/adminLte_componets/moment/min/moment.min.js',
-		  '/adminLte_componets/bootstrap-daterangepicker/daterangepicker.js',
-		  '/adminLte_componets/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js',
-		  '/adminLte_componets/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js',
-		  '/adminLte_componets/plugins/timepicker/bootstrap-timepicker.min.js',
-		  '/adminLte_componets/plugins/iCheck/icheck.min.js',
+			 // datatable
+			'/plugins/datatables.net/js/jquery.dataTables.min.js',
+			'/plugins/datatables.net-bs/js/dataTables.bootstrap.min.js',
+			
+			'/plugins/datatables.net-buttons/js/dataTables.buttons.js',
+			'/plugins/datatables.net-buttons/js/buttons.html5.js',
+			'/plugins/datatables.net-buttons-bs4/js/buttons.bootstrap4.js',
+			 //jszip
+			'/plugins/jszip/dist/jszip.min.js',
+			 //pdfmake
+			'/plugins/pdfmake/build/pdfmake.min.js',
+			'/plugins/pdfmake/build/vfs_fonts.js',
+			'/adminLte_componets/fastclick/lib/fastclick.js',
+			'/adminLte_componets/select2/dist/js/select2.full.min.js',
+			'/adminLte_componets/plugins/input-mask/jquery.inputmask.js',
+			'/adminLte_componets/plugins/input-mask/jquery.inputmask.extensions.js',
+			'/adminLte_componets/moment/min/moment.min.js',
+			'/adminLte_componets/bootstrap-daterangepicker/daterangepicker.js',
+			'/adminLte_componets/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js',
+			'/adminLte_componets/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js',
+			'/adminLte_componets/plugins/timepicker/bootstrap-timepicker.min.js',
+			'/adminLte_componets/plugins/iCheck/icheck.min.js',
+			'/adminLte_componets/select2/dist/js/select2.full.min.js',
 			 //		<!-- AdminLTE for demo purposes -->
-			'/js/demo.js'
+			'/js/demo.js',
+			'/js/helper.js',
 		 ],
 		];
 		

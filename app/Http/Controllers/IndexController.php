@@ -27,6 +27,7 @@ class IndexController extends BaseController
 ////			dd(Route::currentRouteName(),Route('index'),$return,$keys,$this->resources['menus']);
 //		}
 //		dd($return,$this->resources['menus']);
+		
 		return view('index',['data' => $this->resources]);
 	}
 	

@@ -17,7 +17,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','erp_id'
+        'name', 'email', 'password','erp_user_id'
     ];
 
     /**
@@ -60,6 +60,8 @@ class User extends Authenticatable
 		return !!$role->intersect($this->role)->count();//是否相同 ＞0
 		
 	}
-
+	public function financialList(){
+		return $this->hasMany(FinancialList::CLASS,'erp_user_id','erp_user_id');
+	}
 	
 }

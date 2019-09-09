@@ -46,17 +46,18 @@
                     response => {
                         let chartDataBar = response.data.chartDataBar;
 		                    let boxData = response.data.boxData;
+		                    let chartMoneyStatus = response.data.chartMoneyStatus;
                         this.updataTable(response.data.erpReturnData);
 
                         this.$store.commit('changeMonthBalancen',{'month_income':chartDataBar.totalIncome,'month_cost':chartDataBar.totalCost});
-
+										
                         this.$store.commit('changeBox',{value:boxData.profit,field:'profit'});
                         this.$store.commit('changeBox',{value:boxData.bonus_rate,field:'bonus_rate'});
                         this.$store.commit('changeBox',{value:boxData.bonus_next_amount,field:'bonus_next_amount'});
                         this.$store.commit('changeBox',{value:boxData.bonus_next_percentage,field:'bonus_next_percentage'});
                         this.$store.commit('changeBox',{value:boxData.bonus_direct,field:'bonus_direct'});
 
-                        this.$store.commit('changeMoneyStatus',{paid:0,unpaid:chartDataBar.totalIncome});
+                        this.$store.commit('changeMoneyStatus',{paid:chartMoneyStatus.paid,unpaid:chartMoneyStatus.unpaid});
 		                    // console.log(response.data.erpReturnData);
                     },
                     err => {

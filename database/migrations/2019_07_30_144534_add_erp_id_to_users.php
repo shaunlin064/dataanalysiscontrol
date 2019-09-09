@@ -15,7 +15,7 @@ class AddErpIdToUsers extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             //
-	        $table->integer('erp_id');
+	        $table->integer('erp_user_id');
         });
     }
 
@@ -26,7 +26,9 @@ class AddErpIdToUsers extends Migration
      */
     public function down()
     {
-        
-	        Schema::dropIfExists('erp_id');
+	    Schema::table('users', function (Blueprint $table) {
+		    //
+		    $table->dropColumn('erp_user_id');
+	    });
     }
 }

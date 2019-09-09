@@ -34,6 +34,24 @@
 		    ],
 	     ],
 	     [
+		    "name" => "招集人",
+		    "icon" => "fa fa-street-view",
+		    "region" => "user",
+		    "catalogue" => "saleGroup.setting",
+		    "subMenu" => [
+		     [
+			    "name" => "設定",
+			    "icon" => "fa fa-circle-o",
+			    "url" => "saleGroup.setting.list",
+		     ],
+		     [
+			    "name" => "個人檢視",
+			    "icon" => "fa fa-circle-o",
+			    "url" => "saleGroup.setting.view",
+		     ]
+		    ],
+	     ],
+	     [
 		    "name" => "獎金",
 		    "icon" => "fa fa-usd",
 	      "region" => "user",
@@ -45,9 +63,14 @@
 			    "url" => "bonus.review.list",
 		     ],
 		     [
-			    "name" => "個人檢視",
+			    "name" => "個人獎金預估",
 			    "icon" => "fa fa-circle-o",
 			    "url" => "bonus.review.view",
+		     ],
+		     [
+			    "name" => "獎金發放檢視",
+			    "icon" => "fa fa-circle-o",
+			    "url" => "financial.provide.view",
 		     ]
 		    ],
 	     ],
@@ -61,6 +84,11 @@
 			    "name" => "匯率設定",
 			    "icon" => "fa fa-circle-o",
 			    "url" => "financial.exchangeRate.setting",
+		     ],
+		     [
+			    "name" => "獎金發放",
+			    "icon" => "fa fa-circle-o",
+			    "url" => "financial.provide.list",
 		     ],
 		    ],
 	     ],

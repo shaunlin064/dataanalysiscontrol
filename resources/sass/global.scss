@@ -15,3 +15,118 @@
 .block{
   display:block;
 }
+.no-shadow{
+  box-shadow: none;
+}
+.point{
+  cursor: pointer;
+}
+.p-20{
+  padding: 20px;
+}
+.text-r{
+  text-align: right;
+}
+.content.table{
+  position: relative;
+  //border: 1px solid rgba(0,0,0,.12);
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-size: 13px;
+  background-color: #fff;
+  min-height: 150px;
+  .table.head{
+    border-top: solid 0.5px #E0E0E0;
+    margin: 0px;
+  }
+  .arrow{
+    font-family:'Glyphicons Halflings';
+    opacity: 0.5;
+  }
+  .arrow.sorting:after {
+    opacity: 0.4;
+    content: "\e150";
+  }
+  .arrow.sorting_asc:after{
+    content: "\e155";
+  }
+  .arrow.sorting_desc:after {
+    content: "\e156";
+  }
+  .dataTables_length{
+    label{
+      font-weight: normal;
+      text-align: left;
+      white-space: nowrap;
+      select{
+        width: 75px;
+        display: inline-block;
+      }
+    }
+  }
+  .table.head,.body{
+    overflow: hidden;
+    .item{
+      cursor: pointer;
+      //height: auto;
+      //position: relative;
+      //border-top: 1px solid rgba(0,0,0,.12);
+      //border-bottom: 1px solid rgba(0,0,0,.12);
+      //padding: 0px 15px;
+      //box-sizing: border-box;
+      .treeview-items{
+        display: none;
+        height: auto;
+        width: 100%;
+        float: right;
+        padding: 0px 0px 0px 15px;
+        //border-top: 1px solid rgba(0,0,0,.12);
+        .head,.body{
+          overflow: hidden;
+        }
+      }
+    }
+    .item:hover{
+      color: #212529;
+      background-color: rgba(0,0,0,.075);
+    }
+  }
+  .body{
+    margin-bottom: 20px;
+  }
+  .border-bottom{
+    border-bottom: solid 0.5px #E0E0E0;
+    width: 100%;
+    float: left;
+    left: 0px;
+    //position: absolute;
+    //bottom: 0px;
+    height: 1px;
+  }
+  .columm{
+    padding-top: 15px;
+    padding-bottom: 10px;
+    height: 49px;
+    text-align: center;
+
+  }
+  .loading{
+    margin: 50px 0;
+  }
+  .footer{
+    nav{
+      .pagination{
+        padding: 0px 0px 10px 0px;
+      }
+    }
+
+  }
+}
+td.details-control {
+  background: url('/img/details_open.png') no-repeat center center;
+  cursor: pointer;
+}
+tr.shown td.details-control {
+  background: url('/img/details_close.png') no-repeat center center;
+}
+

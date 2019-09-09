@@ -25,14 +25,28 @@
 		 't_revenue' => 'income',
 		 't_cost' => 'cost'
 		];
-		
-		const CURRENCY_TYPE = [
-			'USD','JPY'
-		];
-		
+		public function getBalancePayMentIds (String $tpye = 'select')
+		{
+			
+			$apiObj = new ApiController();
+			
+			$data = [
+			 'token' => env('API_TOKEN'),
+			 'action' => 'balancePayMent',
+			 'data' => [
+				'selectType' => $tpye
+			 ]
+			];
+			$url = env('API_GET_BALANCE_PAYMENT_IDS_URL');
+			
+			$returnData = $apiObj->curlPost(json_encode($data),$url,'json');
+			
+			return $returnData;
+		}
 		
 		public function getErpMemberFinancial (Array $userIds,String $dateYearMonth = null ,String  $organizationStr = 'all',$outgroup = null)
 		{
+			
 			if($dateYearMonth){
 				$dateYearMonth = $dateYearMonth;
 			}else{
@@ -103,21 +117,24 @@
 		
 		public function exchangeMoney ($items)
 		{
-			$exchangeRate = ExchangeRate::where(['set_date'=>date('Y-m-01',strtotime($items['year_month'].'01')),'currency'=>$items['currency_id']])->first();
+			$set_date = $items->set_date ??  date('Y-m-01',strtotime($items['year_month'].'01'));
+			$currency = $items->currency ?? $items['currency_id'];
+			$organization = $items->organization ?? $items['organization'];
+			$exchangeRate = ExchangeRate::where(['set_date'=> $set_date,'currency'=>$currency])->first();
 			
-			switch($items['currency_id']){
+			switch($currency){
 				case 'USD':
 					if(empty($exchangeRate)){
-//						$exchangeRate = 31;
-						$exchangeRate = 1;
+						$exchangeRate = 31;
+						//$exchangeRate = 1;
 					}else{
 						$exchangeRate = $exchangeRate->rate;
 					}
 					break;
 				case 'JPY':
 					if(empty($exchangeRate)){
-//						$exchangeRate = 0.2875;
-						$exchangeRate = 1;
+						$exchangeRate = 0.2875;
+						//$exchangeRate = 1;
 					}else{
 						$exchangeRate = $exchangeRate->rate;
 					}
@@ -127,13 +144,32 @@
 					break;
 			}
 			
-			if( $items['organization'] == 'js' ){
+			if( $organization == 'js' ){
 				$exchangeRate = 1;
 			}
 			
-			$items['income'] = round($items['income'] * $exchangeRate);
-			$items['cost'] = round($items['cost'] * $exchangeRate);
-			$items['profit'] = round($items['profit'] * $exchangeRate);
+			$tmpData = [
+			  'income' => round(($items->income ?? $items['income']) * $exchangeRate),
+				'cost' => round(($items->cost ?? $items['cost']) * $exchangeRate),
+			];
+			$tmpData['profit'] = $tmpData['income'] - $tmpData['cost'];
+			
+			//TODO 毛利小於零 是否需要扣1%
+			if($items->organization ?? $items['organization'] == 'hk'){
+					$tmpData['profit']= round($tmpData['profit'] * 0.99);
+			}
+			
+			switch(gettype($items)){
+				case 'object':
+					foreach ($tmpData as $key => $item){
+						$items->$key = $item;
+					}
+					break;
+				default:
+					foreach ($tmpData as $key => $item){
+						$items[$key]= $item;
+					}
+			}
 			
 			return $items;
 		}
@@ -149,32 +185,4 @@
 			return $items;
 		}
 		
-		public function exchangeRateSetting ()
-		{
-			
-			if(!in_array(session('userData')['id'],session('role')['admin']['ids'])){
-				abort(403);
-			};
-			$row = ExchangeRate::all();
-			return view('financial.exchangeRate.setting',['data' => $this->resources,'currencys'=> self::CURRENCY_TYPE,'row'=>$row]);
-		}
-		
-		public function add (Request $request)
-		{
-			$date = new DateTime($request->set_date.'/01');
-			$date = $date->format('Y-m-01');
-			$request->request->set('set_date',$date);
-			$request->request->set('created_by_erp_user_id',session('userData')['id']);
-			
-			// exists check
-			if(ExchangeRate::where(['set_date'=>$date,'currency'=>$request->currency])->exists()){
-				return redirect('financial/exchangeRateSetting')->withErrors("資料重複設定");
-			}
-			
-			ExchangeRate::create($request->all());
-			
-			$row = ExchangeRate::all();
-			
-			return view('financial.exchangeRate.setting',['data' => $this->resources,'currencys'=> self::CURRENCY_TYPE,'row'=>$row]);
-		}
 	}

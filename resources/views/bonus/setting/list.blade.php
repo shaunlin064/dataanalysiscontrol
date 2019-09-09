@@ -103,12 +103,12 @@
                 },
                 columns: [
                     {
-                        data: "user_id",
+                        data: "erp_user_id",
                         render: function(data){
                             return users[data]['name'];
                         }
                     },
-                    { data: 'user_id',
+                    { data: 'erp_user_id',
                         render: function(data){
                             return users[data]['department_name'];
                         }},

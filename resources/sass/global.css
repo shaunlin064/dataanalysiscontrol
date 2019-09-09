@@ -1,0 +1,126 @@
+@charset "UTF-8";
+.customer-font-1e {
+  font-size: 1.5em;
+}
+
+.customer-font-3e {
+  font-size: 3em;
+}
+
+.customer-font-6e {
+  font-size: 6em;
+}
+
+.user-circle {
+  margin: auto;
+  color: white;
+}
+
+.block {
+  display: block;
+}
+
+.no-shadow {
+  box-shadow: none;
+}
+
+.point {
+  cursor: pointer;
+}
+
+.p-20 {
+  padding: 20px;
+}
+
+.text-r {
+  text-align: right;
+}
+
+.content.table {
+  position: relative;
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-size: 13px;
+  background-color: #fff;
+  min-height: 150px;
+}
+.content.table .table.head {
+  border-top: solid 0.5px #E0E0E0;
+  margin: 0px;
+}
+.content.table .arrow {
+  font-family: "Glyphicons Halflings";
+  opacity: 0.5;
+}
+.content.table .arrow.sorting:after {
+  opacity: 0.4;
+  content: "";
+}
+.content.table .arrow.sorting_asc:after {
+  content: "";
+}
+.content.table .arrow.sorting_desc:after {
+  content: "";
+}
+.content.table .dataTables_length label {
+  font-weight: normal;
+  text-align: left;
+  white-space: nowrap;
+}
+.content.table .dataTables_length label select {
+  width: 75px;
+  display: inline-block;
+}
+.content.table .table.head, .content.table .body {
+  overflow: hidden;
+}
+.content.table .table.head .item, .content.table .body .item {
+  cursor: pointer;
+}
+.content.table .table.head .item .treeview-items, .content.table .body .item .treeview-items {
+  display: none;
+  height: auto;
+  width: 100%;
+  float: right;
+  padding: 0px 0px 0px 15px;
+}
+.content.table .table.head .item .treeview-items .head, .content.table .table.head .item .treeview-items .body, .content.table .body .item .treeview-items .head, .content.table .body .item .treeview-items .body {
+  overflow: hidden;
+}
+.content.table .table.head .item:hover, .content.table .body .item:hover {
+  color: #212529;
+  background-color: rgba(0, 0, 0, 0.075);
+}
+.content.table .body {
+  margin-bottom: 20px;
+}
+.content.table .border-bottom {
+  border-bottom: solid 0.5px #E0E0E0;
+  width: 100%;
+  float: left;
+  left: 0px;
+  height: 1px;
+}
+.content.table .columm {
+  padding-top: 15px;
+  padding-bottom: 10px;
+  height: 49px;
+  text-align: center;
+}
+.content.table .loading {
+  margin: 50px 0;
+}
+.content.table .footer nav .pagination {
+  padding: 0px 0px 10px 0px;
+}
+
+td.details-control {
+  background: url("/img/details_open.png") no-repeat center center;
+  cursor: pointer;
+}
+
+tr.shown td.details-control {
+  background: url("/img/details_close.png") no-repeat center center;
+}
+
+/*# sourceMappingURL=global.css.map */

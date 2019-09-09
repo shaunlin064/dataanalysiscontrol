@@ -12,6 +12,8 @@
 	use App\Http\Controllers\BaseController;
 	use App\Menu;
 	use Auth;
+	use Route;
+	use Str;
 	
 	class Permission extends BaseController
 	{
@@ -19,16 +21,26 @@
 		public $menus;
 		public function __construct ()
 		{
-			$this->menus = Menu::all();
-			
+			$region = Str::before(Route::currentRouteName(),'.')  == 'system' ? 'system' : 'user';
+			$this->menus = Menu::where('region',$region )->get();
+			$uid = session('userData')['id'];
 			$this->role['admin']['ids'] = [15,17,157,172,179,187];
+			$convener = [67,84];
+			
 			$this->role['user']['ids'] = [];
-			$this->role['user']['purview']['menus'] = [1,2];
-			$this->role['user']['purview']['menu_subs'] = [2,4];
+			if(in_array($uid,$convener)){
+				$this->role['user']['purview']['menus'] = [1,2,3];
+				$this->role['user']['purview']['menu_subs'] = [2,4,6,7];
+			}else{
+				$this->role['user']['purview']['menus'] = [1,3];
+				$this->role['user']['purview']['menu_subs'] = [2,6,7];
+			}
+			
 			$this->role['user']['purview']['menu_sub_level2s'] = [];
 			
-			$uid = session('userData')['id'];
-			$collect = collect($this->role);
+			
+			
+			
 			$this->userRoleType = in_array($uid,$this->role['admin']['ids']) ? 'admin' : 'user';
 			
 //			 $collect->map(function($v,$k) use($uid){

@@ -2,37 +2,41 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use App\BonusLevels;
+use Illuminate\Database\Eloquent\Model;
 
 class Bonus extends Model
 {
     //
 	protected $table = 'bonus';
-	protected $fillable = ['user_id','set_date','boundary'];
+	protected $fillable = ['erp_user_id','set_date','boundary'];
 	
 	public function levels()
 	{
 		return $this->hasMany(BonusLevels::CLASS);
 	}
 	
+	public function bonusReach ()
+	{
+		return $this->hasOne(BonusReach::CLASS);
+	}
 	public function getUserBonus ($uid, $totalProfit,String $dateYearMonth)
 	{
 		//待解 如 搜尋舊資料 但當時未設定 bonus 預設要抓最新 or 當時前後？
 		//目前預設抓最新設定
 		
 		//check exists or use Old Data
-		if($this->where(['user_id' => $uid,'set_date' => $dateYearMonth])->exists()){
+		if($this->where(['erp_user_id' => $uid,'set_date' => $dateYearMonth])->exists()){
 			
 			$userbonus = $this->where([
-			 'user_id' => $uid,
+			 'erp_user_id' => $uid,
 			 'set_date' => $dateYearMonth
 			])->with('levels')->get()->first()->toArray();
 			
 		}else{
 			//抓取 最新一筆設定資料
-//			if( $this->where(['user_id' => $uid,])->with('levels')->exists() ){
-//				$userbonus = $this->where(['user_id' => $uid,])->with('levels')->OrderBy('id','desc')->get()->first()->toArray();
+//			if( $this->where(['erp_user_id' => $uid,])->with('levels')->exists() ){
+//				$userbonus = $this->where(['erp_user_id' => $uid,])->with('levels')->OrderBy('id','desc')->get()->first()->toArray();
 //
 //			}else{
 				$userbonus = [

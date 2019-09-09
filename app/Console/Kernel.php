@@ -33,6 +33,7 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')
         //          ->hourly();
 	    $schedule->command('update_user_bonus')->monthlyOn('1','00:00');
+	    $schedule->command('update_sale_groups')->monthlyOn('1','00:00');
 	    $schedule->command('update_financial_data')->monthlyOn('16','00:00');
     }
 

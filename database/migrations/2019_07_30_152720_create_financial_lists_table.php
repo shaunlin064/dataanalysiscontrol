@@ -17,7 +17,7 @@ class CreateFinancialListsTable extends Migration
             $table->bigIncrements('id');
             $table->integer('status'); // 狀態 0未收款 1已收款 2 已收款且放款
             $table->bigInteger('cp_detail_id'); //erp cp_detail_id
-            $table->integer('erp_id'); // epr user id
+            $table->integer('erp_user_id'); // epr user id
 	          $table->bigInteger('campaign_id'); // cam id
             $table->string('campaign_name'); //案件名稱
             $table->string('media_channel_name'); // 該條cue 媒體

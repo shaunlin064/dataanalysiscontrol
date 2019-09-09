@@ -10,6 +10,7 @@
 	
 	use App\Http\Controllers\ApiController;
 	use App\Http\Controllers\Auth\Permission;
+	use App\Http\Controllers\Financial\FinancialListController;
 	use App\Http\Controllers\FinancialController;
 
 	use Illuminate\Contracts\Auth\Access\Gate;
@@ -38,7 +39,7 @@
 		public function add ()
 		{
 			$userObj = new UserController();
-			$alreadySetUserIds = Bonus::select('user_id')->groupBy('user_id')->get()->toArray();
+			$alreadySetUserIds = Bonus::select('erp_user_id')->groupBy('erp_user_id')->get()->toArray();
 			$alreadySetUserIds = Arr::flatten($alreadySetUserIds);
 			
 			//for test data
@@ -131,18 +132,19 @@
 			};
 			
 			$bonus = Bonus::where('id',$id)->with('levels')->get()->toArray()[0];
-			$uid = $bonus['user_id'];
+			$uid = $bonus['erp_user_id'];
 			
 			$loginUserId = session('userData')['id'];
 			
 			$permission = new Permission();
 			$permission->permissionCheck($uid,$loginUserId);
 
-			$userTmpData = session('users')[$bonus['user_id']];
+			$userTmpData = session('users')[$bonus['erp_user_id']];
 			
 			$editData = $bonus;
 			$financial = new FinancialController();
-			$getlatelyMonth = $financial->getUserLatelyProfit($bonus['user_id']);
+			
+			$getlatelyMonth = $financial->getUserLatelyProfit($bonus['erp_user_id']);
 			extract($getlatelyMonth);
 			
 			$userData = [
@@ -180,7 +182,7 @@
 //				]
 //			 ]
 //			];
-			
+//			dd($editData);
 			return view('bonus.setting.edit',['data' => $this->resources,'row'=>$editData,'userData' => $userData,'userBonusHistory' => $userBonusHistory ]);
 		}
 		
@@ -204,7 +206,7 @@
 			};
 			
 			
-//			$bonus = Bonus::where('user_id',$uid)->with('levels')->get()->toArray();
+//			$bonus = Bonus::where('erp_user_id',$uid)->with('levels')->get()->toArray();
 			
 			
 			// 排程儲存
@@ -340,7 +342,7 @@
 			//新月份
 			if($bonus->set_date != $date->format('Y-m-01')){
 				$request->offsetUnset('bonus_id');
-				$request->merge(['user_id' => $bonus->user_id]);
+				$request->merge(['erp_user_id' => $bonus->erp_user_id]);
 				
 				return $this->save($request);
 			}else{
@@ -463,7 +465,7 @@
 			$importDatas = [];
 			//替換keyName 與 user id
 			foreach($objfileArr as $key => $item){
-				$importDatas[$key]['user_id'] = $userData->where('account',$item[1])->max('id');
+				$importDatas[$key]['erp_user_id'] = $userData->where('account',$item[1])->max('id');
 				$importDatas[$key]['boundary'] = $item[2];
 			}
 			
@@ -492,7 +494,7 @@
 		 */
 		private function getBonusHistory ($uid)
 		{
-			$userBonusHistory = Bonus::where('user_id', $uid)->orderBy('id', 'DESC')->with('levels')->get()->toArray();
+			$userBonusHistory = Bonus::where('erp_user_id', $uid)->orderBy('id', 'DESC')->with('levels')->get()->toArray();
 			return $userBonusHistory;
 		}
 	}
