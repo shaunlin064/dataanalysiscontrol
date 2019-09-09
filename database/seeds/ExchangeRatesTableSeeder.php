@@ -3,7 +3,7 @@
 	use App\ExchangeRate;
 	use Illuminate\Database\Seeder;
 
-class ExchangeRatesSeeder extends Seeder
+class ExchangeRatesTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
