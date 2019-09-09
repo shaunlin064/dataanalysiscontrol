@@ -2,9 +2,8 @@
 
 namespace App\Console;
 
-use App\Bonus;
-use App\BonusLevels;
 use App\Console\Commands\UpdateFinancialData;
+use App\Console\Commands\UpdateSaleGroups;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Console\Commands\UpdateUserBonus;
@@ -20,6 +19,7 @@ class Kernel extends ConsoleKernel
         //
       UpdateUserBonus::class,
 	    UpdateFinancialData::class,
+      UpdateSaleGroups::class,
     ];
 
     /**
