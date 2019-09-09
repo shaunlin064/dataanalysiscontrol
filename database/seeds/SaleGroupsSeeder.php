@@ -19,7 +19,10 @@ class SaleGroupsSeeder extends Seeder
 	     '業務六部' => [84,181,170,186]
 	    ];
 	    $convener = [67,84];
-	
+	    $saleBonus = [
+	     ['achieving_money' => 0,
+		    'bonus_rate' => 0
+	     ]];
 	    $sale5Bonus = [
 	     ['achieving_money' => 100*10000,
 		    'bonus_rate' => 5
@@ -55,6 +58,8 @@ class SaleGroupsSeeder extends Seeder
 			    $groupsData = $sale5Bonus;
 		    }else if($name == '業務六部'){
 			    $groupsData = $sale5Bonus;
+		    }else{
+			    $groupsData = $saleBonus;
 		    }
 		
 		    while($date->format('Y-m-d') != '2018-01-01'){

@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         ExchangeRatesTableSeeder::class,
         SaleGroupsSeeder::class,
         SaleGroupsReachsSeeder::class,
+        UsersTableSeeder::class,
        ]);
     }
 }
