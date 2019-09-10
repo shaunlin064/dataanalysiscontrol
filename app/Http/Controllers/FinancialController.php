@@ -153,9 +153,8 @@
 				'cost' => round(($items->cost ?? $items['cost']) * $exchangeRate),
 			];
 			$tmpData['profit'] = $tmpData['income'] - $tmpData['cost'];
-			
 			//TODO 毛利小於零 是否需要扣1%
-			if($items->organization ?? $items['organization'] == 'hk'){
+			if(($items->organization ?? $items['organization']) == 'hk'){
 					$tmpData['profit']= round($tmpData['profit'] * 0.99);
 			}
 			
