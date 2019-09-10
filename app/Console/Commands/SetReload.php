@@ -43,5 +43,6 @@ class SetReload extends Command
 	    Artisan::call('reload_financial_money_receipt');
 	    Artisan::call('reload_bonus_reach');
 	    Artisan::call('reload_convener_reach');
+	    Artisan::call('set_old_provide');
     }
 }

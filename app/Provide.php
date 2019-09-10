@@ -8,7 +8,7 @@ class Provide extends Model
 {
     //
 	protected $table = 'financial_provides';
-	protected $fillable = ['financial_lists_id','bonus_id','provide_money'];
+	protected $fillable = ['financial_lists_id','bonus_id','provide_money','created_at','updated_at'];
 	
 	public function financialList ()
 	{
