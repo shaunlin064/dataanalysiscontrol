@@ -336,26 +336,32 @@
                 }
 		        },
 		        select_self(){
-              let targetDom = $(event.target).parent('.item').find('input:checkbox');
-              
-              let checkStatus = !targetDom.prop("checked");
-              if(targetDom[0] == undefined){
-                  targetDom = $(event.target);
-                  checkStatus = targetDom.prop("checked");
-              }
-              
-              
+                //select_self觸發 有兩種 一種是checkbox 一種是整行div
+                let targetDom;
+                let checkStatus;
+                switch($(event.target)[0].tagName){
+                    case 'SPAN':
+                        /*event target 靠 span 觸發 checkbox*/
+                        return false;
+                        break;
+		                case 'DIV':
+                        targetDom = $(event.target).parent('.item').find('input:checkbox');
+                        //判斷checkbox狀態
+                        checkStatus = !targetDom.prop("checked");
+		                    break;
+                    case 'INPUT':
+                        targetDom = $(event.target);
+                        //判斷checkbox狀態 因冒泡關係 要判斷反向
+                        checkStatus = targetDom.prop("checked");
+		                    break;
+                }
+				        
               if(targetDom[0].tagName == 'INPUT'){
                   this.toggleCheck(checkStatus, targetDom);
                   this.selectIdValue(checkStatus,targetDom);
                   this.calculatBonus(checkStatus,targetDom);
               }
-              
 
-              // let campaignBonus = $(this).parents('.item').find('input[name="campaignBonus"]');
-              // let checkBoxDom = $(this).parent().find('input:checkbox');
-							//
-              // calculatBonus(checkBoxDom,campaignBonus);
 		        },
             calculatBonus(checkStatus,targetDom){
                 targetDom.map(function(index,v){

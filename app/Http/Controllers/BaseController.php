@@ -107,7 +107,14 @@
 		
 		public function __construct ()
 		{
-		
+				if(env('RESOURCES_CACHE_OPEN')){
+					$time = time();
+					$this->resources =  collect($this->resources)->map(function($v,$k) use($time){
+						 return collect($v)->map(function ($v)use($time){
+						 	  return $v .= sprintf('?v=%d',$time);
+						 });
+					});
+				}
 		}
 		
 	}

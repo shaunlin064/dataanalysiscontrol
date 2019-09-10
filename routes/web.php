@@ -10,11 +10,11 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+use \Illuminate\Support\Facades\Artisan;
 	/*
 			 * 登入系統
 			 */
-//	Route::get('/home', 'HomeController@index')->name('home');
+
 	
 	Route::group(['namespace' => '\App\Http\Controllers\Auth'], function() {
 		Route::get('/login', [
@@ -32,10 +32,7 @@
 		 'uses' => 'AuthCustomerController@logout',
 		 ]);
 	});
-	Route::get('/menu/firstCreate', [
-	 'as' => 'menu.firstCreate',
-	 'uses' => 'MenuController@firstCreate'
-	]);
+
 	
 	Route::group(['middleware' => ['CheckLogin','CheckPermissions'] ], function(){
 		/*
@@ -143,7 +140,6 @@
 			});
 		});
 	});
-	
 //Auth::routes();
 
 //Route::get('/home', 'IndexController@index')->name('home');
