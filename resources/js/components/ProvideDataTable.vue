@@ -65,7 +65,7 @@
 					<!--</div>-->
 					<input type='hidden' name='campaignBonus' value='0'>
 					<div class='border-bottom'></div>
-					<div class='treeview-items'>
+					<div class='treeview-items is-show'>
 						<div class='head'>
 							<div class='columm col-md-1'>
 							</div>

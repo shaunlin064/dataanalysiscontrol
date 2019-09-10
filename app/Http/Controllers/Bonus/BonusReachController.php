@@ -11,7 +11,7 @@ use App\Http\Controllers\Controller;
 class BonusReachController extends Controller
 {
     //
-	public function update ($startDate = '2018-05-01')
+	public function update ($startDate = '2018-01-01')
 	{
 		$users = \App\User::all()->pluck('erp_user_id');
 		

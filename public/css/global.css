@@ -92,11 +92,15 @@
 
 .content.table .table.head .item .treeview-items,
 .content.table .body .item .treeview-items {
-  display: none;
   height: auto;
   width: 100%;
   float: right;
   padding: 0px 0px 0px 15px;
+}
+
+.content.table .table.head .item .treeview-items .is-show,
+.content.table .body .item .treeview-items .is-show {
+  display: block;
 }
 
 .content.table .table.head .item .treeview-items .head,
