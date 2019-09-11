@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class SaleGroupsBonusLevels extends Model
 {
     //
-	protected $fillable = ['set_date','achieving_money','bonus_rate','bonus_direct'];
+	protected $fillable = ['set_date','achieving_rate','bonus_rate','bonus_direct'];
 	
 	public function getBonusLevels ($userGroupsId,$setDate)
 	{
 		//取設定月份 bonus level 招集人獎金表
 		
-		return $this->where(['sale_groups_id'=>$userGroupsId,'set_date'=>$setDate])->orderBy('achieving_money','asc')->get();
+		return $this->where(['sale_groups_id'=>$userGroupsId,'set_date'=>$setDate])->orderBy('achieving_rate','asc')->get();
 	}
 	
 	public function getReachBonusLevels($totalProfit,$userGroupsId,$setDate){
@@ -22,9 +22,9 @@ class SaleGroupsBonusLevels extends Model
 		
 		//取到達 bonus
 		$maxAchievingMoney = $bonusLevels->filter(function($v,$k) use($totalProfit){
-			return $totalProfit > $v->achieving_money;
-		})->max('achieving_money');
-		$finalBonus = $bonusLevels->firstwhere('achieving_money',$maxAchievingMoney);
+			return $totalProfit > $v->achieving_rate;
+		})->max('achieving_rate');
+		$finalBonus = $bonusLevels->firstwhere('achieving_rate',$maxAchievingMoney);
 		
 		//回傳最後達到的 bonus
 		return $finalBonus;

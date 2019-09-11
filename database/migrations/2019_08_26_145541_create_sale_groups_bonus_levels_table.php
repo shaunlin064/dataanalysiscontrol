@@ -17,7 +17,7 @@ class CreateSaleGroupsBonusLevelsTable extends Migration
             $table->bigIncrements('id');
 	          $table->bigInteger('sale_groups_id');
 	          $table->date('set_date');
-		        $table->integer('achieving_money');
+		        $table->integer('achieving_rate');
 		        $table->double( 'bonus_rate');
 		        $table->integer('bonus_direct')->default(0);
             $table->timestamps();

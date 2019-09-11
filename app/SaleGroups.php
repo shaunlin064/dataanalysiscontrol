@@ -12,7 +12,7 @@ class SaleGroups extends Model
 	public function groupsUsers ()
 	{
 		
-			return $this->hasMany(SaleGroupsUsers::CLASS)->orderBy('is_convener','desc');
+			return $this->hasMany(SaleGroupsUsers::CLASS)->orderBy('set_date', 'desc')->orderBy('is_convener','desc');
 		
 	}
 	

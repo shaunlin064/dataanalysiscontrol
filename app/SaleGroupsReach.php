@@ -55,7 +55,7 @@ class SaleGroupsReach extends Model
 	public function setAllConvenerReach ($setDate)
 	{
 		$groupsConveners = SaleGroupsUsers::where(['is_convener'=>1,'set_date'=>$setDate])->get();
-		// loop 招集人資料計算 此樂團擊達成率、獎金、毛利
+		// loop 招集人資料計算 此團績達成率、獎金、毛利
 		foreach($groupsConveners as $groupsConvener){
 			//計算此組別此月毛利
 			//找與招集人同一團的人員id

@@ -45,9 +45,14 @@ class SaleGroupController extends BaseController
 		//get nowdata
 		$row = $saleGroups->toArray();
 		$row['groups_bonus']  = $saleGroups->groupsBonus->where('set_date',$datenow)->values()->toArray();
-		$row['groups_users']  = $saleGroups->groupsUsers->where('set_date',$datenow)->values()->toArray();
+		$row['groups_users']  = $saleGroups->groupsUsers->where('set_date',$datenow)->values();
+		$totalBoundary = $row['groups_users']->map(function($v,$k){
+			return $v->getUserBonusBoundary;
+		})->sum('boundary');
+		
 		$groupsBonusHistory = $saleGroups->groupsBonus->groupBy('set_date')->toArray();
 		$groupsUsersHistory = $saleGroups->groupsUsers->groupBy('set_date');
+		
 		$tmpUser = collect($row['groups_users']);
 		// get already select
 		$userNowSelect = $tmpUser->pluck('erp_user_id');
@@ -64,12 +69,19 @@ class SaleGroupController extends BaseController
 		foreach($user as $key => $item){
 			$user[$key]['groups_users'] = in_array($item['id'],$userNowSelectArray) ? 1 : 0;
 			$user[$key]['groups_is_convener'] = in_array($item['id'],$userNowIsConvenerArray) ? 1 : 0;
+			$user[$key]['boundary'] = SaleGroupsUsers::where(['set_date' => $datenow,'erp_user_id' => $item['id']])->first()->getUserBonusBoundary->boundary ?? 0;
 		}
+		$user = collect($user)->filter(function($v,$k){
+			return $v['boundary'] != 0;
+		})->toArray();
+		
+		
 		sort($user);
 		return view('saleGroup.setting.edit',[
 		 'data' => $this->resources,
 		 'user'=> $user,
 		 'row'=>$row,
+		 'totalBoundary' => $totalBoundary,
 		 'groupsBonusHistory' => $groupsBonusHistory,
 		 'groupsUsersHistory' => $groupsUsersHistory,
 		 'userNowSelect' => $userNowSelect,
@@ -104,9 +116,8 @@ class SaleGroupController extends BaseController
 		
 		foreach ($saleGroups as $key => $saleGroup){
 			$row[$key]['groupsBonusHistory'] = $saleGroup->groupsBonus->groupBy('set_date')->toArray();
-			$row[$key]['groupsUsersHistory'] = $saleGroup->groupsUsers->groupBy('set_date')->toArray();
+			$row[$key]['groupsUsersHistory'] = $saleGroup->groupsUsers->groupBy('set_date');
 		}
-		
 		//trim user data
 		$user = session('users');
 		return view('saleGroup.setting.view',[

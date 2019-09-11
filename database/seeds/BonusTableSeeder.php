@@ -66,22 +66,22 @@
 	     ]
 	    ];
 	    $exileUserId = [133,153,188];
-	    $userdata[] = ['set_date'=>'2018-05-01','erp_user_id' => 186,'boundary' => 400000];
-	    $userdata[] = ['set_date'=>'2018-05-01','erp_user_id' => 170,'boundary' => 400000];
-	    $userdata[] = ['set_date'=>'2018-05-01','erp_user_id' => 131,'boundary' => 500000];
-	    $userdata[] = ['set_date'=>'2018-05-01','erp_user_id' => 122,'boundary' => 550000];
-	    $userdata[] = ['set_date'=>'2018-05-01','erp_user_id' => 132,'boundary' => 550000];
-	    $userdata[] = ['set_date'=>'2018-05-01','erp_user_id' => 136,'boundary' => 550000];
-	    $userdata[] = ['set_date'=>'2018-05-01','erp_user_id' => 155,'boundary' => 550000];
-	    $userdata[] = ['set_date'=>'2018-05-01','erp_user_id' => 133,'boundary' => 550000];
-	    $userdata[] = ['set_date'=>'2018-05-01','erp_user_id' => 181,'boundary' => 550000];
-	    $userdata[] = ['set_date'=>'2018-05-01','erp_user_id' => 153,'boundary' => 550000];
-	    $userdata[] = ['set_date'=>'2018-05-01','erp_user_id' => 84,'boundary' => 600000];
-	    $userdata[] = ['set_date'=>'2018-05-01','erp_user_id' => 174,'boundary' => 600000];
+	    $userdata[] = ['set_date'=>'2018-01-01','erp_user_id' => 186,'boundary' => 400000];
+	    $userdata[] = ['set_date'=>'2018-01-01','erp_user_id' => 170,'boundary' => 400000];
+	    $userdata[] = ['set_date'=>'2018-01-01','erp_user_id' => 131,'boundary' => 500000];
+	    $userdata[] = ['set_date'=>'2018-01-01','erp_user_id' => 122,'boundary' => 550000];
+	    $userdata[] = ['set_date'=>'2018-01-01','erp_user_id' => 132,'boundary' => 550000];
+	    $userdata[] = ['set_date'=>'2018-01-01','erp_user_id' => 136,'boundary' => 550000];
+	    $userdata[] = ['set_date'=>'2018-01-01','erp_user_id' => 155,'boundary' => 550000];
+	    $userdata[] = ['set_date'=>'2018-01-01','erp_user_id' => 133,'boundary' => 550000];
+	    $userdata[] = ['set_date'=>'2018-01-01','erp_user_id' => 181,'boundary' => 550000];
+	    $userdata[] = ['set_date'=>'2018-01-01','erp_user_id' => 153,'boundary' => 550000];
+	    $userdata[] = ['set_date'=>'2018-01-01','erp_user_id' => 84,'boundary' => 600000];
+	    $userdata[] = ['set_date'=>'2018-01-01','erp_user_id' => 174,'boundary' => 600000];
 	    $userdata[] = ['set_date'=>'2019-08-01','erp_user_id' => 200,'boundary' => 600000];
 	    $userdata[] = ['set_date'=>'2019-08-01','erp_user_id' => 201,'boundary' => 600000];
-	    $userdata[] = ['set_date'=>'2018-05-01','erp_user_id' => 67,'boundary' => 650000];
-	    $userdata[] = ['set_date'=>'2018-05-01','erp_user_id' => 188,'boundary' => 700000];
+	    $userdata[] = ['set_date'=>'2018-01-01','erp_user_id' => 67,'boundary' => 650000];
+	    $userdata[] = ['set_date'=>'2018-01-01','erp_user_id' => 188,'boundary' => 700000];
 	
 	    $nextMonth = date('Y-m-01',strtotime("+1 month"));
 

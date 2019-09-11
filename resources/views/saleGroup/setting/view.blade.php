@@ -74,7 +74,7 @@
                                                 @foreach($items as $item)
                                                     <tr>
                                                         <td></td>
-                                                        <td><span class='badge bg-light-blue'>${{$item['achieving_money']}}</span></td>
+                                                        <td><span class='badge bg-light-blue'>${{$item['achieving_rate']}}</span></td>
                                                         <td><span class="badge bg-red">{{$item['bonus_rate']}}%</span></td>
                                                     </tr>
                                                 @endforeach

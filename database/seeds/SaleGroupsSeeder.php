@@ -19,33 +19,16 @@ class SaleGroupsSeeder extends Seeder
 	     '業務六部' => [84,181,170,186]
 	    ];
 	    $convener = [67,84];
-	    $saleBonus = [
-	     ['achieving_money' => 0,
-		    'bonus_rate' => 0
+	    $saleBonus = [ [
+		    "achieving_rate" => 100,
+		    "bonus_rate" => 0,
+		    'bonus_direct' => 15000,
+	     ],
+	     [
+		    "achieving_rate" => 150,
+		    "bonus_rate" => 0,
+		    'bonus_direct' => 20000,
 	     ]];
-	    $sale5Bonus = [
-	     ['achieving_money' => 100*10000,
-		    'bonus_rate' => 5
-	     ],
-	     ['achieving_money' => 200*10000,
-		    'bonus_rate' => 4
-	     ],
-	     ['achieving_money' => 300*10000,
-		    'bonus_rate' => 3
-	     ],
-	    ];
-	
-	    $sale6Bonus = [
-	     ['achieving_money' => 100*10000,
-		    'bonus_rate' => 5
-	     ],
-	     ['achieving_money' => 200*10000,
-		    'bonus_rate' => 4
-	     ],
-	     ['achieving_money' => 300*10000,
-		    'bonus_rate' => 3
-	     ],
-	    ];
 	
 	    foreach ($saleGroup as $name => $item){
 		
@@ -54,13 +37,7 @@ class SaleGroupsSeeder extends Seeder
 		    $date = new \DateTime(date('Ym01'));
 		    $date->modify('+1Month');
 		
-		    if($name == '業務五部'){
-			    $groupsData = $sale5Bonus;
-		    }else if($name == '業務六部'){
-			    $groupsData = $sale5Bonus;
-		    }else{
-			    $groupsData = $saleBonus;
-		    }
+		    $groupsData = $saleBonus;
 		
 		    while($date->format('Y-m-d') != '2018-01-01'){
 			    $setDate = $date->modify('-1Month')->format('Y-m-d');
