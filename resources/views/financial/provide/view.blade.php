@@ -40,21 +40,8 @@
                     </div>
                 </div>
                 <div class="form-group col-xs-8 col-md-6 pull-left">
-                    <date-range :start_date='"2019-08"' :end_date='"2019-09"'></date-range>
+                    <date-range :start_date='"{{date('Y-m')}}"' :end_date='"{{date('Y-m')}}"'></date-range>
                 </div>
-                {{--<div class="form-group col-xs-8 col-md-6 pull-left">--}}
-                {{--    <label>月份</label>--}}
-                {{--    <date-picker-component :dom_id='"review-datepicker"'></date-picker-component>--}}
-                {{--    <!-- /.input group -->--}}
-                {{--</div>--}}
-                {{--<div class='col-xs-3 col-md-2 pull-right'>--}}
-                {{--    <label></label>--}}
-                {{--    <div class='input-group'>--}}
-                {{--        <a class="btn btn-app">--}}
-                {{--            <i class="fa fa-save"></i>excel匯出--}}
-                {{--        </a>--}}
-                {{--    </div>--}}
-                {{--</div>--}}
             </div>
             <div class="box-footer">
                 <div class="row">
@@ -64,12 +51,11 @@
                             <span class="input-group-addon">
                               <input type="radio" name='selectType' data-type='select_user'>
                             </span>
-                            <select class="form-control select2" id='select_user' multiple="multiple" data-placeholder="選擇成員" style="width: 100%;">
-                                @foreach( $userList as $item)
-                                    <option value='{{$item['id']}}'> {{$item['name']}} </option>
-                                @endforeach
-                            </select>
-                            <!-- /.user-select-block -->
+                            <select2 :id='"select_user"'
+                                     :multiple='true'
+                                     :placeholder='"選擇成員"'
+                                     :row='{!! json_encode($userList) !!}'
+                            ></select2>
                         </div>
                         <!-- /input-group -->
                     </div>
@@ -81,32 +67,17 @@
                             <span class="input-group-addon">
                               <input type="radio" name='selectType' data-type='select_groups'>
                             </span>
-                            <select class="form-control select2" id='select_groups' multiple="multiple" data-placeholder="選擇團隊" style="width: 100%;">
-                                @foreach( $saleGroups as $item)
-                                    <option value='{{$item['id']}}'> {{$item['name']}} </option>
-                                @endforeach
-                            </select>
+                            <select2 :id='"select_groups"'
+                                     :multiple='true'
+                                     :placeholder='"選擇團隊"'
+                                     :row='{!! json_encode($saleGroups) !!}'
+                            ></select2>
                         </div>
                         <!-- /input-group -->
                     </div>
                     <!-- /.col-lg-6 -->
                         @endif
                 </div>
-                {{--<div class="row">--}}
-                {{--    <div class="col-sm-12 border-right">--}}
-                {{--        <div class="form-group col-xs-12">--}}
-                {{--            <label>檢視人員</label>--}}
-                {{--            <select class="form-control select2" multiple="multiple" data-placeholder="Select a State" style="width: 100%;">--}}
-                {{--                @foreach( session('users') as $item)--}}
-                {{--                    <option value='{{$item['id']}}'> {{$item['name']}} </option>--}}
-                {{--                @endforeach--}}
-                {{--            </select>--}}
-                {{--        </div>--}}
-                {{--        <!-- /.user-select-block -->--}}
-                {{--    </div>--}}
-                {{--    <!-- /.col -->--}}
-                {{--</div>--}}
-                <!-- /.row -->
             </div>
         </div>
         <simple-data-table-componet
@@ -126,7 +97,7 @@
     <!-- page script -->
     <script>
         $(function () {
-            $('.select2').select2();
+            // $('.select2').select2();
             var evTimeStamp = 0;
             $('.row').on('click','input[name="selectType"]',function(v,k){
                 let now = +new Date();

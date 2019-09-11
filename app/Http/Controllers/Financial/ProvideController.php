@@ -87,7 +87,6 @@ class ProvideController extends BaseController
 	
 	public function view ($id= null)
 	{
-		
 		//$columns = [
 		// ["className"=> 'details-control',
 		//	"orderable"=>      false,
@@ -122,6 +121,7 @@ class ProvideController extends BaseController
 			}
 			
 		}
+		sort($userList);
 		
 		$columns =
 		  [
@@ -203,7 +203,7 @@ class ProvideController extends BaseController
 		//	$v->groupsUsers = $v->groupsUsers->pluck('erp_user_id')->unique();
 		//	return $v;
 		//});
-		//dd($saleGroups);
+		
 		return view('financial.provide.view',
 		 [
 			'data' => $this->resources,'columns'=> $columns, 'row'=>$row,'saleGroups' => $saleGroups ,'userList' => $userList]);

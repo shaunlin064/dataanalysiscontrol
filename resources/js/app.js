@@ -111,7 +111,7 @@ Vue.component('pagination', require('laravel-vue-pagination'));
 //date range
 Vue.component('date-range', require('./components/DateRange').default);
 
-Vue.component('testbutton', require('./components/testbutton').default);
+Vue.component('select2', require('./components/Select2').default);
 
 
 const app = new Vue({

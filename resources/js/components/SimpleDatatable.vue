@@ -117,7 +117,6 @@
                 if(ex_buttons){
                     dataTableConfig.dom = 'Bfrtip';
                     ex_buttons.map(function(v){
-                        console.log(v);
                         dataTableConfig.buttons = [{ extend: v , className: 'btn btn-success btn-flat' , text: `${v}匯出`}];
                     });
                 }
