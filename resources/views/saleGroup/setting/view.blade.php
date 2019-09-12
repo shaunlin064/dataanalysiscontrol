@@ -41,7 +41,8 @@
                         <div class='box-header with-border'>
                             <h3 class='box-title'>{{$saleGroups['name']}}</h3>
                         </div>
-                        @foreach( $saleGroups['groupsBonusHistory'] as $key => $items)
+
+                        @foreach( $saleGroups['groupsUsersHistory'] as $key => $groupsUsersHistory)
                             <div class="box box-warning collapsed-box">
                                 <div class="box-header with-border">
                                     <h3 class="box-title">{{$key}}</h3>
@@ -54,6 +55,42 @@
                                 </div>
                                 <!-- /.box-header -->
                                 <div class="box-body">
+                                    <div class="box box-widget widget-user">
+                                        <!-- Add the bg color to the header using any of the bg-* classes -->
+                                        <div class="widget-user-header bg-aqua-active">
+                                            <div class="col-sm-6 border-right">
+                                                <div class="description-block">
+                                                    <h5 class="">獎金比例</h5>
+                                                    <h3 class="description-text">
+                                                        {{5.5 - ($groupsUsersHistory->count() * 0.25).'%' }}
+                                                    </h3>
+                                                </div>
+                                                <!-- /.description-block -->
+                                            </div>
+                                            <!-- /.col -->
+                                        {{--<div class="col-sm-4 border-right">--}}
+                                        {{--    <div class="description-block">--}}
+                                        {{--        <h5 class="">團隊名稱</h5>--}}
+                                        {{--        <h3>{{$row['name']}}</h3>--}}
+                                        {{--    </div>--}}
+                                        {{--    <!-- /.description-block -->--}}
+                                        {{--</div>--}}
+                                        <!-- /.col -->
+                                            <div class="col-sm-6">
+                                                <div class="description-block">
+                                                    <h5 class="">責任額總計</h5>
+                                                    <h3 class="description-text" id='total_boundary'>
+                                                        {{$groupsUsersHistory->map(function($v){
+                                                                return $v->getUserBonusBoundary->boundary  ?? 0;
+                                                            })->sum()
+                                                         }}
+                                                    </h3>
+                                                </div>
+                                                <!-- /.description-block -->
+                                            </div>
+                                            <!-- /.col -->
+                                        </div>
+                                    </div>
                                     <h4>團為績效位階
                                         <span class="pull-right"></span>
                                     </h4>
@@ -68,31 +105,34 @@
                                                 <tr>
                                                     <th style="width: 10px">#</th>
                                                     <th>達成比例</th>
-                                                    <th>獎金比例</th>
-                                                    {{--<th>額外獎金</th>--}}
+                                                    <th>額外獎金</th>
                                                 </tr>
-                                                @foreach($items as $item)
-                                                    <tr>
-                                                        <td></td>
-                                                        <td><span class='badge bg-light-blue'>${{$item['achieving_rate']}}</span></td>
-                                                        <td><span class="badge bg-red">{{$item['bonus_rate']}}%</span></td>
-                                                    </tr>
-                                                @endforeach
+
+                                                @if(isset($saleGroups['groupsBonusHistory'][$key]))
+                                                    @foreach($saleGroups['groupsBonusHistory'][$key] as $item)
+                                                        <tr>
+                                                            <td></td>
+                                                            <td><span class='badge bg-light-blue'>{{$item['achieving_rate']}}%</span></td>
+                                                            <td><span class="badge bg-red">${{$item['bonus_direct']}}</span></td>
+                                                        </tr>
+                                                    @endforeach
+                                                @endif
                                                 </tbody>
                                             </table>
                                         </div>
                                         <!-- /.box-body -->
                                     </div>
                                     <!-- /.box -->
-                                    @foreach($saleGroups['groupsUsersHistory'][$key] as $users)
-                                        @if($users['is_convener'] == 0)
-                                            <span class='badge bg-light-blue'>{{session('users')[$users['erp_user_id']]['org_name']}}</span>
+                                    @foreach($groupsUsersHistory as $users)
+                                        @if($users->is_convener == 0)
+                                            <span class='badge bg-light-blue'>{{$users->user['name']}}</span>
                                         @else
-                                            <span class='badge bg-red'>{{session('users')[$users['erp_user_id']]['org_name']}}</span>
+                                            <span class='badge bg-red'>{{$users->user['name']}}</span>
                                         @endif
                                     @endforeach
                                 </div>
                                 <!-- /.box-body -->
+
                             </div>
                         @endforeach
                     <!-- /.box -->

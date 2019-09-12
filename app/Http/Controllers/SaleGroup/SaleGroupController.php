@@ -75,7 +75,6 @@ class SaleGroupController extends BaseController
 			return $v['boundary'] != 0;
 		})->toArray();
 		
-		
 		sort($user);
 		return view('saleGroup.setting.edit',[
 		 'data' => $this->resources,

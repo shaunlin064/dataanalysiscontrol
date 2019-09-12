@@ -84,7 +84,7 @@
                                 <div class="box box-widget widget-user">
                                     <!-- Add the bg color to the header using any of the bg-* classes -->
                                     <div class="widget-user-header bg-aqua-active">
-                                        <div class="col-sm-4 border-right">
+                                        <div class="col-sm-6 border-right">
                                             <div class="description-block">
                                                 <h5 class="">獎金比例</h5>
                                                 <h3 class="description-text">
@@ -94,20 +94,20 @@
                                             <!-- /.description-block -->
                                         </div>
                                         <!-- /.col -->
-                                        <div class="col-sm-4 border-right">
-                                            <div class="description-block">
-                                                <h5 class="">團隊名稱</h5>
-                                                <h3>{{$row['name']}}</h3>
-                                            </div>
-                                            <!-- /.description-block -->
-                                        </div>
+                                        {{--<div class="col-sm-4 border-right">--}}
+                                        {{--    <div class="description-block">--}}
+                                        {{--        <h5 class="">團隊名稱</h5>--}}
+                                        {{--        <h3>{{$row['name']}}</h3>--}}
+                                        {{--    </div>--}}
+                                        {{--    <!-- /.description-block -->--}}
+                                        {{--</div>--}}
                                         <!-- /.col -->
-                                        <div class="col-sm-4">
+                                        <div class="col-sm-6">
                                             <div class="description-block">
                                                 <h5 class="">責任額總計</h5>
                                                 <h3 class="description-text" id='total_boundary'>
                                                     {{$items->map(function($v){
-	                                                        return $v->getUserBonusBoundary->boundary;
+	                                                        return $v->getUserBonusBoundary->boundary  ?? 0;
                                                         })->sum()
                                                      }}
                                                 </h3>

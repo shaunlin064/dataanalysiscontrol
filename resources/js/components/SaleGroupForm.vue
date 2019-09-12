@@ -197,21 +197,27 @@
                 }else{
                     this.has_error = false;
                 }
-						
-                if(this.user_now_select.length == 0){
-                    alert('請選擇團隊成員');
-                    return;
-                }
-                if(this.user_now_select_is_convener.length > 1){
-                    alert('招集人不能超過一位');
-                    return;
-                }
+		            
                 this.detail_check();
                 if( !(this.has_error) && !(this.detail_error_check) ){
                     $('#bonusSettingForm').submit();
                 }
             },
             detail_check(){
+                if(this.name == ''){
+                    $('#groupName').focus();
+                    return;
+                }
+                if(this.user_now_select.length == 0){
+                    alert('請選擇團隊成員');
+                    return;
+                }
+                
+                if(this.user_now_select_is_convener.length > 1){
+                    alert('招集人不能超過一位');
+                    return;
+                }
+                
                 let detail_has_error = this.detail_has_error;
                 const values = Object.values(this.items);
                 let detail_error_check = false;
