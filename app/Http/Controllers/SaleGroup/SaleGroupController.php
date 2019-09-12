@@ -71,9 +71,9 @@ class SaleGroupController extends BaseController
 			$user[$key]['groups_is_convener'] = in_array($item['id'],$userNowIsConvenerArray) ? 1 : 0;
 			$user[$key]['boundary'] = SaleGroupsUsers::where(['set_date' => $datenow,'erp_user_id' => $item['id']])->first()->getUserBonusBoundary->boundary ?? 0;
 		}
-		$user = collect($user)->filter(function($v,$k){
-			return $v['boundary'] != 0;
-		})->toArray();
+		//$user = collect($user)->filter(function($v,$k){
+		//	return $v['boundary'] != 0;
+		//})->toArray();
 		
 		sort($user);
 		return view('saleGroup.setting.edit',[
