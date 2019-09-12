@@ -49,10 +49,11 @@
                         <label>選擇成員</label>
                         <div class="input-group">
                             <span class="input-group-addon">
-                              <input type="radio" name='selectType' data-type='select_user'>
+                              <input type="radio" name='selectType' data-type='select_user' checked>
                             </span>
                             <select2 :id='"select_user"'
                                      :multiple='true'
+                                     :disabled='false'
                                      :placeholder='"選擇成員"'
                                      :row='{!! json_encode($userList) !!}'
                             ></select2>
@@ -70,6 +71,7 @@
                             <select2 :id='"select_groups"'
                                      :multiple='true'
                                      :placeholder='"選擇團隊"'
+                                     :disabled='true'
                                      :row='{!! json_encode($saleGroups) !!}'
                             ></select2>
                         </div>
@@ -97,7 +99,6 @@
     <!-- page script -->
     <script>
         $(function () {
-            // $('.select2').select2();
             var evTimeStamp = 0;
             $('.row').on('click','input[name="selectType"]',function(v,k){
                 let now = +new Date();
@@ -112,10 +113,14 @@
                     case 'select_user':
                         select_user.attr('disabled',false);
                         select_groups.attr('disabled',true).val(null).trigger("change");
+                        select_groups.next().find('li.select2-selection__choice').remove();
+                        select_groups.next().find('.select2-search__field').attr('placeholder','選擇團隊').css('width','415px');
                         break;
                     case 'select_groups':
                         select_groups.attr('disabled',false);
                         select_user.attr('disabled',true).val(null).trigger("change");
+                        select_user.next().find('li.select2-selection__choice').remove();
+                        select_user.next().find('.select2-search__field').attr('placeholder','選擇成員').css('width','415px');
                         break;
                 }
             });
