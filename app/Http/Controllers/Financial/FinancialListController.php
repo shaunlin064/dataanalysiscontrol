@@ -79,13 +79,13 @@
 			$alreadySetData = collect(FinancialList::where('set_date','>=',$this->acceptDate->format('Y-m-d'))->get()->toArray());
 			$financeList = new FinancialList();
 			$updateDataTmp = [];
-			
+			//dd($erpReturnData->where('memberid',181)->where('year_month','201908'));
 			// 先過濾已新增過的資料 做 UPDATA 為新增的資料做 insert
 			$erpReturnData = $erpReturnData->filter(function($v,$k) use($financeList,$alreadySetData,&$updateDataTmp){
 				
 				$data = $alreadySetData->where('cp_detail_id',$v['o_id'])->where('set_date',date("Y-m-01",strtotime($v['year_month'].'01')))->first();
-				
-				if(empty($data) && $financeList->where(['cp_detail_id' => $v['o_id']],[ 'set_date' => date("Y-m-01",strtotime($v['year_month'].'01')) ])->doesntExist()){
+		
+				if(empty($data) && $financeList->where(['cp_detail_id' => $v['o_id'], 'set_date' => date("Y-m-01",strtotime($v['year_month'].'01')) ])->doesntExist()){
 					return $v;
 				}else if(!empty($data)){
 					//debug check

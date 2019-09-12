@@ -21,6 +21,7 @@ class CreateSaleGroupsReachesTable extends Migration
 		        $table->bigInteger('sale_groups_users_id');
 	          $table->date('set_date');
             $table->double( 'groups_profit');
+	          $table->double( 'rate');
 	          $table->double( 'provide_money');
             $table->timestamps();
         });

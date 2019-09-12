@@ -57,6 +57,15 @@
         </div>
 
     </div>
+    <div class='row'>
+        <simple-data-table-componet
+                :table_id='"provide_bonus_table"'
+                :table_head='"招集人獎金"'
+                :table_title='["月份","業務","團隊名稱","類型","團隊毛利","獎金比例","獎金"]'
+                :row = '{{ json_encode($saleGroupsReach) }}'
+                :columns = {!!json_encode($saleGroupsTableColumns)!!}
+        ></simple-data-table-componet>
+    </div>
     {{--list --}}
     <div class='row'>
         <div class='col-md-12'>

@@ -32,6 +32,7 @@ class ProvideController extends BaseController
     //
 	public function list ()
 	{
+	
 //		$userData = [
 		////		 'uId' => $id,
 		////		 'name' => session('users')[$id]['name'],
@@ -70,11 +71,30 @@ class ProvideController extends BaseController
 		//'allId' => count($allId) ? $allId : [],
 		//  'selectIds'=> count($selectIds) ? $selectIds : [],
 		//  'paginate'=> count($paginate) ? $paginate : [],
-	
+		$columns =
+		 [
+			['data' => 'set_date'],
+			['data'=> 'user_name'],
+			['data'=> 'group_name'],
+			['data'=> 'status'],
+			['data'=> 'groups_profit'],
+			['data'=> 'rate'],
+			['data'=> 'provide_money']
+		 ];
+		//:table_title='["月份","業務","團隊名稱","類型","團隊毛利","獎金比例","獎金"]'
+		$saleGroupsReach = SaleGroupsReach::where('status',0)->get();
+		$saleGroupsReach = $saleGroupsReach->map(function($v,$k){
+		 $v->user_name = $v->saleUser->user->name;
+			$v->group_name = $v->saleGroups->name;
+			return $v;
+		})->toArray();
+
 		return view('financial.provide.list',
 		 [
 		  'data' => $this->resources ,
 		  'row' => $newRow ? $newRow : [],
+		  'saleGroupsReach' => $saleGroupsReach,
+		  'saleGroupsTableColumns' => $columns,
 		  'allId' => count($allId) ? $allId : [],
 		  'selectIds'=> $selectIds,
 		  'paginate'=> $paginate,
