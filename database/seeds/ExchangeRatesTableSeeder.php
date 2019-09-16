@@ -15,10 +15,10 @@ class ExchangeRatesTableSeeder extends Seeder
 	    $created_by_erp_user_id = 157;
 	    $datas = [
 	     '201804' => [
-	      [
-		     'currency' => 'CNY',
-		     'rate' => '4.6441'
-	      ],
+	      //[
+		    // 'currency' => 'CNY',
+		    // 'rate' => '4.6441'
+	      //],
 	      [
 		     'currency' => 'JPY',
 		     'rate' => '0.271'
@@ -29,10 +29,10 @@ class ExchangeRatesTableSeeder extends Seeder
 	      ]
 	     ],
 	     '201805' => [
-		    [
-		     'currency' => 'CNY',
-		     'rate' => '4.664'
-		    ],
+		    //[
+		    // 'currency' => 'CNY',
+		    // 'rate' => '4.664'
+		    //],
 		    [
 		     'currency' => 'JPY',
 		     'rate' => '0.2703'
@@ -43,10 +43,10 @@ class ExchangeRatesTableSeeder extends Seeder
 		    ]
 	     ],
 	     '201806' => [
-		    [
-		     'currency' => 'CNY',
-		     'rate' => '4.6253'
-		    ],
+		    //[
+		    // 'currency' => 'CNY',
+		    // 'rate' => '4.6253'
+		    //],
 		    [
 		     'currency' => 'JPY',
 		     'rate' => '0.2714'
@@ -57,10 +57,10 @@ class ExchangeRatesTableSeeder extends Seeder
 		    ]
 	     ],
 	     '201807' => [
-		    [
-		     'currency' => 'CNY',
-		     'rate' => '4.5165'
-		    ],
+		    //[
+		    // 'currency' => 'CNY',
+		    // 'rate' => '4.5165'
+		    //],
 		    [
 		     'currency' => 'JPY',
 		     'rate' => '0.2722'
@@ -71,10 +71,10 @@ class ExchangeRatesTableSeeder extends Seeder
 		    ]
 	     ],
 	     '201808' => [
-		    [
-		     'currency' => 'CNY',
-		     'rate' => '4.4561'
-		    ],
+		    //[
+		    // 'currency' => 'CNY',
+		    // 'rate' => '4.4561'
+		    //],
 		    [
 		     'currency' => 'JPY',
 		     'rate' => '0.2747'
@@ -85,10 +85,10 @@ class ExchangeRatesTableSeeder extends Seeder
 		    ]
 	     ],
 	     '201809' => [
-		    [
-		     'currency' => 'CNY',
-		     'rate' => '4.4565'
-		    ],
+		    //[
+		    // 'currency' => 'CNY',
+		    // 'rate' => '4.4565'
+		    //],
 		    [
 		     'currency' => 'JPY',
 		     'rate' => '0.2728'
@@ -99,10 +99,10 @@ class ExchangeRatesTableSeeder extends Seeder
 		    ]
 	     ],
 	     '201810' => [
-		    [
-		     'currency' => 'CNY',
-		     'rate' => '4.433'
-		    ],
+		    //[
+		    // 'currency' => 'CNY',
+		    // 'rate' => '4.433'
+		    //],
 		    [
 		     'currency' => 'JPY',
 		     'rate' => '0.2718'
@@ -113,10 +113,10 @@ class ExchangeRatesTableSeeder extends Seeder
 		    ]
 	     ],
 	     '201811' => [
-		    [
-		     'currency' => 'CNY',
-		     'rate' => '4.4212'
-		    ],
+		    //[
+		    // 'currency' => 'CNY',
+		    // 'rate' => '4.4212'
+		    //],
 		    [
 		     'currency' => 'JPY',
 		     'rate' => '0.2702'
@@ -127,10 +127,10 @@ class ExchangeRatesTableSeeder extends Seeder
 		    ]
 	     ],
 	     '201812' => [
-	      [
-	       'currency' => 'CNY',
-		      'rate' => '4.4466'
-	      ],
+	      //[
+	      // 'currency' => 'CNY',
+		    //  'rate' => '4.4466'
+	      //],
 	      [
 		     'currency' => 'JPY',
 		     'rate' => '0.2726'
@@ -141,10 +141,10 @@ class ExchangeRatesTableSeeder extends Seeder
 	      ]
 	     ],
 	     '201901' => [
-		    [
-		     'currency' => 'CNY',
-		     'rate' => '4.5102'
-		    ],
+		    //[
+		    // 'currency' => 'CNY',
+		    // 'rate' => '4.5102'
+		    //],
 		    [
 		     'currency' => 'JPY',
 		     'rate' => '0.2811'
@@ -155,10 +155,10 @@ class ExchangeRatesTableSeeder extends Seeder
 		    ]
 	     ],
 	     '201902' => [
-		    [
-		     'currency' => 'CNY',
-		     'rate' => '4.5442'
-		    ],
+		    //[
+		    // 'currency' => 'CNY',
+		    // 'rate' => '4.5442'
+		    //],
 		    [
 		     'currency' => 'JPY',
 		     'rate' => '0.2769'
@@ -169,10 +169,10 @@ class ExchangeRatesTableSeeder extends Seeder
 		    ]
 	     ],
 	     '201903' => [
-		    [
-		     'currency' => 'CNY',
-		     'rate' => '4.567'
-		    ],
+		    //[
+		    // 'currency' => 'CNY',
+		    // 'rate' => '4.567'
+		    //],
 		    [
 		     'currency' => 'JPY',
 		     'rate' => '0.2756'
@@ -183,10 +183,10 @@ class ExchangeRatesTableSeeder extends Seeder
 		    ]
 	     ],
 	     '201904' => [
-		    [
-		     'currency' => 'CNY',
-		     'rate' => '4.5656'
-		    ],
+		    //[
+		    // 'currency' => 'CNY',
+		    // 'rate' => '4.5656'
+		    //],
 		    [
 		     'currency' => 'JPY',
 		     'rate' => '0.2745'
@@ -197,10 +197,10 @@ class ExchangeRatesTableSeeder extends Seeder
 		    ]
 	     ],
 	     '201905' => [
-		    [
-		     'currency' => 'CNY',
-		     'rate' => '4.5149'
-		    ],
+		    //[
+		    // 'currency' => 'CNY',
+		    // 'rate' => '4.5149'
+		    //],
 		    [
 		     'currency' => 'JPY',
 		     'rate' => '0.2822'
@@ -211,10 +211,10 @@ class ExchangeRatesTableSeeder extends Seeder
 		    ]
 	     ],
 	     '201906' => [
-		    [
-		     'currency' => 'CNY',
-		     'rate' => '4.5068'
-		    ],
+		    //[
+		    // 'currency' => 'CNY',
+		    // 'rate' => '4.5068'
+		    //],
 		    [
 		     'currency' => 'JPY',
 		     'rate' => '0.2879'
@@ -225,10 +225,10 @@ class ExchangeRatesTableSeeder extends Seeder
 		    ]
 	     ],
 	     '201907' => [
-		    [
-		     'currency' => 'CNY',
-		     'rate' => '4.491'
-		    ],
+		    //[
+		    // 'currency' => 'CNY',
+		    // 'rate' => '4.491'
+		    //],
 		    [
 		     'currency' => 'JPY',
 		     'rate' => '0.2852'
@@ -239,10 +239,10 @@ class ExchangeRatesTableSeeder extends Seeder
 		    ]
 	     ],
 	     '201908' => [
-		    [
-		     'currency' => 'CNY',
-		     'rate' => '4.4099'
-		    ],
+		    //[
+		    // 'currency' => 'CNY',
+		    // 'rate' => '4.4099'
+		    //],
 		    [
 		     'currency' => 'JPY',
 		     'rate' => '0.2934'

@@ -112,22 +112,5 @@
 			    $dateStart = $dateStart->modify('+1 Month');
 		    }
 	    }
-//	    $characterRole = [
-//	     [400000]
-//	     [500000]
-//	     [550000]
-//	     [600000]
-//	     [650000]
-//	     [700000]
-//	     [800000]
-//	    ];
-//	    $specialist
-//	    $seniorSpecialist
-//      $salesExecutive
-//      $deputyManager
-//	    $associateDirector
-//	    $director
-	     
-	    
     }
 }

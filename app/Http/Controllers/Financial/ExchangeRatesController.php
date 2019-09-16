@@ -12,7 +12,7 @@ class ExchangeRatesController extends BaseController
 {
     //
 	const CURRENCY_TYPE = [
-	 'USD','JPY','CNY'
+	 'USD','JPY'
 	];
 	
 	public function setting ()
