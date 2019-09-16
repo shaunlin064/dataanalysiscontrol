@@ -1,5 +1,5 @@
 <template>
-	<div class='content table mdl-shadow--2dp mdl-data-table--selectable mdl-shadow--2dp col-md-12'>
+	<div class='content table mdl-shadow--2dp mdl-data-table--selectable mdl-shadow--2dp col-md-12' id='financial_provide_list'>
 		<!--{{top element}}-->
 		<form action="#">
 			<div class="col-sm-6 p-20">
@@ -300,8 +300,7 @@
             },
 		        select_all(){
               let checkStatus = $(event.target).prop("checked");
-              
-              this.toggleCheck(checkStatus, $('input:checkbox'));
+              this.toggleCheck(checkStatus, $(event.target).parents('#financial_provide_list').find('input:checkbox'));
                 let all_ids = Object.assign([], this.all_ids);
                 
                 if (checkStatus) {
@@ -313,7 +312,6 @@
               } else {
                   this.select_financial_id = [];
                   $('#total_money').html(0);
-                  console.log(this.select_financial_id);
               }
               
 		        },
