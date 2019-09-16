@@ -31,29 +31,29 @@
     <div class='row'>
         <div class="box box-widget widget-user">
             <!-- Add the bg color to the header using any of the bg-* classes -->
-            <div class="widget-user-header bg-aqua">
-                <!-- small box -->
-                <div class="small-box no-shadow col-md-4 col-sm-6 col-xs-12">
-                    <div class="inner text-center">
-                        <h3 id='total_money'>0</h3>
-                        <input type='hidden' name='totalBonus' value='0'>
-                        <p>總計發放金額</p>
-                    </div>
-                </div>
-                {{--<div class="form-group col-xs-8 col-md-5 pull-left">--}}
-                {{--    <label>月份選擇</label>--}}
-                {{--    <date-picker-component :dom_id='"review-datepicker"'></date-picker-component>--}}
-                {{--    <!-- /.input group -->--}}
-                {{--</div>--}}
-                {{--<div class='col-xs-3 col-md-2 pull-right'>--}}
-                {{--    <label></label>--}}
-                {{--    <div class='input-group'>--}}
-                {{--        <a class="btn btn-app">--}}
-                {{--            <i class="fa fa-save"></i>excel匯出--}}
-                {{--        </a>--}}
-                {{--    </div>--}}
-                {{--</div>--}}
-            </div>
+            {{--<div class="widget-user-header bg-aqua">--}}
+            {{--    <!-- small box -->--}}
+            {{--    <div class="small-box no-shadow col-md-4 col-sm-6 col-xs-12">--}}
+            {{--        <div class="inner text-center">--}}
+            {{--            <h3 id='total_money'>0</h3>--}}
+            {{--            <input type='hidden' name='totalBonus' value='0'>--}}
+            {{--            <p>總計發放金額</p>--}}
+            {{--        </div>--}}
+            {{--    </div>--}}
+            {{--    --}}{{--<div class="form-group col-xs-8 col-md-5 pull-left">--}}
+            {{--    --}}{{--    <label>月份選擇</label>--}}
+            {{--    --}}{{--    <date-picker-component :dom_id='"review-datepicker"'></date-picker-component>--}}
+            {{--    --}}{{--    <!-- /.input group -->--}}
+            {{--    --}}{{--</div>--}}
+            {{--    --}}{{--<div class='col-xs-3 col-md-2 pull-right'>--}}
+            {{--    --}}{{--    <label></label>--}}
+            {{--    --}}{{--    <div class='input-group'>--}}
+            {{--    --}}{{--        <a class="btn btn-app">--}}
+            {{--    --}}{{--            <i class="fa fa-save"></i>excel匯出--}}
+            {{--    --}}{{--        </a>--}}
+            {{--    --}}{{--    </div>--}}
+            {{--    --}}{{--</div>--}}
+            {{--</div>--}}
         </div>
 
     </div>
@@ -61,11 +61,14 @@
         <simple-data-table-componet
                 :table_id='"provide_bonus_table"'
                 :table_head='"招集人獎金"'
-                :table_title='["月份","業務","團隊名稱","類型","團隊毛利","獎金比例","獎金"]'
+                :table_title='["","月份","業務","團隊名稱","類型","團隊毛利","獎金比例","獎金"]'
                 :row = '{{ json_encode($saleGroupsReach) }}'
-                :columns = {!!json_encode($saleGroupsTableColumns)!!}
+                :columns = '{!!json_encode($saleGroupsTableColumns)!!}'
+                :type = '"select"'
         ></simple-data-table-componet>
     </div>
+
+{{--    </div>--}}
     {{--list --}}
     <div class='row'>
         <div class='col-md-12'>

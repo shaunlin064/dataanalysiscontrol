@@ -1,6 +1,7 @@
 export default {
     state: {
         change_date: '',
+        table_select: [],
         user_id: 0,
         profit: 0,
         bonus_rate: 0,
@@ -15,7 +16,9 @@ export default {
         month_cost: 0,
     },
     getters:{
-
+        getTableSelect(state){
+            return state.table_select;
+        },
     },
     actions:{
         saveName({commit}, msg) {
@@ -25,6 +28,9 @@ export default {
     mutations: {
         changeDate(state,value) {
             state.change_date = value;
+        },
+        tableSelect(state,value) {
+            state.table_select = value;
         },
         changeBox(state,arg){
             switch(arg.field){

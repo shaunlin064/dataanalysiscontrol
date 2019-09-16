@@ -26,3 +26,4 @@ mix.copyDirectory('node_modules/datatables.net-bs', 'public/plugins/datatables.n
 mix.copyDirectory('node_modules/datatables.net-bs4', 'public/plugins/datatables.net-bs4');
 mix.copyDirectory('node_modules/datatables.net-buttons', 'public/plugins/datatables.net-buttons');
 mix.copyDirectory('node_modules/datatables.net-buttons-bs4', 'public/plugins/datatables.net-buttons-bs4');
+mix.copyDirectory('node_modules/datatables.net-select-bs4', 'public/plugins/datatables.net-select-bs4');

@@ -32,6 +32,7 @@
 			//'/adminLte_componets/datatables.net/css/jquery.dataTables.css',
 			'/plugins/datatables.net-bs4/css/dataTables.bootstrap4.css',
 			'/plugins/datatables.net-buttons-bs4/css/buttons.bootstrap4.css',
+		  '/plugins/datatables.net-select-bs4/css/select.bootstrap4.min.css',
 			 //		<!-- daterange picker -->
 			'/adminLte_componets/bootstrap-daterangepicker/daterangepicker.css',
 			 //		<!-- bootstrap datepicker -->
@@ -83,6 +84,8 @@
 			'/plugins/datatables.net-buttons/js/dataTables.buttons.js',
 			'/plugins/datatables.net-buttons/js/buttons.html5.js',
 			'/plugins/datatables.net-buttons-bs4/js/buttons.bootstrap4.js',
+			 
+		  '/plugins/datatables.net-select-bs4/js/select.bootstrap4.min.js',
 			 //jszip
 			'/plugins/jszip/dist/jszip.min.js',
 			 //pdfmake

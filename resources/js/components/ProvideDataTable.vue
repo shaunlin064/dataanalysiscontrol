@@ -159,7 +159,7 @@
         props:{
             arg : Object,
         },
-        computed: mapState(['change_date']),
+        computed: mapState(['change_date','getTableSelect']),
         data() {
             return {
                 csrf: this.arg.csrf_token,
@@ -186,9 +186,11 @@
 		            users : this.arg.users,
                 total_bonus : 0,
                 select_financial_id : this.arg.select_ids ? this.arg.select_ids : [],
-		            original_select_financial_id : this.arg.original_select_financial_id,
+		            original_select_financial_ids : this.arg.original_select_financial_id,
                 all_ids: this.arg.all_ids ? this.arg.all_ids : [],
                 total_alreday_select_money : this.arg.total_alreday_select_money,
+		            sale_sale_groups_reach_ids: this.$store.getters.getTableSelect,
+                // original_sale_sale_groups_reach_ids:  this.arg.original_sale_sale_groups_reach_ids,
             }
         },
         methods: {
@@ -469,7 +471,8 @@
                 let paramters = {
                     '_token' : this.csrf,
                     'select_financial_ids' : [this.select_financial_id],
-                    'original_select_financial_ids' : [this.original_select_financial_id]
+                    'original_select_financial_ids' : [this.original_select_financial_ids],
+		                'sale_sale_groups_reach_ids' : this.sale_sale_groups_reach_ids,
                 };
                 // paramters.map(function(v){
                 //     console.log(v);

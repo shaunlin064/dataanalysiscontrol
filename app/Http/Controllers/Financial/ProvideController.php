@@ -73,14 +73,16 @@ class ProvideController extends BaseController
 		//  'paginate'=> count($paginate) ? $paginate : [],
 		$columns =
 		 [
+		  ['data' => 'id'],
 			['data' => 'set_date'],
 			['data'=> 'user_name'],
 			['data'=> 'group_name'],
-			['data'=> 'status'],
+			['data'=> 'status','render'=>'團績獎金'],
 			['data'=> 'groups_profit'],
 			['data'=> 'rate'],
 			['data'=> 'provide_money']
 		 ];
+
 		//:table_title='["月份","業務","團隊名稱","類型","團隊毛利","獎金比例","獎金"]'
 		$saleGroupsReach = SaleGroupsReach::where('status',0)->get();
 		$saleGroupsReach = $saleGroupsReach->map(function($v,$k){
@@ -378,6 +380,11 @@ class ProvideController extends BaseController
 	
 	public function post()
 	{
+		
+		$selectSaleGroupsReachIds = explode(',',Input::post('sale_sale_groups_reach_ids'));
+		$saleGroupReach = new SaleGroupsReach();
+		$saleGroupReach->whereIn('id',$selectSaleGroupsReachIds)->update(['status'=>1]);
+		
 		$selectFincialIds = Input::post('select_financial_ids');
 		$selectFincialIds = $selectFincialIds != null ? explode(',',$selectFincialIds) : [];
 		

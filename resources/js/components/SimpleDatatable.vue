@@ -29,7 +29,7 @@
 </template>
 
 <script>
-	
+    import {mapState,mapMutations,mapActions,mapGetters} from 'vuex';
     export default {
         name: "SimpleDatatable",
         props: {
@@ -39,15 +39,20 @@
 		        row : Array,
             columns : Array,
             ex_buttons : Array,
+		        type: String
         },
         data() {
             return {
             }
         },
+        computed: mapGetters(['getTableSelect']),
 		    methods:{
-              change_render(item){
-                  return new Function('data','type','row', 'return `'+item+'`');
-              },
+            change_render(item){
+                return new Function('data','type','row', 'return `'+item+'`');
+            },
+            set_select(value) {
+                this.$store.commit('tableSelect', value);
+            },
 		    },
         mounted: function(){
             // function format ( d ) {
@@ -85,7 +90,10 @@
 		        var rowData = this.row;
 		        var tableId = this.table_id;
 		        var ex_buttons = this.ex_buttons;
+		        var type = this.type;
+		        var vue = this;
             $(document).ready(function() {
+                let domtable = $('#'+tableId+'');
                 let dataTableConfig =
                     {
                         paging      : true,
@@ -113,7 +121,31 @@
                             }
                         },
                         columns: columns,
+                       
                     };
+                if(type == 'select'){
+                    dataTableConfig.columnDefs= [{
+                        'targets': 0,
+                        'searchable':false,
+                        'orderable':false,
+                        'width':'1%',
+                        'className': 'dt-body-center',
+                        'render': function (data, type, full, meta){
+                            return `<input type="checkbox" value="${full.id}">`;
+                        }
+                    }];
+                    dataTableConfig.order = [1, 'asc'];
+                    dataTableConfig.rowCallback = function(row, data, dataIndex){
+                        // Get row ID
+                        var rowId = data[0];
+
+                        // If row ID is in the list of selected row IDs
+                        if($.inArray(rowId, rows_selected) !== -1){
+                            $(row).find('input[type="checkbox"]').prop('checked', true);
+                            $(row).addClass('selected');
+                        }
+                    };
+                }
                 if(ex_buttons){
                     dataTableConfig.dom = 'Bfrtip';
                     ex_buttons.map(function(v){
@@ -121,10 +153,51 @@
                     });
                 }
 								
-                var dataTable = $('#'+tableId+'').DataTable(dataTableConfig);
+                var dataTable = domtable.DataTable(dataTableConfig);
                 dataTable.clear();
                 dataTable.rows.add( rowData );
                 dataTable.draw();
+                
+                if(type == 'select'){
+                    // Array holding selected row IDs
+                    var rows_selected = vue.$store.getters.getTableSelect;
+                    // Handle click on checkbox
+                    domtable.find('tbody').on('click', 'input[type="checkbox"]', function(e){
+                        var $row = $(this).closest('tr');
+
+                        // Get row data
+                        var data = dataTable.row($row).data();
+
+                        // Get row ID
+                        var rowId = data['id'];
+
+                        // Determine whether row ID is in the list of selected row IDs
+                        var index = $.inArray(rowId, rows_selected);
+
+                        // If checkbox is checked and row ID is not in list of selected row IDs
+                        if(this.checked && index === -1){
+                            rows_selected.push(rowId);
+
+                            // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
+                        } else if (!this.checked && index !== -1){
+                            rows_selected.splice(index, 1);
+                        }
+
+                        if(this.checked){
+                            $row.addClass('selected');
+                        } else {
+                            $row.removeClass('selected');
+                        }
+                        // Prevent click event from propagating to parent
+                        e.stopPropagation();
+                    });
+
+                    // Handle click on table cells with checkboxes
+                    domtable.on('click', 'tbody td, thead th:first-child', function(e){
+                        $(this).parent().find('input[type="checkbox"]').trigger('click');
+                    });
+                }
+            });
                 // //chilren row
                 // $('#'+tableId+' tbody').on('click', 'td.details-control', function () {
                 //     var tr = $(this).closest('tr');
@@ -141,7 +214,6 @@
                 //         tr.addClass('shown');
                 //     }
                 // } );
-            });
         },
         watch:{
             // change_date: {
