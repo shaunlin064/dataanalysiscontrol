@@ -25,10 +25,10 @@
 			$this->menus = Menu::where('region',$region )->get();
 			$uid = session('userData')['id'];
 			$this->role['admin']['ids'] = [15,17,157,172,179,187];
-			$convener = [67,84];
+			$this->role['convener']['ids'] = [67,84];
 			
 			$this->role['user']['ids'] = [];
-			if(in_array($uid,$convener)){
+			if(in_array($uid,$this->role['convener']['ids'])){
 				$this->role['user']['purview']['menus'] = [1,2,3];
 				$this->role['user']['purview']['menu_subs'] = [2,4,6,7];
 			}else{
@@ -69,5 +69,13 @@
 			if(!in_array($uid,$this->role['admin']['ids']) && $id != $uid){
 				abort(403);
 			};
+		}
+		
+		public function isAdmin($uid){
+			if(!in_array($uid,$this->role['admin']['ids'])){
+				return false;
+			}else{
+				return true;
+			}
 		}
 	}

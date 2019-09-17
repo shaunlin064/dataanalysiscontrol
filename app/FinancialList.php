@@ -46,7 +46,10 @@ class FinancialList extends Model
 	public function user(){
 		return $this->hasOne(User::CLASS,'erp_user_id','erp_user_id');
 	}
+	public function saleGroups(){
 	
+		return $this->hasOne(SaleGroupsUsers::CLASS, 'erp_user_id','erp_user_id')->where('set_date',$this->set_date);
+	}
 	public function dataFormat ()
 	{
 		$this->keyChange()->valueChange();

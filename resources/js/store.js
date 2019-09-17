@@ -1,8 +1,13 @@
+let date = new Date();
+date = `${date.getFullYear()}-${('0'+(date.getMonth()+1)).substring(0,2)}-01`;
 export default {
     state: {
         change_date: '',
+        start_date: date,
+        end_date:date,
         table_select: [],
         user_id: 0,
+        sale_group_id:0,
         profit: 0,
         bonus_rate: 0,
         bonus_next_amount: 0,
@@ -28,6 +33,10 @@ export default {
     mutations: {
         changeDate(state,value) {
             state.change_date = value;
+        },
+        changeDateRange(state,value){
+            state.start_date = value[0];
+            state.end_date = value[1];
         },
         tableSelect(state,value) {
             state.table_select = value;
@@ -62,6 +71,9 @@ export default {
         },
         changeUserId(state,value){
             state.user_id = value;
+        },
+        changeSaleGroupId(state,value){
+            state.sale_group_id = value;
         }
     }
 };

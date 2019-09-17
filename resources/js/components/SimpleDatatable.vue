@@ -45,7 +45,10 @@
             return {
             }
         },
-        computed: mapGetters(['getTableSelect']),
+        computed: {
+            ...mapGetters(['getTableSelect']),
+		        ...mapState(['start_date','end_date','change_date']),
+        },
 		    methods:{
             change_render(item){
                 return new Function('data','type','row', 'return `'+item+'`');
@@ -216,15 +219,22 @@
                 // } );
         },
         watch:{
-            // change_date: {
-            //     immediate: true,    // 这句重要
-            //     handler (val, oldVal) {
-            //         if(oldVal !== undefined) {
-						//
-            //             console.log(val,oldVal);
-            //         }
-            //     }
-            // }
+            start_date: {
+                immediate: true,    // 这句重要
+                handler (val, oldVal) {
+                    if(oldVal !== undefined) {
+                        console.log(val,oldVal);
+                    }
+                }
+            },
+            end_date: {
+                immediate: true,    // 这句重要
+                handler (val, oldVal) {
+                    if(oldVal !== undefined) {
+                        console.log(val,oldVal);
+                    }
+                }
+            }
         }
     }
 </script>

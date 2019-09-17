@@ -127,9 +127,8 @@
                 handler (val, oldVal) {
                     if(oldVal !== undefined) {
                         this.getCampaignData(this.user_id,val);
-                        // console.log(this.user_id,val,'datatable update');
+                        console.log(val);
                     }
-                    
                 }
             }
 		    }

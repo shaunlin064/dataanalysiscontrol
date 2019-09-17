@@ -109,126 +109,52 @@ class ProvideController extends BaseController
 	
 	public function view ($id= null)
 	{
-		//$columns = [
-		// ["className"=> 'details-control',
-		//	"orderable"=>      false,
-		//	"data" =>           null,
-		//	"defaultContent" => ''],
-		// ['data'=> 'user_name'],['data'=> 'campaign_name'],['data'=> 'sale_group_name']];
-	/**/
-		
-		$nowUser = Auth::user();
-		$permission = new Permission();
-		$isAdmin = in_array($nowUser->erp_user_id,$permission->role['admin']['ids']);
-		$erpUserId = $nowUser->erp_user_id;
+
 		$date = new DateTime(date('Ym01'));
+		$nowUser = Auth::user();
+		$uid= $nowUser->erp_user_id;
 		
-		if($isAdmin){
-			
-			$saleGroups = SaleGroups::where('id','!=',0)->get();
-			$userList = session('users');
-			
-		}else{
-			
-			$saleGroupsUsers = SaleGroupsUsers::where(['erp_user_id'=> $nowUser->erp_user_id,'set_date'=>$date])->first();
-			$checkIsConvener = $saleGroupsUsers->is_convener;
-			
-			if($checkIsConvener){
-				$saleGroups = $saleGroupsUsers->saleGroups;
-				$userGroupIds = $saleGroupsUsers->getSameGroupsUser($erpUserId,$date)->pluck('user')->pluck('erp_user_id');
-				$userList = collect(session('users'))->whereIn('id',$userGroupIds);
-			}else{
-				$saleGroups = [];
-				$userList = collect(session('users'))->whereIn('id',$erpUserId);
-			}
-			
-		}
-		sort($userList);
+		$provideStart = new DateTime();
+		$provideEnd = new DateTime();
 		
-		$columns =
-		  [
-		   ['data' => 'provide_set_date'],
-		   ['data'=> 'set_date'],
-		   ['data'=> 'campaign_name'],
-			 ['data'=> 'user_name'],
-			 ['data'=> 'sale_group_name'],
-			 ['data'=> 'media_channel_name'],
-		   ['data'=> 'sell_type_name'],
-		   ['data'=> 'provide_money'],
-			];
+		list($saleGroups, $userList, $userIds) = $this->getListData($uid, $date);
 		
-		$row = [
+		$saleGroupsReach = $this->getSaleGroupProvide($provideStart, $provideEnd, $userIds);
+		$provideBonus = $this->getUserBounsProvide($provideStart, $provideEnd, $userIds);
+		
+		$provideBonusColumns =
 		 [
-		  'provide_set_date' => '2019-07',
-		  'media_channel_name' => 'FaceBook',
-		  'sell_type_name' => '廣告素材製作',
-		  'provide_money' => 2000,
-		  'set_date' => '201906',
-			'user_name' => '測試1',
-			'campaign_name' => 'Aetolia-冒険のラプソディー 日本推廣',
-			'sale_group_name' => '整合行銷部',
-		 ],
+			['data' => 'provide_set_date'],
+			['data'=> 'set_date'],
+			['data'=> 'campaign_name'],
+			['data'=> 'user_name'],
+			['data'=> 'sale_group_name'],
+			['data'=> 'media_channel_name'],
+			['data'=> 'sell_type_name'],
+			['data'=> 'provide_money'],
+		 ];
+		
+		$saleGroupsReachColumns =
 		 [
-		  'provide_set_date' => '2019-07',
-			'media_channel_name' => 'FaceBook',
-			'sell_type_name' => '廣告素材製作',
-			'provide_money' => 2000,
-			'set_date' => '201906',
-			'user_name' => '測試',
-			'campaign_name' => 'Aetolia-冒険のラプソディー 日本推廣',
-			'sale_group_name' => '整合行銷部',
-		 ],
-		];
-		
-		//			$row = [
-		//				[
-		//					'user_name' => '測試',
-		//					'campaign_name' => 'Aetolia-冒険のラプソディー 日本推廣',
-		//					'sale_group_name' => '整合行銷部',
-		//					'cue' => [
-		//					  [
-		//					   'set_date' => '201906',
-		//						  'media_channel_name' => 'FaceBook',
-		//						  'sell_type_name' => '廣告素材製作',
-		//						  'provide_money' => 2000
-		//					  ],
-		//					  [
-		//						'set_date' => '201906',
-		//						'media_channel_name' => 'FaceBook',
-		//						'sell_type_name' => '廣告素材製作',
-		//						'provide_money' => 2000
-		//					 ]
-		//					],
-		//			  ],
-		//			  [
-		//				'user_name' => 'nash',
-		//				'campaign_name' => 'Aetolia-冒険のラプソディー 日本推廣',
-		//				'sale_group_name' => '整合行銷部',
-		//				'cue' => [
-		//				 [
-		//					'set_date' => '201906',
-		//					'media_channel_name' => 'google',
-		//					'sell_type_name' => '廣告素材製作',
-		//					'provide_money' => 2000
-		//				 ],
-		//				 [
-		//					'set_date' => '201906',
-		//					'media_channel_name' => 'FaceBook',
-		//					'sell_type_name' => '廣告素材製作',
-		//					'provide_money' => 2000
-		//				 ]
-		//				],
-		//			 ]
-		//			];
-		
-		//$saleGroups = $saleGroups->map(function($v,$k){
-		//	$v->groupsUsers = $v->groupsUsers->pluck('erp_user_id')->unique();
-		//	return $v;
-		//});
+			['data' => 'provide_set_date'],
+			['data'=> 'set_date'],
+			['data'=> 'user_name'],
+			['data'=> 'sale_group_name'],
+			['data'=> 'status','render'=>'團績獎金'],
+			['data'=> 'groups_profit'],
+			['data'=> 'rate'],
+			['data'=> 'provide_money'],
+		 ];
 		
 		return view('financial.provide.view',
 		 [
-			'data' => $this->resources,'columns'=> $columns, 'row'=>$row,'saleGroups' => $saleGroups ,'userList' => $userList]);
+			'data' => $this->resources,
+		  'provideBonusColumns'=> $provideBonusColumns,
+		  'provideBonus'=>$provideBonus,
+		  'saleGroupsReachColumns' => $saleGroupsReachColumns,
+		  'saleGroupsReach'=>$saleGroupsReach,
+		  'saleGroups' => $saleGroups,
+		  'userList' => $userList]);
 	}
 	public function getAllSelectId ()
 	{
@@ -513,6 +439,101 @@ class ProvideController extends BaseController
 	{
 		$provideFid = Provide::all()->pluck('financial_lists_id');
 		FinancialList::WhereIn('id', $provideFid)->update(['status' => 2]);
+	}
+	
+	/**
+	 * @param DateTime $provideStart
+	 * @param DateTime $provideEnd
+	 * @param $userIds
+	 * @return SaleGroupsReach[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection
+	 */
+	private function getSaleGroupProvide (DateTime $provideStart, DateTime $provideEnd, $userIds)
+	{
+		/* sale Groups Bonus*/
+		$saleGroupsReach = SaleGroupsReach::with('saleGroups', 'saleUser')->where('status', 1)->whereBetween('updated_at', [$provideStart->format('Y-m-01'), $provideEnd->format('Y-m-31')])->get();
+		$saleGroupsReach = $saleGroupsReach->whereIn('saleUser.erp_user_id', $userIds);
+		$saleGroupsReach = $saleGroupsReach->map(function ($v, $k) {
+			$v['provide_set_date'] = $v->updated_at->format('Y-m-d');
+			$v['user_name'] = $v->saleUser->user->name;
+			$v['sale_group_name'] = $v->saleGroups->name;
+			return $v;
+		})->values();
+		return $saleGroupsReach;
+	}
+	
+	/**
+	 * @param DateTime $provideStart
+	 * @param DateTime $provideEnd
+	 * @param $userIds
+	 * @return FinancialList[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection
+	 */
+	private function getUserBounsProvide (DateTime $provideStart, DateTime $provideEnd, $userIds)
+	{
+		// financial bonus list
+		$provideBonus = FinancialList::with(['provide', 'user'])->get();
+		$provideBonus = $provideBonus->whereBetween('provide.created_at', [$provideStart->format('Y-m-01'), $provideEnd->format('Y-m-31')])
+		 ->whereIn('erp_user_id', $userIds)->values();
+		
+		$provideBonus = $provideBonus->map(function ($v, $k) {
+			$v['sale_group_name'] = $v->saleGroups->saleGroups->name;
+			$v['user_name'] = $v->user->name;
+			$v['provide_set_date'] = $v->provide->created_at->format('Y-m-d');
+			$v['provide_money'] = $v->provide->provide_money;
+			return $v;
+		})->values();
+		return $provideBonus;
+	}
+	
+	/**
+	 * @param bool $isAdmin
+	 * @param bool $isConvener
+	 * @param $saleGroupsUsers
+	 * @param $uid
+	 * @param DateTime $date
+	 * @return array
+	 */
+	private function getListData ($uid, DateTime $date): array
+	{
+		/*permission check select*/
+		$permission = new Permission();
+		/*admin check*/
+		$isAdmin = $permission->isAdmin($uid);
+		/*convener check*/
+		$saleGroupsUsers = SaleGroupsUsers::where(['erp_user_id'=> $uid,'set_date'=>$date])->first();
+		$isConvener = $saleGroupsUsers->is_convener ?? false;
+		
+		/* 依照權限不同 取的 user list 資料差異
+				admin 全取
+				convener 取該團隊
+				user 取自己
+				*/
+		$saleGroupsIds = [];
+		$saleGroups = [];
+		$userList = [];
+		$userIds = [];
+		
+		if ($isAdmin) {
+			$saleGroups = SaleGroups::all();
+			$userList = session('users');
+			$saleGroupsIds = $saleGroups->pluck('id');
+			$userIds = SaleGroups::with('groupsUsers')->whereIn('id', $saleGroupsIds)->get()->map(function ($v, $k) {
+				return $v->groupsUsers->pluck('erp_user_id');
+			})->flatten()->unique();
+		} else {
+			if ($isConvener) {
+				$saleGroups = [$saleGroupsUsers->saleGroups];
+				$userGroupIds = $saleGroupsUsers->getSameGroupsUser($uid, $date)->pluck('user')->pluck('erp_user_id');
+				$userList = collect(session('users'))->whereIn('id', $userGroupIds);
+			} else {
+				$saleGroups = [];
+				$userList = collect(session('users'))->whereIn('id', $uid);
+			}
+			$userIds = $userList->pluck('id');
+			$userList = $userList->toArray();
+		}
+		
+		sort($userList);
+		return array($saleGroups, $userList, $userIds);
 	}
 }
 
