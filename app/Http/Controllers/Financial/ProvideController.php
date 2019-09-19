@@ -62,6 +62,7 @@ class ProvideController extends BaseController
 			$v['rate'] = $v->bonus->bonusReach->reach_rate ?? 0;
 			$v['profit'] = $this->exchangeMoney($v);
 			$v['provide_money'] = $v['profit'] > 0 ? round($v['profit'] * $v['rate'] / 100) : 0;
+			$v['set_date'] = substr($v['set_date'],0,7);
 			return $v;
 		})->values();
 		
@@ -108,6 +109,7 @@ class ProvideController extends BaseController
 		$saleGroupsReach = $saleGroupsReach->map(function($v,$k){
 		 $v->user_name = $v->saleUser->user->name;
 			$v->group_name = $v->saleGroups->name;
+			$v->set_date = substr($v->set_date,0,7);
 			return $v;
 		})->toArray();
 
@@ -500,6 +502,7 @@ class ProvideController extends BaseController
 			$v['provide_set_date'] = $v->updated_at->format('Y-m');
 			$v['user_name'] = $v->saleUser->user->name;
 			$v['sale_group_name'] = $v->saleGroups->name;
+			$v['set_date'] = substr($v['set_date'],0,7);
 			return $v;
 		})->values();
 		return $saleGroupsReach;
@@ -531,6 +534,7 @@ class ProvideController extends BaseController
 			$v['provide_set_date'] = $v->provide->created_at->format('Y-m');
 			$v['provide_money'] = $v->provide->provide_money;
 			$v['rate'] = $v->provide->bonusReach->reach_rate ?? 0;
+			$v['set_date'] = substr($v['set_date'],0,7);
 			return $v;
 		})->values();
 		return $provideBonus;
