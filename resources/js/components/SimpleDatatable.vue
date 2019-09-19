@@ -14,6 +14,13 @@
 						</thead>
 						<tbody>
 						</tbody>
+						<tbody id="content_loader" v-if='loading'>
+						<tr>
+							<td colspan="14" class='text-center'>
+								<i class="fa fa-spin fa-refresh" style="font-size: 3em; padding: 20px;"></i>
+							</td>
+						</tr>
+						</tbody>
 						<tfoot>
 						<tr>
 							<th v-for='item in table_title'>{{item}}</th>
@@ -39,15 +46,17 @@
 		        row : Array,
             columns : Array,
             ex_buttons : Array,
-		        type: String
+		        type: String,
+            csrf: String
         },
         data() {
             return {
+              now : 0,
             }
         },
         computed: {
-            ...mapGetters(['getTableSelect']),
-		        ...mapState(['start_date','end_date','change_date']),
+            // ...mapGetters(['getTableSelect','getUserIds','getSaleGroupIds','getStartDate','getEndDate']),
+		        ...mapState(['table_select','start_date','end_date','change_date','user_ids','sale_group_ids','loading']),
         },
 		    methods:{
             change_render(item){
@@ -56,45 +65,76 @@
             set_select(value) {
                 this.$store.commit('tableSelect', value);
             },
+				    tableClear(){
+                if(this.dataTable !== undefined){
+                    this.dataTable.clear();
+                    this.dataTable.draw();
+                }
+				    },
+		        updataTable(row){
+                this.dataTable.clear();
+		            this.dataTable.rows.add( row );
+                this.dataTable.draw();
+		        },
+				    getData(){
+          
+                
+						    let data = {
+                    _token : this.csrf,
+						        startDate : this.$store.state.start_date,
+                    endDate : this.$store.state.end_date,
+                    saleGroupIds : this.$store.state.sale_group_ids,
+                    userIds : this.$store.state.user_ids
+						    };
+                
+                if( (data.saleGroupIds == '' && data.userIds == '') || data._token === undefined ){
+									return false;
+                }
+                var table_id = this.table_id;
+                this.$store.state.loading = true;
+                this.tableClear();
+                
+                axios.post('/financial/provide/getAjaxProvideData',data).then(
+                    response => {
+                        this.$store.state.loading = false;
+                        let rowData = eval(`response.data.${this.table_id}`);
+                        
+                        let total = parseInt(0);
+                        
+                        rowData.map(function(v){
+                            total += parseInt(v.provide_money);
+                        });
+                        if(table_id == 'provide_bonus_list'){
+                            this.$store.state.bonus_total_money = total;
+                            
+                        }else{
+                            this.$store.state.sale_group_total_money = total;
+                        }
+                        // this.$store.commit('changeTotalMoney', total);
+                        this.updataTable(rowData);
+                        
+                    },
+                    err => {
+                        
+                        reject(err);
+                    }
+                );
+                
+				    },
 		    },
-        mounted: function(){
-            // function format ( d ) {
-            //     // `d` is the original data object for the row
-            //     return  `
-						// 			<table class='table table-bordered table-striped' cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">
-						// 				<thead>
-						// 				<tr>
-						// 					<th>月份</th>
-						// 					<th>媒體</th>
-						// 					<th>類型</th>
-						// 					<th>發放獎金</th>
-						// 				</tr>
-						// 				</thead>
-						// 				<tbody>
-						// 				${d.cue.map((item, i) =>
-						// 					`<tr>
-			      //               <td>${item.set_date}</td>
-			      //               <td>${item.media_channel_name}</td>
-			      //               <td>${item.sell_type_name}</td>
-			      //               <td>${item.provide_money}</td>
-		        //             </tr>`
-		        //         )}
-						// 				</tbody>
-            //       </table>`;
-            // }
-            
+        beforeMount: function(){
             this.columns.map(function(v){
                 if(v.render !== undefined){
                     v.render = new Function('data','type','row',''+v.parmas+'; return  `'+v.render+'`');
                 }
             });
-            
-		        var columns = this.columns;
-		        var rowData = this.row;
-		        var tableId = this.table_id;
-		        var ex_buttons = this.ex_buttons;
-		        var type = this.type;
-		        var vue = this;
+
+            var columns = this.columns;
+            var rowData = this.row;
+            var tableId = this.table_id;
+            var ex_buttons = this.ex_buttons;
+            var type = this.type;
+            var vue = this;
             $(document).ready(function() {
                 let domtable = $('#'+tableId+'');
                 let dataTableConfig =
@@ -124,7 +164,7 @@
                             }
                         },
                         columns: columns,
-                       
+
                     };
                 if(type == 'select'){
                     dataTableConfig.columnDefs= [{
@@ -155,21 +195,24 @@
                         dataTableConfig.buttons = [{ extend: v , className: 'btn btn-success btn-flat' , text: `${v}匯出`}];
                     });
                 }
-								
-                var dataTable = domtable.DataTable(dataTableConfig);
-                dataTable.clear();
-                dataTable.rows.add( rowData );
-                dataTable.draw();
-                
+
+                vue.dataTable = domtable.DataTable(dataTableConfig);
+                vue.dataTable.clear();
+                vue.dataTable.rows.add( rowData );
+                vue.dataTable.draw();
+
                 if(type == 'select'){
                     // Array holding selected row IDs
                     var rows_selected = vue.$store.getters.getTableSelect;
+                    // var rows_selected = vue.$store.state.table_select;
+                    rows_selected[vue.table_id] = [];
+
                     // Handle click on checkbox
                     domtable.find('tbody').on('click', 'input[type="checkbox"]', function(e){
                         var $row = $(this).closest('tr');
 
                         // Get row data
-                        var data = dataTable.row($row).data();
+                        var data = vue.dataTable.row($row).data();
 
                         // Get row ID
                         var rowId = data['id'];
@@ -179,11 +222,11 @@
 
                         // If checkbox is checked and row ID is not in list of selected row IDs
                         if(this.checked && index === -1){
-                            rows_selected.push(rowId);
 
+                            eval(`rows_selected.${vue.table_id}`).push(rowId);
                             // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
                         } else if (!this.checked && index !== -1){
-                            rows_selected.splice(index, 1);
+                            eval(`rows_selected.${vue.table_id}`).splice(index, 1);
                         }
 
                         if(this.checked){
@@ -200,12 +243,12 @@
                         $(this).parent().find('input[type="checkbox"]').trigger('click');
                     });
                 }
-            });
+                // });
                 // //chilren row
                 // $('#'+tableId+' tbody').on('click', 'td.details-control', function () {
                 //     var tr = $(this).closest('tr');
                 //     var row = dataTable.row( tr );
-								//
+                //
                 //     if ( row.child.isShown() ) {
                 //         // This row is already open - close it
                 //         row.child.hide();
@@ -216,22 +259,43 @@
                 //         row.child( format(row.data()) ).show();
                 //         tr.addClass('shown');
                 //     }
-                // } );
+            } );
+        },
+        mounted: function(){
+		        
+        
         },
         watch:{
             start_date: {
                 immediate: true,    // 这句重要
-                handler (val, oldVal) {
-                    if(oldVal !== undefined) {
-                        console.log(val,oldVal);
+                    handler (val, oldVal) {
+                    if(oldVal !== val  && oldVal !== undefined && oldVal !== '' && val !== '' && oldVal.length !== 0) {
+                        this.getData();
                     }
                 }
             },
             end_date: {
                 immediate: true,    // 这句重要
-                handler (val, oldVal) {
-                    if(oldVal !== undefined) {
-                        console.log(val,oldVal);
+                    handler (val, oldVal) {
+                    if(oldVal !== val  && oldVal !== undefined && oldVal !== '' && val !== '' && oldVal.length !== 0) {
+                        this.getData();
+                    }
+                }
+            },
+            user_ids: {
+                immediate: true,    // 这句重要
+                    handler (val, oldVal) {
+                    if(oldVal !== val) {
+                        this.getData();
+                    }
+                }
+            },
+            sale_group_ids: {
+                immediate: true,// 这句重要
+                    // lazy:true,
+                    handler (val,oldVal) {
+                    if(oldVal !== val  && oldVal !== undefined && oldVal !== '' && val !== '' && oldVal.length !== 0) {
+                        this.getData();
                     }
                 }
             }

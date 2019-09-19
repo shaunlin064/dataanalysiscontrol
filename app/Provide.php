@@ -17,7 +17,7 @@ class Provide extends Model
 	
 	public function bonusReach ()
 	{
-		return $this->hasOne(BonusReach::CLASS);
+		return $this->hasOne(BonusReach::CLASS,'bonus_id','bonus_id');
 	}
 	
 }

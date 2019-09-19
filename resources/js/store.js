@@ -3,12 +3,15 @@ date = `${date.getFullYear()}-${('0'+(date.getMonth()+1)).substring(0,2)}-01`;
 export default {
     state: {
         change_date: '',
-        start_date: date,
-        end_date:date,
+        start_date: '',
+        end_date:'',
         table_select: [],
-        user_id: 0,
-        sale_group_id:0,
+        user_ids: [],
+        sale_group_ids:[],
         profit: 0,
+        total_money: 0,
+        bonus_total_money : 0,
+        sale_group_total_money: 0,
         bonus_rate: 0,
         bonus_next_amount: 0,
         bonus_next_percentage: 0,
@@ -19,11 +22,12 @@ export default {
         money_status_bonus_unpaid: 0,
         month_income: 0,
         month_cost: 0,
+        loading:false,
     },
     getters:{
         getTableSelect(state){
             return state.table_select;
-        },
+        }
     },
     actions:{
         saveName({commit}, msg) {
@@ -40,6 +44,9 @@ export default {
         },
         tableSelect(state,value) {
             state.table_select = value;
+        },
+        changeTotalMoney(state,value) {
+            state.total_money = value;
         },
         changeBox(state,arg){
             switch(arg.field){
@@ -70,10 +77,10 @@ export default {
             state.month_cost = arg.month_cost;
         },
         changeUserId(state,value){
-            state.user_id = value;
+            state.user_ids = value;
         },
         changeSaleGroupId(state,value){
-            state.sale_group_id = value;
+            state.sale_group_ids = value;
         }
     }
 };

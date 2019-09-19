@@ -111,6 +111,9 @@ Vue.component('date-range', require('./components/DateRange').default);
 
 Vue.component('select2', require('./components/Select2').default);
 
+Vue.component('count-total', require('./components/CountTotal').default);
+
+Vue.component('provide-submit', require('./components/ProvideSubmit').default);
 
 const app = new Vue({
     el: '#app',

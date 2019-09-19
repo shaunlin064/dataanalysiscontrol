@@ -39,20 +39,31 @@ class ProvideController extends BaseController
 		////		 'title' => session('users')[$id]['department_name'],
 		////		];
 		// material design
-		$this->resources['cssPath'][] = '/plugins/material/material.min.css';
-		$this->resources['cssPath'][] = 'https://fonts.googleapis.com/icon?family=Material+Icons';
-		$this->resources['jsPath'][] = '/plugins/material/material.min.js';
-		$this->resources['cssPath'][] = '/css/glyphicons.css';
-		
-		$page = Input::get('page') ?? 1;
-		$sort = Input::get('sort')?? 'DESC';
-		$sort_by = Input::get('sort_by')?? 'erp_user_id';
-		$showItem = Input::get('showItem') ?? 500;
-		$searchStr = Input::get('searchStr') ?? '';
-		
+		//$this->resources['cssPath'][] = '/plugins/material/material.min.css';
+		//$this->resources['cssPath'][] = 'https://fonts.googleapis.com/icon?family=Material+Icons';
+		//$this->resources['jsPath'][] = '/plugins/material/material.min.js';
+		//$this->resources['cssPath'][] = '/css/glyphicons.css';
+		//
+		//$page = Input::get('page') ?? 1;
+		//$sort = Input::get('sort')?? 'DESC';
+		//$sort_by = Input::get('sort_by')?? 'erp_user_id';
+		//$showItem = Input::get('showItem') ?? 500;
+		//$searchStr = Input::get('searchStr') ?? '';
+		//
 		$date = new \DateTime();
+		//
+		//list($newRow,$paginate,$allId,$selectIds,$totalAlredaySelectMoney) = $this->getDataBackend('add',$date->format('Y-m-01'));
 		
-		list($newRow,$paginate,$allId,$selectIds,$totalAlredaySelectMoney) = $this->getDataBackend('add',$date->format('Y-m-01'));
+		// financial bonus list
+		$bonuslist = FinancialList::where('status',1)->get();
+		$bonuslist = $bonuslist->map(function ($v, $k) {
+			$v['sale_group_name'] = $v->saleGroups->saleGroups->name ?? '';
+			$v['user_name'] = $v->user->name;
+			$v['rate'] = $v->bonus->bonusReach->reach_rate ?? 0;
+			$v['profit'] = $this->exchangeMoney($v);
+			$v['provide_money'] = $v['profit'] > 0 ? round($v['profit'] * $v['rate'] / 100) : 0;
+			return $v;
+		})->values();
 		
 		//dd(UrlWindow::make($paginate->onEachSide(1)));
 //		dd($paginate->count(),$paginate->getUrlRange(5, 10),
@@ -68,22 +79,31 @@ class ProvideController extends BaseController
 //$paginate->previousPageUrl(),
 //$paginate->total());
 		
-		//'allId' => count($allId) ? $allId : [],
-		//  'selectIds'=> count($selectIds) ? $selectIds : [],
-		//  'paginate'=> count($paginate) ? $paginate : [],
-		$columns =
+		$saleGroupsTableColumns =
 		 [
 		  ['data' => 'id'],
 			['data' => 'set_date'],
 			['data'=> 'user_name'],
 			['data'=> 'group_name'],
-			['data'=> 'status','render'=>'團績獎金'],
 			['data'=> 'groups_profit'],
 			['data'=> 'rate'],
 			['data'=> 'provide_money']
 		 ];
+		
+		$bonuslistColumns =
+		 [
+		  ['data' => 'id'],
+			['data'=> 'set_date'],
+			['data'=> 'user_name'],
+			['data'=> 'sale_group_name'],
+			['data'=> 'campaign_name'],
+			['data'=> 'media_channel_name'],
+			['data'=> 'sell_type_name'],
+			['data'=> 'profit'],
+			['data'=> 'rate'],
+			['data'=> 'provide_money'],
+		 ];
 
-		//:table_title='["月份","業務","團隊名稱","類型","團隊毛利","獎金比例","獎金"]'
 		$saleGroupsReach = SaleGroupsReach::where('status',0)->get();
 		$saleGroupsReach = $saleGroupsReach->map(function($v,$k){
 		 $v->user_name = $v->saleUser->user->name;
@@ -94,17 +114,21 @@ class ProvideController extends BaseController
 		return view('financial.provide.list',
 		 [
 		  'data' => $this->resources ,
-		  'row' => $newRow ? $newRow : [],
+		  //'row' => $newRow ? $newRow : [],
 		  'saleGroupsReach' => $saleGroupsReach,
-		  'saleGroupsTableColumns' => $columns,
-		  'allId' => count($allId) ? $allId : [],
-		  'selectIds'=> $selectIds,
-		  'paginate'=> $paginate,
-		  'sort'=>$sort,
-		  'sort_by'=>$sort_by,
-		  'search_str'=>$searchStr,
-		  'paginateElement'=>Arr::flatten(UrlWindow::make($paginate->onEachSide(1))),
-		  'totalAlredaySelectMoney' => $totalAlredaySelectMoney]);
+		  'saleGroupsTableColumns' => $saleGroupsTableColumns,
+		  'bonuslistColumns' => $bonuslistColumns,
+		  'bonuslist' => $bonuslist,
+		  //'allId' => count($allId) ? $allId : [],
+		  //'selectIds'=> $selectIds,
+		  //'paginate'=> $paginate,
+		  //'sort'=>$sort,
+		  //'sort_by'=>$sort_by,
+		  //'search_str'=>$searchStr,
+		  //'paginateElement'=>Arr::flatten(UrlWindow::make($paginate->onEachSide(1))),
+		  //'totalAlredaySelectMoney' => $totalAlredaySelectMoney
+		 
+		 ]);
 	}
 	
 	public function view ($id= null)
@@ -121,16 +145,19 @@ class ProvideController extends BaseController
 		
 		$saleGroupsReach = $this->getSaleGroupProvide($provideStart, $provideEnd, $userIds);
 		$provideBonus = $this->getUserBounsProvide($provideStart, $provideEnd, $userIds);
-		
+		//$saleGroupsReach = [];
+		//$provideBonus = [];
 		$provideBonusColumns =
 		 [
 			['data' => 'provide_set_date'],
 			['data'=> 'set_date'],
+		  ['data'=> 'user_name'],
+		  ['data'=> 'sale_group_name'],
 			['data'=> 'campaign_name'],
-			['data'=> 'user_name'],
-			['data'=> 'sale_group_name'],
 			['data'=> 'media_channel_name'],
 			['data'=> 'sell_type_name'],
+		  ['data'=> 'profit'],
+		  ['data'=> 'rate'],
 			['data'=> 'provide_money'],
 		 ];
 		
@@ -140,7 +167,6 @@ class ProvideController extends BaseController
 			['data'=> 'set_date'],
 			['data'=> 'user_name'],
 			['data'=> 'sale_group_name'],
-			['data'=> 'status','render'=>'團績獎金'],
 			['data'=> 'groups_profit'],
 			['data'=> 'rate'],
 			['data'=> 'provide_money'],
@@ -200,6 +226,7 @@ class ProvideController extends BaseController
 	
 	public function ajaxCalculatFinancialBonus ()
 	{
+		
 		$selectFincialIds = Input::post('select_financial_ids') ?? [];
 		$selectFincialIds = explode(',', $selectFincialIds);
 		
@@ -304,24 +331,25 @@ class ProvideController extends BaseController
 		
 	}
 	
-	public function post()
+	public function post(Request $request)
 	{
 		
-		$selectSaleGroupsReachIds = explode(',',Input::post('sale_sale_groups_reach_ids'));
+		$selectSaleGroupsReachIds = explode(',',$request->provide_sale_groups_bonus);
 		$saleGroupReach = new SaleGroupsReach();
 		$saleGroupReach->whereIn('id',$selectSaleGroupsReachIds)->update(['status'=>1]);
 		
-		$selectFincialIds = Input::post('select_financial_ids');
+		$selectFincialIds = $request->provide_bonus;
+		
 		$selectFincialIds = $selectFincialIds != null ? explode(',',$selectFincialIds) : [];
 		
-		$originalSelectFinancialIds = Input::post('original_select_financial_ids');
-		$originalSelectFinancialIds = $originalSelectFinancialIds != null ? explode(',',$originalSelectFinancialIds) : [];
+		//$originalSelectFinancialIds = Input::post('original_select_financial_ids');
+		//$originalSelectFinancialIds = $originalSelectFinancialIds != null ? explode(',',$originalSelectFinancialIds) : [];
 		
 		$this->resetFinancialStatus();
 		
-		$deleteIds = array_diff($originalSelectFinancialIds,$selectFincialIds);
-		
-		$this->delete($deleteIds);
+		//$deleteIds = array_diff($originalSelectFinancialIds,$selectFincialIds);
+		//
+		//$this->delete($deleteIds);
 		
 		$this->save($selectFincialIds);
 		
@@ -430,10 +458,6 @@ class ProvideController extends BaseController
 	}
 	
 	
-	public function exportExcel ()
-	{
-	
-	}
 	
 	private function resetFinancialStatus (): void
 	{
@@ -441,19 +465,39 @@ class ProvideController extends BaseController
 		FinancialList::WhereIn('id', $provideFid)->update(['status' => 2]);
 	}
 	
+	public function getAjaxProvideData (Request $request)
+	{
+		
+		$provideStart = new DateTime($request->startDate);
+		$provideEnd = new DateTime($request->endDate);
+		$saleGroupIds = $request->saleGroupIds;
+		$userIds = $request->userIds;
+		
+		$saleGroupRowData = $this->getSaleGroupProvide($provideStart,$provideEnd,$userIds,$saleGroupIds);
+		$bonusRowData = $this->getUserBounsProvide($provideStart,$provideEnd,$userIds,$saleGroupIds);
+		
+		echo json_encode(["provide_groups_list" => $saleGroupRowData,"provide_bonus_list"=>$bonusRowData]);
+	}
 	/**
 	 * @param DateTime $provideStart
 	 * @param DateTime $provideEnd
 	 * @param $userIds
 	 * @return SaleGroupsReach[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection
 	 */
-	private function getSaleGroupProvide (DateTime $provideStart, DateTime $provideEnd, $userIds)
+	private function getSaleGroupProvide (DateTime $provideStart, DateTime $provideEnd, $userIds = null , $saleGroupIds = null)
 	{
+		
+		if($saleGroupIds && $userIds == null){
+			$userIds = SaleGroups::with('groupsUsers')->whereIn('id', $saleGroupIds)->get()->map(function ($v, $k) {
+				return $v->groupsUsers->pluck('erp_user_id');
+			})->flatten();
+		}
+		
 		/* sale Groups Bonus*/
 		$saleGroupsReach = SaleGroupsReach::with('saleGroups', 'saleUser')->where('status', 1)->whereBetween('updated_at', [$provideStart->format('Y-m-01'), $provideEnd->format('Y-m-31')])->get();
 		$saleGroupsReach = $saleGroupsReach->whereIn('saleUser.erp_user_id', $userIds);
 		$saleGroupsReach = $saleGroupsReach->map(function ($v, $k) {
-			$v['provide_set_date'] = $v->updated_at->format('Y-m-d');
+			$v['provide_set_date'] = $v->updated_at->format('Y-m');
 			$v['user_name'] = $v->saleUser->user->name;
 			$v['sale_group_name'] = $v->saleGroups->name;
 			return $v;
@@ -467,8 +511,15 @@ class ProvideController extends BaseController
 	 * @param $userIds
 	 * @return FinancialList[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection
 	 */
-	private function getUserBounsProvide (DateTime $provideStart, DateTime $provideEnd, $userIds)
+	private function getUserBounsProvide (DateTime $provideStart, DateTime $provideEnd, $userIds = null,$saleGroupIds = null)
 	{
+		
+		if($saleGroupIds && $userIds == null){
+			$userIds = SaleGroups::with('groupsUsers')->whereIn('id', $saleGroupIds)->get()->map(function ($v, $k) {
+				return $v->groupsUsers->pluck('erp_user_id');
+			})->flatten();
+		}
+		
 		// financial bonus list
 		$provideBonus = FinancialList::with(['provide', 'user'])->get();
 		$provideBonus = $provideBonus->whereBetween('provide.created_at', [$provideStart->format('Y-m-01'), $provideEnd->format('Y-m-31')])
@@ -477,8 +528,9 @@ class ProvideController extends BaseController
 		$provideBonus = $provideBonus->map(function ($v, $k) {
 			$v['sale_group_name'] = $v->saleGroups->saleGroups->name;
 			$v['user_name'] = $v->user->name;
-			$v['provide_set_date'] = $v->provide->created_at->format('Y-m-d');
+			$v['provide_set_date'] = $v->provide->created_at->format('Y-m');
 			$v['provide_money'] = $v->provide->provide_money;
+			$v['rate'] = $v->provide->bonusReach->reach_rate ?? 0;
 			return $v;
 		})->values();
 		return $provideBonus;

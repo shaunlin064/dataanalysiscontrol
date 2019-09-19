@@ -36,7 +36,7 @@
 				    box_title: String,
 				    data_table: Object
 		    },
-        computed: mapState(['change_date','user_id']),
+        computed: mapState(['change_date','user_ids']),
         methods:{
             getCampaignData(uId,dateYearMonth){
                 // dateYearMonth =  dateYearMonth.replace('/','');
@@ -126,8 +126,7 @@
                 immediate: true,    // 这句重要
                 handler (val, oldVal) {
                     if(oldVal !== undefined) {
-                        this.getCampaignData(this.user_id,val);
-                        console.log(val);
+                        this.getCampaignData(this.user_ids,val);
                     }
                 }
             }

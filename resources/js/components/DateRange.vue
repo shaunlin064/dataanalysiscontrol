@@ -14,14 +14,12 @@
 </template>
 
 <script>
-    import {mapState} from 'vuex';
     export default {
         name: "date-range",
         props: {
             start_date : String,
             end_date : String,
         },
-        computed: mapState(['change_date']),
         data() {
             return {
                 starDate : this.start_date,
@@ -40,21 +38,13 @@
                 endDate: this.endDate,
             });
             // thisVue.changeDate();
-		        
+            thisVue.changeDate();
             dateRoot.on('apply.daterangepicker', function(ev, picker) {
 
                 thisVue.starDate = picker.startDate.format('YYYY-MM-01');
                 thisVue.endDate = picker.endDate.format('YYYY-MM-01');
                 thisVue.changeDate();
-								//
-                // historyDom.hide();
-                // historyDom.map(function(){
-                //     let date = $(this).data('history-range');
-								//
-                //     if((date > rangeStart && date < rangeEnd) || date == rangeStart || date == rangeEnd){
-                //         $(this).show();
-                //     }
-                // });
+						
             });
         },
         methods: {

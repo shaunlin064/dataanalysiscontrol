@@ -20,7 +20,13 @@ class SaleGroupController extends BaseController
 	
 	public function add ()
 	{
+		$date = new \DateTime();
+		$datenow = $date->format('Y-m-01');
+		//trim user data
 		$user = session('users');
+		foreach($user as $key => $item){
+			$user[$key]['boundary'] = SaleGroupsUsers::where(['set_date' => $datenow,'erp_user_id' => $item['id']])->first()->getUserBonusBoundary->boundary ?? 0;
+		}
 		sort($user);
 		return view('saleGroup.setting.add',['data' => $this->resources,'user'=> $user
 		]);

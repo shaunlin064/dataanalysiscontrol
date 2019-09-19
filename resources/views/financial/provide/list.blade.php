@@ -58,46 +58,62 @@
 
     </div>
     <div class='row'>
+        <div class='col-md-12'>
         <simple-data-table-componet
-                :table_id='"provide_bonus_table"'
+                :table_id='"provide_sale_groups_bonus"'
                 :table_head='"招集人獎金"'
-                :table_title='["","月份","業務","團隊名稱","類型","團隊毛利","獎金比例","獎金"]'
+                :table_title='["","月份","業務","團隊名稱","團隊毛利","比例","獎金"]'
                 :row = '{{ json_encode($saleGroupsReach) }}'
                 :columns = '{!!json_encode($saleGroupsTableColumns)!!}'
                 :type = '"select"'
         ></simple-data-table-componet>
+        </div>
     </div>
 
 {{--    </div>--}}
     {{--list --}}
     <div class='row'>
         <div class='col-md-12'>
-            <provide-data-table-component :arg='{
-            "csrf_token" : "{{csrf_token()}}",
-            "paginate_count": {{$paginate->count()}},
-            "paginate" : {
-                "hasPages" : "{{$paginate->hasPages()}}",
-                "onFirstPage" : "{{$paginate->onFirstPage()}}",
-                "previousPageUrl" : "{{$paginate->previousPageUrl()}}",
-                "currentPage" : "{{$paginate->currentPage()}}",
-                "hasMorePages" : "{{$paginate->hasMorePages()}}",
-                "nextPageUrl" : "{{$paginate->nextPageUrl()}}",
-                "element" : {{ json_encode($paginateElement) }}
-            },
-            "sort" : "{{$sort}}",
-            "sort_by" : "{{$sort_by}}",
-            "show_item" : "{{$paginate->perPage()}}",
-            "search_str" : "{{$search_str}}",
-            "first_item_num" : {{$paginate->firstItem() ?? 0}},
-            "last_item_num" : {{$paginate->lastItem() ?? 0 }},
-            "total_item_num" : {{$paginate->total() ?? 0}},
-            "row" : {{ json_encode($row)}},
-            "users" : {{ json_encode(session('users'))}},
-            "all_ids" : {!!  json_encode($allId)  !!},
-            "select_ids" : {!! json_encode($selectIds) !!},
-            "original_select_financial_id" : {!! json_encode($selectIds) !!},
-            "total_alreday_select_money" : {{ $totalAlredaySelectMoney }}
-                    }'></provide-data-table-component>
+            <simple-data-table-componet
+                    :table_id='"provide_bonus"'
+                    :table_head='"個人獎金"'
+                    :table_title='["","月份","業務","團隊名稱","案件名稱","媒體","類型","毛利","比例","獎金"]'
+                    :row = '{{ json_encode($bonuslist) }}'
+                    :columns = '{!!json_encode($bonuslistColumns)!!}'
+                    :type = '"select"'
+                    :csrf= '"{{csrf_token()}}"'
+            ></simple-data-table-componet>
+            <provide-submit
+                    :csrf= '"{{csrf_token()}}"'
+                    :domid='"provide_submit"'
+                    :post_action_url='"post"'
+            ></provide-submit>
+            {{--<provide-data-table-component :arg='{--}}
+            {{--"csrf_token" : "{{csrf_token()}}",--}}
+            {{--"paginate_count": {{$paginate->count()}},--}}
+            {{--"paginate" : {--}}
+            {{--    "hasPages" : "{{$paginate->hasPages()}}",--}}
+            {{--    "onFirstPage" : "{{$paginate->onFirstPage()}}",--}}
+            {{--    "previousPageUrl" : "{{$paginate->previousPageUrl()}}",--}}
+            {{--    "currentPage" : "{{$paginate->currentPage()}}",--}}
+            {{--    "hasMorePages" : "{{$paginate->hasMorePages()}}",--}}
+            {{--    "nextPageUrl" : "{{$paginate->nextPageUrl()}}",--}}
+            {{--    "element" : {{ json_encode($paginateElement) }}--}}
+            {{--},--}}
+            {{--"sort" : "{{$sort}}",--}}
+            {{--"sort_by" : "{{$sort_by}}",--}}
+            {{--"show_item" : "{{$paginate->perPage()}}",--}}
+            {{--"search_str" : "{{$search_str}}",--}}
+            {{--"first_item_num" : {{$paginate->firstItem() ?? 0}},--}}
+            {{--"last_item_num" : {{$paginate->lastItem() ?? 0 }},--}}
+            {{--"total_item_num" : {{$paginate->total() ?? 0}},--}}
+            {{--"row" : {{ json_encode($row)}},--}}
+            {{--"users" : {{ json_encode(session('users'))}},--}}
+            {{--"all_ids" : {!!  json_encode($allId)  !!},--}}
+            {{--"select_ids" : {!! json_encode($selectIds) !!},--}}
+            {{--"original_select_financial_id" : {!! json_encode($selectIds) !!},--}}
+            {{--"total_alreday_select_money" : {{ $totalAlredaySelectMoney }}--}}
+            {{--        }'></provide-data-table-component>--}}
 
         </div>
         <!-- Colored raised button -->

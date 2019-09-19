@@ -106,6 +106,7 @@ use \Illuminate\Support\Facades\Artisan;
 					Route::prefix('/provide')->group(function () {
 						Route::get('/list', 'ProvideController@list')->name('financial.provide.list');
 						Route::get('/view/{id?}', 'ProvideController@view')->name('financial.provide.view');
+						Route::post('/getAjaxProvideData', 'ProvideController@getAjaxProvideData')->name('financial.provide.getAjaxProvideData');
 						Route::any('/getAllSelectId', 'ProvideController@getAllSelectId')->name('financial.provide.getAllSelectId');
 						Route::any('/getAjaxData', 'ProvideController@getAjaxData')->name('financial.provide.getAjaxData');
 						Route::any('/ajaxCalculatFinancialBonus', 'ProvideController@ajaxCalculatFinancialBonus')->name('financial.provide.ajaxCalculatFinancialBonus');

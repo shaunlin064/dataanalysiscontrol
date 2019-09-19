@@ -21,6 +21,16 @@
             return {}
         },
         methods:{
+            updateSelectToVux(domId){
+              switch(domId){
+                case 'select_user':
+                    this.changeUserId($('#'+domId+'').val());
+                    break;
+                case 'select_groups' :
+                    this.changeSaleGroupId($('#'+domId+'').val());
+                    break;
+              }
+            },
             changeUserId(ids) {
                 this.$store.commit('changeUserId', ids);
             },
@@ -28,21 +38,16 @@
                 this.$store.commit('changeSaleGroupId', ids);
             },
         },
-        computed: mapState(['user_id','sale_group_id']),
+        computed: mapState(['user_ids','sale_group_ids']),
         mounted: function(){
             $('#'+this.id+'').select2();
 		        
             var domId = this.id;
             var thisVue = this;
+            
+            thisVue.updateSelectToVux(domId);
             $('#'+this.id+'').on('change', function (e) {
-                switch(domId){
-		                case 'select_user':
-                        thisVue.changeUserId($('#'+domId+'').val());
-		                    break;
-		                case 'select_groups' :
-                        thisVue.changeSaleGroupId($('#'+domId+'').val());
-		                    break;
-                }
+                thisVue.updateSelectToVux(domId);
             });
             var evTimeStamp = 0;
             $('.row').on('click','input[name="selectType"]',function(v,k){

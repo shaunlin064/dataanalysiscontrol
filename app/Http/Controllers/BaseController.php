@@ -51,7 +51,7 @@
 			 //			 folder instead of downloading all of them to reduce the load. --
 			'/css/skins/_all-skins.min.css',
 			 //	<!-- Google Font -->
-			'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic',
+			//'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic',
 			 // global css
 			'/css/global.css'
 		 ],
