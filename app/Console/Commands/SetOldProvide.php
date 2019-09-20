@@ -56,7 +56,6 @@ class SetOldProvide extends Command
 	    	////離職員工 如果收款日期在離職後 不存入已放款
 	    	if($leavelUser->where('id',$v->erp_user_id)->count() > 0){
 	    		$leaveDate = $leavelUser->where('id',$v->erp_user_id)->first()['user_resign_date'];
-			    dd($leaveDate >= $v->receipt->created_at);
 	    		if($leaveDate >= $v->receipt->created_at){
 				    return;
 			    }

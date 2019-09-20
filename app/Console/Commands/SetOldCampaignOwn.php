@@ -86,6 +86,5 @@ class SetOldCampaignOwn extends Command
 			    });
 		    }
 	    }
-	    echo 'change Campaign done';
     }
 }
