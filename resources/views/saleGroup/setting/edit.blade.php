@@ -68,7 +68,7 @@
                         {{--</div>--}}
                         <!-- /.form group -->
                     {{--History Start--}}
-                        @foreach( $groupsUsersHistory as $key => $items)
+                        @foreach( $groupsBonusHistory as $key => $items)
                         <div class="box box-warning collapsed-box">
                             <div class="box-header with-border">
                                 <h3 class="box-title">{{$key}}</h3>
@@ -88,7 +88,7 @@
                                             <div class="description-block">
                                                 <h5 class="">獎金比例</h5>
                                                 <h3 class="description-text">
-                                                    {{5.5 - ($items->count() * 0.25).'%' }}
+                                                    {{$items['rate'].'%' }}
                                                 </h3>
                                             </div>
                                             <!-- /.description-block -->
@@ -106,9 +106,7 @@
                                             <div class="description-block">
                                                 <h5 class="">責任額總計</h5>
                                                 <h3 class="description-text" id='total_boundary'>
-                                                    {{$items->map(function($v){
-	                                                        return $v->getUserBonusBoundary->boundary  ?? 0;
-                                                        })->sum()
+                                                    {{$items['totalBoundary']
                                                      }}
                                                 </h3>
                                             </div>
@@ -133,8 +131,8 @@
                                                     <th>達成比例</th>
                                                     <th>額外獎金</th>
                                                 </tr>
-                                                @if(isset($groupsBonusHistory[$key]))
-                                                @foreach($groupsBonusHistory[$key] as $item)
+                                                @if(isset($items['bonuslevel']))
+                                                @foreach($items['bonuslevel'] as $item)
                                                 <tr>
                                                     <td></td>
                                                     <td><span class='badge bg-light-blue'>{{$item['achieving_rate']}}%</span></td>
@@ -148,11 +146,11 @@
                                     <!-- /.box-body -->
                                 </div>
                                 <!-- /.box -->
-                                @foreach($groupsUsersHistory[$key] as $users)
+                                @foreach($items['user'] as $users)
                                     @if($users->is_convener == 0)
-                                        <span class='badge bg-light-blue'>{{$users->user['name']}}</span>
+                                        <span class='badge bg-light-blue'>{{$users->name}}</span>
                                     @else
-                                        <span class='badge bg-red'>{{$users->user['name']}}</span>
+                                        <span class='badge bg-red'>{{$users->name}}</span>
                                     @endif
                                 @endforeach
                             </div>

@@ -104,14 +104,11 @@
                 columns: [
                     {
                         data: "erp_user_id",
-                        render: function(data){
+                        render: function(data, type, row){
                             return users[data]['name'];
                         }
                     },
-                    { data: 'erp_user_id',
-                        render: function(data){
-                            return users[data]['department_name'];
-                        }},
+                    { data: 'sale_groups_name'},
                     { data: 'boundary'},
                     { data: 'id',
                         render: function (data) {

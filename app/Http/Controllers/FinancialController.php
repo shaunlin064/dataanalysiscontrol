@@ -25,7 +25,7 @@
 		 't_revenue' => 'income',
 		 't_cost' => 'cost'
 		];
-		public function getBalancePayMentIds (String $tpye = 'select')
+		public function getBalancePayMentData (String $tpye = 'select')
 		{
 			
 			$apiObj = new ApiController();

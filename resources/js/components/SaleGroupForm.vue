@@ -121,11 +121,11 @@
         data() {
             return {
                 columns : [
-                    {data: "groups_users", render: '<p class="hidden">${data}</p><input id="checkbox${row.id}" class="groupsUsers" type="checkbox" value=${row.id} ${checkt}>',parmas:'let checkt = data == 1 ? "checked" : "" '},
-                    {data: "groups_is_convener", render: '<p class="hidden">${data}</p><input class="is_convener" type="checkbox" value=${row.id} ${checkt}>',parmas:'let checkt = data == 1 ? "checked" : "" '},
-                    {data: "name", render: '<label class="point" for=checkbox${row.id}>${data}</label>'},
-                    {data: "boundary", render: '<label class="point" data-boundary=${data} for=checkbox${row.id}>${data}</label>'},
-                    {data: "department_name", render: '<label class="point" for=checkbox${row.id}>${data}</label>'}
+                    {data: "groups_users", render: '<p class="hidden">${data}</p><input id="checkbox${row.erp_user_id}" class="groupsUsers" type="checkbox" value=${row.erp_user_id} ${checkt}>',parmas:'let checkt = data == 1 ? "checked" : "" '},
+                    {data: "groups_is_convener", render: '<p class="hidden">${data}</p><input class="is_convener" type="checkbox" value=${row.erp_user_id} ${checkt}>',parmas:'let checkt = data == 1 ? "checked" : "" '},
+                    {data: "name", render: '<label class="point" for=checkbox${row.erp_user_id}>${data}</label>'},
+                    {data: "boundary", render: '<label class="point" data-boundary_id=${row.erp_user_id} data-boundary=${data} for=checkbox${row.erp_user_id}>${data}</label>'},
+                    {data: "sale_groups_name", render: '<label class="point" for=checkbox${row.erp_user_id}>${data}</label>'}
                 ],
                 csrf_token : this.arg.csrf_token,
                 sale_group_id: this.arg.sale_group_id ? this.arg.sale_group_id : 0,
@@ -142,6 +142,7 @@
                 user_now_select_is_convener: this.arg.user_now_select_is_convener ? JSON.parse(this.arg.user_now_select_is_convener) : [],
                 total_boundary: this.arg.total_boundary ? parseInt(this.arg.total_boundary) : 0,
                 bonus_rate :  5.5,
+		            count_rate : 0,
             }
         },
         filters: {
@@ -239,9 +240,19 @@
         },
         mounted: function() {
             // $('.select2').select2();
-            this.bonus_rate -=  this.user_now_select.length * 0.25;
             var evTimeStamp = 0;
             var vue = this;
+            $(document).ready(function() {
+                 vue.user_now_select.map(function (v, k) {
+                    let boundary = $('*[data-boundary_id="'+v+'"]').data('boundary');
+                    if(boundary !== undefined && boundary !== 0  ){
+                        vue.count_rate++;
+                    }
+                });
+                vue.bonus_rate -=  vue.count_rate * 0.25;
+            });
+            
+            
 		        $('.row').on('click','input[type="checkbox"]',function(v,k){
                 var now = +new Date();
                 if (now - evTimeStamp < 100) {
@@ -259,15 +270,22 @@
                         vue.user_now_select_is_convener = vue.user_now_select_is_convener.filter(e => e !== thisValue);
                     }
 				        }else if($(this).hasClass('groupsUsers')){
+                    let boundary = $('*[data-boundary_id="'+thisValue+'"]').data('boundary');
                     if(checkStatus){
                         vue.total_boundary += $(this).parent().parent().find('[data-boundary]').data('boundary');
                         vue.user_now_select.push(thisValue);
-                        vue.bonus_rate -= 0.25;
+		                    
+                        if(boundary !== undefined && boundary !== 0  ){
+                            vue.count_rate++;
+                        }
                     }else{
                         vue.user_now_select = vue.user_now_select.filter(e => e !== thisValue);
                         vue.total_boundary -= $(this).parent().parent().find('[data-boundary]').data('boundary');
-                        vue.bonus_rate += 0.25;
+                        if(boundary !== undefined && boundary !== 0  ){
+                            vue.count_rate--;
+                        }
                     }
+                    vue.bonus_rate = 5.5 - vue.count_rate*0.25;
 				        }
 		        });
         },

@@ -69,6 +69,7 @@
     <!-- page script -->
     <script>
         $(function () {
+            var users = {!! json_encode(session('users')) !!};
             var dataTable = $('#bonusTable').DataTable({
                 'paging'      : true,
                 'ordering'    : true,
@@ -94,10 +95,15 @@
                     }
                 },
                 columns: [
-                    { data: "name"},
-                    { data: 'department_name'},
-                    { data: 'id',
-                        render: function (data) {
+                    {
+                        data: "erp_user_id",
+                        render: function(data, type, row){
+                            return users[data]['name'];
+                        }
+                    },
+                    { data: 'sale_groups_name'},
+                    { data: 'erp_user_id',
+                        render: function (data,type,row) {
                             return `<a href='/bonus/review/view/${data}'>
 <button type="button" class="btn btn-primary btn-flat">檢視</button>
 </a>`;

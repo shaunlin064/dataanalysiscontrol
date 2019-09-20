@@ -49,10 +49,15 @@ class ReloadConvenerReach extends Command
 	    
 			while($date->format('Y-m-d') != $startDate){
 				$setDate = $date->modify('-1Month')->format('Y-m-d');
-				
-				$saleGroupsReach->setAllConvenerReach($setDate);
+				$data[] = $saleGroupsReach->setAllConvenerReach($setDate);
 			}
-			
+	    collect($data)->flatten()->map(function($v,$k){
+		    $date =  new DateTime($v->set_date);
+		    $v->updated_at = $date->modify('+1Month')->format('Y-m-d H:i:s');
+		    $v->status = 1;
+		    $v->update();
+	    });
+	    
 	    echo 'ReloadConvenerReach done';
     }
 }

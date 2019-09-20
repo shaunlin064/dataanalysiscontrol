@@ -64,4 +64,7 @@ class User extends Authenticatable
 		return $this->hasMany(FinancialList::CLASS,'erp_user_id','erp_user_id');
 	}
 	
+	public function userGroups(){
+		return $this->hasMany(SaleGroupsUsers::CLASS,'erp_user_id','erp_user_id')->groupBy('sale_groups_id');
+	}
 }

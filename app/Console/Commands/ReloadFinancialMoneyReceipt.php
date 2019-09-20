@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Console\Commands;
-
+ini_set('max_execution_time', 300);
 use App\Http\Controllers\Financial\FinancialListController;
 use Illuminate\Console\Command;
 

@@ -21,6 +21,7 @@
 	use App\Http\Controllers\UserController;
 	use App\Bonus;
 	use App\BonusLevels;
+	use Illuminate\Support\Facades\Artisan;
 	use Illuminate\Support\Facades\Redirect;
 	use Validator;
 	use App\Exceptions\Handler;
@@ -94,33 +95,22 @@
 //			Auth::loginUsingId(1, true);
 //			app(\Illuminate\Contracts\Auth\Access\Gate::class)->abilities();
 //			dd(Auth::user());
-
+			
 			$date = new \DateTime();
 			
-			$bonus = Bonus::where('set_date','=',$date->format('Y-m-01'))->get()->toArray();
+			$listdata = Bonus::where('set_date','=',$date->format('Y-m-01'))->get()->map(function($v,$k){
+				
+				$v->name = $v->user->name;
+
+				$groupNames = $v->user->userGroups->map(function($v,$k){
+				 return $v->saleGroups->name;
+				})->toArray();
+				
+				$v->sale_groups_name = isset($groupNames) ? implode(',', $groupNames) : '';
+				
+			 return $v;
+			})->toArray();
 			
-			$listdata = $bonus;
-			
-//			$listdata = [
-//			 [
-//			  'id' => 1,
-//				'name' => 'Trident',
-//				'depatment' => 'Internet Explorer 4.0',
-//				'boundary' => 300000
-//			 ],
-//			[
-//			 'id' => 2,
-//				'name' => 'Trident',
-//				'depatment' => 'Internet Explorer 4.0',
-//				'boundary' => 200000
-//			 ],
-//			[
-//			 'id' => 3,
-//				'name' => 'Trident',
-//				'depatment' => 'Internet Explorer 4.0',
-//				'boundary' => 100000
-//			 ],
-//			];
 			return view('bonus.setting.list',['data' => $this->resources,'row' => $listdata]);
 		}
 		

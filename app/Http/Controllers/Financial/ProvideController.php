@@ -21,6 +21,7 @@ use http\Client\Curl\User;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\UrlWindow;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Route;
 use Illuminate\Support\Arr;
@@ -32,7 +33,6 @@ class ProvideController extends BaseController
     //
 	public function list ()
 	{
-	
 //		$userData = [
 		////		 'uId' => $id,
 		////		 'name' => session('users')[$id]['name'],
@@ -57,6 +57,7 @@ class ProvideController extends BaseController
 		// financial bonus list
 		$bonuslist = FinancialList::where('status',1)->get();
 		$bonuslist = $bonuslist->map(function ($v, $k) {
+			$v['receipt_date'] = $v->receipt->created_at->format('Y-m-d');
 			$v['sale_group_name'] = $v->saleGroups->saleGroups->name ?? '';
 			$v['user_name'] = $v->user->name;
 			$v['rate'] = $v->bonus->bonusReach->reach_rate ?? 0;
@@ -94,17 +95,26 @@ class ProvideController extends BaseController
 		$bonuslistColumns =
 		 [
 		  ['data' => 'id'],
+		  ['data' => 'receipt_date'],
 			['data'=> 'set_date'],
 			['data'=> 'user_name'],
 			['data'=> 'sale_group_name'],
-			['data'=> 'campaign_name'],
+			['data'=> 'campaign_name','render' => sprintf('<a href="http://%s/jsadwaysN2/campaign_view.php?id=${row.campaign_id}" target="_blank">${row.campaign_name}</a>',env('ERP_URL'))],
 			['data'=> 'media_channel_name'],
 			['data'=> 'sell_type_name'],
 			['data'=> 'profit'],
 			['data'=> 'rate'],
 			['data'=> 'provide_money'],
 		 ];
-
+		
+		//columns : [
+    //                {data: "groups_users", render: '<p class="hidden">${data}</p><input id="checkbox${row.erp_user_id}" class="groupsUsers" type="checkbox" value=${row.erp_user_id} ${checkt}>',parmas:'let checkt = data == 1 ? "checked" : "" '},
+    //                {data: "groups_is_convener", render: '<p class="hidden">${data}</p><input class="is_convener" type="checkbox" value=${row.erp_user_id} ${checkt}>',parmas:'let checkt = data == 1 ? "checked" : "" '},
+    //                {data: "name", render: '<label class="point" for=checkbox${row.erp_user_id}>${data}</label>'},
+    //                {data: "boundary", render: '<label class="point" data-boundary_id=${row.erp_user_id} data-boundary=${data} for=checkbox${row.erp_user_id}>${data}</label>'},
+    //                {data: "sale_groups_name", render: '<label class="point" for=checkbox${row.erp_user_id}>${data}</label>'}
+    //            ],
+		
 		$saleGroupsReach = SaleGroupsReach::where('status',0)->get();
 		$saleGroupsReach = $saleGroupsReach->map(function($v,$k){
 		 $v->user_name = $v->saleUser->user->name;

@@ -11,7 +11,7 @@ class SaleGroupsReach extends Model
 	 'status' => 0,
 	];
 	
-	protected $fillable = ['status','sale_groups_id','sale_groups_bonus_levels_id','sale_groups_users_id','set_date','groups_profit','provide_money','rate'];
+	protected $fillable = ['status','sale_groups_id','sale_groups_bonus_levels_id','sale_groups_users_id','set_date','groups_profit','provide_money','rate','updated_at'];
 
 	public function saleGroups(){
 		return $this->belongsTo(SaleGroups::Class,'sale_groups_id');
@@ -22,7 +22,16 @@ class SaleGroupsReach extends Model
 	}
 	public function setConvenerReach ($setDate,$saleGroupsId,$saleGroupsUsersId)
 	{
-		$sameGroupErpUserIds = SaleGroupsUsers::where(['sale_groups_id' => $saleGroupsId,'set_date' => $setDate])->get()->pluck('erp_user_id');
+		$sameGroupErpUserIds = SaleGroupsUsers::where(['sale_groups_id' => $saleGroupsId,'set_date' => $setDate])->get();
+		
+		$haveBoundaryIds =  $sameGroupErpUserIds->map(function($v,$k){
+		  $v['boundary'] = $v->getUserBonusBoundary->boundary ?? 0;
+		  return $v;
+		})->where('boundary','>' ,0)->pluck('erp_user_id');
+		
+		$sameGroupErpUserIds = $sameGroupErpUserIds->pluck('erp_user_id');
+		
+		/*TODO:: 確認團隊名單內 責任額為0是否還需要計算業績 以相同邏輯情況下 責任額歸責任額 業績還是要計算, 如不計算就移出團隊即可*/
 		//找出所有財報資料 外匯轉換
 		$objFinaniial = FinancialList::whereIn('erp_user_id',$sameGroupErpUserIds)->where('set_date',$setDate)->get();
 		
@@ -37,7 +46,8 @@ class SaleGroupsReach extends Model
 		/*TODO::計算英雄榜獎金 與 呈現*/
 		$finalBonus = $saleGroupsBonus->getReachBonusLevels($groupsTotalProfit,$saleGroupsId,$setDate);
 		
-		list($provideMoney,$rate) = $this->bonusMoney($sameGroupErpUserIds, $groupsTotalProfit);
+		list($provideMoney,$rate) = $this->bonusMoney($haveBoundaryIds, $groupsTotalProfit);
+		
 		$newData = SaleGroupsReach::create([
 		 'sale_groups_id' => $saleGroupsId,
 		 'sale_groups_users_id' => $saleGroupsUsersId,
@@ -70,7 +80,9 @@ class SaleGroupsReach extends Model
 			$saleGroupsUsersId = $groupsConvener->id;
 			$this->cleanData($saleGroupsId,$saleGroupsUsersId,$setDate);
 			$newData[] = $this->setConvenerReach($setDate,$saleGroupsId,$saleGroupsUsersId);
+			
 		}
+		
 		return $newData ?? [] ;
 	}
 	
@@ -83,6 +95,7 @@ class SaleGroupsReach extends Model
 	{
 		$convenerRateStart = config('sale_group.convenerRateStart');
 		$convenerRateLadder = config('sale_group.convenerRateLadder');
+		
 		$rate = $convenerRateStart - count($sameGroupErpUserIds) * $convenerRateLadder;
 		/*如未設定招集人此月份資料則會出錯*/
 		$provideMoney = isset($rate) ? round($groupsTotalProfit * ($rate / 100)) : 0;

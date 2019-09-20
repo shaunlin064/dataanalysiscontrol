@@ -36,14 +36,17 @@
 		public function updateFinancialMoneyReceipt ($type='select')
 		{
 			$financial = new FinancialController();
+			/*cp_detail_id and balance date */
+			$erpReturnData = collect($financial->getBalancePayMentData($type));
+			$cpDetailIds = $erpReturnData->pluck('cp_detail_id');
 			
-			$erpReturnData = collect($financial->getBalancePayMentIds($type));
-			$v = FinancialList::whereIn('cp_detail_id',$erpReturnData)->get();
-			FinancialList::whereIn('cp_detail_id',$erpReturnData)->update(['status' => 1]);
+			$v = FinancialList::whereIn('cp_detail_id',$cpDetailIds)->get();
+			FinancialList::whereIn('cp_detail_id',$cpDetailIds)->update(['status' => 1]);
 			
-			$v->map(function ($v){
+			$v->map(function ($v) use($erpReturnData){
+				
 				if(!FinancialReceipt::where('financial_lists_id',$v->id)->exists()){
-					FinancialReceipt::create(['financial_lists_id' => $v->id]);
+					FinancialReceipt::create(['financial_lists_id' => $v->id,'created_at' => $erpReturnData->where('cp_detail_id',$v->cp_detail_id)->first()['balance_date']]);
 				}
 			});
 		}

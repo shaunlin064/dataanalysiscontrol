@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\SaleGroup;
 
+use App\Bonus;
 use App\SaleGroups;
 use App\SaleGroupsBonusLevels;
+use App\SaleGroupsReach;
 use App\SaleGroupsUsers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BaseController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Input;
 
@@ -23,11 +26,17 @@ class SaleGroupController extends BaseController
 		$date = new \DateTime();
 		$datenow = $date->format('Y-m-01');
 		//trim user data
-		$user = session('users');
-		foreach($user as $key => $item){
-			$user[$key]['boundary'] = SaleGroupsUsers::where(['set_date' => $datenow,'erp_user_id' => $item['id']])->first()->getUserBonusBoundary->boundary ?? 0;
-		}
-		sort($user);
+		$user = Bonus::all()->pluck('erp_user_id')->unique()->values();
+		
+		$user = $user->map(function($v,$k) use($datenow){
+			$new['erp_user_id'] = $v;
+			$new['boundary'] = SaleGroupsUsers::where(['set_date' => $datenow,'erp_user_id' => $v])->first()->getUserBonusBoundary->boundary ?? 0;
+			$new['name'] = session('users')[$v]['name'];
+			$saleGroupIds = SaleGroupsUsers::where('erp_user_id',$v)->get()->pluck('sale_groups_id')->unique();
+			$new['sale_groups_name'] = implode(',',SaleGroups::whereIn('id',$saleGroupIds)->get()->pluck('name')->toArray());
+		 return $new;
+		})->sortBy('sale_groups_name')->values()->toArray();
+		
 		return view('saleGroup.setting.add',['data' => $this->resources,'user'=> $user
 		]);
 	}
@@ -41,7 +50,7 @@ class SaleGroupController extends BaseController
 		//$this->resources['cssPath'][] = '/css/glyphicons.css';
 		//$this->resources['cssPath'][] = '/plugins/material/dataTables.material.css';
 		//$this->resources['jsPath'][] = '/plugins/material/dataTables.material.js';
-		
+	
 		
 		$date = new \DateTime();
 		$datenow = $date->format('Y-m-01');
@@ -56,8 +65,23 @@ class SaleGroupController extends BaseController
 			return $v->getUserBonusBoundary;
 		})->sum('boundary');
 		
-		$groupsBonusHistory = $saleGroups->groupsBonus->groupBy('set_date')->toArray();
-		$groupsUsersHistory = $saleGroups->groupsUsers->groupBy('set_date');
+		$groupsBonusHistory = $saleGroups->groupsBonus->groupBy('set_date')->map(function($v,$k) use($id){
+			
+			//$reachRate = SaleGroupsReach::where('set_date',$k)->where('sale_groups_id',$id)->first()->rate ?? 0;
+			
+		 return ['bonuslevel' => $v,'rate' => 5.5,'totalBoundary' => 0];
+		})->toArray();
+		
+		$saleGroups->groupsUsers->map(function($v,$k) use(&$groupsBonusHistory){
+			$v['boundary'] = $v->getUserBonusBoundary->boundary ?? 0;
+			$v['name'] = $v->user->name;
+			$groupsBonusHistory[$v->set_date]['totalBoundary'] += $v['boundary'];
+			$groupsBonusHistory[$v->set_date]['user'][] =  $v;
+			if($v['boundary'] != 0){
+				$groupsBonusHistory[$v->set_date]['rate'] -= 0.25;
+			}
+			
+		});
 		
 		$tmpUser = collect($row['groups_users']);
 		// get already select
@@ -69,26 +93,26 @@ class SaleGroupController extends BaseController
 		})->values();
 		
 		//trim user data
-		$user = session('users');
+		$user = Bonus::all()->pluck('erp_user_id')->unique()->values();
 		$userNowSelectArray =$userNowSelect->toArray();
 		$userNowIsConvenerArray = $userNowIsConvener->toArray();
-		foreach($user as $key => $item){
-			$user[$key]['groups_users'] = in_array($item['id'],$userNowSelectArray) ? 1 : 0;
-			$user[$key]['groups_is_convener'] = in_array($item['id'],$userNowIsConvenerArray) ? 1 : 0;
-			$user[$key]['boundary'] = SaleGroupsUsers::where(['set_date' => $datenow,'erp_user_id' => $item['id']])->first()->getUserBonusBoundary->boundary ?? 0;
-		}
-		//$user = collect($user)->filter(function($v,$k){
-		//	return $v['boundary'] != 0;
-		//})->toArray();
-		
-		sort($user);
+		$user = $user->map(function($v,$k) use($userNowSelectArray,$userNowIsConvenerArray,$datenow){
+			$new['erp_user_id'] = $v;
+			$new['groups_users'] = in_array($v,$userNowSelectArray) ? 1 : 0;
+			$new['groups_is_convener'] = in_array($v,$userNowIsConvenerArray) ? 1 : 0;
+			$new['boundary'] = SaleGroupsUsers::where(['set_date' => $datenow,'erp_user_id' => $v])->first()->getUserBonusBoundary->boundary ?? 0;
+			$new['name'] = session('users')[$v]['name'];
+			$saleGroupIds = SaleGroupsUsers::where('erp_user_id',$v)->get()->pluck('sale_groups_id')->unique();
+			$new['sale_groups_name'] = implode(',',SaleGroups::whereIn('id',$saleGroupIds)->get()->pluck('name')->toArray());
+			return $new;
+		})->sortBy('sale_groups_name')->values()->toArray();
+
 		return view('saleGroup.setting.edit',[
 		 'data' => $this->resources,
 		 'user'=> $user,
 		 'row'=>$row,
 		 'totalBoundary' => $totalBoundary,
 		 'groupsBonusHistory' => $groupsBonusHistory,
-		 'groupsUsersHistory' => $groupsUsersHistory,
 		 'userNowSelect' => $userNowSelect,
 		 'userNowIsConvener' => $userNowIsConvener
 		]);

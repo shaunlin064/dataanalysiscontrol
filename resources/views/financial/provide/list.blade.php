@@ -77,7 +77,7 @@
             <simple-data-table-componet
                     :table_id='"provide_bonus"'
                     :table_head='"個人獎金"'
-                    :table_title='["","月份","業務","團隊名稱","案件名稱","媒體","類型","毛利","比例","獎金"]'
+                    :table_title='["","收款日期","月份","業務","團隊名稱","案件名稱","媒體","類型","毛利","比例","獎金"]'
                     :row = '{{ json_encode($bonuslist) }}'
                     :columns = '{!!json_encode($bonuslistColumns)!!}'
                     :type = '"select"'

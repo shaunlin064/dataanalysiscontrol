@@ -33,7 +33,7 @@ class BonusReachController extends Controller
 						// getUserBonus set output Data
 						$reachData = $reviewController->getUserBonus($uId, $totalProfit, $date->format('Y-m-01'));
 						$boxData[$uId][$date->format('Y-m-01')] = $reachData;
-						
+
 						$bonusReach = BonusReach::create(['reach_rate' => $reachData['bonus_rate'],'bonus_id' => $bonus->id]);
 						
 					}
