@@ -57,7 +57,5 @@ class ReloadConvenerReach extends Command
 		    $v->status = 1;
 		    $v->update();
 	    });
-	    
-	    echo 'ReloadConvenerReach done';
     }
 }
