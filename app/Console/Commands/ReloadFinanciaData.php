@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Http\Controllers\Financial\FinancialListController;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class ReloadFinanciaData extends Command
 {
@@ -40,7 +41,9 @@ class ReloadFinanciaData extends Command
     {
         //
 	    $finanicalList = new FinancialListController();
-	
+	    DB::table('financial_lists')->truncate();
+	    DB::table('financial_receipts')->truncate();
+	    DB::table('financial_provides')->truncate();
 	    $finanicalList->saveUntilNowAllData();
     }
 }
