@@ -84,7 +84,7 @@
         @if($saleGroups)
             <simple-data-table-componet
                     :table_id='"provide_groups_list"'
-                    :table_head='"招集人獎金"'
+                    :table_head='"招集人獎金檢視"'
                     :table_title='["發放月份","月份","業務","團隊","團隊毛利","比例","獎金"]'
                     :row = '{{ json_encode($saleGroupsReach) }}'
                     :ex_buttons= '["excel"]'
@@ -94,12 +94,12 @@
         @endif
         <simple-data-table-componet
                 :table_id='"provide_bonus_list"'
-                :table_head='"獎金清單"'
+                :table_head='"獎金清單檢視"'
                 :table_title='["發放月份","月份","業務","團隊","案件","媒體","類型","毛利","比例","獎金"]'
                 :row = '{{ json_encode($provideBonus) }}'
                 :ex_buttons= '["excel"]'
                 :csrf= '"{{csrf_token()}}"'
-                :columns = {!!json_encode($provideBonusColumns)!!}
+                :columns = '{!!json_encode($provideBonusColumns)!!}'
         ></simple-data-table-componet>
     </div>
     <!-- /.row -->

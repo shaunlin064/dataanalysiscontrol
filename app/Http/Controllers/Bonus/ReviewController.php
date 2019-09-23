@@ -35,7 +35,7 @@
 			
 			$listdata = Bonus::where('id','!=','0')->groupBy('erp_user_id')->get()->map(function($v,$k){
 				
-				$v->name = $v->user->name;
+				$v->name =  ucfirst($v->user->name);
 				
 				$groupNames = $v->user->userGroups->map(function($v,$k){
 					return $v->saleGroups->name;

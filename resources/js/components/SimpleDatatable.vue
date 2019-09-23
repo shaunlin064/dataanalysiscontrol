@@ -78,7 +78,7 @@
 		        },
 				    getData(){
           
-                
+          
 						    let data = {
                     _token : this.csrf,
 						        startDate : this.$store.state.start_date,
@@ -86,7 +86,7 @@
                     saleGroupIds : this.$store.state.sale_group_ids,
                     userIds : this.$store.state.user_ids
 						    };
-                
+						    
                 if( (data.saleGroupIds == '' && data.userIds == '') || data._token === undefined ){
 									return false;
                 }
@@ -121,6 +121,9 @@
                 );
                 
 				    },
+            getExportFileName(){
+                return `${this.table_head}_${this.start_date.substr(0,7)}-${this.end_date.substr(0,7)}`;
+            }
 		    },
         beforeMount: function(){
             this.columns.map(function(v){
@@ -192,15 +195,20 @@
                 if(ex_buttons){
                     dataTableConfig.dom = 'Bfrtip';
                     ex_buttons.map(function(v){
-                        dataTableConfig.buttons = [{ extend: v , className: 'btn btn-success btn-flat' , text: `${v}匯出`}];
+                        dataTableConfig.buttons = [{
+	                        extend: v ,
+	                        className: 'btn btn-success btn-flat' ,
+	                        text: `${v}匯出`,
+	                        title:function () { return vue.getExportFileName();},
+	                        filename: function () { return vue.getExportFileName();}}];
                     });
-                }
+                };
 
                 vue.dataTable = domtable.DataTable(dataTableConfig);
                 vue.dataTable.clear();
                 vue.dataTable.rows.add( rowData );
                 vue.dataTable.draw();
-
+               
                 if(type == 'select'){
                     // Array holding selected row IDs
                     var rows_selected = vue.$store.getters.getTableSelect;

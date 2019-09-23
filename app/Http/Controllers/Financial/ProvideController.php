@@ -58,7 +58,7 @@ class ProvideController extends BaseController
 		$bonuslist = $bonuslist->map(function ($v, $k) {
 			$v['receipt_date'] = $v->receipt->created_at->format('Y-m-d');
 			$v['sale_group_name'] = $v->saleGroups->saleGroups->name ?? '';
-			$v['user_name'] = $v->user->name;
+			$v['user_name'] =  ucfirst($v->user->name);
 			$v['rate'] = $v->bonus->bonusReach->reach_rate ?? 0;
 			$v['profit'] = $this->exchangeMoney($v);
 			$v['provide_money'] = $v['profit'] > 0 ? round($v['profit'] * $v['rate'] / 100) : 0;
@@ -117,7 +117,7 @@ class ProvideController extends BaseController
 		
 		$saleGroupsReach = SaleGroupsReach::where('status',0)->get();
 		$saleGroupsReach = $saleGroupsReach->map(function($v,$k){
-		 $v->user_name = $v->saleUser->user->name;
+		 $v->user_name =  ucfirst($v->saleUser->user->name);
 			$v->group_name = $v->saleGroups->name;
 			$v->set_date = substr($v->set_date,0,7);
 			return $v;
@@ -165,7 +165,7 @@ class ProvideController extends BaseController
 			['data'=> 'set_date'],
 		  ['data'=> 'user_name'],
 		  ['data'=> 'sale_group_name'],
-			['data'=> 'campaign_name'],
+		  ['data'=> 'campaign_name','render' => sprintf('<a href="http://%s/jsadwaysN2/campaign_view.php?id=${row.campaign_id}" target="_blank">${row.campaign_name}</a>',env('ERP_URL'))],
 			['data'=> 'media_channel_name'],
 			['data'=> 'sell_type_name'],
 		  ['data'=> 'profit'],
@@ -510,7 +510,7 @@ class ProvideController extends BaseController
 		$saleGroupsReach = $saleGroupsReach->whereIn('saleUser.erp_user_id', $userIds);
 		$saleGroupsReach = $saleGroupsReach->map(function ($v, $k) {
 			$v['provide_set_date'] = $v->updated_at->format('Y-m');
-			$v['user_name'] = $v->saleUser->user->name;
+			$v['user_name'] =  ucfirst($v->saleUser->user->name);
 			$v['sale_group_name'] = $v->saleGroups->name;
 			$v['set_date'] = substr($v['set_date'],0,7);
 			return $v;
@@ -540,7 +540,7 @@ class ProvideController extends BaseController
 		
 		$provideBonus = $provideBonus->map(function ($v, $k) {
 			$v['sale_group_name'] = $v->saleGroups->saleGroups->name;
-			$v['user_name'] = $v->user->name;
+			$v['user_name'] =  ucfirst($v->user->name);
 			$v['provide_set_date'] = $v->provide->created_at->format('Y-m');
 			$v['provide_money'] = $v->provide->provide_money;
 			$v['rate'] = $v->provide->bonusReach->reach_rate ?? 0;
@@ -581,7 +581,7 @@ class ProvideController extends BaseController
 		if ($isAdmin) {
 			$saleGroups = SaleGroups::all();
 			$userList = Bonus::with('user')->groupBy('erp_user_id')->orderBy('erp_user_id')->get()->map(function($v,$k){
-				$v->name = ucfirst($v->user->name);
+				$v->name =  ucfirst($v->user->name);
 			 return $v;
 			})->toArray();
 			

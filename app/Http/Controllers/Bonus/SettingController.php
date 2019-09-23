@@ -100,7 +100,7 @@
 			
 			$listdata = Bonus::where('set_date','=',$date->format('Y-m-01'))->get()->map(function($v,$k){
 				
-				$v->name = $v->user->name;
+				$v->name =  ucfirst($v->user->name);
 
 				$groupNames = $v->user->userGroups->map(function($v,$k){
 				 return $v->saleGroups->name;
