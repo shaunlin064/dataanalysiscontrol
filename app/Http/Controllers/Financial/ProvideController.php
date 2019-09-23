@@ -33,9 +33,6 @@ class ProvideController extends BaseController
     //
 	public function list ()
 	{
-		
-		//Artisan::call('set_old_provide');
-		
 //		$userData = [
 		////		 'uId' => $id,
 		////		 'name' => session('users')[$id]['name'],
@@ -583,7 +580,11 @@ class ProvideController extends BaseController
 		
 		if ($isAdmin) {
 			$saleGroups = SaleGroups::all();
-			$userList = session('users');
+			$userList = Bonus::with('user')->groupBy('erp_user_id')->orderBy('erp_user_id')->get()->map(function($v,$k){
+				$v->name = ucfirst($v->user->name);
+			 return $v;
+			})->toArray();
+			
 			$saleGroupsIds = $saleGroups->pluck('id');
 			$userIds = SaleGroups::with('groupsUsers')->whereIn('id', $saleGroupsIds)->get()->map(function ($v, $k) {
 				return $v->groupsUsers->pluck('erp_user_id');
@@ -597,11 +598,13 @@ class ProvideController extends BaseController
 				$saleGroups = [];
 				$userList = collect(session('users'))->whereIn('id', $uid);
 			}
+			
 			$userIds = $userList->pluck('id');
 			$userList = $userList->toArray();
+			sort($userList);
 		}
 		
-		sort($userList);
+		
 		return array($saleGroups, $userList, $userIds);
 	}
 }
