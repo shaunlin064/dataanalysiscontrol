@@ -33,6 +33,9 @@ class ProvideController extends BaseController
     //
 	public function list ()
 	{
+		
+		//Artisan::call('set_old_provide');
+		
 //		$userData = [
 		////		 'uId' => $id,
 		////		 'name' => session('users')[$id]['name'],
@@ -53,7 +56,6 @@ class ProvideController extends BaseController
 		$date = new \DateTime();
 		//
 		//list($newRow,$paginate,$allId,$selectIds,$totalAlredaySelectMoney) = $this->getDataBackend('add',$date->format('Y-m-01'));
-		
 		// financial bonus list
 		$bonuslist = FinancialList::where('status',1)->get();
 		$bonuslist = $bonuslist->map(function ($v, $k) {
@@ -64,6 +66,7 @@ class ProvideController extends BaseController
 			$v['profit'] = $this->exchangeMoney($v);
 			$v['provide_money'] = $v['profit'] > 0 ? round($v['profit'] * $v['rate'] / 100) : 0;
 			$v['set_date'] = substr($v['set_date'],0,7);
+			$v['user_resign_date'] = session('users')[$v->erp_user_id]['user_resign_date'];
 			return $v;
 		})->values();
 		
@@ -97,7 +100,7 @@ class ProvideController extends BaseController
 		  ['data' => 'id'],
 		  ['data' => 'receipt_date'],
 			['data'=> 'set_date'],
-			['data'=> 'user_name'],
+			['data'=> 'user_name','render' => '<span class="d-inline-block" tabindex="0" data-toggle="tooltip" title="離職日${row.user_resign_date}"><a>${data}</a></span>'],
 			['data'=> 'sale_group_name'],
 			['data'=> 'campaign_name','render' => sprintf('<a href="http://%s/jsadwaysN2/campaign_view.php?id=${row.campaign_id}" target="_blank">${row.campaign_name}</a>',env('ERP_URL'))],
 			['data'=> 'media_channel_name'],

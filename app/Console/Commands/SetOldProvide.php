@@ -44,6 +44,7 @@ class SetOldProvide extends Command
     {
         //
 	    $financialList = FinancialList::with('receipt')->where(['status' => 1])->where('set_date','<=','2019-06-01')->get();
+	    
 	    $erpUserDatas = new UserController();
 	    $erpUserDatas->getErpUser();
 	    $leavelUser = collect($erpUserDatas->users)->where('user_resign_date','!=','0000-00-00');
@@ -56,7 +57,8 @@ class SetOldProvide extends Command
 	    	////離職員工 如果收款日期在離職後 不存入已放款
 	    	if($leavelUser->where('id',$v->erp_user_id)->count() > 0){
 	    		$leaveDate = $leavelUser->where('id',$v->erp_user_id)->first()['user_resign_date'];
-	    		if($leaveDate >= $v->receipt->created_at){
+
+	    		if($leaveDate <= $v->receipt->created_at){
 				    return;
 			    }
 		    }
