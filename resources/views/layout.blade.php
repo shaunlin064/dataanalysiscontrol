@@ -53,11 +53,10 @@
 	</div>
 	<!-- /.content-wrapper -->
 
-	<footer class="main-footer">
-		<div class="pull-right hidden-xs">
-		</div>
-
-	</footer>
+	{{--<footer class="main-footer">--}}
+	{{--	<div class="pull-right hidden-xs">--}}
+	{{--	</div>--}}
+	{{--</footer>--}}
 
 
 
