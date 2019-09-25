@@ -25,8 +25,11 @@
 		<link rel='stylesheet' href='{{$path}}'>
 	@endforeach
 </head>
+@include('loading')
 <body class='hold-transition skin-blue sidebar-mini'>
-<div id="app">
+
+<div id="app" class='app_hide'>
+
 <div class='wrapper'>
 
 	@yield('headerbar')
