@@ -111,7 +111,7 @@
         </div>
         <!-- /.widget-user -->
         <div class="col-xs-12">
-            <data-table-component :box_title='"案件清單"' :user_id='{{$userData['uId']}}' :data_table='{{ json_encode($dataTable) }}' :dom_id='"bonusTable"'></data-table-component>
+            <data-table-component :box_title='"財報清單"' :user_id='{{$userData['uId']}}' :data_table='{{ json_encode($dataTable) }}' :dom_id='"bonusTable"'></data-table-component>
         </div>
         <!-- /.box -->
         </div>

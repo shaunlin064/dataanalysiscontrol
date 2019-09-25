@@ -58,7 +58,8 @@
 				abort(404);
 			}
 			
-			$loginUserId = session('userData')['id'];
+			//$loginUserId = session('userData')['id'];
+			$loginUserId = Auth::user()->erp_user_id;
 			//check permission
 			$permission = new Permission();
 			$permission->permissionCheck($id,$loginUserId);
@@ -69,7 +70,8 @@
 			//$yearMonth = '201907';
 			//$yearMonthDay ='2019-07-01';
 			//get financialData
-			$erpReturnData = $this->getFinancialData($id, $yearMonthDay, $yearMonth);
+			$financialListObj = new FinancialList();
+			$erpReturnData = $financialListObj->getFinancialData($id, $yearMonthDay, $yearMonth);
 			
 			// loop calculation total Amount
 			list($totalIncome, $totalCost, $totalProfit, $erpReturnData) = $this->calculationTotal($erpReturnData);
@@ -160,7 +162,8 @@
 			$yearMonthDay = $date->format('Y-m-01');
 			
 			//get financialData
-			$erpReturnData = $this->getFinancialData($uId, $yearMonthDay, $yearMonth);
+			$financialListObj = new FinancialList();
+			$erpReturnData = $financialListObj->getFinancialData($uId, $yearMonthDay, $yearMonth);
 			
 			// loop calculation total Amount
 			list($totalIncome, $totalCost, $totalProfit, $erpReturnData) = $this->calculationTotal($erpReturnData);
@@ -201,30 +204,23 @@
 			if (empty($erpReturnData)) {
 				$erpReturnData = [];
 			} else {
-				foreach ($erpReturnData as $key => $items) {
+				$erpReturnData = collect($erpReturnData);
+				$totalIncome = $erpReturnData->sum('income');
+				$totalCost = $erpReturnData->sum('cost');
+				$totalProfit = $erpReturnData->sum('profit');
+				
+				$erpReturnData = $erpReturnData->map(function($items){
 					$items = gettype($items) == 'object' ? get_object_vars($items) : $items;
-					
-					if ($items['income'] == 0 && $items['cost'] == 0) {
-						unset($erpReturnData[$key]);
-						continue;
+				
+					if ($items['income'] != 0 || $items['cost'] != 0) {
+						
+						if($items['organization'] == 'hk'){
+							$items['profit'] = sprintf('<p style="color:red">%d</p>',$items['profit']);
+						}
+						$items['campaign_name'] = sprintf('<a href="http://%s/jsadwaysN2/campaign_view.php?id=%d" target="_blank">%s</a>',env('ERP_URL'),$items['cam_id'],$items['campaign_name']);
+						return $items;
 					}
-					
-					$totalIncome += $items['income'];
-					$totalCost += $items['cost'];
-					
-					$totalProfit += $items['profit'];
-					
-					if($items['organization'] == 'hk'){
-						$erpReturnData[$key]['profit'] = sprintf('<p style="color:red">%d</p>',$items['profit']);
-					}
-					
-					$erpReturnData[$key]['campaign_name'] = sprintf('<a href="http://%s/jsadwaysN2/campaign_view.php?id=%d" target="_blank">%s</a>',env('ERP_URL'),$items['cam_id'],$items['campaign_name']);
-					
-					$erpReturnData[$key]['paymentStatus'] = $erpReturnData[$key]['receipt']['created_at'] ?? 'no';
-					$erpReturnData[$key]['bonusStatus'] = $erpReturnData[$key]['provide']['created_at'] ??'no';
-					
-				}
-				sort($erpReturnData);
+				})->filter()->values()->toArray();
 			}
 			return array($totalIncome, $totalCost, $totalProfit, $erpReturnData);
 		}
@@ -245,40 +241,13 @@
 			$boxData = [
 			 'profit' => $returnBonusData['estimateBonus'],
 			 'bonus_rate' => isset($returnBonusData['reachLevle']['bonus_rate']) ? $returnBonusData['reachLevle']['bonus_rate'] : 0,
-			 'bonus_next_amount' => isset($returnBonusData['nextLevel']['bonus_next_amount']) ? $returnBonusData['nextLevel']['bonus_next_amount'] : 0,
+			 'bonus_next_amount' => isset($returnBonusData['nextLevel']['bonus_next_amount']) ? round($returnBonusData['nextLevel']['bonus_next_amount']) : 0,
 			 'bonus_next_percentage' => isset($returnBonusData['nextLevel']['bonus_next_percentage']) ? $returnBonusData['nextLevel']['bonus_next_percentage'] : 0,
 			 'bonus_direct' => $returnBonusData['bonusDirect']
 			];
 			return $boxData;
 		}
 		
-		/**
-		 * @param $id
-		 * @param string $yearMonthDay
-		 * @param string $yearMonth
-		 * @return bool|mixed|string
-		 */
-		public function getFinancialData ($id, string $yearMonthDay, string $yearMonth)
-		{
-			//確認是否已有資料 反之call API
-			$financialList = FinancialList::where(['erp_user_id' => $id, 'set_date' => $yearMonthDay])->with('receipt')->with('provide')->get();
-			
-			$financial = new FinancialController();
-			if ($financialList->count() == 0) {
-				// get api data
-				$erpReturnData = collect($financial->getErpMemberFinancial([$id], $yearMonth));
-				
-				$erpReturnData = $erpReturnData->map(function ($v) use($financial) {
-					return $financial->exchangeMoney($v);
-				});
-			} else {
-				$erpReturnData = $financialList->map(function ($v) use($financial){
-					return $financial->exchangeMoney($v->revertKeyChange()->revertValueChange());
-				});
-			}
-			
-			return $erpReturnData->toArray();
-		}
 	}
 	
 	

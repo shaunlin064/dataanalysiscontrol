@@ -27,7 +27,7 @@ class BonusReachController extends Controller
 					$bonus = Bonus::where(['erp_user_id' => $uId,'set_date' => $date->format('Y-m-01')])->select('id')->first();
 					//get financialData
 					if($financialList){
-						$erpReturnData = $reviewController->getFinancialData($uId, $date->format('Y-m-01'), $date->format('Ym'));
+						$erpReturnData = $financialList->getFinancialData($uId, $date->format('Y-m-01'), $date->format('Ym'));
 						// loop calculation total Amount
 						list($totalIncome, $totalCost, $totalProfit, $erpReturnData) = $reviewController->calculationTotal($erpReturnData);
 						// getUserBonus set output Data

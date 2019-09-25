@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Http\Controllers\FinancialController;
 use Illuminate\Database\Eloquent\Model;
 
 class FinancialList extends Model
@@ -42,14 +43,15 @@ class FinancialList extends Model
 		return $this->hasOne(FinancialReceipt::CLASS, 'financial_lists_id','id');
 	}
 	
-	
 	public function user(){
 		return $this->hasOne(User::CLASS,'erp_user_id','erp_user_id');
 	}
+	
 	public function saleGroups(){
 	
 		return $this->hasOne(SaleGroupsUsers::CLASS, 'erp_user_id','erp_user_id')->where('set_date',$this->set_date);
 	}
+	
 	public function dataFormat ()
 	{
 		$this->keyChange()->valueChange();
@@ -97,7 +99,6 @@ class FinancialList extends Model
 		
 		return $this;
 	}
-
 	
 	public function valueChange ()
 	{
@@ -136,6 +137,39 @@ class FinancialList extends Model
 		if($this->checkDiff($id, $data)){
 			return $this->where('id', $id)->update($data);
 		}
+	}
+	
+	/**
+	 * @param $id
+	 * @param string $yearMonthDay
+	 * @param string $yearMonth
+	 * @return bool|mixed|string
+	 */
+	public function getFinancialData ($id, string $yearMonthDay, string $yearMonth)
+	{
+		//確認是否已有資料 反之call API
+		$financialList = $this->where(['erp_user_id' => $id, 'set_date' => $yearMonthDay])->with('receipt')->with('provide')->get();
+		
+		$financial = new FinancialController();
+		
+		if ($financialList->count() == 0) {
+			// get api data
+			$erpReturnData = collect($financial->getErpMemberFinancial([$id], $yearMonth));
+			
+			$erpReturnData = $erpReturnData->map(function ($v) {
+				$v['paymentStatus'] = isset($v['receipt']['created_at']) ? substr($v['receipt']['created_at'],0,10) : 'no';
+				$v['bonusStatus'] = isset($v['provide']['created_at']) ? substr($v['provide']['created_at'],0,10) : 'no';
+				return $this->exchangeMoney($v);
+			});
+		} else {
+			$erpReturnData = $financialList->map(function ($v){
+				$v['paymentStatus'] = isset($v['receipt']['created_at']) ? substr($v['receipt']['created_at'],0,10) : 'no';
+				$v['bonusStatus'] = isset($v['provide']['created_at']) ? substr($v['provide']['created_at'],0,10) : 'no';
+				return $this->exchangeMoney($v->revertKeyChange()->revertValueChange());
+			});
+		}
+		
+		return $erpReturnData->toArray();
 	}
 	
 	public function exchangeMoney ($items)

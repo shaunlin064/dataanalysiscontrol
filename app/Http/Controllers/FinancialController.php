@@ -115,64 +115,6 @@
 			];
 		}
 		
-		public function exchangeMoney ($items)
-		{
-			$set_date = $items->set_date ??  date('Y-m-01',strtotime($items['year_month'].'01'));
-			$currency = $items->currency ?? $items['currency_id'];
-			$organization = $items->organization ?? $items['organization'];
-			$exchangeRate = ExchangeRate::where(['set_date'=> $set_date,'currency'=>$currency])->first();
-			
-			switch($currency){
-				case 'USD':
-					if(empty($exchangeRate)){
-						$exchangeRate = 31;
-						//$exchangeRate = 1;
-					}else{
-						$exchangeRate = $exchangeRate->rate;
-					}
-					break;
-				case 'JPY':
-					if(empty($exchangeRate)){
-						$exchangeRate = 0.2875;
-						//$exchangeRate = 1;
-					}else{
-						$exchangeRate = $exchangeRate->rate;
-					}
-					break;
-				default:
-					$exchangeRate = 1;
-					break;
-			}
-			
-			if( $organization == 'js' ){
-				$exchangeRate = 1;
-			}
-			
-			$tmpData = [
-			  'income' => round(($items->income ?? $items['income']) * $exchangeRate),
-				'cost' => round(($items->cost ?? $items['cost']) * $exchangeRate),
-			];
-			$tmpData['profit'] = $tmpData['income'] - $tmpData['cost'];
-			//TODO 毛利小於零 是否需要扣1%
-			if(($items->organization ?? $items['organization']) == 'hk'){
-					$tmpData['profit']= round($tmpData['profit'] * 0.99);
-			}
-			
-			switch(gettype($items)){
-				case 'object':
-					foreach ($tmpData as $key => $item){
-						$items->$key = $item;
-					}
-					break;
-				default:
-					foreach ($tmpData as $key => $item){
-						$items[$key]= $item;
-					}
-			}
-			
-			return $items;
-		}
-		
 		public function apiKeyFieldNameChange ($items)
 		{
 			foreach(self::CUSTOMER_FIELDS_LOCAL_API_DIFFERENCE as $localKey => $apikey){
