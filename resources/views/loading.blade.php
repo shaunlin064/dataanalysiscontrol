@@ -118,8 +118,7 @@
 
     <div class="loading" id='loading'>
         <div class="loader">
-            <div class="image">
-                <i class="fa fa-codepen"></i>
+            <div class="image rotate_animation">
             </div>
             <span></span>
         </div>
@@ -149,20 +148,14 @@
     <script src='/adminLte_componets/jquery/dist/jquery.js'></script>
     <script>
 
+            changeLoadIcon();
+            // Start the changing images
+            var intervalId = setInterval(function() {
+               changeLoadIcon();
+            }, 1000);
 
-                var counter = 0;
-                $('.loader .image').addClass('rotate_animation');
-                // Start the changing images
-                setInterval(function() {
-                    if(counter == 9) {
-                        counter = 0;
-                    }
-                    changeImage(counter);
-                    counter++;
-                }, 1000);
-
-                // Set the percentage off
-                loading();
+            // Set the percentage off
+            loading();
 
             window.onload=loadDone;
             function loadDone(){
@@ -171,10 +164,15 @@
                 setTimeout(function(){
                     $('#loading').fadeOut();
                     $('#app').removeClass('app_hide');
+                    clearInterval(intervalId);
                 }, 1500);
             }
 
-            function changeImage(counter) {
+            function changeLoadIcon(counter = undefined) {
+                if(counter === undefined){
+                    counter = Math.floor(Math.random()*9);
+                }
+
                 var images = [
                     '<i class="fa fa-fighter-jet"></i>',
                     '<i class="fa fa-gamepad"></i>',
@@ -188,6 +186,8 @@
                 ];
 
                 $(".loader .image").html(""+ images[counter] +"");
+
+                return counter;
             }
 
             function loading(){
@@ -214,4 +214,5 @@
                 };
 
             }
+
     </script>
