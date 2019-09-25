@@ -58,7 +58,7 @@
         opacity: 0;
     }
     .rotate_animation{
-        animation: 1s rotate infinite;
+        animation: 800ms rotate infinite;
     }
     .loader span {
         display: block;
@@ -152,7 +152,7 @@
             // Start the changing images
             var intervalId = setInterval(function() {
                changeLoadIcon();
-            }, 1000);
+            }, 800);
 
             // Set the percentage off
             loading();
@@ -164,8 +164,9 @@
                 setTimeout(function(){
                     $('#loading').fadeOut();
                     $('#app').removeClass('app_hide');
+                    $('.loader .image').removeClass('rotate_animation');
                     clearInterval(intervalId);
-                }, 1500);
+                }, 800);
             }
 
             function changeLoadIcon(counter = undefined) {
