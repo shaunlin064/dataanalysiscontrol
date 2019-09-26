@@ -464,9 +464,9 @@ class ProvideController extends BaseController
 	 */
 	private function exchangeMoney ($v)
 	{
-		$fincialController = new FinancialController();
+		$fincialList = new FinancialList();
 	
-		return $fincialController->exchangeMoney($v)->profit;
+		return $fincialList->exchangeMoney($v)->profit;
 	}
 	
 	
@@ -558,7 +558,7 @@ class ProvideController extends BaseController
 	 * @param DateTime $date
 	 * @return array
 	 */
-	private function getListData ($uid, DateTime $date): array
+	public function getListData ($uid, DateTime $date): array
 	{
 		/*permission check select*/
 		$permission = new Permission();
