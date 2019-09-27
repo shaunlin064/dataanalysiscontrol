@@ -26,23 +26,24 @@ class Bonus extends Model
 	}
 	
 	
-	public function getUserBonus ($uid, $totalProfit,String $dateYearMonth)
+	public function getUserBonus ($erpUserId, $totalProfit,String $dateYearMonth)
 	{
 		//待解 如 搜尋舊資料 但當時未設定 bonus 預設要抓最新 or 當時前後？
 		//目前預設抓最新設定
 		
 		//check exists or use Old Data
-		if($this->where(['erp_user_id' => $uid,'set_date' => $dateYearMonth])->exists()){
+
+		if($this->where(['erp_user_id' => $erpUserId,'set_date' => $dateYearMonth])->exists()){
 			
 			$userbonus = $this->where([
-			 'erp_user_id' => $uid,
+			 'erp_user_id' => $erpUserId,
 			 'set_date' => $dateYearMonth
 			])->with('levels')->get()->first()->toArray();
 			
 		}else{
 			//抓取 最新一筆設定資料
-//			if( $this->where(['erp_user_id' => $uid,])->with('levels')->exists() ){
-//				$userbonus = $this->where(['erp_user_id' => $uid,])->with('levels')->OrderBy('id','desc')->get()->first()->toArray();
+//			if( $this->where(['erp_user_id' => $erpUserId,])->with('levels')->exists() ){
+//				$userbonus = $this->where(['erp_user_id' => $erpUserId,])->with('levels')->OrderBy('id','desc')->get()->first()->toArray();
 //
 //			}else{
 				$userbonus = [
@@ -61,6 +62,7 @@ class Bonus extends Model
 		
 		foreach($userbonus['levels'] as $key => $items){
 			$thisLevelAchieving = $userbonus['boundary'] * $items['achieving_rate'] * 0.01;
+			
 			if( $totalProfit >  $thisLevelAchieving){
 				$reachLevle = $items;
 			}else{
@@ -97,6 +99,7 @@ class Bonus extends Model
 		
 		
 		$returnData = [ 'estimateBonus'=>$estimateBonus,'reachLevle' => $reachLevle , 'nextLevel' => $nextLevel,'bonusDirect' => $bonusDirect ];
+		
 		return $returnData;
 	}
 }

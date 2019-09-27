@@ -56,13 +56,13 @@
 	      "region" => "user",
 	      "catalogue" => "bonus.review",
 		    "subMenu" => [
+		     //[
+			   // "name" => "全體列表",
+			   // "icon" => "fa fa-circle-o",
+			   // "url" => "bonus.review.list",
+		     //],
 		     [
-			    "name" => "全體列表",
-			    "icon" => "fa fa-circle-o",
-			    "url" => "bonus.review.list",
-		     ],
-		     [
-			    "name" => "個人獎金預估",
+			    "name" => "業績統計檢視",
 			    "icon" => "fa fa-circle-o",
 			    "url" => "bonus.review.view",
 		     ],

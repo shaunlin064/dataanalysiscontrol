@@ -1,6 +1,6 @@
 <template>
 	<div class="box box-danger" id="canvas-holder">
-		<canvas :id=dom_id></canvas>
+		<canvas :id=table_id></canvas>
 	</div>
 </template>
 
@@ -9,23 +9,25 @@
     export default {
         name: "Chart",
 		    props:{
-            dom_id:String,
+            table_id:String,
 				    title:String,
 				    type:String,
 				    chart_data:Array,
-            labels:Array
+            labels:Array,
+            ajax_url: String,
+            csrf: String,
 		    },
-        computed: mapState(['month_income','month_cost','money_status_paid','money_status_unpaid','money_status_bonus_paid','money_status_bonus_unpaid']),
+        computed: {...mapState(['month_income','month_cost','month_profit','money_status_paid','money_status_unpaid','money_status_bonus_paid','money_status_bonus_unpaid','table_select','start_date','end_date','change_date','user_ids','sale_group_ids'])},
 		    data: function(){
             return {
                 default_color:{
-                  red: 'rgb(255, 99, 132)',
-                  orange: 'rgb(255, 159, 64)',
-                  yellow: 'rgb(255, 205, 86)',
-                  green: 'rgb(75, 192, 192)',
-                  blue: 'rgb(54, 162, 235)',
-                  purple: 'rgb(153, 102, 255)',
-                  grey: 'rgb(201, 203, 207)'
+                  red: 'rgba(255, 99, 132,0.5)',
+                  orange: 'rgba(255, 159, 64,0.5)',
+                  yellow: 'rgba(255, 205, 86,0.5)',
+                  green: 'rgba(75, 192, 192,0.5)',
+                  blue: 'rgba(54, 162, 235,0.5)',
+                  purple: 'rgba(153, 102, 255,0.5)',
+                  grey: 'rgba(201, 203, 207,0.5)'
 	            },
 	            pie_color:[
                   'rgb(255, 205, 86)',
@@ -34,9 +36,9 @@
                   'rgb(75, 192, 192)',
 	            ],
 	            bar_color:[
-                  'rgb(255, 99, 132)',
-                  'rgb(54, 162, 235)',
-                  'rgb(75, 192, 192)',
+                  'rgba(255, 99, 132,0.5)',
+                  'rgba(54, 162, 235,0.5)',
+                  'rgba(75, 192, 192,0.5)',
 	            ],
 	            bar_label:[
 	                '收入',
@@ -61,7 +63,8 @@
 	                    },
 	                }
 	            },
-	            chart_obj :{}
+	            chart_obj :{},
+                chart_labels : [],
             }
 		    },
         created: function(){
@@ -84,10 +87,47 @@
             });
         },
 		    mounted: function(){
-            var ctx = document.getElementById(this.dom_id).getContext('2d');
+            var ctx = document.getElementById(this.table_id).getContext('2d');
             this.chart_obj = new Chart(ctx, this.config);
 		    },
 		    methods:{
+            getData(){
+                if(this.ajax_url === undefined){
+                    return false;
+                }
+                let data = {
+                    _token : this.csrf,
+                    startDate : this.$store.state.start_date,
+                    endDate : this.$store.state.end_date,
+                    saleGroupIds : this.$store.state.sale_group_ids,
+                    userIds : this.$store.state.user_ids
+                };
+                if( (data.saleGroupIds == '' && data.userIds == '') || data._token === undefined ){
+                    return false;
+                }
+                
+                axios.post(this.ajax_url,data).then(
+                    response => {
+                        let rowData = eval(`response.data.${this.table_id}`);
+		                    
+                        if(rowData){
+                            if(this.table_id == 'chart_money_status'){
+                                this.$store.commit('changeMoneyStatus',{paid:rowData.paid,unpaid:rowData.unpaid});
+                            }else if(this.table_id == 'chart_financial_bar'){
+                                this.$store.commit('changeMonthBalancen',{'month_income':rowData.totalIncome,'month_cost':rowData.totalCost,'month_profit':rowData.totalProfit});
+                                this.chart_labels = rowData.labels;
+                            }
+                            
+                            this.update(this);
+                        };
+
+                    },
+                    err => {
+
+                        reject(err);
+                    }
+                );
+            },
             update(vue_this){
                 
                 if(vue_this.type == 'pie'){
@@ -104,11 +144,11 @@
                     let monthdata = [
                         vue_this.month_income,
 		                    vue_this.month_cost,
-                        vue_this.month_income-vue_this.month_cost,
+                        vue_this.month_profit,
                     ];
-                    
+                    vue_this.chart_obj.data.labels = vue_this.chart_labels;
                     vue_this.chart_obj.data.datasets.map( function(dataset,key){
-		                    dataset.data = [monthdata[key]];
+		                    dataset.data = monthdata[key];
                     });
                 }
                 vue_this.chart_obj.update();
@@ -118,6 +158,40 @@
             }),
 		    },
         watch:{
+            start_date: {
+                immediate: true,    // 这句重要
+                handler (val, oldVal) {
+                    if(oldVal !== val  && oldVal !== undefined && oldVal !== '' && val !== '' && oldVal.length !== 0) {
+                        
+                        this.getData();
+                    }
+                }
+            },
+            end_date: {
+                immediate: true,    // 这句重要
+                handler (val, oldVal) {
+                    if( oldVal !== undefined  && val !== '') {
+                        this.getData();
+                    }
+                }
+            },
+            user_ids: {
+                immediate: true,    // 这句重要
+                handler (val, oldVal) {
+                    if(oldVal !== val) {
+                        this.getData();
+                    }
+                }
+            },
+            sale_group_ids: {
+                immediate: true,// 这句重要
+                // lazy:true,
+                handler (val,oldVal) {
+                    if( oldVal !== undefined && val !== '' ) {
+                        this.getData();
+                    }
+                }
+            },
             money_status_paid: {
                 immediate: true,
                 handler (val, oldVal) {

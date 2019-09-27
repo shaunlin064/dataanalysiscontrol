@@ -49,7 +49,7 @@ class SetOldProvide extends Command
 	    $erpUserDatas->getErpUser();
 	    $leavelUser = collect($erpUserDatas->users)->where('user_resign_date','!=','0000-00-00');
 			
-	    $financialListObj = new FinancialController();
+	    $financialListObj = new FinancialList();
 	   
 	    //add && update
 	    $financialList->map(function ($v) use($financialListObj,$leavelUser){

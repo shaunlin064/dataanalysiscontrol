@@ -8,6 +8,7 @@
 	
 	namespace App\Http\Controllers\Bonus;
 	
+	use App\FinancialList;
 	use App\Http\Controllers\ApiController;
 	use App\Http\Controllers\Auth\Permission;
 	use App\Http\Controllers\Financial\FinancialListController;
@@ -123,8 +124,8 @@
 			
 			$bonus = Bonus::where('id',$id)->with('levels')->get()->toArray()[0];
 			$uid = $bonus['erp_user_id'];
-			
-			$loginUserId = session('userData')['id'];
+			$erpUserId = Auth::user()->erp_user_id;
+			$loginUserId = $erpUserId;
 			
 			$permission = new Permission();
 			$permission->permissionCheck($uid,$loginUserId);
@@ -132,10 +133,8 @@
 			$userTmpData = session('users')[$bonus['erp_user_id']];
 			
 			$editData = $bonus;
-			$financial = new FinancialController();
 			
-			$getlatelyMonth = $financial->getUserLatelyProfit($bonus['erp_user_id']);
-			extract($getlatelyMonth);
+			list($highestProfit,$thisMonthProfit,$lastMonthProfit) = $this->getUserLatelyProfit($bonus['erp_user_id']);
 			
 			$userData = [
 			 'name' => $userTmpData['name'],
@@ -178,15 +177,9 @@
 		
 		public function view($uid = null)
 		{
-			$uid = $uid ?? session('userData')['id'];
-//			$userData = [
-//			 'name' => '小米',
-//			 'title' => '業務',
-//			 'lastMonthProfit' => 1000000,
-//			 'thisMonthProfit' => 900000,
-//			 'historyMonthProfit' => 1000000
-//			];
-			$loginUserId = session('userData')['id'];
+			$erpUserId = Auth::user()->erp_user_id;
+			$uid = $uid ?? $erpUserId;
+			$loginUserId = $erpUserId;
 			
 			//check permission
 			$permission = new Permission();
@@ -228,10 +221,7 @@
 //				}
 //			}
 			
-			$financial = new FinancialController();
-			$getlatelyMonth = $financial->getUserLatelyProfit($uid);
-			extract($getlatelyMonth);
-
+			list($highestProfit,$thisMonthProfit,$lastMonthProfit) = $this->getUserLatelyProfit($uid);
 			
 			$userData = [
 			 'uId' => $uid,
@@ -382,33 +372,6 @@
 			return count($children) != count($tmp->keyBy('achieving_rate')) ? false : true ;
 		}
 		
-		public function getUserLatelyProfit ($uid)
-		{
-			$lastMonth = new \DateTime('last day of last month');
-			$lastMonth = $lastMonth->format('Ym');
-			$thisMonth = new \DateTime();
-			$thisMonth = $thisMonth->format('Ym');
-			
-			$financial = new FinancialController();
-			$erpReturnData = $financial->getErpMemberFinancial([$uid],'all','all');
-			$erpReturnData = collect($erpReturnData);
-			
-			$thisMonthProfit = $erpReturnData->filter(function($item) use($thisMonth) {
-				return $item['year_month'] == $thisMonth;
-			})->max('profit');
-			$lastMonthProfit = $erpReturnData->filter(function($item) use($lastMonth) {
-				return $item['year_month'] == $lastMonth;
-			})->max('profit');
-			$highestProfit =  $erpReturnData->max('profit');
-			
-			
-			return [
-			 'thisMonthProfit' => $thisMonthProfit,
-				'lastMonthProfit' => $lastMonthProfit,
-				'highestProfit' => $highestProfit
-			 ];
-		}
-		
 		public function importbonusSetting(){
 			
 			//讀檔案
@@ -482,9 +445,19 @@
 		 * @param $uid
 		 * @return mixed
 		 */
-		private function getBonusHistory ($uid)
+		private function getBonusHistory ($erpUserId)
 		{
-			$userBonusHistory = Bonus::where('erp_user_id', $uid)->orderBy('id', 'DESC')->with('levels')->get()->toArray();
+			$userBonusHistory = Bonus::where('erp_user_id', $erpUserId)->orderBy('id', 'DESC')->with('levels')->get()->toArray();
 			return $userBonusHistory;
+		}
+		
+		/**
+		 * @param $bonus
+		 * @return array
+		 */
+		private function getUserLatelyProfit ($erpUserId): array
+		{
+			$financialListObj = new FinancialList();
+			return $financialListObj->getUserLatelyProfit($erpUserId);
 		}
 	}

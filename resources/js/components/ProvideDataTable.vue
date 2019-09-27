@@ -203,7 +203,7 @@
                 
                 let sort_name = target.data('sort');
                 this.sortingReset(sort_name);
-                console.log(sorting,sorting_asc,sorting_desc);
+                // console.log(sorting,sorting_asc,sorting_desc);
                 if(sort_name == 'erp_user_id'){
                     if(sorting === true){
                         this.sort_erp_user_id.sorting_asc= true;

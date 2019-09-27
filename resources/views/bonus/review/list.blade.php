@@ -112,7 +112,7 @@
                 ],
             });
             let listdata = {!! json_encode($row)  !!};
-            console.log(listdata);
+            // console.log(listdata);
             dataTable.clear();
             dataTable.rows.add( listdata );
             dataTable.draw();

@@ -2,8 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Http\Controllers\Financial\FinancialListController;
-use App\Http\Controllers\FinancialController;
+use App\FinancialReceipt;
 use Illuminate\Console\Command;
 
 class UpdateFinancialMoneyReceipt extends Command
@@ -40,8 +39,8 @@ class UpdateFinancialMoneyReceipt extends Command
     public function handle()
     {
         //
-	    $finanicalList = new FinancialListController();
-	    $finanicalList->updateFinancialMoneyReceipt();
+	    $finanicalReceiptObj = new FinancialReceipt();
+	    $finanicalReceiptObj->updateFinancialMoneyReceipt();
 	    
     }
 }

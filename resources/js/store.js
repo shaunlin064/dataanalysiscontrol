@@ -20,8 +20,9 @@ export default {
         money_status_unpaid: 0,
         money_status_bonus_paid: 0,
         money_status_bonus_unpaid: 0,
-        month_income: 0,
-        month_cost: 0,
+        month_income: [],
+        month_cost: [],
+        month_profit: [],
         loading:false,
     },
     getters:{
@@ -75,6 +76,7 @@ export default {
         changeMonthBalancen(state,arg){
             state.month_income = arg.month_income;
             state.month_cost = arg.month_cost;
+            state.month_profit = arg.month_profit;
         },
         changeUserId(state,value){
             state.user_ids = value;

@@ -2,7 +2,8 @@
 
 namespace App\Console\Commands;
 ini_set('max_execution_time', 300);
-use App\Http\Controllers\Financial\FinancialListController;
+
+use App\FinancialReceipt;
 use Illuminate\Console\Command;
 
 class ReloadFinancialMoneyReceipt extends Command
@@ -39,7 +40,7 @@ class ReloadFinancialMoneyReceipt extends Command
     public function handle()
     {
         //
-	    $finanicalList = new FinancialListController();
-	    $finanicalList->updateFinancialMoneyReceipt('all');
+	    $finanicalReceiptObj = new FinancialReceipt();
+	    $finanicalReceiptObj->updateFinancialMoneyReceipt('all');
     }
 }

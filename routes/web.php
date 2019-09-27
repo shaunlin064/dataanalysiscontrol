@@ -90,7 +90,7 @@ use \Illuminate\Support\Facades\Artisan;
 				Route::get('/edit/{id}', 'ReviewController@edit')->name('bonus.review.edit');
 				Route::get('/view/{id?}', 'ReviewController@view')->name('bonus.review.view');
 				Route::any('/getdata', 'ReviewController@getdata')->name('bonus.review.getdata');
-				
+				Route::any('/getAjaxData', 'ReviewController@getAjaxData')->name('bonus.review.getAjaxData');
 			});
 		});
 		

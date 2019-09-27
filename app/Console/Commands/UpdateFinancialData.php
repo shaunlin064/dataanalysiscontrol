@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Http\Controllers\Financial\FinancialListController;
+use App\FinancialList;
 use Illuminate\Console\Command;
 
 class UpdateFinancialData extends Command
@@ -39,7 +39,7 @@ class UpdateFinancialData extends Command
     public function handle()
     {
         //
-	    $finanicalList = new FinancialListController();
+	    $finanicalList = new FinancialList();
 	
 	    $finanicalList->saveCloseData();
 	    

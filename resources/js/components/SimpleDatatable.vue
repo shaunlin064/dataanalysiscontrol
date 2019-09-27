@@ -47,7 +47,8 @@
             columns : Array,
             ex_buttons : Array,
 		        type: String,
-            csrf: String
+            csrf: String,
+		        ajax_url: String,
         },
         data() {
             return {
@@ -77,8 +78,9 @@
                 this.dataTable.draw();
 		        },
 				    getData(){
-          
-          
+						    if(this.ajax_url === undefined){
+						        return false;
+						    }
 						    let data = {
                     _token : this.csrf,
 						        startDate : this.$store.state.start_date,
@@ -93,25 +95,25 @@
                 var table_id = this.table_id;
                 this.$store.state.loading = true;
                 this.tableClear();
-                
-                axios.post('/financial/provide/getAjaxProvideData',data).then(
+                axios.post(this.ajax_url,data).then(
                     response => {
                         this.$store.state.loading = false;
                         let rowData = eval(`response.data.${this.table_id}`);
                         
                         let total = parseInt(0);
-                        
-                        rowData.map(function(v){
-                            total += parseInt(v.provide_money);
-                        });
-                        if(table_id == 'provide_bonus_list'){
-                            this.$store.state.bonus_total_money = total;
+                        if(rowData){
+                            rowData.map(function(v){
+                                total += parseInt(v.provide_money);
+                            });
                             
-                        }else{
-                            this.$store.state.sale_group_total_money = total;
-                        }
-                        // this.$store.commit('changeTotalMoney', total);
-                        this.updataTable(rowData);
+                            if(table_id == 'provide_bonus_list'){
+                                this.$store.state.bonus_total_money = total;
+                            }else{
+                                this.$store.state.sale_group_total_money = total;
+                            }
+														
+                            this.updataTable(rowData);
+                        };
                         
                     },
                     err => {
@@ -285,7 +287,7 @@
             end_date: {
                 immediate: true,    // 这句重要
                     handler (val, oldVal) {
-                    if(oldVal !== val  && oldVal !== undefined && oldVal !== '' && val !== '' && oldVal.length !== 0) {
+                    if( oldVal !== undefined  && val !== '') {
                         this.getData();
                     }
                 }
@@ -302,7 +304,7 @@
                 immediate: true,// 这句重要
                     // lazy:true,
                     handler (val,oldVal) {
-                    if(oldVal !== val  && oldVal !== undefined && oldVal !== '' && val !== '' && oldVal.length !== 0) {
+                    if( oldVal !== undefined && val !== '' ) {
                         this.getData();
                     }
                 }

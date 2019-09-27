@@ -26,14 +26,20 @@
 			$uid = session('userData')['id'];
 			$this->role['admin']['ids'] = [15,17,157,172,179,187];
 			$this->role['convener']['ids'] = [67,84];
+			$this->role['financial']['ids'] = [63,178,190,202,203];
 			
 			$this->role['user']['ids'] = [];
 			if(in_array($uid,$this->role['convener']['ids'])){
 				$this->role['user']['purview']['menus'] = [1,2,3];
-				$this->role['user']['purview']['menu_subs'] = [2,4,6,7];
+				$this->role['user']['purview']['menu_subs'] = [2,4,5,6];
 			}else{
 				$this->role['user']['purview']['menus'] = [1,3];
-				$this->role['user']['purview']['menu_subs'] = [2,6,7];
+				$this->role['user']['purview']['menu_subs'] = [2,5,6];
+				
+				if(in_array($uid,$this->role['financial']['ids'])){
+					$this->role['user']['purview']['menus'][] = 4;
+					$this->role['user']['purview']['menu_subs'][] = 7;
+				}
 			}
 			
 			$this->role['user']['purview']['menu_sub_level2s'] = [];

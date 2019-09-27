@@ -90,6 +90,7 @@
                     :ex_buttons= '["excel"]'
                     :csrf= '"{{csrf_token()}}"'
                     :columns = '{!!json_encode($saleGroupsReachColumns)!!}'
+                    :ajax_url= '"/financial/provide/getAjaxProvideData"'
             ></simple-data-table-componet>
         @endif
         <simple-data-table-componet
@@ -100,6 +101,7 @@
                 :ex_buttons= '["excel"]'
                 :csrf= '"{{csrf_token()}}"'
                 :columns = '{!!json_encode($provideBonusColumns)!!}'
+                :ajax_url = '"/financial/provide/getAjaxProvideData"'
         ></simple-data-table-componet>
     </div>
     <!-- /.row -->

@@ -7,13 +7,6 @@
 	 */
 	
 	namespace App\Http\Controllers;
-	use App\Http\Controllers\ApiController;
-	use App\Http\Controllers\Controller;
-	use Illuminate\Http\Request;
-	use Illuminate\Support\Facades\Auth;
-	use App\ExchangeRate;
-	use DateTime;
-	use Illuminate\Support\Str;
 	
 	class FinancialController extends BaseController
 	{
@@ -60,12 +53,13 @@
 			 'token' => env('API_TOKEN'),
 			 'action' => 'getUserProfitByCamCue',
 			 'data' => [
-				'userIds' => $userIds,
+				'userIds' => implode(',',$userIds),
 				'yearMonthStr' => $dateYearMonth,
 				'organizationStr' => $organizationStr,
 			  'outgroup' => $outgroup
 			 ]
 			];
+			
 			$url = env('API_GET_MEMBER_FINANCIAL_URL');
 			
 			$returnData = $apiObj->curlPost(json_encode($data),$url,'json');
@@ -79,40 +73,6 @@
 			}
 			
 			return $returnData;
-		}
-		
-		public function getUserLatelyProfit ($uid)
-		{
-			$lastMonth = new \DateTime('last day of last month');
-			$lastMonth = $lastMonth->format('Ym');
-			$thisMonth = new \DateTime();
-			$thisMonth = $thisMonth->format('Ym');
-			
-			$erpReturnData = $this->getErpMemberFinancial([$uid],'all','all');
-			
-			$erpReturnData = collect($erpReturnData);
-			$erpReturnData = $erpReturnData->groupBy('year_month');
-			
-			$thisMonthProfit = $erpReturnData->filter(function($item,$key) use($thisMonth) {
-					return $key == $thisMonth;
-			})->get($thisMonth);
-			$thisMonthProfit = empty($thisMonthProfit) ? 0 : $thisMonthProfit->sum('profit');
-			
-			$lastMonthProfit = $erpReturnData->filter(function($item,$key) use($lastMonth) {
-					return $key == $lastMonth;
-			})->get($lastMonth);
-			$lastMonthProfit = empty($lastMonthProfit) ? 0 : $lastMonthProfit->sum('profit');
-			
-			$highestProfit = $erpReturnData->map(function($item) {
-					return $item->sum('profit');
-			});
-			$highestProfit = empty($highestProfit) ? 0 : $highestProfit->max();
-			
-			return [
-			 'thisMonthProfit' => $thisMonthProfit,
-			 'lastMonthProfit' => $lastMonthProfit,
-			 'highestProfit' => $highestProfit
-			];
 		}
 		
 		public function apiKeyFieldNameChange ($items)

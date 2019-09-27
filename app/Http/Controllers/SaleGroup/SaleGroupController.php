@@ -123,13 +123,12 @@ class SaleGroupController extends BaseController
 		return view('saleGroup.setting.list',['data' => $this->resources,'row' => $saleGroups]);
 	}
 	
-	public function view ($erp_user_id = null)
+	public function view ($erpUserId = null)
 	{
 		$date = new \DateTime();
 		$datenow = $date->format('Y-m-01');
-		
-		$erp_user_id = $erp_user_id ?? session('userData')['id'];
-		$saleGroupsUsers = SaleGroupsUsers::where(['erp_user_id' => $erp_user_id,'is_convener' => 1])
+		$erpUserId = $erpUserId ?? Auth::user()->erp_user_id;
+		$saleGroupsUsers = SaleGroupsUsers::where(['erp_user_id' => $erpUserId,'is_convener' => 1])
 		                    ->orderBy('set_date','desc')->get();
 		
 		$saleGroupsIds = $saleGroupsUsers->groupBy('sale_groups_id')->map(function($v,$k) use($datenow){

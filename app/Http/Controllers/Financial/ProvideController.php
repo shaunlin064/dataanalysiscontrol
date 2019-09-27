@@ -4,28 +4,19 @@ namespace App\Http\Controllers\Financial;
 ini_set('max_execution_time', 180);
 
 use App\Bonus;
-use App\BonusReach;
 use App\FinancialList;
 use App\Http\Controllers\Auth\Permission;
 use App\Http\Controllers\BaseController;
-use App\Http\Controllers\Bonus\ReviewController;
 use App\Http\Controllers\FinancialController;
 use App\Provide;
 use App\SaleGroups;
-use App\SaleGroupsBonusLevels;
 use App\SaleGroupsReach;
 use App\SaleGroupsUsers;
 use DateTime;
-use function foo\func;
-use http\Client\Curl\User;
+use App\User;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Pagination\UrlWindow;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Route;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 
 class ProvideController extends BaseController
@@ -33,27 +24,7 @@ class ProvideController extends BaseController
     //
 	public function list ()
 	{
-//		$userData = [
-		////		 'uId' => $id,
-		////		 'name' => session('users')[$id]['name'],
-		////		 'title' => session('users')[$id]['department_name'],
-		////		];
-		// material design
-		//$this->resources['cssPath'][] = '/plugins/material/material.min.css';
-		//$this->resources['cssPath'][] = 'https://fonts.googleapis.com/icon?family=Material+Icons';
-		//$this->resources['jsPath'][] = '/plugins/material/material.min.js';
-		//$this->resources['cssPath'][] = '/css/glyphicons.css';
-		//
-		//$page = Input::get('page') ?? 1;
-		//$sort = Input::get('sort')?? 'DESC';
-		//$sort_by = Input::get('sort_by')?? 'erp_user_id';
-		//$showItem = Input::get('showItem') ?? 500;
-		//$searchStr = Input::get('searchStr') ?? '';
-		//
-		$date = new \DateTime();
-		//
-		//list($newRow,$paginate,$allId,$selectIds,$totalAlredaySelectMoney) = $this->getDataBackend('add',$date->format('Y-m-01'));
-		// financial bonus list
+		
 		$bonuslist = FinancialList::where('status',1)->get();
 		$bonuslist = $bonuslist->map(function ($v, $k) {
 			$v['receipt_date'] = $v->receipt->created_at->format('Y-m-d');
@@ -66,20 +37,6 @@ class ProvideController extends BaseController
 			$v['user_resign_date'] = session('users')[$v->erp_user_id]['user_resign_date'];
 			return $v;
 		})->values();
-		
-		//dd(UrlWindow::make($paginate->onEachSide(1)));
-//		dd($paginate->count(),$paginate->getUrlRange(5, 10),
-//$paginate->currentPage(),
-//$paginate->firstItem(),
-//$paginate->getOptions(),
-//$paginate->hasMorePages(),
-//$paginate->lastItem(),
-//$paginate->lastPage(),
-//$paginate->nextPageUrl(),
-//$paginate->onFirstPage(),
-//$paginate->perPage(),
-//$paginate->previousPageUrl(),
-//$paginate->total());
 		
 		$saleGroupsTableColumns =
 		 [
@@ -126,20 +83,10 @@ class ProvideController extends BaseController
 		return view('financial.provide.list',
 		 [
 		  'data' => $this->resources ,
-		  //'row' => $newRow ? $newRow : [],
 		  'saleGroupsReach' => $saleGroupsReach,
 		  'saleGroupsTableColumns' => $saleGroupsTableColumns,
 		  'bonuslistColumns' => $bonuslistColumns,
 		  'bonuslist' => $bonuslist,
-		  //'allId' => count($allId) ? $allId : [],
-		  //'selectIds'=> $selectIds,
-		  //'paginate'=> $paginate,
-		  //'sort'=>$sort,
-		  //'sort_by'=>$sort_by,
-		  //'search_str'=>$searchStr,
-		  //'paginateElement'=>Arr::flatten(UrlWindow::make($paginate->onEachSide(1))),
-		  //'totalAlredaySelectMoney' => $totalAlredaySelectMoney
-		 
 		 ]);
 	}
 	
@@ -147,18 +94,16 @@ class ProvideController extends BaseController
 	{
 
 		$date = new DateTime(date('Ym01'));
-		$nowUser = Auth::user();
-		$uid= $nowUser->erp_user_id;
+		$erpUserId = Auth::user()->erp_user_id;
 		
-		$provideStart = new DateTime();
-		$provideEnd = new DateTime();
+		list($saleGroups, $userList) = $this->getListData($erpUserId, $date);
 		
-		list($saleGroups, $userList, $userIds) = $this->getListData($uid, $date);
+		//$provideStart = new DateTime();
+		//$provideEnd = new DateTime();
+		//$userIds = collect($userList)->pluck('erp_user_id')->toArray();
+		//$saleGroupsReach = $this->getSaleGroupProvide($provideStart, $provideEnd, $userIds);
+		//$provideBonus = $this->getUserBounsProvide($provideStart, $provideEnd, $userIds);
 		
-		$saleGroupsReach = $this->getSaleGroupProvide($provideStart, $provideEnd, $userIds);
-		$provideBonus = $this->getUserBounsProvide($provideStart, $provideEnd, $userIds);
-		//$saleGroupsReach = [];
-		//$provideBonus = [];
 		$provideBonusColumns =
 		 [
 			['data' => 'provide_set_date'],
@@ -188,9 +133,9 @@ class ProvideController extends BaseController
 		 [
 			'data' => $this->resources,
 		  'provideBonusColumns'=> $provideBonusColumns,
-		  'provideBonus'=>$provideBonus,
+		  'provideBonus'=>[],
 		  'saleGroupsReachColumns' => $saleGroupsReachColumns,
-		  'saleGroupsReach'=>$saleGroupsReach,
+		  'saleGroupsReach'=>[],
 		  'saleGroups' => $saleGroups,
 		  'userList' => $userList]);
 	}
@@ -200,7 +145,7 @@ class ProvideController extends BaseController
 		
 		return $row;
 	}
-	
+	/*waste*/
 	public function getDataBackend ($type = 'add' ,$startDate , $endDate = null)
 	{
 		$startDate = $startDate ?? 'all';
@@ -219,6 +164,7 @@ class ProvideController extends BaseController
 		
 		return $this->getData($output, $type, $parmas);
 	}
+	/*waste*/
 	public function getAjaxData ()
 	{
 		$type = Input::get('type') ?? 'add';
@@ -270,6 +216,7 @@ class ProvideController extends BaseController
 		
 		echo round($financialData->sum());
 	}
+	/*waste*/
 	public function getData ($output = 'echo' ,$type = 'add' ,$parmas)
 	{
 		extract($parmas);
@@ -347,22 +294,11 @@ class ProvideController extends BaseController
 	{
 		
 		$selectSaleGroupsReachIds = explode(',',$request->provide_sale_groups_bonus);
-		$saleGroupReach = new SaleGroupsReach();
-		$saleGroupReach->whereIn('id',$selectSaleGroupsReachIds)->update(['status'=>1]);
+		$this->setSaleGroupsReachProvide($selectSaleGroupsReachIds);
 		
 		$selectFincialIds = $request->provide_bonus;
-		
 		$selectFincialIds = $selectFincialIds != null ? explode(',',$selectFincialIds) : [];
-		
-		//$originalSelectFinancialIds = Input::post('original_select_financial_ids');
-		//$originalSelectFinancialIds = $originalSelectFinancialIds != null ? explode(',',$originalSelectFinancialIds) : [];
-		
 		$this->resetFinancialStatus();
-		
-		//$deleteIds = array_diff($originalSelectFinancialIds,$selectFincialIds);
-		//
-		//$this->delete($deleteIds);
-		
 		$this->save($selectFincialIds);
 		
 		$message['status_string'] = 'success';
@@ -378,6 +314,7 @@ class ProvideController extends BaseController
 	 * @param string $sort
 	 * @return mixed
 	 */
+	/*waste*/
 	private function returnList (array $newColumm, $searchStr, string $sort_by, string $sort)
 	{
 		
@@ -452,6 +389,7 @@ class ProvideController extends BaseController
 	/**
 	 * @param $deleteIds
 	 */
+	/*waste*/
 	private function delete ($deleteIds): void
 	{
 		FinancialList::whereIn('id', $deleteIds)->update(['status' => 1]);
@@ -469,8 +407,6 @@ class ProvideController extends BaseController
 		return $fincialList->exchangeMoney($v)->profit;
 	}
 	
-	
-	
 	private function resetFinancialStatus (): void
 	{
 		$provideFid = Provide::all()->pluck('financial_lists_id');
@@ -479,7 +415,6 @@ class ProvideController extends BaseController
 	
 	public function getAjaxProvideData (Request $request)
 	{
-		
 		$provideStart = new DateTime($request->startDate);
 		$provideEnd = new DateTime($request->endDate);
 		$saleGroupIds = $request->saleGroupIds;
@@ -554,18 +489,19 @@ class ProvideController extends BaseController
 	 * @param bool $isAdmin
 	 * @param bool $isConvener
 	 * @param $saleGroupsUsers
-	 * @param $uid
+	 * @param $erpUserId
 	 * @param DateTime $date
 	 * @return array
 	 */
-	public function getListData ($uid, DateTime $date): array
+	public function getListData ($erpUserId, DateTime $date): array
 	{
 		/*permission check select*/
 		$permission = new Permission();
 		/*admin check*/
-		$isAdmin = $permission->isAdmin($uid);
+		$isAdmin = $permission->isAdmin($erpUserId);
+		$dateStr = $date->format('Y-m-01');
 		/*convener check*/
-		$saleGroupsUsers = SaleGroupsUsers::where(['erp_user_id'=> $uid,'set_date'=>$date])->first();
+		$saleGroupsUsers = SaleGroupsUsers::where(['erp_user_id'=> $erpUserId,'set_date'=>$dateStr])->first();
 		$isConvener = $saleGroupsUsers->is_convener ?? false;
 		
 		/* 依照權限不同 取的 user list 資料差異
@@ -581,31 +517,36 @@ class ProvideController extends BaseController
 		if ($isAdmin) {
 			$saleGroups = SaleGroups::all();
 			$userList = Bonus::with('user')->groupBy('erp_user_id')->orderBy('erp_user_id')->get()->map(function($v,$k){
-				$v->name =  ucfirst($v->user->name);
-			 return $v;
-			})->toArray();
+				$newUser = $v->user;
+				$newUser->name =  ucfirst($newUser->name);
+			 return $newUser;
+			});
 			
-			$saleGroupsIds = $saleGroups->pluck('id');
-			$userIds = SaleGroups::with('groupsUsers')->whereIn('id', $saleGroupsIds)->get()->map(function ($v, $k) {
-				return $v->groupsUsers->pluck('erp_user_id');
-			})->flatten()->unique();
 		} else {
+			
 			if ($isConvener) {
 				$saleGroups = [$saleGroupsUsers->saleGroups];
-				$userGroupIds = $saleGroupsUsers->getSameGroupsUser($uid, $date)->pluck('user')->pluck('erp_user_id');
-				$userList = collect(session('users'))->whereIn('id', $userGroupIds);
+				
+				$userGroupIds = $saleGroupsUsers->getSameGroupsUser($erpUserId, $dateStr)->pluck('user')->pluck('erp_user_id')->toArray();
+				
+				$userList = User::whereIn('erp_user_id', $userGroupIds)->get();
 			} else {
 				$saleGroups = [];
-				$userList = collect(session('users'))->whereIn('id', $uid);
+				
+				$userList = User::where('erp_user_id', $erpUserId)->get();
 			}
-			
-			$userIds = $userList->pluck('id');
-			$userList = $userList->toArray();
-			sort($userList);
 		}
 		
-		
-		return array($saleGroups, $userList, $userIds);
+		return array($saleGroups, $userList->toArray());
+	}
+	
+	/**
+	 * @param array $selectSaleGroupsReachIds
+	 */
+	private function setSaleGroupsReachProvide (array $selectSaleGroupsReachIds): void
+	{
+		$saleGroupReach = new SaleGroupsReach();
+		$saleGroupReach->whereIn('id', $selectSaleGroupsReachIds)->update(['status' => 1]);
 	}
 }
 

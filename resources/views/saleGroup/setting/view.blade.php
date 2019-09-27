@@ -152,9 +152,9 @@
     <!-- page script -->
     <script>
         $(function () {
-            $('.box').on('click','.btn.btn-box-tool',function (v,k) {
-               console.log($(this));
-            });
+            // $('.box').on('click','.btn.btn-box-tool',function (v,k) {
+            //    console.log($(this));
+            // });
         });
     </script>
 @endsection

@@ -11,7 +11,7 @@
         <!-- sidebar: style can be found in sidebar.less -->
         <section class='sidebar'>
             <!-- Sidebar user panel -->
-            <div class='user-panel'>
+            <div class='user-panel' style='padding:5px;'>
                 <div class='pull-left image'>
                     <div class='user-circle customer-font-3e'>
                         <i class='fa fa fa-user-circle block'></i>

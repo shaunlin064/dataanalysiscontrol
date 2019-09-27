@@ -136,12 +136,12 @@
         mounted: function() {
             // console.log(this.check_is_set(1));
 						$('.select2').select2();
-						console.log(this.items);
+						// console.log(this.items);
 				},
 		    methods: {
 		
 		            add() {
-		                console.log(this.items);
+		                // console.log(this.items);
 		                this.originalData = null;
 		                this.items.push({ achieving_rate: '0', bonus_rate: '0', bonus_direct: '0'});
                     // this.detail_has_error.push({achieving_rate: false, bonus_rate: false});
@@ -168,9 +168,9 @@
 		            },
 		
 		            remove(item, index) {
-		                this.items.splice(index, 1)
-		                this.$set(this.items, 'penguin', 0)
-				            console.log(this.originalData);
+		                this.items.splice(index, 1);
+		                this.$set(this.items, 'penguin', 0);
+				            // console.log(this.originalData);
 		                return
 		            },
 		
@@ -179,7 +179,7 @@
                     this.has_error = true;
                     this.has_error = false;
                     this.detail_check();
-                    console.log(this.detail_error_check);
+                    // console.log(this.detail_error_check);
                     if(!this.detail_error_check){
                         this.originalData = null
                         this.editIndex = null

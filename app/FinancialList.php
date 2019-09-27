@@ -3,7 +3,9 @@
 namespace App;
 
 use App\Http\Controllers\FinancialController;
+use DateTime;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class FinancialList extends Model
 {
@@ -140,36 +142,105 @@ class FinancialList extends Model
 	}
 	
 	/**
+	 * @param $v
+	 * @return mixed
+	 */
+	function setStatusTime ($v)
+	{
+		$v['paymentStatus'] = isset($v['receipt']['created_at']) ? substr($v['receipt']['created_at'], 0, 10) : 'no';
+		$v['bonusStatus'] = isset($v['provide']['created_at']) ? substr($v['provide']['created_at'], 0, 10) : 'no';
+		return $v;
+	}
+	
+	/**
 	 * @param $id
-	 * @param string $yearMonthDay
-	 * @param string $yearMonth
+	 * @param string $dateStart
+	 * @param string $dateEnd
 	 * @return bool|mixed|string
 	 */
-	public function getFinancialData ($id, string $yearMonthDay, string $yearMonth)
+	public function getFinancialData (Array $erpUserIds, string $dateStart,string $dateEnd = null)
 	{
+		$dateStart = new \DateTime($dateStart);
+		$dateEnd = $dateEnd ? new \DateTime($dateEnd) :  $dateStart;
+		
 		//確認是否已有資料 反之call API
-		$financialList = $this->where(['erp_user_id' => $id, 'set_date' => $yearMonthDay])->with('receipt')->with('provide')->get();
-		
-		$financial = new FinancialController();
-		
-		if ($financialList->count() == 0) {
-			// get api data
-			$erpReturnData = collect($financial->getErpMemberFinancial([$id], $yearMonth));
-			
-			$erpReturnData = $erpReturnData->map(function ($v) {
-				$v['paymentStatus'] = isset($v['receipt']['created_at']) ? substr($v['receipt']['created_at'],0,10) : 'no';
-				$v['bonusStatus'] = isset($v['provide']['created_at']) ? substr($v['provide']['created_at'],0,10) : 'no';
+		$erpReturnData = $this->whereIn('erp_user_id' , $erpUserIds)->whereBetween('set_date' ,[$dateStart->format('Y-m-01'),$dateEnd->format('Y-m-01')])->with('receipt')->with('provide')->get()
+			->map(function ($v){
+				
+				$v = $this->setStatusTime($v);
+				$v->sale_group_name = $v->saleGroups->saleGroups->name;
+				$v->user_name =  ucfirst($v->user->name);
+				
 				return $this->exchangeMoney($v);
-			});
-		} else {
-			$erpReturnData = $financialList->map(function ($v){
-				$v['paymentStatus'] = isset($v['receipt']['created_at']) ? substr($v['receipt']['created_at'],0,10) : 'no';
-				$v['bonusStatus'] = isset($v['provide']['created_at']) ? substr($v['provide']['created_at'],0,10) : 'no';
-				return $this->exchangeMoney($v->revertKeyChange()->revertValueChange());
-			});
-		}
+				//return $this->exchangeMoney($v->revertKeyChange()->revertValueChange());
+			})
+		 ->where('profit','!=',0)->values()->toArray();
 		
-		return $erpReturnData->toArray();
+		return $erpReturnData;
+	}
+	
+	//存入所有資料 資料重抓使用 （慎）
+	public function saveUntilNowAllData ()
+	{
+		$financial = new FinancialController();
+		$erpReturnData = collect($financial->getErpMemberFinancial(['all'],'all'))->toArray();
+		
+		DB::beginTransaction();
+		try{
+			$newdata = [];
+			foreach ($erpReturnData as $erpReturnDatum) {
+				$financeList = new FinancialList();
+				$financeList->fill($erpReturnDatum)->dataFormat()->save();
+			}
+			
+			DB::commit();
+			
+		} catch (\Exception $ex) {
+			DB::rollback();
+			dd($ex->getMessage());
+		}
+	}
+	
+	//存入現在已完成結帳月份的資料
+	public function saveCloseData ()
+	{
+		$financial = new FinancialController();
+		$date = new DateTime(date('Ym01'));
+		
+		$erpReturnData = collect($financial->getErpMemberFinancial(['all'],$date->format('Ym')));
+		$alreadySetData = $this->where('set_date','>=',$date->format('Y-m-d'))->get();
+		
+		$updateDataTmp = [];
+		//dd($erpReturnData->where('memberid',181)->where('year_month','201908'));
+		// 先過濾已新增過的資料 做 UPDATA 為新增的資料做 insert
+		$erpReturnData = $erpReturnData->filter(function($v,$k) use($alreadySetData,&$updateDataTmp){
+			
+			$tmpDate = new DateTime($v['year_month'].'01');
+			$setDate = $tmpDate->format('Y-m-d');
+			$data = $alreadySetData->where('cp_detail_id',$v['o_id'])->where('set_date',$setDate)->first();
+			
+			if(empty($data)){
+				return $v;
+			}else if(!empty($data)){
+				//debug check
+				$updateDataTmp[]= $v;
+				$this->updateSet($data['id'],$v);
+			}
+		});
+		
+		DB::beginTransaction();
+		
+		try{
+			$erpReturnData->each(function($v){
+				$financeList = new FinancialList();
+				$financeList->fill($v)->dataFormat()->save();
+			});
+			DB::commit();
+			
+		} catch (\Exception $ex) {
+			DB::rollback();
+			\Log::error($ex->getMessage());
+		}
 	}
 	
 	public function exchangeMoney ($items)
@@ -230,6 +301,27 @@ class FinancialList extends Model
 		return $items;
 		
 	}
+	
+	public function getUserLatelyProfit ($erpUserId)
+	{
+		$thisMonth = new \DateTime();
+		$thisMonth = $thisMonth->format('Y-m-01');
+		
+		$lastMonth = new \DateTime('last day of last month');
+		$lastMonth = $lastMonth->format('Y-m-01');
+		
+		$erpReturnData = $this->where('erp_user_id' ,$erpUserId)->get();
+		$allProfitBySetDate = $erpReturnData->groupBy('set_date')->map(function($item) {
+			return $item->sum('profit');
+		});
+		
+		$thisMonthProfit = $allProfitBySetDate->get($thisMonth) ?? 0;
+		$lastMonthProfit = $allProfitBySetDate->get($lastMonth) ?? 0;
+		$highestProfit = empty($allProfitBySetDate) ? 0 : $allProfitBySetDate->max();
+		
+		return [$highestProfit,$thisMonthProfit, $lastMonthProfit];
+	}
+	
 	/**
 	 * @param $id
 	 * @param $data
