@@ -101,7 +101,7 @@
 				session()->forget('retrunUrl');
 				return redirect($returnUrl);
 			}
-			return redirect()->action('IndexController@index');
+			return redirect()->action('Bonus\ReviewController@view');
 			
 		}
 		
