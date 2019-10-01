@@ -279,7 +279,7 @@
             start_date: {
                 immediate: true,    // 这句重要
                     handler (val, oldVal) {
-                    if(oldVal !== val  && oldVal !== undefined && oldVal !== '' && val !== '' && oldVal.length !== 0) {
+                    if(oldVal !== undefined  && val !== '') {
                         this.getData();
                     }
                 }
@@ -295,7 +295,7 @@
             user_ids: {
                 immediate: true,    // 这句重要
                     handler (val, oldVal) {
-                    if(oldVal !== val) {
+                    if(oldVal !== undefined && val !== '') {
                         this.getData();
                     }
                 }
