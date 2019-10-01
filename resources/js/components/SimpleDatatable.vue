@@ -73,9 +73,11 @@
                 }
 				    },
 		        updataTable(row){
+                if(this.dataTable !== undefined){
                 this.dataTable.clear();
 		            this.dataTable.rows.add( row );
                 this.dataTable.draw();
+                }
 		        },
 				    getData(){
 						    if(this.ajax_url === undefined){
@@ -210,7 +212,7 @@
                 vue.dataTable.clear();
                 vue.dataTable.rows.add( rowData );
                 vue.dataTable.draw();
-               
+                vue.getData();
                 if(type == 'select'){
                     // Array holding selected row IDs
                     var rows_selected = vue.$store.getters.getTableSelect;
