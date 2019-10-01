@@ -98,7 +98,8 @@ class SaleGroupsReach extends Model
 		
 		$rate = $convenerRateStart - count($sameGroupErpUserIds) * $convenerRateLadder;
 		/*如未設定招集人此月份資料則會出錯*/
-		$provideMoney = isset($rate) ? round($groupsTotalProfit * ($rate / 100)) : 0;
+		
+		$provideMoney = (isset($rate) && $groupsTotalProfit > 0 )? round($groupsTotalProfit * ($rate / 100)) : 0;
 		return [$provideMoney,$rate];
 	}
 }
