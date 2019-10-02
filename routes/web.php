@@ -14,7 +14,9 @@ use \Illuminate\Support\Facades\Artisan;
 	/*
 			 * 登入系統
 			 */
-
+	Route::get('/info',function(){
+		phpinfo();
+	});
 	
 	Route::group(['namespace' => '\App\Http\Controllers\Auth'], function() {
 		Route::get('/login', [
