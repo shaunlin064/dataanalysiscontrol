@@ -13,6 +13,7 @@ class ExchangeRatesTableSeeder extends Seeder
     public function run()
     {
 	    $created_by_erp_user_id = 157;
+	    /*參考資料為 即期賣出匯率*/
 	    $datas = [
 	     '201804' => [
 	      //[
@@ -251,7 +252,21 @@ class ExchangeRatesTableSeeder extends Seeder
 		     'currency' => 'USD',
 		     'rate' => '31.3468'
 		    ]
-	     ]
+	     ],
+	     '201909' => [
+		     //[
+		     // 'currency' => 'CNY',
+		     // 'rate' => '4.4099'
+		     //],
+		    [
+		     'currency' => 'JPY',
+		     'rate' => '0.287825'
+		    ],
+		    [
+		     'currency' => 'USD',
+		     'rate' => '31.06925'
+		    ]
+	     ],
 	    ];
 	    
 	    foreach( $datas  as $setDate => $data){
