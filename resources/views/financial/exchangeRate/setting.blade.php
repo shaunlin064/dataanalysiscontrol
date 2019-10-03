@@ -70,7 +70,7 @@
                                         </div>
                                         <label for="inputRate" class="col-sm-1 control-label">匯率</label>
                                         <div class="col-sm-3">
-                                            <input type="number" class="form-control" id="rate" name='rate' placeholder="匯率" required>
+                                            <input type="number" step='0.00000001' class="form-control" id="rate" name='rate' placeholder="匯率" required>
                                         </div>
                                     </div>
                                     <div class='form-group'>
