@@ -3,7 +3,7 @@
 		<div class="input-group-addon">
 			<i class="fa fa-calendar"></i>
 		</div>
-		<input type="text" class="form-control pull-right" :id=dom_id :value=change_date :name=dom_id>
+		<input type="text" class="form-control pull-right" :id=dom_id :value=date :name=dom_id>
 	</div>
 </template>
 
@@ -15,7 +15,11 @@
             dom_id:String,
             date : String
 		    },
-        computed: mapState(['change_date']),
+        data: function() {
+            return {
+                date_start: this.date ? this.date : new Date(),
+            }
+        },
         methods:{
             changeDate(value){
                 this.$store.commit('changeDate',value);
@@ -38,10 +42,11 @@
         },
 		    mounted: function() {
             let vue = this;
-            let d = new Date();
+            let d = this.date_start;
             let m = moment(d).format('MM');
             let y = moment(d).format('YYYY');
             let td = moment(d).format('DD');
+            
             let domEle = $('#'+this.dom_id+'');
             
             domEle.datepicker({

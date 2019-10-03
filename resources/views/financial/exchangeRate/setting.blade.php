@@ -5,6 +5,10 @@
 	 * Date: 2019-07-29
 	 * Time: 10:44
 	 */
+
+	$dateLastMonth = new DateTime();
+	$dateLastMonth = $dateLastMonth->modify('-1Month')->format('Y/m');
+
 ?>
 
 @extends('layout')
@@ -57,7 +61,10 @@
 
                                         <label for='set_date-datepicker' class="col-sm-1 control-label">月份</label>
                                         <div class="col-sm-3">
-                                            <date-picker-component :dom_id='"set_date"'></date-picker-component>
+                                            <date-picker-component
+                                                    :dom_id='"set_date"'
+                                                    :date='"{{$dateLastMonth}}"'
+                                            ></date-picker-component>
                                         </div>
 
                                         <label for='selectCurrency' class="col-sm-1 control-label">幣別</label>
@@ -77,7 +84,6 @@
 
                                     </div>
                                 </div>
-{{--                                <span class="center-block text-center">當前設定月份為 {{date('Y-m',strtotime("-1 month"))}}</span>--}}
                                 <!-- /.box-body -->
                                 <div class="box-footer">
                                     <button type="submit" class="btn btn-info pull-right">送出</button>
@@ -87,25 +93,14 @@
                         </div>
                         <!-- /.box -->
                     </div>
-                    <table id="exchangeTable" class="table table-bordered table-striped">
-                        <thead>
-                        <tr>
-                            <th>月份</th>
-                            <th>幣別</th>
-                            <th>匯率</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                        <tfoot>
-                        <tr>
-                            <th>月份</th>
-                            <th>幣別</th>
-                            <th>匯率</th>
-                        </tr>
-                        </tfoot>
-                    </table>
                 </div>
+                <simple-data-table-componet
+                        :table_id='"exchangeTable"'
+                        :table_head='"財報清單"'
+                        :table_title='["月份","幣別","匯率"]'
+                        :row = '{!! json_encode($row) !!}'
+                        :columns = '{!!  json_encode(([['data'=>"set_date"],['data'=>"currency"],['data'=>"rate"]]))!!}'
+                ></simple-data-table-componet>
                 <!-- /.box-body -->
             </div>
             <!-- /.box -->
@@ -120,52 +115,6 @@
     <!-- page script -->
     <script>
         $(function () {
-            {{--var users = {!! json_encode(session('users')) !!};--}}
-                    {{--var departments = {!! json_encode(session('department')) !!};--}}
-
-            var dataTable = $('#exchangeTable').DataTable({
-                    'paging'      : true,
-                    'ordering'    : true,
-                    'info'        : true,
-                    'autoWidth'   : false,
-                    "aLengthMenu" : [25, 50, 100], //更改顯示記錄數選項
-                    "oLanguage": {
-                        "emptyTable"    : "目前沒有任何（匹配的）資料。",
-                        "sProcessing":   "處理中...",
-                        "sLengthMenu":   "顯示 _MENU_ 項結果",
-                        "sZeroRecords":  "沒有資料",
-                        "sInfo":         "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
-                        "sInfoEmpty":    "顯示第 0 至 0 項結果，共 0 項",
-                        "sInfoFiltered": "(從 _MAX_ 項結果過濾)",
-                        "sInfoPostFix":  "",
-                        "sSearch":       "搜索:",
-                        "sUrl":          "",
-                        "oPaginate": {
-                            "sFirst":    "首頁",
-                            "sPrevious": "上頁",
-                            "sNext":     "下頁",
-                            "sLast":     "尾頁"
-                        }
-                    },
-                    "order": [[ 0, 'desc' ]],
-                    columns: [
-                        {
-                            data: "set_date"
-                        },
-                        { data: 'currency',},
-                        { data: 'rate'},
-                    ],
-                });
-            let listdata = {!! json_encode($row)  !!};
-
-            dataTable.clear();
-            dataTable.rows.add( listdata );
-            dataTable.draw();
-
-            $('#bonusSetting').on('click','#addNewUser',function(){
-                window.open('/bonus/setting/add');
-            });
-
         })
     </script>
 @endsection
