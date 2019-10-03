@@ -81,6 +81,17 @@
         overflow: hidden;
         height: 500px;
     }
+    .over_hide{
+        overflow: hidden;
+    }
+
+    @media screen and (max-width: 812px){
+        #load_body{
+            position: absolute;
+            bottom: 10%;
+        }
+    }
+
     @keyframes textShow{
         0% {
             transform: translate3d(0px, 100%, 0px);
@@ -147,7 +158,7 @@
     <!-- page script -->
     <script src='/adminLte_componets/jquery/dist/jquery.js'></script>
     <script>
-
+            $('html').addClass('over_hide');
             changeLoadIcon();
             // Start the changing images
             var intervalId = setInterval(function() {
@@ -164,6 +175,7 @@
                 setTimeout(function(){
                     $('#loading').fadeOut();
                     $('#app').removeClass('app_hide');
+                    $('html').removeClass('over_hide');
                     $('.loader .image').removeClass('rotate_animation');
                     clearInterval(intervalId);
                 }, 800);
