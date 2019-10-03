@@ -22,6 +22,20 @@
 		return true;
 	}
 	
+	function date_range($first, $last)
+	{
+		$period = new \DatePeriod(
+		 new DateTime($first),
+		 new \DateInterval('P1M'),
+		 new DateTime($last)
+		);
+		
+		foreach ($period as $date)
+			$dates[] = $date->format('Y-m-d');
+		
+		return $dates;
+	}
+	
 	/*END 「Date 相關」 */
 	
 	/*START 字串相關*/

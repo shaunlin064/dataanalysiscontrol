@@ -2,6 +2,7 @@
 
 namespace App;
 
+use DateTime;
 use Illuminate\Database\Eloquent\Model;
 
 class SaleGroups extends Model
@@ -25,9 +26,7 @@ class SaleGroups extends Model
 	
 	public function groupsBonus ()
 	{
-		
 		return $this->hasMany(SaleGroupsBonusLevels::CLASS)->orderBy('set_date', 'desc');
-		
 	}
 	
 	public function groupsBonusLastMonth ()
@@ -37,4 +36,25 @@ class SaleGroups extends Model
 		return $this->hasMany(SaleGroupsBonusLevels::CLASS)->where('set_date',$lastMonth)->orderBy('set_date', 'desc');
 	}
 	
+	
+	/**
+	 * @param $saleGroupIds
+	 * @return array
+	 */
+	public function getGroupBoundary ($saleGroupIds,String $dateTime)
+	{
+		$tmpGroups = SaleGroups::whereIn('id', $saleGroupIds)->get()->map(function ($v, $k) use ($dateTime) {
+			$dateStart = new DateTime($dateTime);
+			$dateStart = $dateStart->format('Y-m-01');
+			$sameGroupErpUserIds = SaleGroupsUsers::where(['sale_groups_id' => $v->id, 'set_date' => $dateStart])->get();
+			$groupBoundary = $sameGroupErpUserIds->map(function ($v, $k) {
+				$v['boundary'] = $v->getUserBonusBoundary->boundary ?? 0;
+				return $v;
+			})->sum('boundary');
+			$v['boundary'] = $groupBoundary;
+			$v['set_date'] = $dateStart;
+			return $v;
+		});
+		return $tmpGroups->toArray();
+	}
 }

@@ -50,7 +50,7 @@ class FinancialList extends Model
 	}
 	
 	public function saleGroups(){
-	
+		
 		return $this->hasOne(SaleGroupsUsers::CLASS, 'erp_user_id','erp_user_id')->where('set_date',$this->set_date);
 	}
 	
@@ -168,9 +168,9 @@ class FinancialList extends Model
 			->map(function ($v){
 				
 				$v = $this->setStatusTime($v);
-				$v->sale_group_name = $v->saleGroups->saleGroups->name;
+				$v->sale_group_name = $v->saleGroups->saleGroups->name ?? '';
 				$v->user_name =  ucfirst($v->user->name);
-				
+				$v->sale_group_id = $v->saleGroups->sale_groups_id ?? 0;
 				return $this->exchangeMoney($v);
 				//return $this->exchangeMoney($v->revertKeyChange()->revertValueChange());
 			})

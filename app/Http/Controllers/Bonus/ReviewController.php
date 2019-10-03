@@ -8,24 +8,21 @@
 	
 	namespace App\Http\Controllers\Bonus;
 	
+	use Illuminate\Support\Facades\Artisan;
+	use Illuminate\Support\Facades\Cache;
 	use App\FinancialList;
-	use App\Http\Controllers\ApiController;
 	use App\Http\Controllers\Auth\Permission;
 	use App\Http\Controllers\BaseController;
 	use App\Http\Controllers\Financial\FinancialListController;
 	use App\Http\Controllers\Financial\ProvideController;
-	use App\Http\Controllers\FinancialController;
 	use App\Bonus;
-	use App\BonusLevels;
 	use App\SaleGroups;
 	use App\User;
 	use DateTime;
 	use Gate;
 	use Illuminate\Http\Request;
-	use Illuminate\Support\Facades\Artisan;
 	use Illuminate\Support\Facades\Input;
 	use Auth;
-	use App\Http\Controllers\UserController;
 	
 	class ReviewController extends BaseController
 	{
@@ -56,6 +53,7 @@
 		
 		public function view($erpUserId = null)
 		{
+			
 			$loginUserId = Auth::user()->erp_user_id;
 			
 			$erpUserId = $erpUserId ?? $loginUserId;
@@ -92,82 +90,14 @@
 				['data'=> 'paymentStatus'],
 				['data'=> 'bonusStatus'],
 			 ];
-		
-			//$yearMonth = '201907';
-			//$yearMonthDay ='2019-07-01';
-			//get financialData
-			//$erpReturnData = $this->getFinancialData($erpUserId, $yearMonthDay, $yearMonth);
-			
-			
-			//
-			//$dateStart =  $date->format('Y-m-01');
+
+			////
+			//$dateStart =  $date->format('2017-01-01');
 			//$dateEnd = $date->format('Y-m-01');
 			////$userIds = collect($userList)->pluck('erp_user_id')->toArray();
 			//$request = new Request(['startDate' => $dateStart,'endDate'=>$dateEnd,'saleGroupIds' => [1,2,3,4],'userIds'=>null]);
 			//$this->getAjaxData($request);
-			
-			////
-			//$erpReturnData = $this->getFinancialData($userIds, $dateStart,$dateEnd);
-			//$progressDatas = collect([]);
-			//collect($erpReturnData)->groupBy(['set_date','erp_user_id'])->map(function($items,$setDate) use(&$progressDatas){
-			//	$items = $items->map(function($v,$erpUserId) use($setDate){
-			//		$tmpData = $this->getUserBonus($erpUserId, $v->sum('profit'), $setDate);
-			//		$tmpData['sale_group_name'] = $v->max('sale_group_name');
-			//		$tmpData['user_name'] = $v->max('user_name');
-			//		$tmpData['set_date'] = substr($setDate,0,7);
-			//		return $tmpData;
-			//	})->values();
-			//	$progressDatas = $progressDatas->concat($items);
-			//});
-			//dd($progressDatas);
-			//
-			//$totalAmounts = [
-			// 'income' => [],
-			//	'cost' => [],
-			//	'profit' => []
-			//];
-			//$labels = [];
-			//collect($erpReturnData)->groupBy('set_date')->map(function($v,$k) use(&$totalAmounts,&$labels){
-			//	$tmpDate = new DateTime($k);
-			//	$labels[] = $tmpDate->format('Ym');
-			//	$totalAmounts['income'][] = round($v->sum('income'));
-			//	$totalAmounts['cost'][] = round($v->sum('cost'));
-			//	$totalAmounts['profit'][] = round($v->sum('profit'));
-			//});
-			//$chartDataBar = [
-			// [
-			//	'data' => $totalAmounts['income'],
-			// ],
-			// [
-			//	'data' => $totalAmounts['cost'],
-			// ],
-			// [
-			//	'data' => $totalAmounts['profit'],
-			// ],
-			//];
-			
-			
-			
-//			// loop calculation total Amount
-//			list($totalIncome, $totalCost, $totalProfit, $erpReturnData) = $this->calculationTotal($erpReturnData);
-//
-//			// getUserBonus set output Data
-//			$boxData = $this->getUserBonus($erpUserId, $totalProfit, $dateStart);
-//
-//			$tmpCollect = collect($erpReturnData);
-//			$chartData = [
-//			 [ 'data' => [
-//				$tmpCollect->where('status','=',0 )->sum('income'),
-//				$tmpCollect->where('status','>=',1 )->sum('income'),
-//				0,
-//				0
-//			 ]],
-//				//[ 'data' => [
-//				//	 0,
-//				//	 0,
-//				//	 1,
-//				//	 1]]
-//			];
+		
 			$labels = [];
 			$chartDataBar = [
 			 [
@@ -194,6 +124,8 @@
 				//	 1]]
 			];
 //
+			
+			
 			$progressColumns = [
 			 ['data'=> 'set_date',"width"=>"50px"],
 				['data' => 'user_name',"width"=>"50px"],
@@ -203,71 +135,18 @@
 			 ['data' => 'bonus_rate',"width"=>"20px",'render' => '${data}%'],
 			 ['data' => 'profit'],
 			];
-			//$progressData = [
-			//	['set_date' => '2019-09',
-			//		'user_name' => 'test',
-			//		'progress' => 100,
-			//	 'bonus_rate' => 5,
-			//	 'bonus_total' => 100,
-			//	 'sale_group_name' => "測試組"
-			//	],
-			// ['set_date' => '2019-10',
-			//	'user_name' => 'test',
-			//	'progress' => 70,
-			//  'bonus_rate' => 5,
-			//  'bonus_total' => 100,
-			//  'sale_group_name' => "測試組"
-			// ],
-			// ['set_date' => '2019-11',
-			//	'user_name' => 'test',
-			//	'progress' => 50,
-			//  'bonus_rate' => 5,
-			//  'bonus_total' => 100,
-			//  'sale_group_name' => "測試組"
-			// ],
-			// ['set_date' => '2019-09',
-			//	'user_name' => 'test',
-			//	'progress' => 30,
-			//  'bonus_rate' => 5,
-			//  'bonus_total' => 100,
-			//  'sale_group_name' => "測試組"
-			// ],
-			// ['set_date' => '2019-09',
-			//	'user_name' => 'test',
-			//	'progress' => -55,
-			//  'bonus_rate' => 0,
-			//  'bonus_total' => 0,
-			//  'sale_group_name' => "測試組"
-			// ],
-			//];
-
-//
-//			$dataTable = [
-//			 'rowTitle' => [
-//			  'year_month' => '月份',
-//			  'campaign_name' => '名稱',
-//			  'media_channel_name' =>	'媒體',
-//			  'sell_type_name' =>	'類型' ,
-//			  'currency_id' => '原幣別',
-//			  'organization' => '公司',
-//			  'income' =>	'收入' ,
-//			  'cost' =>	'成本' ,
-//			  'profit'	=> '毛利',
-//			  'paymentStatus' => '收款狀態',
-//			  'bonusStatus'	=> '發放狀態',
-//			 ],
-//				'data' => $erpReturnData
-//			];
-//			$userData = [
-//			 'uId' => $erpUserId,
-//			 'name' => session('users')[$erpUserId]['name'],
-//			 'title' => session('users')[$erpUserId]['department_name'],
-//			];
+			
+			$groupsProgressColumns = [
+			 ['data'=> 'set_date',"width"=>"50px"],
+			 ['data'=> 'name',"width"=>"50px"],
+			 ['data' => 'percentage' , 'render' => '<span style="display: none">${data}</span><div class="progress progress-xs progress-striped active" style="${rotate}"><div class="progress-bar progress-bar-${style}" style="width: ${Math.abs(data)}%;"></div></div>','parmas' => 'let style="yellow"; let rotate=""; if(data > 90){ style = "success"}else if(data < 0){ style = "danger"; rotate = "transform: rotate(180deg)";}'],
+			 ['data' => 'percentage','render' => '<span style="display: none">${style}</span><span class="badge bg-${style}">${data}%</span>','parmas' => 'let style ="yellow"; if(data > 90){ style = "green"}else if(data < 0){ style = "red"}',"width"=>"10px"],
+				['data' => 'profit']
+			 ];
+	
 			
 			return view('bonus.review.view',[
 				'data' => $this->resources,
-				//'userData' => $userData,
-				//'dataTable' => $dataTable,
 				'chartData' => $chartData,
 				'chartDataBar' => $chartDataBar,
 				'chartDataBarLabels' => $labels,
@@ -275,123 +154,110 @@
 				'bonusColumns' => $bonusColumns,
 				'progressDatas' => [],
 				'progressColumns' => $progressColumns,
+				'groupProgressDatas' => [],
+				'groupProgressColumns' => $groupsProgressColumns,
 				'saleGroups' => $saleGroups,
 				'userList' => $userList
 			]
 			);
 		}
 		
-		public function getAjaxData (Request $request)
+		public function getAjaxData (Request $request,$outType = 'echo')
 		{
 			$dateStart = $request->startDate;
 			$dateEnd = $request->endDate;
 			$saleGroupIds = $request->saleGroupIds;
 			$userIds = $request->userIds;
 			
+			$SaleGroupsObj = new SaleGroups();
 			if(!empty($userIds)){
 				$userIds = User::whereIn('id',$userIds)->get()->pluck('erp_user_id')->toArray();
 			}
 			
 			if($saleGroupIds && empty($userIds)){
-				$userIds = SaleGroups::with('groupsUsers')->whereIn('id', $saleGroupIds)->get()->map(function ($v, $k) {
+				$userIds = $SaleGroupsObj->with('groupsUsers')->whereIn('id', $saleGroupIds)->get()->map(function ($v, $k) {
 					return $v->groupsUsers->pluck('erp_user_id');
 				})->flatten()->unique()->values()->toArray();
 			}
 			
-			$erpReturnData = collect($this->getFinancialData($userIds,$dateStart,$dateEnd))->map(function($v,$k){
-			 return $v;
+			/*cache all user erp Id*/
+			$allUserErpIds = Cache::store('memcached')->remember('allUserErpId', (4*360), function () {
+				return User::all()->pluck('erp_user_id')->toArray();
 			});
+			/*cache all groupId*/
+			$allGroupIds = Cache::store('memcached')->remember('allGroupId', (10*60), function () {
+			return SaleGroups::all()->pluck('id')->toArray();
+		});
 			
-			/*$chartMoneyStatus*/
+			/*cache start*/
+			if( $dateStart != $dateEnd){
+				$dateRange = date_range($dateStart,$dateEnd);
+			}
+			$dateRange[] = $dateEnd;
+			$cacheData = collect([]);
+			$dateNow = new DateTime();
+			/*check cache exists*/
+			$cahceKey = 'financial.review';
+			foreach($dateRange as $date){
+				/*TODO::優化快取暫存時間判斷*/
+				$date2 = new DateTime($date);
+				$cacheTime = 1;//hr
+				$dateDistance = ($dateNow->getTimestamp()-$date2->getTimestamp())/(60*60*24)/365;
+				if($dateDistance > 2){ // over two year
+					$cacheTime = 24 * 30; // 1 month
+				}elseif($dateDistance > 1){ // over one year
+					$cacheTime = 24 * 15; // 2 week
+				}elseif($dateDistance > 0.125){ // over 1.5 month
+					$cacheTime = 24; // 1 day
+				}else{ // close one month
+					$cacheTime = 1; // 1 hr
+				};
+				
+				if (!Cache::store('memcached')->has($cahceKey.$date)) {
+					//
+					list($erpReturnData, $progressDatas, $groupProfitDatas) = $this->getDataFromDataBase($allUserErpIds, $allGroupIds,$date, $date);
+					Cache::store('memcached')->put($cahceKey.$date, ["bonus_list" =>$erpReturnData, 'progress_list' => $progressDatas, 'group_progress_list' => $groupProfitDatas],($cacheTime * 3600 ));
+				}
+				$cacheData[] = Cache::store('memcached')->get($cahceKey.$date);
+			}
+			
+			$group_progress_list = collect([]);
+			$bonus_list = collect([]);
+			$progress_list = collect([]);
+			$cacheData->map(function($v,$setDate) use(&$progress_list,&$bonus_list,&$group_progress_list){
+				//$bonus_list = array_merge($bonus_list,$v['bonus_list']->toArray());
+				$bonus_list = $bonus_list->concat($v['bonus_list']);
+				$progress_list = $progress_list->concat($v['progress_list']);
+				$group_progress_list = $group_progress_list->concat($v['group_progress_list']);
+			});
+			$bonus_list = $bonus_list->whereIn('erp_user_id',$userIds);
+			
 			$chartMoneyStatus = [
-			 'unpaid' => round($erpReturnData->where('status','=',0 )->sum('income')),
-			 'paid' => round($erpReturnData->where('status','>=',1 )->sum('income'))
+			 'unpaid' => round($bonus_list->where('status', '=', 0)->sum('income')),
+			 'paid' => round($bonus_list->where('status', '>=', 1)->sum('income'))
 			];
-			
-			/*$chartFinancialBar*/
 			$chartFinancialBar = [
+			 'labels' => [],
 			 'totalIncome' => [],
 			 'totalCost' => [],
 			 'totalProfit' => []
 			];
-			$erpReturnData->groupBy('set_date')->map(function($v,$k) use(&$chartFinancialBar){
+			$bonus_list->groupBy('set_date')->map(function ($v, $k) use (&$chartFinancialBar) {
 				$tmpDate = new DateTime($k);
 				$chartFinancialBar['labels'][] = $tmpDate->format('Ym');
 				$chartFinancialBar['totalIncome'][] = round($v->sum('income'));
 				$chartFinancialBar['totalCost'][] = round($v->sum('cost'));
 				$chartFinancialBar['totalProfit'][] = round($v->sum('profit'));
 			});
-			/*progressDatas*/
-			$progressDatas = collect([]);
-			$erpReturnData->groupBy(['set_date','erp_user_id'])->map(function($items,$setDate) use(&$progressDatas){
-				
-				$items = $items->map(function($v,$erpUserId) use($setDate){
-					$tmpData = $this->getUserBonus($erpUserId, $v->sum('profit'), $setDate);
-					$tmpData['totalProfit'] = $v->sum('profit');
-					$tmpData['sale_group_name'] = $v->max('sale_group_name');
-					$tmpData['user_name'] = $v->max('user_name');
-					$tmpData['set_date'] = substr($setDate,0,7);
-					return $tmpData;
-				})->values();
-				$progressDatas = $progressDatas->concat($items);
-			});
+			$bonus_list = $bonus_list->values()->toArray();
+			$progress_list = $progress_list->whereIn('erp_user_id',$userIds)->values()->toArray();
+			$group_progress_list = $group_progress_list->whereIn('id',$saleGroupIds)->values()->toArray();
 			
-			$erpReturnData = $erpReturnData->map(function($v,$k){
-				$v['set_date'] = substr($v['set_date'],0,7);
-			 return $v;
-			});
+			if($outType == 'echo'){
+				echo json_encode(["bonus_list" => $bonus_list, "chart_money_status" => $chartMoneyStatus, "chart_financial_bar" => $chartFinancialBar, 'progress_list' => $progress_list, 'group_progress_list' => $group_progress_list]);
+			}
 			
-			echo json_encode(["bonus_list" => $erpReturnData,"chart_money_status" => $chartMoneyStatus,"chart_financial_bar" =>$chartFinancialBar,'progress_list'=>$progressDatas]);
-		}
-		/*watset*/
-		public function getdata ()
-		{
-//			$dataTable = [
-//				 ['yearMonth' => '201906',
-//				 'campaignName' => '測試1',
-//				 'mediaChannelName' => 'fb',
-//				 'sellType' => 'CPC',
-//				 'income' => 100000,
-//				 'cost' => 50000,
-//				 'profit' => 50000,
-//				 'paymentStatus' => 0,
-//				 'bonusStatus' => 0,]
-//			];
 			
-			$uId = Input::get('uId');
-			$inputDate = str_replace('/', '', Input::get('dateYearMonth'));
-			$inputDate .= '01';
-			$date = new \DateTime($inputDate);
-			$yearMonthDay = $date->format('Y-m-01');
-			
-			//get financialData
-			$erpReturnData = $this->getFinancialData($uId, $yearMonthDay);
-			
-			// loop calculation total Amount
-			list($totalIncome, $totalCost, $totalProfit, $erpReturnData) = $this->calculationTotal($erpReturnData);
-			
-			// getUserBonus set output Data
-			$boxData = $this->getUserBonus($uId, $totalProfit, $yearMonthDay);
-			
-			$tmpCollect = collect($erpReturnData);
-			
-			$chartMoneyStatus = [
-			 'unpaid' => $tmpCollect->where('status','=',0 )->sum('income'),
-				'paid' =>$tmpCollect->where('status','>=',1 )->sum('income')
-				 ];
-			
-			$chartDataBar = [
-			 'totalIncome' => $totalIncome,
-				'totalCost' => $totalCost,
-				'totalProfit' => $totalProfit
-			];
-			
-			echo json_encode([
-			 'erpReturnData' => $erpReturnData,
-			 'chartDataBar' => $chartDataBar,
-				'boxData' => $boxData,
-				'chartMoneyStatus' => $chartMoneyStatus,
-			 ]);
 		}
 		
 		/**
@@ -456,6 +322,68 @@
 		{
 			$financialListObj = new FinancialList();
 			return $financialListObj->getFinancialData($erpUserIds, $dateStart,$dateEnd);
+		}
+		
+		/**
+		 * @param array $userIds
+		 * @param $dateStart
+		 * @param $dateEnd
+		 * @param SaleGroups $SaleGroupsObj
+		 * @param $saleGroupIds
+		 * @return array
+		 * @throws \Exception
+		 */
+		private function getDataFromDataBase (array $userIds, $saleGroupIds, $dateStart, $dateEnd ): array
+		{
+			$SaleGroupsObj = new SaleGroups();
+			
+			$erpReturnData = collect($this->getFinancialData($userIds, $dateStart, $dateEnd));
+			
+			/*progressDatas*/
+			$progressDatas = collect([]);
+			$erpReturnData->groupBy(['set_date', 'erp_user_id'])->map(function ($items, $setDate) use (&$progressDatas) {
+				
+				$items = $items->map(function ($v, $erpUserId) use ($setDate) {
+					$tmpData = $this->getUserBonus($erpUserId, $v->sum('profit'), $setDate);
+					$tmpData['totalProfit'] = $v->sum('profit');
+					$tmpData['sale_group_name'] = $v->max('sale_group_name');
+					$tmpData['user_name'] = $v->max('user_name');
+					$tmpData['set_date'] = substr($setDate, 0, 7);
+					$tmpData['erp_user_id'] = $erpUserId;
+					return $tmpData;
+				})->values();
+				$progressDatas = $progressDatas->concat($items);
+			});
+			
+			///*get group Profit */
+			$groupDateStart = new DateTime($dateStart);
+			$tmpGroups = [];
+			/*getGroupBoundary*/
+			if ($dateEnd == $groupDateStart->format('Y-m-01')) {
+				$tmpGroups[] = $SaleGroupsObj->getGroupBoundary($saleGroupIds, $groupDateStart->format('Y-m-01'));
+			}
+			
+			while ($dateEnd != $groupDateStart->format('Y-m-01')) {
+				$tmpGroups[] = $SaleGroupsObj->getGroupBoundary($saleGroupIds, $groupDateStart->format('Y-m-01'));
+				$groupDateStart->modify('+1Month');
+			}
+			/*calculation profit percentage*/
+			$groupProfitDatas = collect([]);
+			collect($tmpGroups)->map(function ($items, $k) use (&$groupProfitDatas, $erpReturnData) {
+				$items = collect($items)->map(function ($item, $k) use ($erpReturnData) {
+					$item['profit'] = round($erpReturnData->where('sale_group_id', $item['id'])->where('set_date', $item['set_date'])->sum('profit'));
+					$item['percentage'] = ($item['profit'] == 0 || $item['boundary'] == 0) ? 0 : round($item['profit'] / $item['boundary'] * 100);
+					$item['set_date'] = substr($item['set_date'], 0, 7);
+					return $item;
+				});
+				$groupProfitDatas = $groupProfitDatas->concat($items);
+			});
+			$erpReturnData = $erpReturnData->map(function ($v, $k) {
+				$v['set_date'] = substr($v['set_date'], 0, 7);
+				return $v;
+			});
+			
+			return [$erpReturnData->toArray(),  $progressDatas->toArray(), $groupProfitDatas->toArray()];
 		}
 		
 	}

@@ -49,6 +49,8 @@
 		        type: String,
             csrf: String,
 		        ajax_url: String,
+            length_change: String,
+		        page_length: Number,
         },
         data() {
             return {
@@ -103,7 +105,9 @@
                         let rowData = eval(`response.data.${this.table_id}`);
                         
                         let total = parseInt(0);
+		                    
                         if(rowData){
+                            
                             rowData.map(function(v){
                                 total += parseInt(v.provide_money);
                             });
@@ -113,7 +117,7 @@
                             }else{
                                 this.$store.state.sale_group_total_money = total;
                             }
-														
+
                             this.updataTable(rowData);
                         };
                         
@@ -171,8 +175,10 @@
                             }
                         },
                         columns: columns,
-
+                        pageLength: vue.page_length ? vue.page_length : 25,
+                        lengthChange : vue.length_change == 'hide' ? false : true
                     };
+                
                 if(type == 'select'){
                     dataTableConfig.columnDefs= [{
                         'targets': 0,
@@ -207,7 +213,6 @@
 	                        filename: function () { return vue.getExportFileName();}}];
                     });
                 };
-
                 vue.dataTable = domtable.DataTable(dataTableConfig);
                 vue.dataTable.clear();
                 vue.dataTable.rows.add( rowData );

@@ -172,6 +172,22 @@
                         :csrf= '"{{csrf_token()}}"'
                         :columns = '{!!json_encode($progressColumns)!!}'
                         :ajax_url= '"/bonus/review/getAjaxData"'
+                        :page_length='10'
+                        :length_change='"hide"'
+                ></simple-data-table-componet>
+            </div>
+            <div class="col-xs-12 col-md-6">
+                <simple-data-table-componet
+                        :table_id='"group_progress_list"'
+                        :table_head='"團隊績效表"'
+                        :table_title='["月份","團隊","績效","績效","毛利"]'
+                        :row = '{!! json_encode($groupProgressDatas) !!}'
+                        {{--:ex_buttons= '["excel"]'--}}
+                        :csrf= '"{{csrf_token()}}"'
+                        :columns = '{!!json_encode($groupProgressColumns)!!}'
+                        :ajax_url= '"/bonus/review/getAjaxData"'
+                        :page_length='10'
+                        :length_change='"hide"'
                 ></simple-data-table-componet>
             </div>
             <div class="col-xs-12">
