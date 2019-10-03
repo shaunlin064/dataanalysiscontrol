@@ -154,6 +154,7 @@
                         ordering    : true,
                         info        : true,
                         autoWidth   : true,
+                        scrollX: true,
                         aaSorting : [[0, 'desc']], //預設的排序方式，第2列，升序排列
                         aLengthMenu : [25, 50, 100], //更改顯示記錄數選項
                         oLanguage: {
