@@ -26,7 +26,7 @@
 	@endforeach
 </head>
 @include('loading')
-<body class='hold-transition skin-blue sidebar-collapse sidebar-mini'>
+<body class='hold-transition skin-blue sidebar-mini'>
 
 <div id="app" class='app_hide'>
 
