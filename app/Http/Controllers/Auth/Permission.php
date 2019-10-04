@@ -24,7 +24,7 @@
 			$region = Str::before(Route::currentRouteName(),'.')  == 'system' ? 'system' : 'user';
 			$this->menus = Menu::where('region',$region )->get();
 			$uid = session('userData')['id'];
-			$this->role['admin']['ids'] = [15,17,157,172,179,187];
+			$this->role['admin']['ids'] = [15,17,111,157,172,179,187];
 			$this->role['convener']['ids'] = [67,84];
 			$this->role['financial']['ids'] = [63,178,190,202,203];
 			
