@@ -44,6 +44,7 @@ class ReloadConvenerReach extends Command
 	    $startDate = '2018-01-01';
 	    
 	    $date = new DateTime(date('Ym01'));
+	    $date->modify('-1Month');
 	    DB::table('sale_groups_reaches')->truncate();
 	    $saleGroupsReach = new SaleGroupsReach();
 	    

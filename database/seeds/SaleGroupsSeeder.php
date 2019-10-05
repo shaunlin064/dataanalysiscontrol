@@ -13,11 +13,31 @@ class SaleGroupsSeeder extends Seeder
     public function run()
     {
         //
+	    
 	    $saleGroup = [
-	     '整合行銷部' => [133,153,174,188,200,201,204,205],
-	     '業務五部' => [67,122,131,132,136,155],
-	     '業務六部' => [84,181,170,186],
-	     '離職業務' => [19,22,27,28,71,91,96,97,107,108,143,154,156,161,175],
+	     '整合行銷部' => [
+	      '2019-10-01'=>[133,153,174,188,200,201,204,205]
+	     ],
+	     '業務五部' => [
+	      '2019-06-01' => [67,132,136,155],
+	      '2019-07-01' => [67,122,131,132,136,155],
+	      '2019-08-01' => [67,122,131,132,136,155],
+	      '2019-09-01' => [67,122,131,132,136,155],
+	      '2019-10-01' => [67,131,132,136,155],
+	     ],
+	     '業務六部' => [
+	      '2019-06-01' => [84,156,170,181],
+	      '2019-07-01' => [84,170,181,186],
+	      '2019-08-01' => [84,170,181,186],
+	      '2019-09-01' => [84,170,181,186],
+		     '2019-10-01' => [84,170,181,186]
+	    ],
+	     '離職業務' => [
+	      '2019-07-01' =>[19,22,27,71,91,96,97,107,108,143,154,156,161,175],
+	      '2019-08-01' =>[19,22,27,28,71,91,96,97,107,108,143,154,156,161,175],
+	      '2019-09-01' =>[19,22,27,28,71,91,96,97,107,108,143,154,156,161,175],
+	      '2019-10-01' =>[19,22,27,28,71,91,96,97,107,108,122,143,154,156,161,175]
+	     ],
 	    ];
 	    $convener = [67,84];
 	    $saleBonus = [ [
@@ -35,31 +55,41 @@ class SaleGroupsSeeder extends Seeder
 		
 		    $saleGroups = SaleGroups::create(['name' => $name]);
 		
-		    $date = new \DateTime(date('Ym01'));
-		    $date->modify('+1Month');
-		
+		    $dateNow = new \DateTime(date('Ym01'));
+		    
+		    $date = new \DateTime(date('2017-12-01'));
+		    
 		    $groupsData = $saleBonus;
-		
-		    while($date->format('Y-m-d') != '2018-01-01'){
-			    $setDate = $date->modify('-1Month')->format('Y-m-d');
+		   
+		    while($date->format('Y-m-d') != $dateNow->format('Y-m-d')){
+			    $setDate = $date->modify('+1Month')->format('Y-m-d');
+			    $nowSetDate = [];
+			    foreach ($item as $dataSetDate => $uid){
+				    if($dataSetDate == $setDate && empty($nowSetDate)) {
+					    $nowSetDate = $uid;
+				    }
+			    	if($dataSetDate > $setDate && empty($nowSetDate)) {
+					    $nowSetDate = $uid;
+				    }
+			    }
 			    $userData = array_map(function($v) use($setDate,$convener,$saleGroups){
+				
 				    $tmp = [
 				     'erp_user_id' => $v,
 				     'set_date' => $setDate,
 				     'is_convener' => in_array($v,$convener) ? 1 : 0
 				    ];
 				    return $tmp;
-			    },$item,[$setDate,$convener,$saleGroups]);
+			    },$nowSetDate,[$setDate,$convener,$saleGroups]);
 			    $saleGroups->groupsUsers()->createMany($userData);
+			    
+			    $groupsBonus = array_map(function($v) use($setDate){
+				    $v['set_date'] = $setDate;
+				    return $v;
+			    },$groupsData,[$setDate]);
 			
-			    if(isset($groupsData)){
-				    $groupsBonus = array_map(function($v) use($setDate){
-					    $v['set_date'] = $setDate;
-					    return $v;
-				    },$groupsData,[$setDate]);
-				
-				    $saleGroups->groupsBonus()->createMany($groupsBonus);
-			    }
+			    $saleGroups->groupsBonus()->createMany($groupsBonus);
+					  
 		    };
 	    }
     }

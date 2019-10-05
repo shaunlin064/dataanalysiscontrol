@@ -76,18 +76,24 @@
 	    $userdata[] = ['set_date'=>'2017-01-01','erp_user_id' => 133,'boundary' => 550000];
 	    $userdata[] = ['set_date'=>'2017-01-01','erp_user_id' => 181,'boundary' => 550000];
 	    $userdata[] = ['set_date'=>'2017-01-01','erp_user_id' => 153,'boundary' => 550000];
-	    $userdata[] = ['set_date'=>'2019-09-01','erp_user_id' => 204,'boundary' => 550000];
+	    $userdata[] = ['set_date'=>'2019-09-01','erp_user_id' => 204,'boundary' => 100000];
 	    $userdata[] = ['set_date'=>'2017-01-01','erp_user_id' => 84,'boundary' => 600000];
 	    $userdata[] = ['set_date'=>'2017-01-01','erp_user_id' => 174,'boundary' => 600000];
-	    $userdata[] = ['set_date'=>'2019-08-01','erp_user_id' => 200,'boundary' => 600000];
-	    $userdata[] = ['set_date'=>'2019-08-01','erp_user_id' => 201,'boundary' => 600000];
-	    $userdata[] = ['set_date'=>'2019-09-01','erp_user_id' => 205,'boundary' => 600000];
+	    $userdata[] = ['set_date'=>'2019-09-01','erp_user_id' => 200,'boundary' => 200000];
+	    $userdata[] = ['set_date'=>'2019-09-01','erp_user_id' => 201,'boundary' => 200000];
+	    $userdata[] = ['set_date'=>'2019-09-01','erp_user_id' => 205,'boundary' => 100000];
 	    $userdata[] = ['set_date'=>'2017-01-01','erp_user_id' => 67,'boundary' => 650000];
 	    $userdata[] = ['set_date'=>'2017-01-01','erp_user_id' => 188,'boundary' => 700000];
 	
+	    $otherrule = [
+	     ['set_date' => '2019-10-01' ,'erp_user_id' => 200, 'boundary' => 300000],['erp_user_id' => 200,'set_date'=>'2019-11-01','boundary' => 600000],
+	     ['set_date' => '2019-10-01' , 'erp_user_id' => 201,'boundary' => 300000],['erp_user_id' => 201,'set_date'=>'2019-11-01','boundary' => 600000],
+	     ['set_date' => '2019-10-01' ,'erp_user_id' => 204, 'boundary' => 200000],['erp_user_id' => 204,'set_date'=>'2019-11-01','boundary' => 250000],['erp_user_id' => 204,'set_date'=>'2019-12-01','boundary' => 550000],
+	     ['set_date' => '2019-10-01' ,'erp_user_id' => 205, 'boundary' => 200000],['erp_user_id' => 205,'set_date'=>'2019-11-01','boundary' => 300000],['erp_user_id' => 205,'set_date'=>'2019-12-01','boundary' => 600000],
+	    ];
+	    $otherrule = collect($otherrule);
 	    
-	    
-	    $nextMonth = date('Y-m-01',strtotime("+1 month"));
+	    $nextMonth = date('Y-m-01',strtotime("+3 month"));
 
 	    foreach($userdata as $importData){
 		
@@ -96,21 +102,13 @@
 		    while($nextMonth != $dateStart->format('Y-m-01')) {
 		    	
 			    $importData['set_date'] = $dateStart->format('Y-m-01');
-			    
-			    $request = new Request($importData);
-			    $bonus = Bonus::create($request->all());
-			    $setBonusLevels = $bonusLevels;
-			    
-					if( $importData['set_date'] >= '2019-07-01' && in_array($importData['erp_user_id'],$exileUserId)){
-						$setBonusLevels = $exileRuleLevels;
-					};
-			    
-			    
-			    collect($setBonusLevels)->map(function($v) use($bonus){
-				    $v['bonus_id'] = $bonus->id;
-				    BonusLevels::create($v);
-			    });
-			    
+			    $otherData = $otherrule->where('erp_user_id',$importData['erp_user_id'])->where('set_date',$importData['set_date']);
+			    if($otherData->count() > 0){
+				    $importData['boundary'] = $otherData->first()['boundary'];
+			    }
+
+			    $this->save($importData, $bonusLevels, $exileUserId, $exileRuleLevels);
+			
 			    $dateStart = $dateStart->modify('+1 Month');
 		    }
 	    }
@@ -127,4 +125,27 @@
 	    }
 	   
     }
-}
+		
+		/**
+		 * @param $importData
+		 * @param array $bonusLevels
+		 * @param array $exileUserId
+		 * @param array $exileRuleLevels
+		 */
+		private function save ($importData, array $bonusLevels, array $exileUserId, array $exileRuleLevels): void
+		{
+			$request = new Request($importData);
+			$bonus = Bonus::create($request->all());
+			$setBonusLevels = $bonusLevels;
+			
+			if ($importData['set_date'] >= '2019-07-01' && in_array($importData['erp_user_id'], $exileUserId)) {
+				$setBonusLevels = $exileRuleLevels;
+			};
+			
+			
+			collect($setBonusLevels)->map(function ($v) use ($bonus) {
+				$v['bonus_id'] = $bonus->id;
+				BonusLevels::create($v);
+			});
+		}
+	}

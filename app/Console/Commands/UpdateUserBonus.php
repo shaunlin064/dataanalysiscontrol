@@ -61,15 +61,18 @@ class UpdateUserBonus extends Command
 			    }
 			    
 			    $v = $v->toArray();
-			    $bonus = Bonus::create($v);
-			
-			    if(in_array($v['erp_user_id'],$leaveUser)) {
-				    return;
+			    if(!Bonus::where('erp_user_id',$v->erp_user_id)->where('ser_date',$v->set_date)->exists){
+				    $bonus = Bonus::create($v);
+				    
+				    if(in_array($v['erp_user_id'],$leaveUser)) {
+					    return;
+				    }
+				    
+				    collect($v['levels'])->map(function ($v) use ($bonus) {
+					    $v['bonus_id'] = $bonus->id;
+					    BonusLevels::create($v);
+				    });
 			    }
-			    collect($v['levels'])->map(function ($v) use ($bonus) {
-				    $v['bonus_id'] = $bonus->id;
-				    BonusLevels::create($v);
-			    });
 		    });
 		
 		    DB::commit();

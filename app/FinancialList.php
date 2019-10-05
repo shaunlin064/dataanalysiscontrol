@@ -183,7 +183,7 @@ class FinancialList extends Model
 	public function saveUntilNowAllData ()
 	{
 		$financial = new FinancialController();
-		$erpReturnData = collect($financial->getErpMemberFinancial(['all'],'all'))->toArray();
+		$erpReturnData = collect($financial->getErpMemberFinancial(['all'],'all'));
 		
 		DB::beginTransaction();
 		try{

@@ -15,7 +15,9 @@ use App\SaleGroupsUsers;
 use DateTime;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Route;
 use Illuminate\Support\Facades\Input;
 
@@ -24,19 +26,40 @@ class ProvideController extends BaseController
     //
 	public function list ()
 	{
+		/*check cache exists*/
+		$cahceKey = 'provide.list';
+		$cacheData = collect([]);
 		
-		$bonuslist = FinancialList::where('status',1)->get();
-		$bonuslist = $bonuslist->map(function ($v, $k) {
-			$v['receipt_date'] = $v->receipt->created_at->format('Y-m-d');
-			$v['sale_group_name'] = $v->saleGroups->saleGroups->name ?? '';
-			$v['user_name'] =  ucfirst($v->user->name);
-			$v['rate'] = $v->bonus->bonusReach->reach_rate ?? 0;
-			$v['profit'] = $this->exchangeMoney($v);
-			$v['provide_money'] = $v['profit'] > 0 ? round($v['profit'] * $v['rate'] / 100) : 0;
-			$v['set_date'] = substr($v['set_date'],0,7);
-			$v['user_resign_date'] = session('users')[$v->erp_user_id]['user_resign_date'];
-			return $v;
-		})->values();
+		if (!Cache::store('memcached')->has($cahceKey)) {
+			$erpUSerId = Bonus::all()->pluck('erp_user_id')->unique()->values();
+			$bonuslist = FinancialList::where('status',1)->where('profit','<>',0)->whereIn('erp_user_id',$erpUSerId)->get();
+			$bonuslist = $bonuslist->map(function ($v, $k) {
+				$v['receipt_date'] = $v->receipt->created_at->format('Y-m-d');
+				$v['sale_group_name'] = $v->saleGroups->saleGroups->name ?? '';
+				$v['user_name'] =  ucfirst($v->user->name);
+				$v['rate'] = $v->bonus->bonusReach->reach_rate ?? 0;
+				$v['profit'] = $this->exchangeMoney($v);
+				$v['provide_money'] = $v['profit'] > 0 ? round($v['profit'] * $v['rate'] / 100) : 0;
+				$v['set_date'] = substr($v['set_date'],0,7);
+				$v['user_resign_date'] = session('users')[$v->erp_user_id]['user_resign_date'];
+				return $v;
+			})->values();
+			
+			$saleGroupsReach = SaleGroupsReach::where('status',0)->get();
+			$saleGroupsReach = $saleGroupsReach->map(function($v,$k){
+				$v->user_name =  ucfirst($v->saleUser->user->name);
+				$v->group_name = $v->saleGroups->name;
+				$v->set_date = substr($v->set_date,0,7);
+				return $v;
+			})->toArray();
+			
+			Cache::store('memcached')->put($cahceKey, ["bonuslist" =>$bonuslist, 'saleGroupsReach' => $saleGroupsReach],( 8 * 3600 ));
+		}
+		$cacheData = Cache::store('memcached')->get($cahceKey);
+		
+		$bonuslist = $cacheData['bonuslist'];
+		$saleGroupsReach = $cacheData['saleGroupsReach'];
+		
 		
 		$saleGroupsTableColumns =
 		 [
@@ -64,6 +87,15 @@ class ProvideController extends BaseController
 			['data'=> 'provide_money'],
 		 ];
 		
+		return view('financial.provide.list',
+		 [
+			'data' => $this->resources ,
+			'saleGroupsReach' => $saleGroupsReach,
+			'saleGroupsTableColumns' => $saleGroupsTableColumns,
+			'bonuslistColumns' => $bonuslistColumns,
+			'bonuslist' => $bonuslist,
+		 ]);
+		
 		//columns : [
     //                {data: "groups_users", render: '<p class="hidden">${data}</p><input id="checkbox${row.erp_user_id}" class="groupsUsers" type="checkbox" value=${row.erp_user_id} ${checkt}>',parmas:'let checkt = data == 1 ? "checked" : "" '},
     //                {data: "groups_is_convener", render: '<p class="hidden">${data}</p><input class="is_convener" type="checkbox" value=${row.erp_user_id} ${checkt}>',parmas:'let checkt = data == 1 ? "checked" : "" '},
@@ -72,29 +104,23 @@ class ProvideController extends BaseController
     //                {data: "sale_groups_name", render: '<label class="point" for=checkbox${row.erp_user_id}>${data}</label>'}
     //            ],
 		
-		$saleGroupsReach = SaleGroupsReach::where('status',0)->get();
-		$saleGroupsReach = $saleGroupsReach->map(function($v,$k){
-		 $v->user_name =  ucfirst($v->saleUser->user->name);
-			$v->group_name = $v->saleGroups->name;
-			$v->set_date = substr($v->set_date,0,7);
-			return $v;
-		})->toArray();
+		
 
-		return view('financial.provide.list',
-		 [
-		  'data' => $this->resources ,
-		  'saleGroupsReach' => $saleGroupsReach,
-		  'saleGroupsTableColumns' => $saleGroupsTableColumns,
-		  'bonuslistColumns' => $bonuslistColumns,
-		  'bonuslist' => $bonuslist,
-		 ]);
+
 	}
 	
 	public function view ($id= null)
 	{
-
 		$date = new DateTime(date('Ym01'));
 		$erpUserId = Auth::user()->erp_user_id;
+		//
+		//$provideStart = '2019-08-01';
+		//$provideEnd = '2019-08-01';
+		//$saleGroupIds =[1,2,3,4];
+		//$userIds = [];
+		//$request = new Request(['startDate'=>$provideStart,'endDate'=>$provideEnd,'saleGroupIds'=>$saleGroupIds,'userIds'=>$userIds]);
+		//$ouput = $this->getAjaxProvideData($request);
+		//dd($ouput);
 		
 		list($saleGroups, $userList) = $this->getListData($erpUserId, $date);
 		
@@ -145,42 +171,6 @@ class ProvideController extends BaseController
 		
 		return $row;
 	}
-	/*waste*/
-	public function getDataBackend ($type = 'add' ,$startDate , $endDate = null)
-	{
-		$startDate = $startDate ?? 'all';
-		$output = 'return';
-		//$startDate = '2019-08-01';
-		//$type = 'view';
-		$parmas = [
-			'pgae' => Input::get('page') ?? 1,
-			'sort' => Input::get('sort')?? 'DESC',
-			'sort_by' => Input::get('sort_by')?? 'erp_user_id',
-			'showItem' => Input::get('showItem') ?? 500,
-			'searchStr' => Input::get('searchStr') ?? '',
-			'startDate' => $startDate,
-			'endDate' => $endDate ?? null
-		];
-		
-		return $this->getData($output, $type, $parmas);
-	}
-	/*waste*/
-	public function getAjaxData ()
-	{
-		$type = Input::get('type') ?? 'add';
-		$output = 'echo';
-		
-		$parmas = [
-		 'pgae' => Input::get('page') ?? 1,
-		 'sort' => Input::get('sort')?? 'DESC',
-		 'sort_by' => Input::get('sort_by')?? 'erp_user_id',
-		 'showItem' => Input::get('showItem') ?? 500,
-		 'searchStr' => Input::get('searchStr') ?? '',
-		 'startDate' => Input::get('startDate') ?? 'all',
-		 'endDate' => Input::get('endDate') ?? null,
-		];
-		return $this->getData($output, $type, $parmas);
-	}
 	
 	public function ajaxCalculatFinancialBonus ()
 	{
@@ -216,82 +206,12 @@ class ProvideController extends BaseController
 		
 		echo round($financialData->sum());
 	}
-	/*waste*/
-	public function getData ($output = 'echo' ,$type = 'add' ,$parmas)
-	{
-		extract($parmas);
-		
-		//search
-		$numberColumm = ['`set_date`','`income`','`cost`','`profit`'];
-		$strColumm = ['`campaign_name`','`media_channel_name`','`sell_type_name`','`organization`','`currency`','`users`.`name`'];
-		
-		if(isDateSimple($searchStr)||is_numeric($searchStr)){
-			$newColumm = array_merge($numberColumm,$strColumm);
-		}else{
-			$newColumm = $strColumm;
-		}
-		$selectIds = [];
-		$allId = $this->returnList($newColumm, $searchStr, $sort_by, $sort)->where(function($q){
-			$q->where('status',1)->orwhere(['status' => 2]);
-		})->pluck('id');
-		
-		if($type == 'add'){
-			if($startDate == 'all'){
-				$paginate = $this->returnList($newColumm, $searchStr, $sort_by, $sort)->where(function($q){
-					$q->where('status',1)->orwhere(['status' => 2]);
-				});
-				$selectIds = $this->returnList($newColumm, $searchStr, $sort_by, $sort)->where(['status' => 2]);
-			
-			}else if(empty($endDate) && !empty($startDate)){
-				
-				$date = new \DateTime($startDate);
-				$paginate = $this->returnList($newColumm, $searchStr, $sort_by, $sort)->where(function($q){
-					$q->where('status',1)->orwhere(['status' => 2]);
-				})->where(function($q) use($date){
-					$q->where('financial_provides.created_at','like', $date->format('Y-m').'%')->OrWhereNull('financial_provides.created_at');
-				});
-				$selectIds = $this->returnList($newColumm, $searchStr, $sort_by, $sort)->where(['status' => 2])->where('financial_provides.created_at', 'like', $date->format('Y-m').'%')->pluck('id');
-			}else if(!empty($endDate) && !empty($startDate)){
-				
-				$paginate = $this->returnList($newColumm, $searchStr, $sort_by, $sort)->whereBetween('financial_provides.created_at', [$startDate,$endDate])->where(['status' => 2]);
-				$selectIds = $this->returnList($newColumm, $searchStr, $sort_by, $sort)->where(['status' => 2])->whereBetween('financial_provides.created_at', [$startDate,$endDate])->pluck('id');
-			}
-		};
-		
-		if($type == 'view'){
-			
-			if($startDate == 'all'){
-				$paginate = $this->returnList($newColumm, $searchStr, $sort_by, $sort)->where('status',2);
-			}else if(empty($endDate) && !empty($startDate)){
-				$date = new \DateTime($startDate);
-				$paginate = $this->returnList($newColumm, $searchStr, $sort_by, $sort)->where('status',2)->where('financial_provides.created_at', 'like', $date->format('Y-m').'%');
-				
-			}else if(!empty($endDate) && !empty($startDate)){
-				$paginate = $this->returnList($newColumm, $searchStr, $sort_by, $sort)->where('status',2)->whereBetween('financial_provides.created_at', [$startDate,$endDate] );
-			}
-		};
-		$totalAlredaySelectMoney = 0;
-		$paginate = $paginate->with('provide')->paginate($showItem);
-		
-		$paginate->map(function($v,$k) use(&$newRow,&$totalAlredaySelectMoney){
-			$v['profit'] = $this->exchangeMoney($v);
-			
-			$totalAlredaySelectMoney += $v->provide->provide_money ?? 0;
-			
-			$newRow[$v['erp_user_id']][$v['campaign_id']][] = $v;
-		});
-		
-		if($output == 'echo'){
-			
-			echo json_encode(['row' => $newRow, 'paginate' => $paginate]);
-		}else if($output == 'return'){
-			return [$newRow,$paginate,$allId,$selectIds,$totalAlredaySelectMoney];
-		}
-		
-	}
-	
+
 	public function post(Request $request)
 	{
+		$cahceKey = 'provide.list';
+		Cache::store('memcached')->forget($cahceKey);
+		$cacheData[] = Cache::store('memcached')->get($cahceKey);
 		
 		$selectSaleGroupsReachIds = explode(',',$request->provide_sale_groups_bonus);
 		$this->setSaleGroupsReachProvide($selectSaleGroupsReachIds);
@@ -304,42 +224,9 @@ class ProvideController extends BaseController
 		$message['status_string'] = 'success';
 		$message['message'] = '更新成功';
 		
+		
 		return view('handle',['message'=>$message,'data' => $this->resources,'returnUrl' => Route('financial.provide.list') ]);
 	}
-	
-	/**
-	 * @param array $newColumm
-	 * @param $searchStr
-	 * @param string $sort_by
-	 * @param string $sort
-	 * @return mixed
-	 */
-	/*waste*/
-	private function returnList (array $newColumm, $searchStr, string $sort_by, string $sort)
-	{
-		
-		return FinancialList::join('users', 'financial_lists.erp_user_id', '=', 'users.erp_user_id')
-		 ->leftJoin('bonus', function ($join) {
-			 $join->on('financial_lists.erp_user_id', '=', 'bonus.erp_user_id')
-				->on('financial_lists.set_date', '=', 'bonus.set_date');
-		 })
-		 ->leftJoin('bonus_reach', function ($join) {
-			 $join->on('bonus.id', '=', 'bonus_reach.bonus_id');
-		 })
-		 ->leftJoin('financial_provides', function ($join) {
-			 $join->on('financial_lists.id', '=', 'financial_provides.financial_lists_id');
-		 })
-		 ->select('financial_provides.created_at as provide_date', 'bonus.id as bonus_id', 'bonus_reach.reach_rate', 'users.name', 'financial_lists.*')
-		 
-		 ->where(function ($query) use ($newColumm, $searchStr) {
-			 $query->whereRaw(join(' like "%' . $searchStr . '%" OR ', $newColumm) . ' like "%' . $searchStr . '%"');
-		 })
-		 ->orderBy($sort_by, $sort)->orderBy('campaign_id', 'DESC');
-		//->whereOr('financial_provides.created_at', 'like', '2019-08%')
-	
-	}
-	
-
 	/**
 	 * @param array $selectFincialIds
 	 */
@@ -385,17 +272,6 @@ class ProvideController extends BaseController
 			
 		});
 	}
-	
-	/**
-	 * @param $deleteIds
-	 */
-	/*waste*/
-	private function delete ($deleteIds): void
-	{
-		FinancialList::whereIn('id', $deleteIds)->update(['status' => 1]);
-		Provide::whereIn('financial_lists_id', $deleteIds)->delete();
-	}
-	
 	/**
 	 * @param $v
 	 * @return FinancialController
@@ -419,9 +295,56 @@ class ProvideController extends BaseController
 		$provideEnd = new DateTime($request->endDate);
 		$saleGroupIds = $request->saleGroupIds;
 		$userIds = $request->userIds;
+		if($saleGroupIds && $userIds == null){
+			$userIds = SaleGroups::with('groupsUsers')->whereIn('id', $saleGroupIds)->get()->map(function ($v, $k) {
+				return $v->groupsUsers->pluck('erp_user_id');
+			})->flatten();
+		}
 		
-		$saleGroupRowData = $this->getSaleGroupProvide($provideStart,$provideEnd,$userIds,$saleGroupIds);
-		$bonusRowData = $this->getUserBounsProvide($provideStart,$provideEnd,$userIds,$saleGroupIds);
+		/*cache start*/
+		if( $provideStart != $provideEnd){
+			$dateRange = date_range($provideStart->format('Y-m-01'),$provideEnd->format('Y-m-01'));
+		}
+		$dateRange[] = $provideEnd->format('Y-m-01');
+		$cacheData = collect([]);
+		$dateNow = new DateTime();
+		/*check cache exists*/
+		$cahceKey = 'financial.provide';
+		/*cache all user erp Id*/
+		$allUserErpIds = Cache::store('memcached')->remember('allUserErpId', (4*360), function () {
+			return User::all()->pluck('erp_user_id')->toArray();
+		});
+		
+		foreach($dateRange as $date) {
+			$dateTimeObj = new DateTime($date);
+			
+			if (!Cache::store('memcached')->has($cahceKey . $date)) {
+				$saleGroupRowData = $this->getSaleGroupProvide($dateTimeObj, $dateTimeObj, $allUserErpIds, []);
+				$bonusRowData = $this->getUserBounsProvide($dateTimeObj, $dateTimeObj, $allUserErpIds, []);
+				
+				/*TODO::優化快取暫存時間判斷*/
+				$date2 = $dateTimeObj;
+				$cacheTime = 1;//hr
+				$dateDistance = ($dateNow->getTimestamp() - $date2->getTimestamp()) / (60 * 60 * 24) / 365;
+				if ($dateDistance > 0.25) { // over 3 month
+					Cache::store('memcached')->forever($cahceKey . $date, ['saleGroupRowData' => $saleGroupRowData, 'bonusRowData' => $bonusRowData]);
+				} else { // close one month
+					Cache::store('memcached')->put($cahceKey . $date, ['saleGroupRowData' => $saleGroupRowData, 'bonusRowData' => $bonusRowData],($cacheTime * 3600) );
+				};
+			}
+			$cacheData[] = Cache::store('memcached')->get($cahceKey . $date);
+		}
+		$saleGroupRowData = collect([]);
+		$bonusRowData = collect([]);
+		
+		$cacheData->map(function($v,$setDate) use(&$saleGroupRowData,&$bonusRowData){
+			$saleGroupRowData = $saleGroupRowData->concat($v['saleGroupRowData']);
+			$bonusRowData = $bonusRowData->concat($v['bonusRowData']);
+		});
+		
+		$saleGroupRowData = $saleGroupRowData->whereIn('sale_groups_id',$saleGroupIds)->values()->toArray();
+		$bonusRowData = $bonusRowData->whereIn('erp_user_id',$userIds)->values()->toArray();
+		
 		
 		echo json_encode(["provide_groups_list" => $saleGroupRowData,"provide_bonus_list"=>$bonusRowData]);
 	}
@@ -474,7 +397,8 @@ class ProvideController extends BaseController
 		 ->whereIn('erp_user_id', $userIds)->values();
 		
 		$provideBonus = $provideBonus->map(function ($v, $k) {
-			$v['sale_group_name'] = $v->saleGroups->saleGroups->name;
+
+			$v['sale_group_name'] = isset($v->saleGroups) ? $v->saleGroups->saleGroups->name : '';
 			$v['user_name'] =  ucfirst($v->user->name);
 			$v['provide_set_date'] = $v->provide->created_at->format('Y-m');
 			$v['provide_money'] = $v->provide->provide_money;

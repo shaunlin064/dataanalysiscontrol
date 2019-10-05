@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 ini_set('max_execution_time', 300);
+
 use App\FinancialReceipt;
 use App\FinancialList;
 use App\Http\Controllers\FinancialController;
@@ -43,8 +44,8 @@ class SetOldProvide extends Command
     public function handle()
     {
         //
-	    $financialList = FinancialList::with('receipt')->where(['status' => 1])->where('set_date','<=','2019-06-01')->get();
-	    
+	    $financialList = FinancialList::with('receipt')->where(['status' => 1])->where('set_date','<=','2019-05-01')->get();
+	    $finReceiptObj = new FinancialReceipt();
 	    $erpUserDatas = new UserController();
 	    $erpUserDatas->getErpUser();
 	    $leavelUser = collect($erpUserDatas->users)->where('user_resign_date','!=','0000-00-00');
@@ -52,58 +53,19 @@ class SetOldProvide extends Command
 	    $financialListObj = new FinancialList();
 	   
 	    //add && update
-	    $financialList->map(function ($v) use($financialListObj,$leavelUser){
+	    $financialList->map(function ($v) use($financialListObj,$leavelUser,$finReceiptObj){
 		    
 	    	////離職員工 如果收款日期在離職後 不存入已放款
-	    	if($leavelUser->where('id',$v->erp_user_id)->count() > 0){
-	    		$leaveDate = $leavelUser->where('id',$v->erp_user_id)->first()['user_resign_date'];
-
-	    		if($leaveDate <= $v->receipt->created_at){
-				    return;
-			    }
-		    }
-	    	//save financialList
-	    	$v->status = 2;
-	    	$v->save();
-	    	$v->refresh();
-	    
-	    	//calculat exchangeProfit
-	    	$exchangeProfitMoney = $financialListObj->exchangeMoney($v)->profit;
-		    
-	    	$oldCreated_at = new \DateTime($v->set_date);
-	    	$oldCreated_at->modify('+2 month');
+	    	//if($leavelUser->where('id',$v->erp_user_id)->count() > 0){
+	    	//	$leaveDate = $leavelUser->where('id',$v->erp_user_id)->first()['user_resign_date'];
+	      //
+	    	//	if($leaveDate <= $v->receipt->created_at){
+				//    return;
+			  //  }
+		    //}
+		    // 過往資料直接過濾至已發款
+		    $finReceiptObj->checkinPassData($v);
 	    	
-	    	$financial_lists_id = $v->id;
-	    	$bonusReach = isset($v->bonus) ? $v->bonus->bonusReach : [];
-		    
-	    	$bonusId = $bonusReach->bonus_id ?? 0;
-		    
-	    	$reachRate = $bonusReach->reach_rate ?? 0;
-		   
-	    	$provideMoney = $exchangeProfitMoney * $reachRate / 100;
-	    	
-	    	$provide = Provide::where('financial_lists_id', $financial_lists_id)->first();
-	    
-	    	$provideData = [
-	    	 'bonus_id' => $bonusId,
-	    	 'financial_lists_id' => $financial_lists_id,
-	    	 'provide_money' => $provideMoney > 0 ? $provideMoney  : 0
-	    	];
-	    
-	    	if (isset($provide)) {
-	    		//update
-	    		foreach ($provideData as $key => $item) {
-	    			$provide->$key = $item;
-	    		}
-	    		$provide->save();
-	    	} else {
-	    		//new
-	    		$provideData['created_at'] = $oldCreated_at->format('Y-m-01 H:i:s');
-	    		$provideData['updated_at'] = $oldCreated_at->format('Y-m-01 H:i:s');
-			    $oldCreated_at->modify('-1 month');
-	        $v->receipt->update(['created_at'=> $oldCreated_at->format('Y-m-01 H:i:s'),'updated_at'=> $oldCreated_at->format('Y-m-01 H:i:s')]);
-	    		Provide::create($provideData);
-	    	}
 	    });
     }
 }
