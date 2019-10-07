@@ -295,6 +295,9 @@ class ProvideController extends BaseController
 		$provideEnd = new DateTime($request->endDate);
 		$saleGroupIds = $request->saleGroupIds;
 		$userIds = $request->userIds;
+		if(!empty($userIds)){
+			$userIds = User::whereIn('id',$userIds)->get()->pluck('erp_user_id')->toArray();
+		}
 		if($saleGroupIds && $userIds == null){
 			$userIds = SaleGroups::with('groupsUsers')->whereIn('id', $saleGroupIds)->get()->map(function ($v, $k) {
 				return $v->groupsUsers->pluck('erp_user_id');

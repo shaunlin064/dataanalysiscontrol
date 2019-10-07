@@ -93,10 +93,10 @@
 			 ];
 
 			////
-			//$dateStart =  $date->format('2019-10-01');
+			//$dateStart =  $date->format('2019-01-01');
 			//$dateEnd = $date->format('Y-m-01');
 			////$userIds = collect($userList)->pluck('erp_user_id')->toArray();
-			//$request = new Request(['startDate' => $dateStart,'endDate'=>$dateEnd,'saleGroupIds' => [1,2,3,4],'userIds'=>null]);
+			//$request = new Request(['startDate' => $dateStart,'endDate'=>$dateEnd,'saleGroupIds' => [],'userIds'=>[128]]);
 			//$this->getAjaxData($request);
 		
 			$labels = [];
@@ -143,7 +143,7 @@
 				['data' => 'profit']
 			 ];
 	
-			
+		
 			return view('bonus.review.view',[
 				'data' => $this->resources,
 				'chartData' => $chartData,
@@ -233,16 +233,25 @@
 				$progress_list = $progress_list->concat($v['progress_list']);
 				$group_progress_list = $group_progress_list->concat($v['group_progress_list']);
 			});
+			
 			$tmpBonus = collect([]);
 			$tmpProgressList = collect([]);
+			
 			foreach ($dateRange as $dateItem){
-				foreach ($saleGroupIds as $saleGroupId){
-					$tmpUserIds = $userIds->where('sale_groups_id',$saleGroupId)->where('set_date',$dateItem)->pluck('erp_user_id');
-					$tmpBonus = $tmpBonus->concat($bonus_list->where('set_date',substr($dateItem,0,7))->whereIn('erp_user_id',$tmpUserIds));
-					$tmpProgressList = $tmpProgressList->concat($progress_list->where('set_date',substr($dateItem,0,7))->whereIn('erp_user_id',$tmpUserIds));
+				if($saleGroupIds){
+					foreach ($saleGroupIds as $saleGroupId){
+						$tmpUserIds = $userIds->where('sale_groups_id',$saleGroupId)->where('set_date',$dateItem)->pluck('erp_user_id');
+						$tmpBonus = $tmpBonus->concat($bonus_list->where('set_date',substr($dateItem,0,7))->whereIn('erp_user_id',$tmpUserIds));
+						
+						$tmpProgressList = $tmpProgressList->concat($progress_list->where('set_date',substr($dateItem,0,7))->whereIn('erp_user_id',$tmpUserIds));
+					}
+				}elseif($userIds){
+					
+						$tmpBonus = $bonus_list->whereIn('erp_user_id',$userIds);
+						$tmpProgressList = $progress_list->whereIn('erp_user_id',$userIds);
 				}
+				
 			}
-			//dd();
 			
 			$progress_list = $tmpProgressList->values()->toArray();
 			$bonus_list = $tmpBonus;
@@ -265,7 +274,7 @@
 				$chartFinancialBar['totalProfit'][] = round($v->sum('profit'));
 			});
 			
-		
+			
 			
 			$bonus_list = $bonus_list->values()->toArray();
 			//dd($progress_list,$userIds,$saleGroupIds);
