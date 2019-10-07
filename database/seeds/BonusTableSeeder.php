@@ -65,27 +65,47 @@
 		    'bonus_direct' => 20000,
 	     ]
 	    ];
-	    $exileUserId = [133,153,188];
-	    $userdata[] = ['set_date'=>'2017-01-01','erp_user_id' => 186,'boundary' => 400000];
-	    $userdata[] = ['set_date'=>'2017-01-01','erp_user_id' => 170,'boundary' => 400000];
-	    $userdata[] = ['set_date'=>'2017-01-01','erp_user_id' => 131,'boundary' => 500000];
-	    $userdata[] = ['set_date'=>'2017-01-01','erp_user_id' => 122,'boundary' => 550000];
-	    $userdata[] = ['set_date'=>'2017-01-01','erp_user_id' => 132,'boundary' => 550000];
-	    $userdata[] = ['set_date'=>'2017-01-01','erp_user_id' => 136,'boundary' => 550000];
-	    $userdata[] = ['set_date'=>'2017-01-01','erp_user_id' => 155,'boundary' => 550000];
-	    $userdata[] = ['set_date'=>'2017-01-01','erp_user_id' => 133,'boundary' => 550000];
-	    $userdata[] = ['set_date'=>'2017-01-01','erp_user_id' => 181,'boundary' => 550000];
-	    $userdata[] = ['set_date'=>'2017-01-01','erp_user_id' => 153,'boundary' => 550000];
+	    $exileUserId = [133,153,188,200,201,204,205];
+	    $userdata[] = ['set_date'=>'2019-01-01','erp_user_id' => 186,'boundary' => 400000];
+	    $userdata[] = ['set_date'=>'2019-01-01','erp_user_id' => 170,'boundary' => 400000];
+	    $userdata[] = ['set_date'=>'2019-01-01','erp_user_id' => 131,'boundary' => 500000];
+	    $userdata[] = ['set_date'=>'2019-01-01','erp_user_id' => 122,'boundary' => 550000];
+	    $userdata[] = ['set_date'=>'2019-01-01','erp_user_id' => 132,'boundary' => 550000];
+	    $userdata[] = ['set_date'=>'2019-01-01','erp_user_id' => 136,'boundary' => 550000];
+	    $userdata[] = ['set_date'=>'2019-01-01','erp_user_id' => 155,'boundary' => 550000];
+	    $userdata[] = ['set_date'=>'2019-01-01','erp_user_id' => 181,'boundary' => 550000];//kiki
+	    $userdata[] = ['set_date'=>'2019-01-01','erp_user_id' => 153,'boundary' => 550000];
 	    $userdata[] = ['set_date'=>'2019-09-01','erp_user_id' => 204,'boundary' => 100000];
-	    $userdata[] = ['set_date'=>'2017-01-01','erp_user_id' => 84,'boundary' => 600000];
-	    $userdata[] = ['set_date'=>'2017-01-01','erp_user_id' => 174,'boundary' => 600000];
+	    $userdata[] = ['set_date'=>'2019-01-01','erp_user_id' => 174,'boundary' => 600000];
+	    $userdata[] = ['set_date'=>'2019-01-01','erp_user_id' => 133,'boundary' => 550000];
 	    $userdata[] = ['set_date'=>'2019-09-01','erp_user_id' => 200,'boundary' => 200000];
 	    $userdata[] = ['set_date'=>'2019-09-01','erp_user_id' => 201,'boundary' => 200000];
 	    $userdata[] = ['set_date'=>'2019-09-01','erp_user_id' => 205,'boundary' => 100000];
-	    $userdata[] = ['set_date'=>'2017-01-01','erp_user_id' => 67,'boundary' => 650000];
-	    $userdata[] = ['set_date'=>'2017-01-01','erp_user_id' => 188,'boundary' => 700000];
-	
+	    $userdata[] = ['set_date'=>'2019-01-01','erp_user_id' => 67,'boundary' => 650000];
+	    $userdata[] = ['set_date'=>'2019-01-01','erp_user_id' => 84,'boundary' => 650000];
+	    $userdata[] = ['set_date'=>'2019-01-01','erp_user_id' => 188,'boundary' => 700000];
+			
+	    //'jeff' 175,
+	    // chun 161
+	    // tracy 156
+	    // 107 nash
+	    //brianna 97
+	    //jess 96
+	    //91 marco
+	    
 	    $otherrule = [
+	     ['erp_user_id' => 107,'set_date'=>'2019-03-01','boundary' => 700000],
+	     ['set_date'=>'2019-01-01','erp_user_id' => 84,'boundary' => 650000],['set_date'=>'2019-05-01','erp_user_id' => 84,'boundary' => 600000],
+	     ['set_date'=>'2019-06-01','erp_user_id' => 84,'boundary' => 600000],['set_date'=>'2019-07-01','erp_user_id' => 84,'boundary' => 600000],
+	     ['erp_user_id' => 156,'set_date'=>'2019-06-01','boundary' => 550000],['erp_user_id' => 156,'set_date'=>'2019-03-01','boundary' => 500000],
+	     ['set_date'=>'2019-09-01','erp_user_id' => 131,'boundary' => 500000],['set_date'=>'2019-08-01','erp_user_id' => 131,'boundary' => 200000],
+	     ['set_date'=>'2019-07-01','erp_user_id' => 131,'boundary' => 200000],['set_date'=>'2019-06-01','erp_user_id' => 131,'boundary' => 200000],
+	     ['erp_user_id' => 97,'set_date'=>'2019-05-01','boundary' => 550000],['erp_user_id' => 97,'set_date'=>'2019-03-01','boundary' => 700000],
+	 
+	     ['erp_user_id' => 161,'set_date'=>'2019-03-01','boundary' => 500000],
+	 
+	     ['erp_user_id' => 175,'set_date'=>'2019-04-01','boundary' => 550000],['erp_user_id' => 175,'set_date'=>'2019-03-01','boundary' => 400000],
+		    
 	     ['set_date' => '2019-10-01' ,'erp_user_id' => 200, 'boundary' => 300000],['erp_user_id' => 200,'set_date'=>'2019-11-01','boundary' => 600000],
 	     ['set_date' => '2019-10-01' , 'erp_user_id' => 201,'boundary' => 300000],['erp_user_id' => 201,'set_date'=>'2019-11-01','boundary' => 600000],
 	     ['set_date' => '2019-10-01' ,'erp_user_id' => 204, 'boundary' => 200000],['erp_user_id' => 204,'set_date'=>'2019-11-01','boundary' => 250000],['erp_user_id' => 204,'set_date'=>'2019-12-01','boundary' => 550000],
@@ -96,17 +116,20 @@
 	    $nextMonth = date('Y-m-01',strtotime("+3 month"));
 
 	    foreach($userdata as $importData){
-		
+	    
 		    $dateStart = new \DateTime($importData['set_date']);
-
+	    
 		    while($nextMonth != $dateStart->format('Y-m-01')) {
-		    	
+		  
 			    $importData['set_date'] = $dateStart->format('Y-m-01');
-			    $otherData = $otherrule->where('erp_user_id',$importData['erp_user_id'])->where('set_date',$importData['set_date']);
-			    if($otherData->count() > 0){
+
+			    $otherData = $otherrule->where('erp_user_id',$importData['erp_user_id']);
+			    if( $otherData->where('set_date',$dateStart->format('Y-m-01'))->count() > 0 ){
+				    $importData['boundary'] = $otherData->where('set_date',$dateStart->format('Y-m-01'))->first()['boundary'];
+			    }else if($otherData->count() > 0){
 				    $importData['boundary'] = $otherData->first()['boundary'];
 			    }
-
+	
 			    $this->save($importData, $bonusLevels, $exileUserId, $exileRuleLevels);
 			
 			    $dateStart = $dateStart->modify('+1 Month');
@@ -114,12 +137,20 @@
 	    }
 	
 	    /*離職員工*/
-	    $leaveUser =  [19,22,27,28,91,96,97,107,108,156,161,175];
+	    $leaveUser =  [96,97,107,156,161,175];
 	    foreach ($leaveUser as $item){
-		    $dateStart = new \DateTime('2017-01-01');
+		    $dateStart = new \DateTime('2019-01-01');
 		    while($nextMonth != $dateStart->format('Y-m-01')) {
 			    $data = ['set_date' => $dateStart->format('Y-m-01'), 'erp_user_id' => $item, 'boundary' => 0];
-			    Bonus::create($data);
+			    
+			    $otherData = $otherrule->where('erp_user_id',$item);
+			    if( $otherData->where('set_date',$dateStart->format('Y-m-01'))->count() > 0 ){
+				    $data['boundary'] = $otherData->where('set_date',$dateStart->format('Y-m-01'))->first()['boundary'];
+			    }else if($otherData->count() > 0){
+				    $data['boundary'] = $otherData->first()['boundary'];
+			    }
+			    $this->save($data, $bonusLevels, $exileUserId, $exileRuleLevels);
+			    
 			    $dateStart = $dateStart->modify('+1 Month');
 		    }
 	    }
@@ -138,14 +169,10 @@
 			$bonus = Bonus::create($request->all());
 			$setBonusLevels = $bonusLevels;
 			
-			if ($importData['set_date'] >= '2019-07-01' && in_array($importData['erp_user_id'], $exileUserId)) {
+			if (in_array($importData['erp_user_id'], $exileUserId) && $importData['set_date'] >= '2019-09-01')  {
 				$setBonusLevels = $exileRuleLevels;
 			};
-			
-			
-			collect($setBonusLevels)->map(function ($v) use ($bonus) {
-				$v['bonus_id'] = $bonus->id;
-				BonusLevels::create($v);
-			});
+			$bonus->levels()->createMany($setBonusLevels);
+
 		}
 	}
