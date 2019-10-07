@@ -172,7 +172,10 @@
 			if (in_array($importData['erp_user_id'], $exileUserId) && $importData['set_date'] >= '2019-09-01')  {
 				$setBonusLevels = $exileRuleLevels;
 			};
-			$bonus->levels()->createMany($setBonusLevels);
-
+			
+			if(!in_array($importData['erp_user_id'], [84,67])){
+				$bonus->levels()->createMany($setBonusLevels);
+			}
+			
 		}
 	}
