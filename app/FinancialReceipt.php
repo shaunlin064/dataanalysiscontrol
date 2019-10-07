@@ -46,7 +46,7 @@ class FinancialReceipt extends Model
 			$this->providOldData($v);
 		} elseif (in_array($v->erp_user_id, $leaveUser2['ids']) && $v->set_date < $leaveUser2['setDate']) {
 			$this->providOldData($v);
-		}else{
+		}elseif(in_array($v->erp_user_id,$nowAvalibelUser['ids']) && $v->set_date < $nowAvalibelUser['setDate']){
 			$this->providOldData($v);
 		}
 	}
@@ -65,7 +65,7 @@ class FinancialReceipt extends Model
 		$bonusReach = isset($finListObj->bonus) ? $finListObj->bonus->bonusReach : [];
 		
 		$bonusId = $bonusReach->bonus_id ?? 0;
-		
+
 		$reachRate = $bonusReach->reach_rate ?? 0;
 		
 		$provideMoney = $exchangeProfitMoney * $reachRate / 100;
