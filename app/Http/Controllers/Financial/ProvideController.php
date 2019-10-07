@@ -323,7 +323,7 @@ class ProvideController extends BaseController
 			
 			if (!Cache::store('memcached')->has($cahceKey . $date)) {
 				$saleGroupRowData = $this->getSaleGroupProvide($dateTimeObj, $dateTimeObj, $allUserErpIds, []);
-				$bonusRowData = $this->getUserBounsProvide($dateTimeObj, $dateTimeObj, $allUserErpIds, []);
+				$bonusRowData = $this->getUserBounsProvide($dateTimeObj, $dateTimeObj, $allUserErpIds, [])->where('profit','<>',0);
 				
 				/*TODO::優化快取暫存時間判斷*/
 				$date2 = $dateTimeObj;
