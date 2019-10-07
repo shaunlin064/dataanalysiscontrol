@@ -137,7 +137,7 @@
 	    }
 	
 	    /*離職員工*/
-	    $leaveUser =  [96,97,107,156,161,175];
+	    $leaveUser =  [97,156,161,175];
 	    foreach ($leaveUser as $item){
 		    $dateStart = new \DateTime('2019-01-01');
 		    while($nextMonth != $dateStart->format('Y-m-01')) {
