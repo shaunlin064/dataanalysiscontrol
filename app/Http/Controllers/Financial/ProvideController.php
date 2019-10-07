@@ -39,7 +39,7 @@ class ProvideController extends BaseController
 				$v['user_name'] =  ucfirst($v->user->name);
 				$v['rate'] = $v->bonus->bonusReach->reach_rate ?? 0;
 				$v['profit'] = $this->exchangeMoney($v);
-				$v['provide_money'] = $v['profit'] > 0 ? round($v['profit'] * $v['rate'] / 100) : 0;
+				$v['provide_money'] = round($v['profit'] * $v['rate'] / 100);
 				$v['set_date'] = substr($v['set_date'],0,7);
 				$v['user_resign_date'] = session('users')[$v->erp_user_id]['user_resign_date'];
 				return $v;
