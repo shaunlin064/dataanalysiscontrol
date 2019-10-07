@@ -22,13 +22,14 @@ class FinancialReceipt extends Model
 		
 		$v->map(function ($v) use($erpReturnData){
 			if(!$this->where('financial_lists_id',$v->id)->exists()){
-				$this->create(['financial_lists_id' => $v->id,'created_at' => $erpReturnData->where('cp_detail_id',$v->cp_detail_id)->first()['balance_date']]);
+				$balanceDate = $erpReturnData->where('cp_detail_id',$v->cp_detail_id)->first()['balance_date'];
+				$this->create(['financial_lists_id' => $v->id,'created_at' => $balanceDate]);
 			}
 			
-			// 過往資料直接過濾至已發款
-			if($v->set_date < '2019-06-01'){
-				$this->checkinPassData($v);
-			}
+			//// 過往資料直接過濾至已發款
+			//if($v->set_date < '2019-06-01'){
+			//	$this->checkinPassData($v);
+			//}
 			
 		});
 		
