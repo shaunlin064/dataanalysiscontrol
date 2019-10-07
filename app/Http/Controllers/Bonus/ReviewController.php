@@ -54,6 +54,7 @@
 		public function view($erpUserId = null)
 		{
 			
+			
 			$loginUserId = Auth::user()->erp_user_id;
 			
 			$erpUserId = $erpUserId ?? $loginUserId;
@@ -92,7 +93,7 @@
 			 ];
 
 			////
-			//$dateStart =  $date->format('2017-01-01');
+			//$dateStart =  $date->format('2019-10-01');
 			//$dateEnd = $date->format('Y-m-01');
 			////$userIds = collect($userList)->pluck('erp_user_id')->toArray();
 			//$request = new Request(['startDate' => $dateStart,'endDate'=>$dateEnd,'saleGroupIds' => [1,2,3,4],'userIds'=>null]);
@@ -124,8 +125,6 @@
 				//	 1]]
 			];
 //
-			
-			
 			$progressColumns = [
 			 ['data'=> 'set_date',"width"=>"50px"],
 				['data' => 'user_name',"width"=>"50px"],
@@ -175,11 +174,15 @@
 			}
 			
 			if($saleGroupIds && empty($userIds)){
-				$userIds = $SaleGroupsObj->with('groupsUsers')->whereIn('id', $saleGroupIds)->get()->map(function ($v, $k) {
-					return $v->groupsUsers->pluck('erp_user_id');
-				})->flatten()->unique()->values()->toArray();
+				$userIds = $SaleGroupsObj->all()->map(function ($v, $k) {
+					return $v->groupsUsers;
+					//return ['groupId'=>$v->id,'items'=>$v->groupsUsers];
+					//return $v->groupsUsers->pluck('erp_user_id');
+				})->flatten();
+				//})->flatten()->unique()->values()->toArray();
+				
 			}
-			
+		
 			/*cache all user erp Id*/
 			$allUserErpIds = Cache::store('memcached')->remember('allUserErpId', (4*360), function () {
 				return User::all()->pluck('erp_user_id')->toArray();
@@ -230,7 +233,19 @@
 				$progress_list = $progress_list->concat($v['progress_list']);
 				$group_progress_list = $group_progress_list->concat($v['group_progress_list']);
 			});
-			$bonus_list = $bonus_list->whereIn('erp_user_id',$userIds);
+			$tmpBonus = collect([]);
+			$tmpProgressList = collect([]);
+			foreach ($dateRange as $dateItem){
+				foreach ($saleGroupIds as $saleGroupId){
+					$tmpUserIds = $userIds->where('sale_groups_id',$saleGroupId)->where('set_date',$dateItem)->pluck('erp_user_id');
+					$tmpBonus = $tmpBonus->concat($bonus_list->where('set_date',substr($dateItem,0,7))->whereIn('erp_user_id',$tmpUserIds));
+					$tmpProgressList = $tmpProgressList->concat($progress_list->where('set_date',substr($dateItem,0,7))->whereIn('erp_user_id',$tmpUserIds));
+				}
+			}
+			//dd();
+			
+			$progress_list = $tmpProgressList->values()->toArray();
+			$bonus_list = $tmpBonus;
 			
 			$chartMoneyStatus = [
 			 'unpaid' => round($bonus_list->where('status', '=', 0)->sum('income')),
@@ -249,8 +264,12 @@
 				$chartFinancialBar['totalCost'][] = round($v->sum('cost'));
 				$chartFinancialBar['totalProfit'][] = round($v->sum('profit'));
 			});
+			
+		
+			
 			$bonus_list = $bonus_list->values()->toArray();
-			$progress_list = $progress_list->whereIn('erp_user_id',$userIds)->values()->toArray();
+			//dd($progress_list,$userIds,$saleGroupIds);
+			//$progress_list = $progress_list->whereIn('erp_user_id',$userIds)->values()->toArray();
 			$group_progress_list = $group_progress_list->whereIn('id',$saleGroupIds)->values()->toArray();
 			
 			if($outType == 'echo'){

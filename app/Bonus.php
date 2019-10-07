@@ -81,7 +81,7 @@ class Bonus extends Model
 			}else{
 				$nextLevel['bonus_next_amount'] = $userbonus['boundary'] * $nextLevel['achieving_rate'] * 0.01 - $totalProfit;
 //				$nextLevel['bonus_next_percentage'] = round($totalProfit/ ($userbonus['boundary'] * $nextLevel['achieving_rate'] * 0.01)*100);
-				$nextLevel['bonus_next_percentage'] = round($totalProfit / $userbonus['boundary'] * 100 );
+				$nextLevel['bonus_next_percentage'] = $userbonus['boundary'] != 0  ? round($totalProfit / $userbonus['boundary'] * 100 ) : 0;
 			}
 		}else{
 			

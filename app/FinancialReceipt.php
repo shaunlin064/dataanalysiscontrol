@@ -75,7 +75,7 @@ class FinancialReceipt extends Model
 		$provideData = [
 		 'bonus_id' => $bonusId,
 		 'financial_lists_id' => $financial_lists_id,
-		 'provide_money' => $provideMoney > 0 ? $provideMoney  : 0
+		 'provide_money' => $provideMoney
 		];
 		
 		if (isset($provide)) {
