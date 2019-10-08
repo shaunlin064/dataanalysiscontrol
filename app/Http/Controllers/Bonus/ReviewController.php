@@ -93,7 +93,7 @@
 			 ];
 
 			////
-			//$dateStart =  $date->format('2019-01-01');
+			//$dateStart =  $date->format('2019-06-01');
 			//$dateEnd = $date->format('Y-m-01');
 			////$userIds = collect($userList)->pluck('erp_user_id')->toArray();
 			//$request = new Request(['startDate' => $dateStart,'endDate'=>$dateEnd,'saleGroupIds' => [],'userIds'=>[128]]);
@@ -129,10 +129,12 @@
 			 ['data'=> 'set_date',"width"=>"50px"],
 				['data' => 'user_name',"width"=>"50px"],
 			 ['data'=> 'sale_group_name',"width"=>"50px"],
-				['data' => 'bonus_next_percentage' , 'render' => '<span style="display: none">${data}</span><div class="progress progress-xs progress-striped active" style="${rotate}"><div class="progress-bar progress-bar-${style}" style="width: ${Math.abs(data)}%;"></div></div>','parmas' => 'let style="yellow"; let rotate=""; if(data > 90){ style = "success"}else if(data < 0){ style = "danger"; rotate = "transform: rotate(180deg)";}'],
+				//['data' => 'bonus_next_percentage' , 'render' => '<span style="display: none">${data}</span><div class="progress progress-xs progress-striped active" style="${rotate}"><div class="progress-bar progress-bar-${style}" style="width: ${Math.abs(data)}%;"></div></div>','parmas' => 'let style="yellow"; let rotate=""; if(data > 90){ style = "success"}else if(data < 0){ style = "danger"; rotate = "transform: rotate(180deg)";}'],
+			 ['data'=> 'totalProfit'],
 			 ['data' => 'bonus_next_percentage','render' => '<span class="badge bg-${style}">${data}</span>','parmas' => 'let style ="yellow"; if(data > 90){ style = "green"}else if(data < 0){ style = "red"}',"width"=>"10px"],
 			 ['data' => 'bonus_rate',"width"=>"20px",'render' => '${data}%'],
 			 ['data' => 'profit'],
+				['data' => 'bonus_direct']
 			];
 			
 			$groupsProgressColumns = [
@@ -251,6 +253,7 @@
 						$tmpProgressList = $progress_list->whereIn('erp_user_id',$userIds);
 				}
 				
+				
 			}
 			
 			$progress_list = $tmpProgressList->values()->toArray();
@@ -266,12 +269,22 @@
 			 'totalCost' => [],
 			 'totalProfit' => []
 			];
+			foreach ($dateRange as $dateItem){
+				$newtmpDate = new DateTime($dateItem);
+				$chartFinancialBar['labels'][] = $newtmpDate->format('Ym');
+				$chartFinancialBar['totalIncome'][] = 0;
+				$chartFinancialBar['totalCost'][] = 0;
+				$chartFinancialBar['totalProfit'][] = 0;
+			}
+			
+			
 			$bonus_list->groupBy('set_date')->map(function ($v, $k) use (&$chartFinancialBar) {
 				$tmpDate = new DateTime($k);
-				$chartFinancialBar['labels'][] = $tmpDate->format('Ym');
-				$chartFinancialBar['totalIncome'][] = round($v->sum('income'));
-				$chartFinancialBar['totalCost'][] = round($v->sum('cost'));
-				$chartFinancialBar['totalProfit'][] = round($v->sum('profit'));
+				$key = array_search($tmpDate->format('Ym'),$chartFinancialBar['labels']);
+				//$chartFinancialBar['labels'][] = $tmpDate->format('Ym');
+				$chartFinancialBar['totalIncome'][$key] = round($v->sum('income'));
+				$chartFinancialBar['totalCost'][$key] = round($v->sum('cost'));
+				$chartFinancialBar['totalProfit'][$key] = round($v->sum('profit'));
 			});
 			
 			
@@ -406,6 +419,7 @@
 				});
 				$groupProfitDatas = $groupProfitDatas->concat($items);
 			});
+			
 			$erpReturnData = $erpReturnData->map(function ($v, $k) {
 				$v['set_date'] = substr($v['set_date'], 0, 7);
 				return $v;
