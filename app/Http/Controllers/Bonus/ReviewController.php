@@ -131,18 +131,18 @@
 			 ['data'=> 'sale_group_name',"width"=>"50px"],
 				//['data' => 'bonus_next_percentage' , 'render' => '<span style="display: none">${data}</span><div class="progress progress-xs progress-striped active" style="${rotate}"><div class="progress-bar progress-bar-${style}" style="width: ${Math.abs(data)}%;"></div></div>','parmas' => 'let style="yellow"; let rotate=""; if(data > 90){ style = "success"}else if(data < 0){ style = "danger"; rotate = "transform: rotate(180deg)";}'],
 			 ['data'=> 'totalProfit'],
-			 ['data' => 'bonus_next_percentage','render' => '<span class="badge bg-${style}">${data}</span>','parmas' => 'let style ="yellow"; if(data > 90){ style = "green"}else if(data < 0){ style = "red"}',"width"=>"10px"],
-			 ['data' => 'bonus_rate',"width"=>"20px",'render' => '${data}%'],
+			 ['data' => 'bonus_next_percentage','render' => '<span class="badge bg-${style}">${data}%</span>','parmas' => 'let style ="yellow"; if(data > 90){ style = "green"}else if(data < 0){ style = "red"}',"width"=>"50px"],
+			 ['data' => 'bonus_rate','render' => '${data}%'],
 			 ['data' => 'profit'],
 				['data' => 'bonus_direct']
 			];
 			
 			$groupsProgressColumns = [
-			 ['data'=> 'set_date',"width"=>"50px"],
-			 ['data'=> 'name',"width"=>"50px"],
-			 ['data' => 'percentage' , 'render' => '<span style="display: none">${data}</span><div class="progress progress-xs progress-striped active" style="${rotate}"><div class="progress-bar progress-bar-${style}" style="width: ${Math.abs(data)}%;"></div></div>','parmas' => 'let style="yellow"; let rotate=""; if(data > 90){ style = "success"}else if(data < 0){ style = "danger"; rotate = "transform: rotate(180deg)";}'],
-			 ['data' => 'percentage','render' => '<span class="badge bg-${style}">${data}</span>','parmas' => 'let style ="yellow"; if(data > 90){ style = "green"}else if(data < 0){ style = "red"}',"width"=>"10px"],
-				['data' => 'profit']
+			 ['data'=> 'set_date'],
+			 ['data'=> 'name'],
+			 ['data' => 'profit'],
+			 //['data' => 'percentage' , 'render' => '<span style="display: none">${data}</span><div class="progress progress-xs progress-striped active" style="${rotate}"><div class="progress-bar progress-bar-${style}" style="width: ${Math.abs(data)}%;"></div></div>','parmas' => 'let style="yellow"; let rotate=""; if(data > 90){ style = "success"}else if(data < 0){ style = "danger"; rotate = "transform: rotate(180deg)";}'],
+			 ['data' => 'percentage','render' => '<span class="badge bg-${style}">${data}%</span>','parmas' => 'let style ="yellow"; if(data > 90){ style = "green"}else if(data < 0){ style = "red"}'],
 			 ];
 	
 		

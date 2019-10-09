@@ -166,7 +166,7 @@
                 <simple-data-table-componet
                         :table_id='"progress_list"'
                         :table_head='"成員績效表"'
-                        :table_title='["月份","業務","團隊","毛利","達成率","比例","獎金","英雄榜"]'
+                        :table_title='["月份","業務","團隊","毛利","達成率","%","獎金","英雄榜"]'
                         :row = '{!! json_encode($progressDatas) !!}'
                         {{--:ex_buttons= '["excel"]'--}}
                         :csrf= '"{{csrf_token()}}"'
@@ -180,7 +180,7 @@
                 <simple-data-table-componet
                         :table_id='"group_progress_list"'
                         :table_head='"團隊績效表"'
-                        :table_title='["月份","團隊","達成率","達成率","毛利"]'
+                        :table_title='["月份","團隊","毛利","達成率"]'
                         :row = '{!! json_encode($groupProgressDatas) !!}'
                         {{--:ex_buttons= '["excel"]'--}}
                         :csrf= '"{{csrf_token()}}"'
