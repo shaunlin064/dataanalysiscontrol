@@ -216,13 +216,6 @@ class ProvideController extends BaseController
 	public function post(Request $request)
 	{
 		
-		$date = new DateTime();
-		Cache::store('memcached')->forget($this->cacheKeyFinancial.$date->format('Y-m-01'));
-		Cache::store('memcached')->forget($this->cacheKeyProvide);
-		$date->modify('-1Month');
-		Cache::store('memcached')->forget($this->cacheKeyFinancial.$date->format('Y-m-01'));
-		Cache::store('memcached')->forget($this->cacheKeyProvide);
-		
 		$selectSaleGroupsReachIds = explode(',',$request->provide_sale_groups_bonus);
 		$this->setSaleGroupsReachProvide($selectSaleGroupsReachIds);
 		
@@ -230,6 +223,8 @@ class ProvideController extends BaseController
 		$selectFincialIds = $selectFincialIds != null ? explode(',',$selectFincialIds) : [];
 		$this->resetFinancialStatus();
 		$this->save($selectFincialIds);
+		
+		$this->cacheRelease();
 		
 		$message['status_string'] = 'success';
 		$message['message'] = '更新成功';
@@ -501,6 +496,16 @@ class ProvideController extends BaseController
 		})->filter()->flatten();
 		
 		return $selectIds;
+	}
+	
+	private function cacheRelease (): void
+	{
+		$date = new DateTime();
+		Cache::store('memcached')->forget($this->cacheKeyFinancial . $date->format('Y-m-01'));
+		Cache::store('memcached')->forget($this->cacheKeyProvide);
+		$date->modify('-1Month');
+		Cache::store('memcached')->forget($this->cacheKeyFinancial . $date->format('Y-m-01'));
+		Cache::store('memcached')->forget($this->cacheKeyProvide);
 	}
 }
 
