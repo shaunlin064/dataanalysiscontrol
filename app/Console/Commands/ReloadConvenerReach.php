@@ -41,7 +41,7 @@ class ReloadConvenerReach extends Command
     public function handle()
     {
         //
-	    $startDate = '2018-01-01';
+	    $startDate = '2019-01-01';
 	    
 	    $date = new DateTime(date('Ym01'));
 	    $date->modify('-1Month');
@@ -52,11 +52,15 @@ class ReloadConvenerReach extends Command
 				$setDate = $date->modify('-1Month')->format('Y-m-d');
 				$data[] = $saleGroupsReach->setAllConvenerReach($setDate);
 			}
+			/*過往 招集人獎金 直接發放*/
 	    collect($data)->flatten()->map(function($v,$k){
-		    $date =  new DateTime($v->set_date);
-		    $v->updated_at = $date->modify('+1Month')->format('Y-m-d H:i:s');
-		    $v->status = 1;
-		    $v->update();
+	    	if($v->set_date < '2019-06-01'){
+			    $date =  new DateTime($v->set_date);
+			    $v->updated_at = $date->modify('+4Month')->format('Y-m-d H:i:s');
+			    $v->status = 1;
+			    $v->update();
+		    }
+		    
 	    });
     }
 }

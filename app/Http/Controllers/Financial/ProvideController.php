@@ -116,8 +116,8 @@ class ProvideController extends BaseController
 		//
 		//$provideStart = '2019-08-01';
 		//$provideEnd = '2019-08-01';
-		//$saleGroupIds =[1,2,3,4];
-		//$userIds = [];
+		//$saleGroupIds =[];
+		//$userIds = [84];
 		//$request = new Request(['startDate'=>$provideStart,'endDate'=>$provideEnd,'saleGroupIds'=>$saleGroupIds,'userIds'=>$userIds]);
 		//$ouput = $this->getAjaxProvideData($request);
 		//dd($ouput);
@@ -301,9 +301,8 @@ class ProvideController extends BaseController
 		if($saleGroupIds && $userIds == null){
 			$userIds = SaleGroups::with('groupsUsers')->whereIn('id', $saleGroupIds)->get()->map(function ($v, $k) {
 				return $v->groupsUsers->pluck('erp_user_id');
-			})->flatten();
+			})->flatten()->unique()->values();
 		}
-		
 		/*cache start*/
 		if( $provideStart != $provideEnd){
 			$dateRange = date_range($provideStart->format('Y-m-01'),$provideEnd->format('Y-m-01'));
@@ -345,7 +344,8 @@ class ProvideController extends BaseController
 			$bonusRowData = $bonusRowData->concat($v['bonusRowData']);
 		});
 		
-		$saleGroupRowData = $saleGroupRowData->whereIn('sale_groups_id',$saleGroupIds)->values()->toArray();
+		$saleGroupRowData = $saleGroupRowData->whereIn('erp_user_id',$userIds)->values()->toArray();
+		
 		$bonusRowData = $bonusRowData->whereIn('erp_user_id',$userIds)->values()->toArray();
 		
 		
@@ -368,8 +368,10 @@ class ProvideController extends BaseController
 		
 		/* sale Groups Bonus*/
 		$saleGroupsReach = SaleGroupsReach::with('saleGroups', 'saleUser')->where('status', 1)->whereBetween('updated_at', [$provideStart->format('Y-m-01'), $provideEnd->format('Y-m-31')])->get();
+		
 		$saleGroupsReach = $saleGroupsReach->whereIn('saleUser.erp_user_id', $userIds);
 		$saleGroupsReach = $saleGroupsReach->map(function ($v, $k) {
+			$v['erp_user_id'] = $v->saleUser->erp_user_id;
 			$v['provide_set_date'] = $v->updated_at->format('Y-m');
 			$v['user_name'] =  ucfirst($v->saleUser->user->name);
 			$v['sale_group_name'] = $v->saleGroups->name;
