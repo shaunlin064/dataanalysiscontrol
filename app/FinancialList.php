@@ -148,7 +148,7 @@ class FinancialList extends Model
 	function setStatusTime ($v)
 	{
 		$v['paymentStatus'] = isset($v['receipt']['created_at']) ? substr($v['receipt']['created_at'], 0, 10) : 'no';
-		$v['bonusStatus'] = isset($v['provide']['created_at']) ? substr($v['provide']['created_at'], 0, 10) : 'no';
+		$v['bonusStatus'] = isset($v['provide']['updated_at']) ? substr($v['provide']['updated_at'], 0, 10) : 'no';
 		return $v;
 	}
 	

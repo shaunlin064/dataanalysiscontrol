@@ -24,13 +24,14 @@ use Illuminate\Support\Facades\Input;
 class ProvideController extends BaseController
 {
     //
+	protected $cacheKeyProvide = 'financial.provide';
+	protected $cacheKeyFinancial = 'financial.list';
 	public function list ()
 	{
 		/*check cache exists*/
-		$cahceKey = 'provide.list';
 		$cacheData = collect([]);
 		
-		if (!Cache::store('memcached')->has($cahceKey)) {
+		if (!Cache::store('memcached')->has($this->cacheKeyProvide)) {
 			$erpUSerId = Bonus::all()->pluck('erp_user_id')->unique()->values();
 			$bonuslist = FinancialList::where('status',1)->where('profit','<>',0)->whereIn('erp_user_id',$erpUSerId)->get();
 			$bonuslist = $bonuslist->map(function ($v, $k) {
@@ -53,9 +54,9 @@ class ProvideController extends BaseController
 				return $v;
 			})->toArray();
 			
-			Cache::store('memcached')->put($cahceKey, ["bonuslist" =>$bonuslist, 'saleGroupsReach' => $saleGroupsReach],( 8 * 3600 ));
+			Cache::store('memcached')->put($this->cacheKeyProvide, ["bonuslist" =>$bonuslist, 'saleGroupsReach' => $saleGroupsReach],( 8 * 3600 ));
 		}
-		$cacheData = Cache::store('memcached')->get($cahceKey);
+		$cacheData = Cache::store('memcached')->get($this->cacheKeyProvide);
 		
 		$bonuslist = $cacheData['bonuslist'];
 		$saleGroupsReach = $cacheData['saleGroupsReach'];
@@ -114,10 +115,10 @@ class ProvideController extends BaseController
 		$date = new DateTime(date('Ym01'));
 		$erpUserId = Auth::user()->erp_user_id;
 		//
-		//$provideStart = '2019-08-01';
-		//$provideEnd = '2019-08-01';
-		//$saleGroupIds =[];
-		//$userIds = [84];
+		//$provideStart = '2019-10-01';
+		//$provideEnd = '2019-10-01';
+		//$saleGroupIds =[1,2,3,4];
+		//$userIds = [];
 		//$request = new Request(['startDate'=>$provideStart,'endDate'=>$provideEnd,'saleGroupIds'=>$saleGroupIds,'userIds'=>$userIds]);
 		//$ouput = $this->getAjaxProvideData($request);
 		//dd($ouput);
@@ -209,9 +210,13 @@ class ProvideController extends BaseController
 
 	public function post(Request $request)
 	{
-		$cahceKey = 'provide.list';
-		Cache::store('memcached')->forget($cahceKey);
-		$cacheData[] = Cache::store('memcached')->get($cahceKey);
+		
+		$date = new DateTime();
+		Cache::store('memcached')->forget($this->cacheKeyFinancial.$date->format('Y-m-01'));
+		Cache::store('memcached')->forget($this->cacheKeyProvide);
+		$date->modify('-1Month');
+		Cache::store('memcached')->forget($this->cacheKeyFinancial.$date->format('Y-m-01'));
+		Cache::store('memcached')->forget($this->cacheKeyProvide);
 		
 		$selectSaleGroupsReachIds = explode(',',$request->provide_sale_groups_bonus);
 		$this->setSaleGroupsReachProvide($selectSaleGroupsReachIds);
@@ -232,10 +237,14 @@ class ProvideController extends BaseController
 	 */
 	private function save (array $selectFincialIds): void
 	{
-	
+		$createdTime = new DateTime();
+		if($createdTime->format('d') <= 5){
+			$createdTime->modify('-1Month');
+		}
+		
 		$financialList = FinancialList::whereIn('id', $selectFincialIds)->get();
 		//add && update
-		$financialList->map(function ($v) {
+		$financialList->map(function ($v)  use($createdTime){
 			//save financialList
 			$v->status = 2;
 			$v->save();
@@ -256,7 +265,8 @@ class ProvideController extends BaseController
 			$provideData = [
 			 'bonus_id' => $bonusId,
 			 'financial_lists_id' => $financial_lists_id,
-			 'provide_money' => $provideMoney > 0 ? $provideMoney  : 0
+			 'provide_money' => $provideMoney > 0 ? $provideMoney  : 0,
+			 'created_at' => $createdTime->format('Y-m-01'),
 			];
 			
 			if (isset($provide)) {
@@ -311,7 +321,6 @@ class ProvideController extends BaseController
 		$cacheData = collect([]);
 		$dateNow = new DateTime();
 		/*check cache exists*/
-		$cahceKey = 'financial.provide';
 		/*cache all user erp Id*/
 		$allUserErpIds = Cache::store('memcached')->remember('allUserErpId', (4*360), function () {
 			return User::all()->pluck('erp_user_id')->toArray();
@@ -319,8 +328,7 @@ class ProvideController extends BaseController
 		
 		foreach($dateRange as $date) {
 			$dateTimeObj = new DateTime($date);
-			
-			if (!Cache::store('memcached')->has($cahceKey . $date)) {
+			if (!Cache::store('memcached')->has($this->cacheKeyFinancial  . $date)) {
 				$saleGroupRowData = $this->getSaleGroupProvide($dateTimeObj, $dateTimeObj, $allUserErpIds, []);
 				$bonusRowData = $this->getUserBounsProvide($dateTimeObj, $dateTimeObj, $allUserErpIds, [])->where('profit','<>',0);
 				
@@ -329,12 +337,12 @@ class ProvideController extends BaseController
 				$cacheTime = 1;//hr
 				$dateDistance = ($dateNow->getTimestamp() - $date2->getTimestamp()) / (60 * 60 * 24) / 365;
 				if ($dateDistance > 0.25) { // over 3 month
-					Cache::store('memcached')->forever($cahceKey . $date, ['saleGroupRowData' => $saleGroupRowData, 'bonusRowData' => $bonusRowData]);
+					Cache::store('memcached')->forever($this->cacheKeyFinancial  . $date, ['saleGroupRowData' => $saleGroupRowData, 'bonusRowData' => $bonusRowData]);
 				} else { // close one month
-					Cache::store('memcached')->put($cahceKey . $date, ['saleGroupRowData' => $saleGroupRowData, 'bonusRowData' => $bonusRowData],($cacheTime * 3600) );
+					Cache::store('memcached')->put($this->cacheKeyFinancial  . $date, ['saleGroupRowData' => $saleGroupRowData, 'bonusRowData' => $bonusRowData],($cacheTime * 3600) );
 				};
 			}
-			$cacheData[] = Cache::store('memcached')->get($cahceKey . $date);
+			$cacheData[] = Cache::store('memcached')->get($this->cacheKeyFinancial  . $date);
 		}
 		$saleGroupRowData = collect([]);
 		$bonusRowData = collect([]);
