@@ -1,6 +1,6 @@
 @extends('errors::illustrated-layout')
 
-@section('code', '503')
+@section('code', '維護中')
 @section('title', __('Service Unavailable'))
 
 @section('image')
