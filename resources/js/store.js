@@ -11,6 +11,7 @@ export default {
         profit: 0,
         total_money: 0,
         bonus_total_money : 0,
+        provide_total_money : 0,
         sale_group_total_money: 0,
         bonus_rate: 0,
         bonus_next_amount: 0,

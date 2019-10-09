@@ -51,6 +51,8 @@
 		        ajax_url: String,
             length_change: String,
 		        page_length: Number,
+            select_id:Array,
+		        total_money:Number
         },
         data() {
             return {
@@ -59,7 +61,7 @@
         },
         computed: {
             // ...mapGetters(['getTableSelect','getUserIds','getSaleGroupIds','getStartDate','getEndDate']),
-		        ...mapState(['table_select','start_date','end_date','change_date','user_ids','sale_group_ids','loading']),
+		        ...mapState(['provide_money','table_select','start_date','end_date','change_date','user_ids','sale_group_ids','loading']),
         },
 		    methods:{
             change_render(item){
@@ -183,6 +185,7 @@
                     };
                 
                 if(type == 'select'){
+                    
                     dataTableConfig.columnDefs= [{
                         'targets': 0,
                         'searchable':false,
@@ -194,10 +197,12 @@
                         }
                     }];
                     dataTableConfig.order = [1, 'asc'];
+                    vue.$store.state.provide_total_money = vue.total_money ? vue.total_money : 0;
                     dataTableConfig.rowCallback = function(row, data, dataIndex){
                         // Get row ID
-                        var rowId = data[0];
-
+                        var rowId = data['id'];
+                        rows_selected = vue.select_id;
+                        
                         // If row ID is in the list of selected row IDs
                         if($.inArray(rowId, rows_selected) !== -1){
                             $(row).find('input[type="checkbox"]').prop('checked', true);
@@ -224,29 +229,32 @@
                 if(type == 'select'){
                     // Array holding selected row IDs
                     var rows_selected = vue.$store.getters.getTableSelect;
-                    // var rows_selected = vue.$store.state.table_select;
+                    
                     rows_selected[vue.table_id] = [];
-
+		                
                     // Handle click on checkbox
                     domtable.find('tbody').on('click', 'input[type="checkbox"]', function(e){
                         var $row = $(this).closest('tr');
 
                         // Get row data
                         var data = vue.dataTable.row($row).data();
-
+                        
                         // Get row ID
                         var rowId = data['id'];
 
                         // Determine whether row ID is in the list of selected row IDs
-                        var index = $.inArray(rowId, rows_selected);
-
+                        var index = $.inArray(rowId, rows_selected[vue.table_id]);
+												let thisSelectMoney = $row.find("div[data-money]").data('money');
                         // If checkbox is checked and row ID is not in list of selected row IDs
+                        
                         if(this.checked && index === -1){
-
                             eval(`rows_selected.${vue.table_id}`).push(rowId);
+                            vue.$store.state.provide_total_money += thisSelectMoney;
                             // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
                         } else if (!this.checked && index !== -1){
                             eval(`rows_selected.${vue.table_id}`).splice(index, 1);
+                            vue.$store.state.provide_total_money -= thisSelectMoney;
+                            
                         }
 
                         if(this.checked){

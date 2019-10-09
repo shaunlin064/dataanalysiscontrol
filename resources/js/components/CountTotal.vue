@@ -18,7 +18,7 @@
             }
         },
         computed: {
-            ...mapState(['bonus_total_money','sale_group_total_money','loading']),
+            ...mapState(['bonus_total_money','sale_group_total_money','provide_total_money','loading']),
         },
                 methods:{
                   getTotal(){
@@ -28,6 +28,14 @@
                 mounted: function(){
                 },
                 watch:{
+                    provide_total_money:{
+                        immediate: true,    // 这句重要
+                        handler (val, oldVal) {
+                            if(oldVal !== undefined && val !== oldVal) {
+                                this.total = this.provide_total_money;
+                            }
+                        }
+                    },
                     bonus_total_money: {
                         immediate: true,    // 这句重要
                         handler (val, oldVal) {

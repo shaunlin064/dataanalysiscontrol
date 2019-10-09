@@ -70,7 +70,7 @@ class ProvideController extends BaseController
 			['data'=> 'group_name'],
 			['data'=> 'groups_profit'],
 			['data'=> 'rate'],
-			['data'=> 'provide_money']
+			['data'=> 'provide_money','render' => '<div data-money="${data}">${data}</div>']
 		 ];
 		
 		$bonuslistColumns =
@@ -85,8 +85,11 @@ class ProvideController extends BaseController
 			['data'=> 'sell_type_name'],
 			['data'=> 'profit'],
 			['data'=> 'rate'],
-			['data'=> 'provide_money'],
+			['data'=> 'provide_money','render' => '<div data-money="${data}">${data}</div>'],
 		 ];
+		
+		$autoSelectIds = $this->getProvideBalanceSelectedId($bonuslist);
+		$total_mondey = $bonuslist->whereIn('id',$autoSelectIds)->sum('provide_money');
 		
 		return view('financial.provide.list',
 		 [
@@ -95,6 +98,8 @@ class ProvideController extends BaseController
 			'saleGroupsTableColumns' => $saleGroupsTableColumns,
 			'bonuslistColumns' => $bonuslistColumns,
 			'bonuslist' => $bonuslist,
+		  'autoSelectIds' => $autoSelectIds,
+		  'total_mondey' => $total_mondey ,
 		 ]);
 		
 		//columns : [
@@ -484,6 +489,18 @@ class ProvideController extends BaseController
 	{
 		$saleGroupReach = new SaleGroupsReach();
 		$saleGroupReach->whereIn('id', $selectSaleGroupsReachIds)->update(['status' => 1]);
+	}
+	
+	private function getProvideBalanceSelectedId ($dataList) {
+		$dataList = $dataList->groupBy('erp_user_id');
+		$selectIds = $dataList->map(function($v,$erpUserId){
+			$isAlive = session('users')[$erpUserId]['user_resign_date'] == '0000-00-00';
+			if($isAlive && $v->sum('provide_money') >= 0){
+				return $v->pluck('id');
+			}
+		})->filter()->flatten();
+		
+		return $selectIds;
 	}
 }
 
