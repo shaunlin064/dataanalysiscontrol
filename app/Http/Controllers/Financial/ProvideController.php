@@ -76,7 +76,7 @@ class ProvideController extends BaseController
 		$bonuslistColumns =
 		 [
 		  ['data' => 'id'],
-		  ['data' => 'receipt_date'],
+		  //['data' => 'receipt_date'],
 			['data'=> 'set_date'],
 			['data'=> 'user_name','render' => '<span class="d-inline-block" tabindex="0" data-toggle="tooltip" title="離職日${row.user_resign_date}"><a>${data}</a></span>'],
 			['data'=> 'sale_group_name'],
