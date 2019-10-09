@@ -96,7 +96,7 @@
 			//$dateStart =  $date->format('2019-06-01');
 			//$dateEnd = $date->format('Y-m-01');
 			////$userIds = collect($userList)->pluck('erp_user_id')->toArray();
-			//$request = new Request(['startDate' => $dateStart,'endDate'=>$dateEnd,'saleGroupIds' => [],'userIds'=>[128]]);
+			//$request = new Request(['startDate' => $dateStart,'endDate'=>$dateEnd,'saleGroupIds' => [1,2,3,4],'userIds'=>[]]);
 			//$this->getAjaxData($request);
 		
 			$labels = [];
@@ -252,8 +252,6 @@
 						$tmpBonus = $bonus_list->whereIn('erp_user_id',$userIds);
 						$tmpProgressList = $progress_list->whereIn('erp_user_id',$userIds);
 				}
-				
-				
 			}
 			
 			$progress_list = $tmpProgressList->values()->toArray();
@@ -287,7 +285,14 @@
 				$chartFinancialBar['totalProfit'][$key] = round($v->sum('profit'));
 			});
 			
-			
+			$bonus_list = $bonus_list->map(function($v,$k){
+				
+				$v['income'] = number_format($v['income']);
+				$v['cost'] = number_format($v['cost']);
+				$v['profit'] = number_format($v['profit']);
+				
+			 return $v;
+			});
 			
 			$bonus_list = $bonus_list->values()->toArray();
 			//dd($progress_list,$userIds,$saleGroupIds);
@@ -344,11 +349,11 @@
 			
 			// set output Data
 			$boxData = [
-			 'profit' => $returnBonusData['estimateBonus'],
+			 'profit' => number_format($returnBonusData['estimateBonus']),
 			 'bonus_rate' => isset($returnBonusData['reachLevle']['bonus_rate']) ? $returnBonusData['reachLevle']['bonus_rate'] : 0,
 			 'bonus_next_amount' => isset($returnBonusData['nextLevel']['bonus_next_amount']) ? round($returnBonusData['nextLevel']['bonus_next_amount']) : 0,
 			 'bonus_next_percentage' => isset($returnBonusData['nextLevel']['bonus_next_percentage']) ? $returnBonusData['nextLevel']['bonus_next_percentage'] : 0,
-			 'bonus_direct' => $returnBonusData['bonusDirect']
+			 'bonus_direct' => number_format($returnBonusData['bonusDirect'])
 			];
 			
 			return $boxData;
@@ -386,7 +391,7 @@
 				
 				$items = $items->map(function ($v, $erpUserId) use ($setDate) {
 					$tmpData = $this->getUserBonus($erpUserId, $v->sum('profit'), $setDate);
-					$tmpData['totalProfit'] = $v->sum('profit');
+					$tmpData['totalProfit'] = number_format($v->sum('profit'));
 					$tmpData['sale_group_name'] = $v->max('sale_group_name');
 					$tmpData['user_name'] = $v->max('user_name');
 					$tmpData['set_date'] = substr($setDate, 0, 7);
@@ -412,14 +417,16 @@
 			$groupProfitDatas = collect([]);
 			collect($tmpGroups)->map(function ($items, $k) use (&$groupProfitDatas, $erpReturnData) {
 				$items = collect($items)->map(function ($item, $k) use ($erpReturnData) {
+					
 					$item['profit'] = round($erpReturnData->where('sale_group_id', $item['id'])->where('set_date', $item['set_date'])->sum('profit'));
 					$item['percentage'] = ($item['profit'] == 0 || $item['boundary'] == 0) ? 0 : round($item['profit'] / $item['boundary'] * 100);
+					$item['profit'] = number_format($item['profit']);
 					$item['set_date'] = substr($item['set_date'], 0, 7);
 					return $item;
 				});
 				$groupProfitDatas = $groupProfitDatas->concat($items);
 			});
-			
+		
 			$erpReturnData = $erpReturnData->map(function ($v, $k) {
 				$v['set_date'] = substr($v['set_date'], 0, 7);
 				return $v;
