@@ -197,14 +197,18 @@
                         }
                     }];
                     dataTableConfig.order = [1, 'asc'];
+                    
+                    // Array holding selected row IDs
+                    var rows_selected = vue.$store.getters.getTableSelect;
+                    rows_selected[vue.table_id] = vue.select_id ? vue.select_id : [];
+		                
                     vue.$store.state.provide_total_money = vue.total_money ? vue.total_money : 0;
                     dataTableConfig.rowCallback = function(row, data, dataIndex){
                         // Get row ID
                         var rowId = data['id'];
-                        rows_selected = vue.select_id;
                         
                         // If row ID is in the list of selected row IDs
-                        if($.inArray(rowId, rows_selected) !== -1){
+                        if($.inArray(rowId, rows_selected[vue.table_id]) !== -1){
                             $(row).find('input[type="checkbox"]').prop('checked', true);
                             $(row).addClass('selected');
                         }
@@ -227,11 +231,7 @@
                 vue.dataTable.draw();
                 vue.getData();
                 if(type == 'select'){
-                    // Array holding selected row IDs
-                    var rows_selected = vue.$store.getters.getTableSelect;
-                    
-                    rows_selected[vue.table_id] = [];
-		                
+
                     // Handle click on checkbox
                     domtable.find('tbody').on('click', 'input[type="checkbox"]', function(e){
                         var $row = $(this).closest('tr');
@@ -246,7 +246,6 @@
                         var index = $.inArray(rowId, rows_selected[vue.table_id]);
 												let thisSelectMoney = $row.find("div[data-money]").data('money');
                         // If checkbox is checked and row ID is not in list of selected row IDs
-                        
                         if(this.checked && index === -1){
                             eval(`rows_selected.${vue.table_id}`).push(rowId);
                             vue.$store.state.provide_total_money += thisSelectMoney;
