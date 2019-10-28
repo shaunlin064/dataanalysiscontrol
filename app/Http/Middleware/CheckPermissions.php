@@ -17,21 +17,10 @@ class CheckPermissions
      */
     public function handle($request, Closure $next)
     {
-//	    $uid = session('userData')['id'];
-	    //check permission
 	    $permission = new Permission();
 	    
 	    $permission->menus->map(function ($menu, $k1) {
-//		    $new_class = $menu->subMenu->map(function ($v, $k) use($menu){
-//			    if ($v['url'] == Route::currentRouteName()) {
-//				    return 'active menu-open';
-//			    }
-//		    })->reject(function ($v, $k) {
-//			    return $v == null;
-//		    });
-//
-//		    $menu['new_class'] = $new_class->first();
-		   
+	     
 		    if(!empty($menu->subMenu->where('url',Route::currentRouteName())->toArray())){
 			    $new_class = 'active menu-open';
 		    }else{
@@ -51,7 +40,7 @@ class CheckPermissions
 //
 //	      session(['menus' => $permission->menus ]) ;
 //	    }else{
-		    session(['menus' =>  $permission->menus,'role' => $permission->role ,'userRoleType' => $permission->userRoleType]) ;
+		    session(['menus' =>  $permission->menus ]) ;
 //	    }
 	    
         return $next($request);

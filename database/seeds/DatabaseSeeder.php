@@ -13,11 +13,14 @@ class DatabaseSeeder extends Seeder
     {
        $this->call([
         MenuTableSeeder::class,
-        BonusTableSeeder::class,
         ExchangeRatesTableSeeder::class,
+        UsersTableSeeder::class,
+        BonusTableSeeder::class,
         SaleGroupsSeeder::class,
         SaleGroupsReachsSeeder::class,
-        UsersTableSeeder::class,
+        PermissionSeeder::class,
+        RoleSeeder::class,
+        UserRoleSeeder::class,
        ]);
     }
 }

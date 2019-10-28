@@ -24,8 +24,9 @@
 			$url = env('API_GET_MEMBER_URL');
 			
 			$returnData = $apiObj->curlPost($data,$url,'form');
-			
+   
 			$this->department = $returnData['data']['department'];
+   
 			foreach($returnData['data']['member'] as $key => $item){
 				if(isset($this->department[$item['department_id']])){
 					$returnData['data']['member'][$key]['department_name'] = $this->department[$item['department_id']]['name'];
@@ -40,6 +41,7 @@
 		public function sortUserData($select = null){
 			
 			$newTmp = [];
+			
 			if($this->users) {
 				foreach ($this->users as $item) {
 					switch($select) {
@@ -54,9 +56,41 @@
 							$newTmp[$item['department_id']]['depName'] = isset($this->department[$item['department_id']]['name']) ? $this->department[$item['department_id']]['name'] : '';
 					}
 				};
-			}
+				
+				
+                    $newtmp =[];
+                    $another = [];
+                    //			16,14,25,34,33,32 業務部門 id 排序一下
+                    foreach($newTmp as $key => $item){
+                        switch($key){
+                            case 16:
+                                $newtmp[0] = $item;
+                                break;
+                            case 14:
+                                $newtmp[1] = $item;
+                                break;
+                            case 25:
+                                $newtmp[2] = $item;
+                                break;
+                            case 34:
+                                $newtmp[3] = $item;
+                                break;
+                            case 33:
+                                $newtmp[4] = $item;
+                                break;
+                            case 32:
+                                $newtmp[5] = $item;
+                                break;
+                            default:
+                                $another[] = $item;
+                        }
+                    }
+                    ksort($newtmp);
+                    $userLists = array_merge($newtmp,$another);
+                }
 			
-			return $newTmp;
+			
+			return $userLists;
 		}
 		
 		static function isConvener($erp_id = null){

@@ -89,7 +89,7 @@
 			 //jszip
 			'/plugins/jszip/dist/jszip.min.js',
 			 //pdfmake
-			'/plugins/pdfmake/build/pdfmake.min.js',
+			'/plugins/pdfmake/build/pdfmake.js',
 			'/plugins/pdfmake/build/vfs_fonts.js',
 			'/adminLte_componets/fastclick/lib/fastclick.js',
 			'/adminLte_componets/select2/dist/js/select2.full.min.js',

@@ -7,22 +7,31 @@ use App\FinancialReceipt;
 use App\Http\Controllers\BaseController;
 use DateTime;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class ExchangeRatesController extends BaseController
 {
     //
+	protected $policyModel;
+	
 	const CURRENCY_TYPE = [
 	 'USD','JPY'
 	];
 	
+	public function __construct () {
+	
+		parent::__construct();
+	
+		$this->policyModel = new ExchangeRate();
+	}
+	
 	public function setting ()
 	{
-		$erpUserId = Auth::user()->erp_user_id;
-		if(!in_array($erpUserId,session('role')['admin']['ids']) && !in_array($erpUserId,session('role')['financial']['ids'])){
-			abort(403);
-		};
+		//permission check
+		$this->authorize('view',$this->policyModel);
+		
+		//$erpUserId = Auth::user()->erp_user_id;
+		//abort_if(!in_array($erpUserId,session('role')['admin']['ids']) && !in_array($erpUserId,session('role')['financial']['ids']), 403);
 		
 		$financialReceiptObj = new FinancialReceipt();
 		$financialReceiptObj->updateFinancialMoneyReceipt();
@@ -33,6 +42,9 @@ class ExchangeRatesController extends BaseController
 	
 	public function add (Request $request)
 	{
+		//permission check
+		$this->authorize('update',$this->policyModel);
+		
 		$date = new DateTime($request->set_date.'/01');
 		$date = $date->format('Y-m-01');
 		$erpUserId = Auth::user()->erp_user_id;

@@ -241,7 +241,6 @@
                         
                         // Get row ID
                         var rowId = data['id'];
-
                         // Determine whether row ID is in the list of selected row IDs
                         var index = $.inArray(rowId, rows_selected[vue.table_id]);
 												let thisSelectMoney = $row.find("div[data-money]").data('money');
@@ -289,7 +288,7 @@
             } );
         },
         mounted: function(){
-		        
+		      
         
         },
         watch:{

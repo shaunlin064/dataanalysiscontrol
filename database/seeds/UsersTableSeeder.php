@@ -24,6 +24,7 @@
 	    DB::statement('SET FOREIGN_KEY_CHECKS=0');
 	    DB::table('users')->truncate();
 	    DB::statement('SET FOREIGN_KEY_CHECKS = 1');
+	    
 	    foreach ($erpUserDatas->users as $item){
 		
 		    $userObj = User::where('erp_user_id',$item['id'])->first();

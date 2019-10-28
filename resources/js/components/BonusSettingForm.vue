@@ -8,7 +8,6 @@
 			<!-- /.box-header -->
 			<!-- form start -->
 			<form class="form-horizontal" :action='form_action' method='post' id='bonusSettingForm'>
-				
 				<div class="box-body">
 					<div class="form-group">
 						<input type='hidden' name="_token" :value='csrf'>
@@ -107,7 +106,7 @@
     export default {
         props: {
             row : Object,
-		        type: String,
+            type: String,
             add_user_lists: Array,
             csrf_token : String,
             form_action : String,
@@ -128,8 +127,8 @@
                 originalData: null,
                 items: this.row.levels ? this.row.levels : [],
                 boundary: this.row.boundary ? this.row.boundary : 0,
-		            addUserList : this.add_user_lists,
-		            csrf: this.csrf_token,
+                addUserList : this.add_user_lists,
+                csrf: this.csrf_token,
                 alreadySetUserIds : this.already_set_user_ids,
             }
         },
@@ -217,7 +216,7 @@
                         $('#bonusSettingForm').submit();
                     }
 		            },
-				        detail_check(){
+                    detail_check(){
                     let detail_has_error = this.detail_has_error;
                     const values = Object.values(this.items);
                     let detail_error_check = false;

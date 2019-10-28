@@ -2,25 +2,30 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Permission;
+use Illuminate\Database\Eloquent\Model;
 
 class Role extends Model
 {
     //
-	public function givePermissionTo(Permission $permission){
-		
-		return $this->permission()->save($permission);//將這個權限保存
-		
-	}
+	protected $fillable = ['name','label'];
 	
-	public function permission(){
+	public function permissions(){
 		
 		return $this->belongsToMany(Permission::class);
 	}
 	
-
-	
-	
+	public function givePermissionTo($permission){
+		
+		if (is_string($permission)) {
+            return $this->permissions()->save(
+                Permission::whereName($permission)->firstOrFail()
+            );
+		}
+		
+		//如果是Collection
+		return $this->permissions()->save($permission);//將這個權限保存
+		
+	}
 
 }

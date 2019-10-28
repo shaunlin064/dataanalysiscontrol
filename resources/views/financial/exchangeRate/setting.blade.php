@@ -34,11 +34,11 @@
     <div class="row" id='bonusSetting'>
         <div class="col-xs-12">
             <div class="box">
+                @can('financial.exchangeRate.setting')
                 <div class="box-header">
                     <h3 class="box-title pull-left">設定清單</h3>
 
                 </div>
-
                 <!-- /.box-header -->
                 <div class="box-body">
                     <div class="col-md-12">
@@ -94,6 +94,7 @@
                         <!-- /.box -->
                     </div>
                 </div>
+                @endcan
                 <simple-data-table-componet
                         :table_id='"exchangeTable"'
                         :table_head='"財報清單"'

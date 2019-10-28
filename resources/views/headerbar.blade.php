@@ -68,9 +68,11 @@
 							<div class='pull-left'>
 								<a href='/#' class='btn btn-default btn-flat'>業績管理</a>
 							</div>
-							{{--<div class='pull-left'>--}}
-							{{--	<a href='/system' class='btn btn-default btn-flat'>系統管理</a>--}}
-							{{--</div>--}}
+                            @can('system.index')
+							<div class='pull-left'>
+								<a href='/system' class='btn btn-default btn-flat'>系統管理</a>
+							</div>
+                            @endcan
 							<div class='pull-right'>
 								<a href='/logout' class='btn btn-default btn-flat'>登出</a>
 							</div>

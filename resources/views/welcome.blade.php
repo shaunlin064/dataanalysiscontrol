@@ -80,6 +80,17 @@
             @endif
 
             <div class="content">
+                    @can('financial.exchangeRate.setting')
+                        <a href='#'>外匯設定</a>
+                    @endcan
+
+                    @can('financial.exchange_view')
+                        <a href='#'>外匯檢視</a>
+                    @endcan
+
+                    @can('financial.provide.list')
+                        <a href='#'>獎金發放</a>
+                    @endcan
                 <div class="title m-b-md">
                     Laravel
                 </div>

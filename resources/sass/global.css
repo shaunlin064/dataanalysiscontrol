@@ -116,6 +116,10 @@
   padding: 0px 0px 10px 0px;
 }
 
+.content-center {
+  margin: 0 25%;
+}
+
 td.details-control {
   background: url("/img/details_open.png") no-repeat center center;
   cursor: pointer;

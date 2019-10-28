@@ -31,7 +31,7 @@
         </div>
         <!-- /.col -->
         <div class="col-md-8">
-            <bonus-group-component :arg='{type:"edit",csrf_token:"{{ csrf_token()}}",setting:{{ json_encode($row)  }},form_action:"{{Route('bonus.setting.update')}}",history:{{ json_encode($userBonusHistory) }}}'></bonus-group-component>
+            <bonus-group-component :arg='{type:"edit",csrf_token:"{{ csrf_token()}}",setting:@json($row),form_action:"{{Route('bonus.setting.update')}}",history:{{ json_encode($userBonusHistory) }}}'></bonus-group-component>
         </div>
         <!-- /.col -->
     </div>

@@ -9,7 +9,7 @@ use App\Role;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable,HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -44,27 +44,46 @@ class User extends Authenticatable
 		
 		return $this->api_token;
 	}
-	public function role()
-	{
-		return $this->belongsToMany(Role::class);
-	}
 	
-	public function hasRole($role){
-		//如果包含某一個 就說明有這個角色
-		
-		if (is_string($role)) {
-			return $this->role()->contains('name', $role);
-		}
-		
-		//如果是Collection
-		return !!$role->intersect($this->role)->count();//是否相同 ＞0
-		
-	}
 	public function financialList(){
 		return $this->hasMany(FinancialList::CLASS,'erp_user_id','erp_user_id');
 	}
 	
 	public function userGroups(){
-		return $this->hasMany(SaleGroupsUsers::CLASS,'erp_user_id','erp_user_id')->groupBy('sale_groups_id');
+		return $this->hasMany(SaleGroupsUsers::CLASS,'erp_user_id','erp_user_id')->orderBy('set_date','desc')->groupBy('sale_groups_id');
+		//return $this->hasMany(SaleGroupsUsers::CLASS,'erp_user_id','erp_user_id')->groupBy('sale_groups_id');
 	}
+	
+	public function isAdmin(){
+		return $this->hasRole('admin');
+	}
+    
+    public function getUserGroupsName ()
+    {
+        return $this->userGroups->map(function ($v) {
+            return $v->saleGroups->name;
+        })->implode(',');
+	}
+
+    public function hasPermission(String $permission)
+    {
+        $check = false;
+        $this->roles->each(function($role) use($permission,&$check){
+            if($role->permissions->contains('name',$permission)){
+                $check = true;
+                return false;
+            };
+        });
+        
+        return $check;
+    }
+    
+    public function menuCheck (Menu $menus)
+    {
+        $check = false;
+        $menus->subMenu->each(function($v,$k) use(&$check){
+            $check = $this->hasPermission($v->url);
+        });
+        return $check;
+    }
 }

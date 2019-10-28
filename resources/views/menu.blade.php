@@ -8,23 +8,19 @@
 
 ?>
 	@foreach(session('menus') as $menu)
-		@if( session('userRoleType') == 'admin'
-						||
-						in_array( $menu->id , session('role')[session('userRoleType')]['purview']['menus'] ) )
-			<li class="treeview {{ $menu['new_class'] }}">
-			<a href="#">
-				<i class='{{$menu['icon'] }}'></i>
-				 <span>{{$menu['name']}}</span>
-				 <span class="pull-right-container">
-					<i class="fa fa-angle-left pull-right"></i>
-				 </span>
-			</a>
+        @if( auth()->user()->menuCheck($menu) )
+            <li class="treeview {{ $menu['new_class'] }}">
+            <a href="#">
+                <i class='{{$menu['icon'] }}'></i>
+                 <span>{{$menu['name']}}</span>
+                 <span class="pull-right-container">
+                    <i class="fa fa-angle-left pull-right"></i>
+                 </span>
+            </a>
 			@if(count($menu->subMenu))
 				<ul class="treeview-menu">
 					@foreach ($menu->subMenu as $sub_menu )
-						@if( session('userRoleType') == 'admin'
-						||
-						in_array( $sub_menu->id , session('role')[session('userRoleType')]['purview']['menu_subs'] ) )
+                        @if(auth()->user()->hasPermission($sub_menu->url))
 						<li class={{count($sub_menu->level2) ? 'treeview' : ($sub_menu->url == Route::currentRouteName() ? 'active' : '')}}>
 							<a {{Route(Route::currentRouteName()) == Route($sub_menu->url) ? "class=text ":''}} href="{{ Route($sub_menu->url) }}" target="{{$sub_menu['target']}}"
 							   title="{{$sub_menu['title']}}">
@@ -38,9 +34,7 @@
 							@if(count($sub_menu->level2))
 								<ul class="treeview-menu">
 									@foreach ($sub_menu->level2 as $level2 )
-										@if( session('userRoleType') == 'admin'
-						||
-						in_array( $level2->id , session('role')[session('userRoleType')]['purview']['menu_sub_level2s'] ) )
+										@if( auth()->user()->hasPermission($level2->url))
 										<li>
 											<a href="{{$level2['url']}}" title="{{$level2['title']}}"
 											   target="{{$level2['target']}}">

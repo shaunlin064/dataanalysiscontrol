@@ -91,6 +91,24 @@
 		     ],
 		    ],
 	     ],
+            [
+                "name" => "權限",
+                "icon" => "fa fa-get-pocket",
+                "region" => "system",
+                "catalogue" => "system",
+                "subMenu" => [
+                    [
+                        "name" => "群組權限設定",
+                        "icon" => "fa fa-circle-o",
+                        "url" => "system.role.list",
+                    ],
+                    [
+                        "name" => "使用者群組設定",
+                        "icon" => "fa fa-circle-o",
+                        "url" => "system.role.user.list",
+                    ],
+                ],
+            ],
 	    ];
 	    foreach($menus as $item){
 		    $menuItem = ['name'=>$item['name'],'icon'=>$item['icon'],'region' => $item['region'],'catalogue'=>$item['catalogue']];

@@ -27,49 +27,20 @@
 	class ReviewController extends BaseController
 	{
 //
-		public function __construct ()
-		{
-			parent::__construct();
-		}
-		
-		public function list ()
-		{
-			
-			$listdata = Bonus::where('id','!=','0')->groupBy('erp_user_id')->get()->map(function($v,$k){
-				
-				$v->name =  ucfirst($v->user->name);
-				
-				$groupNames = $v->user->userGroups->map(function($v,$k){
-					return $v->saleGroups->name;
-				})->toArray();
-				
-				$v->sale_groups_name = isset($groupNames) ? implode(',', $groupNames) : '';
-				
-				return $v;
-			})->toArray();
-			
-			return view('bonus.review.list',['data' => $this->resources,'row' => $listdata]);
-		}
-		
+        protected $policyModel;
+        
+        public function __construct () {
+            
+            parent::__construct();
+            
+            $this->policyModel = new FinancialList();
+        }
+        
 		public function view($erpUserId = null)
 		{
-			
-			
 			$loginUserId = Auth::user()->erp_user_id;
 			
-			$erpUserId = $erpUserId ?? $loginUserId;
-			
-			//return error
-			if(isset(session('users')[$erpUserId]) == false){
-				abort(404);
-			}
-			
-			//check permission
-			$permission = new Permission();
-			$permission->permissionCheck($erpUserId,$loginUserId);
-			
 			$date = new \DateTime();
-			
 			
 			$provideObj = new ProvideController();
 			

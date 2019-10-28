@@ -9,106 +9,51 @@
 	namespace App\Http\Controllers\Bonus;
 	
 	use App\FinancialList;
-	use App\Http\Controllers\ApiController;
 	use App\Http\Controllers\Auth\Permission;
 	use App\Http\Controllers\Financial\FinancialListController;
-	use App\Http\Controllers\FinancialController;
-
-	use Illuminate\Contracts\Auth\Access\Gate;
-	use Illuminate\Contracts\Auth\Access\Gate as GateContract;
-	use Illuminate\Contracts\Session\Session;
+	use App\User;
 	use Illuminate\Http\Request;
 	use App\Http\Controllers\BaseController;
 	use App\Http\Controllers\UserController;
 	use App\Bonus;
 	use App\BonusLevels;
-	use Illuminate\Support\Facades\Artisan;
-	use Illuminate\Support\Facades\Redirect;
 	use Validator;
-	use App\Exceptions\Handler;
 	use Illuminate\Support\Arr;
-	use App\Role;
 	use Auth;
 	
 	class SettingController extends BaseController
 	{
+		protected $policyModel;
 		
-		public function __construct ()
-		{
+		public function __construct () {
+			
 			parent::__construct();
+			
+			$this->policyModel = new Bonus();
 		}
 		
 		public function add ()
 		{
-			$userObj = new UserController();
-			$alreadySetUserIds = Bonus::select('erp_user_id')->groupBy('erp_user_id')->get()->toArray();
-			$alreadySetUserIds = Arr::flatten($alreadySetUserIds);
+			$this->authorize('create',$this->policyModel);
 			
-			//for test data
-//			$addUserLists = [
-//			 ['name' => 'test1', 'id'=> 1],
-//			 ['name' => 'test2', 'id'=> 2],
-//			];
-			$userObj->getErpUser();
-			$addUserLists = $userObj->sortUserData('unsetOld');
-
-			$newtmp =[];
-			$another = [];
-//			16,14,25,34,33,32 業務部門 id 排序一下
-			foreach($addUserLists as $key => $item){
-			 switch($key){
-				 case 16:
-					 $newtmp[0] = $item;
-					 break;
-				 case 14:
-					 $newtmp[1] = $item;
-					 break;
-				 case 25:
-					 $newtmp[2] = $item;
-					 break;
-				 case 34:
-					 $newtmp[3] = $item;
-					 break;
-				 case 33:
-					 $newtmp[4] = $item;
-					 break;
-				 case 32:
-					 $newtmp[5] = $item;
-					 break;
-				 default:
-					 $another[] = $item;
-			 }
-			}
-			ksort($newtmp);
-			$addUserLists = array_merge($newtmp,$another);
+			$userObj = new UserController();
+            $userObj->getErpUser();
+            $addUserLists = $userObj->sortUserData('unsetOld');
+            
+			$alreadySetUserIds = Bonus::groupBy('erp_user_id')->get()->pluck('erp_user_id');
 			
 			return view('bonus.setting.add',['data' => $this->resources,'addUserLists' => $addUserLists,'alreadySetUserIds' => $alreadySetUserIds]);
 		}
 		
 		public function list ()
 		{
-//				$role = new Role();
-//			  $role->
-//			$role = Role::first();
-//			$permission = \App\Permission::first();
-//			$role->givePermissionTo($permission);
-			
-//			Auth::loginUsingId(1, true);
-//			app(\Illuminate\Contracts\Auth\Access\Gate::class)->abilities();
-//			dd(Auth::user());
+			$this->authorize('create',$this->policyModel);
 			
 			$date = new \DateTime();
 			
-			$listdata = Bonus::where('set_date','=',$date->format('Y-m-01'))->get()->map(function($v,$k){
-				
+			$listdata = Bonus::where('set_date','=',$date->format('Y-m-01'))->get()->map(function($v){
 				$v->name =  ucfirst($v->user->name);
-
-				$groupNames = $v->user->userGroups->map(function($v,$k){
-				 return $v->saleGroups->name;
-				})->toArray();
-				
-				$v->sale_groups_name = isset($groupNames) ? implode(',', $groupNames) : '';
-				
+				$v->sale_groups_name = $this->getUserGroups($v);
 			 return $v;
 			})->toArray();
 			
@@ -118,151 +63,59 @@
 		public function edit($id)
 		{
 			//exists check
-			if( Bonus::where('id',$id)->with('levels')->exists() === false){
-				abort(404);
-			};
+			abort_if(Bonus::where('id',$id)->with('levels')->doesntExist(), 404);
 			
-			$bonus = Bonus::where('id',$id)->with('levels')->get()->toArray()[0];
-			$uid = $bonus['erp_user_id'];
-			$erpUserId = Auth::user()->erp_user_id;
-			$loginUserId = $erpUserId;
+			$this->authorize('create',$this->policyModel);
 			
-			$permission = new Permission();
-			$permission->permissionCheck($uid,$loginUserId);
-
-			$userTmpData = session('users')[$bonus['erp_user_id']];
+			$bonus = Bonus::where('id',$id)->with('levels')->first();
 			
-			$editData = $bonus;
+			$erpUserId = $bonus->erp_user_id;
 			
-			list($highestProfit,$thisMonthProfit,$lastMonthProfit) = $this->getUserLatelyProfit($bonus['erp_user_id']);
+			list($highestProfit,$thisMonthProfit,$lastMonthProfit) = $this->getUserLatelyProfit($erpUserId);
 			
 			$userData = [
-			 'name' => $userTmpData['name'],
-			  'title' => session('department')[$userTmpData['department_id']]['name'],
+			  'name' => $bonus->user->name,
+			  'title' => $this->getUserGroups($bonus),
 				'lastMonthProfit' => $lastMonthProfit,
 				'thisMonthProfit' => $thisMonthProfit,
 				'historyMonthProfit' => $highestProfit
 			];
 			
-			$userBonusHistory = $this->getBonusHistory($uid);
+			$userBonusHistory = $this->getBonusHistory($erpUserId);
 			
-			
-//			$userBonusHistory = [
-//			 [
-//			  'set_date' => '2019-05',
-//			  'boundary' => '1000000',
-//			  'levels' => [
-//			   ['id'=>1,'achieving_rate' => '10', 'bonus_rate' => '10'],
-//			   ['id'=>2,'achieving_rate' => '10', 'bonus_rate' => '10']
-//			  ]
-//			 ],[
-//				'set_date' => '2019-04',
-//				'boundary' => '1000000',
-//				'levels' => [
-//				 ['id'=>1,'achieving_rate' => '10', 'bonus_rate' => '10'],
-//				 ['id'=>2,'achieving_rate' => '10', 'bonus_rate' => '10']
-//				]
-//			 ],[
-//				'set_date' => '2019-03',
-//				'boundary' => '1000000',
-//				'levels' => [
-//				 ['id'=>1,'achieving_rate' => '10', 'bonus_rate' => '10'],
-//				 ['id'=>2,'achieving_rate' => '10', 'bonus_rate' => '10']
-//				]
-//			 ]
-//			];
-//			dd($editData);
-			return view('bonus.setting.edit',['data' => $this->resources,'row'=>$editData,'userData' => $userData,'userBonusHistory' => $userBonusHistory ]);
+			return view('bonus.setting.edit',['data' => $this->resources,'row'=>$bonus,'userData' => $userData,'userBonusHistory' => $userBonusHistory ]);
 		}
 		
 		public function view($uid = null)
 		{
-			$erpUserId = Auth::user()->erp_user_id;
-			$uid = $uid ?? $erpUserId;
-			$loginUserId = $erpUserId;
+            $loginUserId = Auth::user()->erp_user_id;
+			$uid = $uid ?? $loginUserId;
 			
-			//check permission
-			$permission = new Permission();
-			$permission->permissionCheck($uid,$loginUserId);
-			if(empty(session('users')[$uid])){
-				abort(404);
-			};
+			abort_if(User::where('erp_user_id',$uid)->doesntExist(),404);
 			
-			
-//			$bonus = Bonus::where('erp_user_id',$uid)->with('levels')->get()->toArray();
-			
-			
-			// 排程儲存
-//			$bonus = Bonus::where('set_date','2019-07-01')->with('levels')->get()->toArray();
-//			$tests = collect($bonus);
-			
-//				$importData = $this->importbonusSetting();
-//				foreach($importData as $item){
-//					$request = new Request($item);
-//					$this->save($request,$request->set_date);
-//				}
-//				dd($importData);
-			
-//
-//			foreach($tests  as $item){
-//				$unset = ['created_at','updated_at','id','set_date'];
-//				foreach($unset as $unt){
-//					unset($item[$unt]);
-//				}
-//				$item['set_date'] = '2019-09-01';
-//
-//
-//				$bonus = Bonus::create($item);
-//				if($item['levels']){
-//					foreach( $item['levels'] as $item){
-//						$item['bonus_id'] = $bonus->id;
-//						BonusLevels::create($item);
-//					}
-//				}
-//			}
-			
+            //check permission
+            $bonus = $this->policyModel->where('erp_user_id',$uid)->first();
+            
+            $this->authorize('viewAny',$bonus ?? $this->policyModel);
+   
 			list($highestProfit,$thisMonthProfit,$lastMonthProfit) = $this->getUserLatelyProfit($uid);
 			
 			$userData = [
 			 'uId' => $uid,
-			 'name' => session('users')[$uid]['name'],
-			 'title' => session('users')[$uid]['department_name'],
-			 'lastMonthProfit' => $thisMonthProfit,
-			 'thisMonthProfit' => $lastMonthProfit,
+			 'name' => $bonus->user->name ?? ucfirst(auth()->user()->name),
+			 'title' => $this->getUserGroups($bonus) ?? session('userData')['department'],
+			 'lastMonthProfit' => $lastMonthProfit,
+			 'thisMonthProfit' => $thisMonthProfit,
 			 'historyMonthProfit' => $highestProfit
 			];
 			$userBonusHistory = $this->getBonusHistory($uid);
-			
-			//			$userBonusHistory = [
-//			 [
-//				'set_date' => '2019-05',
-//				'boundary' => '1000000',
-//				'levels' => [
-//				 ['id'=>1,'achieving_rate' => '10', 'bonus_rate' => '10'],
-//				 ['id'=>2,'achieving_rate' => '10', 'bonus_rate' => '10']
-//				]
-//			 ],[
-//				'set_date' => '2019-04',
-//				'boundary' => '1000000',
-//				'levels' => [
-//				 ['id'=>1,'achieving_rate' => '10', 'bonus_rate' => '10'],
-//				 ['id'=>2,'achieving_rate' => '10', 'bonus_rate' => '10']
-//				]
-//			 ],[
-//				'set_date' => '2019-03',
-//				'boundary' => '1000000',
-//				'levels' => [
-//				 ['id'=>1,'achieving_rate' => '10', 'bonus_rate' => '10'],
-//				 ['id'=>2,'achieving_rate' => '10', 'bonus_rate' => '10']
-//				]
-//			 ]
-//			];
 			
 			return view('bonus.setting.view',['data' => $this->resources,'userData' => $userData,'userBonusHistory' => $userBonusHistory ]);
 		}
 		
 		public function save (Request $request,$setDate = null)/**/
 		{
+			$this->authorize('create',$this->policyModel);
 			
 			$date = new \DateTime();
 			$request->merge(['set_date' => isset($setDate) ? $setDate :$date->format('Y-m-01') ]);
@@ -290,32 +143,14 @@
 				}
 			}
 			
-			
 			return redirect()->action('Bonus\SettingController@edit',['id'=>$bonus->id]);
 			
 		}
 		
 		public function update (Request $request)
 		{
-//			$validator = Validator::make($request->all(),[
-//			 'bonus_id' =>'required',
-//			]);
-//
-//			$message= [
-//			 'status' => 0,
-//			 'status_string' => '',
-//			 'message' => ''
-//			];
-//
-//			if($validator->fails()){
-//				$error = $validator->errors()->toArray();
-//				$error = reset($error);
-//
-//				$message['status_string'] = '驗證錯誤';
-//				$message['message'] = $error[0];
-//
-//				return view('handle',['message'=>$message,'data' => $this->resources,'returnUrl' => Route('bonus.setting.list') ]);
-//			}
+			$this->authorize('create',$this->policyModel);
+			
 			$bonus = Bonus::where('id',$request->bonus_id)->with('levels')->first();
 			
 			$date = new \DateTime();
@@ -372,75 +207,6 @@
 			return count($children) != count($tmp->keyBy('achieving_rate')) ? false : true ;
 		}
 		
-		public function importbonusSetting(){
-			
-			//讀檔案
-			$file = fopen(asset('storage/bonus.csv'), "r");
-			
-			$bonusLevels = [
-			 0 => [
-				"achieving_rate" => "30",
-				"bonus_rate" => "5",
-				'bonus_direct' => 0,
-			 ],
-			 1 => [
-				"achieving_rate" => "50",
-				"bonus_rate" => "7",
-				'bonus_direct' => 0,
-			 ],
-			 2 => [
-				"achieving_rate" => "80",
-				"bonus_rate" => "9",
-				'bonus_direct' => 0,
-			 ],
-			 3 => [
-				"achieving_rate" => "100",
-				"bonus_rate" => "9",
-				'bonus_direct' => 15000,
-			 ],
-			 4 => [
-				"achieving_rate" => "150",
-				"bonus_rate" => "9",
-				'bonus_direct' => 20000,
-			 ]
-			];
-			
-			//output
-			$objfileArr = [];
-			while(! feof($file))
-			{
-				$objfileArr[] = fgetcsv($file);
-			};
-			
-			$userData = collect(session('users'));
-			//去標題
-			unset($objfileArr[0]);
-			$importDatas = [];
-			//替換keyName 與 user id
-			foreach($objfileArr as $key => $item){
-				$importDatas[$key]['erp_user_id'] = $userData->where('account',$item[1])->max('id');
-				$importDatas[$key]['boundary'] = $item[2];
-			}
-			
-			$nextMonth = date('Y-m-01',strtotime("+1 month"));
-			
-			
-			foreach($importDatas as $importData){
-				
-				$dateStart = new \DateTime('2018-05-01');
-				$importData['bonus_levels'] = $bonusLevels;
-				
-				while($nextMonth != $dateStart->format('Y-m-01')) {
-					$request = new Request($importData);
-
-					$this->save($request,$dateStart->format('Y-m-01'));
-
-					$dateStart = $dateStart->modify('+1 Month');
-				}
-			}
-			return $importData;
-		}
-		
 		/**
 		 * @param $uid
 		 * @return mixed
@@ -459,5 +225,20 @@
 		{
 			$financialListObj = new FinancialList();
 			return $financialListObj->getUserLatelyProfit($erpUserId);
+		}
+		
+		/**
+		 * @param $bonus
+		 * @return mixed
+		 */
+		private function getUserGroups ($bonus)
+		{
+		    if(empty($bonus)){
+		        return null;
+            }
+			$groupNames = $bonus->saleGroups->map(function ($v) {
+				return $v->saleGroups->name;
+			})->implode(',');
+			return $groupNames;
 		}
 	}

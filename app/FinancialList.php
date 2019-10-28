@@ -309,11 +309,11 @@ class FinancialList extends Model
 		
 		$lastMonth = new \DateTime('last day of last month');
 		$lastMonth = $lastMonth->format('Y-m-01');
-		
-		$erpReturnData = $this->where('erp_user_id' ,$erpUserId)->get();
-		$allProfitBySetDate = $erpReturnData->groupBy('set_date')->map(function($item) {
-			return $item->sum('profit');
-		});
+        
+        $allProfitBySetDate = $this->where('erp_user_id' ,$erpUserId)
+                                ->where('profit','<>',0)->get()
+                                ->map(function($v){ return $this->exchangeMoney($v); })
+                                ->groupBy('set_date')->map(function($item){ return $item->sum('profit'); });
 		
 		$thisMonthProfit = $allProfitBySetDate->get($thisMonth) ?? 0;
 		$lastMonthProfit = $allProfitBySetDate->get($lastMonth) ?? 0;

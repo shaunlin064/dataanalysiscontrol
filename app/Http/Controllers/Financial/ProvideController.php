@@ -26,8 +26,20 @@ class ProvideController extends BaseController
     //
 	protected $cacheKeyProvide = 'financial.provide';
 	protected $cacheKeyFinancial = 'financial.list';
+	protected $policyModel;
+	
+	public function __construct () {
+		
+		parent::__construct();
+		
+		$this->policyModel = new Provide();
+	}
+	
 	public function list ()
 	{
+		
+		$this->authorize('viewSetting',$this->policyModel);
+		
 		/*check cache exists*/
 		$cacheData = collect([]);
 		
@@ -117,6 +129,7 @@ class ProvideController extends BaseController
 	
 	public function view ($id= null)
 	{
+		
 		$date = new DateTime(date('Ym01'));
 		$erpUserId = Auth::user()->erp_user_id;
 		//
@@ -215,6 +228,7 @@ class ProvideController extends BaseController
 
 	public function post(Request $request)
 	{
+		$this->authorize('create',$this->policyModel);
 		
 		$selectSaleGroupsReachIds = explode(',',$request->provide_sale_groups_bonus);
 		$this->setSaleGroupsReachProvide($selectSaleGroupsReachIds);
@@ -423,7 +437,6 @@ class ProvideController extends BaseController
 	}
 	
 	/**
-	 * @param bool $isAdmin
 	 * @param bool $isConvener
 	 * @param $saleGroupsUsers
 	 * @param $erpUserId
@@ -433,9 +446,7 @@ class ProvideController extends BaseController
 	public function getListData ($erpUserId, DateTime $date): array
 	{
 		/*permission check select*/
-		$permission = new Permission();
-		/*admin check*/
-		$isAdmin = $permission->isAdmin($erpUserId);
+		$isAdmin = User::where('erp_user_id',$erpUserId)->first()->isAdmin();
 		$dateStr = $date->format('Y-m-01');
 		/*convener check*/
 		$saleGroupsUsers = SaleGroupsUsers::where(['erp_user_id'=> $erpUserId,'set_date'=>$dateStr])->first();

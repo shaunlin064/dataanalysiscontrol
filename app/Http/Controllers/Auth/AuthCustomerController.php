@@ -11,7 +11,8 @@
 	use App\Http\Controllers\ApiController;
 	use App\Http\Controllers\Bonus\ReviewController;
 	use App\Http\Controllers\UserController;
-	use Illuminate\Foundation\Auth\AuthenticatesUsers;
+    use App\Role;
+    use Illuminate\Foundation\Auth\AuthenticatesUsers;
 	use App\User;
 	use Illuminate\Http\Request;
 	use Illuminate\Support\Facades\Hash;
@@ -78,6 +79,12 @@
 				
 				$userObj = User::create($request->toArray());
 				
+				// new user add default role
+				$roleDefault = Role::where('name','default')->first();
+				if($roleDefault){
+                    $userObj->roles()->attach($roleDefault);
+                }
+				
 				$userObj->fresh();
 			}
 //			Auth::attempt($request->only('name', 'password'));
@@ -98,12 +105,15 @@
 			$message = $this->setUserSession($message);
 			
 			/*TODO::登入 更新快取資料 因command 排成無法偵測到memcached 故先放在登入執行 待未來解決 排成問題*/
-			$date = new \DateTime();
-			$dateStart =  $date->format('2017-01-01');
-			$dateEnd = $date->format('Y-m-01');
-			$request = new Request(['startDate' => $dateStart,'endDate'=>$dateEnd,'saleGroupIds' => [1,2,3,4],'userIds'=>null]);
-			$reviewObj = new ReviewController();
-			$reviewObj->getAjaxData($request,'none');
+            if(env('LOGIN_CACHE')){
+                $date = new \DateTime();
+                $dateStart =  $date->format('2017-01-01');
+                $dateEnd = $date->format('Y-m-01');
+                $request = new Request(['startDate' => $dateStart,'endDate'=>$dateEnd,'saleGroupIds' => [1,2,3,4],'userIds'=>null]);
+                $reviewObj = new ReviewController();
+                $reviewObj->getAjaxData($request,'none');
+            }
+			
 			
 			if( !empty(session('retrunUrl')) ){
 				$returnUrl = session('retrunUrl');

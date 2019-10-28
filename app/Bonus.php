@@ -25,7 +25,6 @@ class Bonus extends Model
 		return $this->belongsTo(User::CLASS, 'erp_user_id', 'erp_user_id');
 	}
 	
-	
 	public function getUserBonus ($erpUserId, $totalProfit,String $dateYearMonth)
 	{
 		//待解 如 搜尋舊資料 但當時未設定 bonus 預設要抓最新 or 當時前後？
@@ -101,5 +100,9 @@ class Bonus extends Model
 		$returnData = [ 'estimateBonus'=>$estimateBonus,'reachLevle' => $reachLevle , 'nextLevel' => $nextLevel,'bonusDirect' => $bonusDirect ];
 		
 		return $returnData;
+	}
+	
+	public function saleGroups(){
+		return $this->hasMany(SaleGroupsUsers::CLASS,'erp_user_id', 'erp_user_id')->where('set_date',$this->set_date);
 	}
 }

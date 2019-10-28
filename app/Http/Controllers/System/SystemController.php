@@ -15,10 +15,9 @@ class SystemController extends BaseController
     public function index()
     {
         //
-	    if(!in_array(session('userData')['id'],session('role')['admin']['ids'])){
-		    abort(403);
-	    };
-	    return view('index',['data'=>$this->resources]);
+	    abort_if(!in_array(session('userData')['id'],session('role')['admin']['ids']), 403);
+
+	    return view('system.index',['data'=>$this->resources]);
     }
 
     /**

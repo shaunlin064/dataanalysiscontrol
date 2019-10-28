@@ -4,26 +4,36 @@ namespace App\Http\Controllers\SaleGroup;
 
 use App\Bonus;
 use App\SaleGroups;
-use App\SaleGroupsBonusLevels;
-use App\SaleGroupsReach;
 use App\SaleGroupsUsers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BaseController;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Input;
 
 class SaleGroupController extends BaseController
 {
     //
-	public function __construct ()
-	{
-		parent::__construct();
-	}
-	
+    protected $policyModel;
+    
+    public function __construct () {
+        
+        parent::__construct();
+        
+        $this->policyModel = new SaleGroups();
+    }
+    
+    public function list ()
+    {
+        $this->authorize('create',$this->policyModel);
+        
+        $saleGroups = SaleGroups::all();
+        return view('saleGroup.setting.list',['data' => $this->resources,'row' => $saleGroups]);
+    }
+    
 	public function add ()
 	{
+        $this->authorize('create',$this->policyModel);
+        
 		$date = new \DateTime();
 		$datenow = $date->format('Y-m-01');
 		//trim user data
@@ -44,15 +54,8 @@ class SaleGroupController extends BaseController
 	
 	public function edit ($id)
 	{
-
-		//$this->resources['cssPath'][] = '/plugins/material/material.min.css';
-		//$this->resources['cssPath'][] = 'https://fonts.googleapis.com/icon?family=Material+Icons';
-		//$this->resources['jsPath'][] = '/plugins/material/material.min.js';
-		//$this->resources['cssPath'][] = '/css/glyphicons.css';
-		//$this->resources['cssPath'][] = '/plugins/material/dataTables.material.css';
-		//$this->resources['jsPath'][] = '/plugins/material/dataTables.material.js';
-	
-		
+        $this->authorize('create',$this->policyModel);
+        
 		$date = new \DateTime();
 		$datenow = $date->format('Y-m-01');
 		
@@ -66,10 +69,7 @@ class SaleGroupController extends BaseController
 			return $v->getUserBonusBoundary;
 		})->sum('boundary');
 		
-		$groupsBonusHistory = $saleGroups->groupsBonus->groupBy('set_date')->map(function($v,$k) use($id){
-			
-			//$reachRate = SaleGroupsReach::where('set_date',$k)->where('sale_groups_id',$id)->first()->rate ?? 0;
-			
+		$groupsBonusHistory = $saleGroups->groupsBonus->groupBy('set_date')->map(function($v) use($id){
 		 return ['bonuslevel' => $v,'rate' => 5.5,'totalBoundary' => 0];
 		})->toArray();
 		
@@ -118,14 +118,11 @@ class SaleGroupController extends BaseController
 		 'userNowIsConvener' => $userNowIsConvener
 		]);
 	}
-	public function list ()
-	{
-		$saleGroups = SaleGroups::all();
-		return view('saleGroup.setting.list',['data' => $this->resources,'row' => $saleGroups]);
-	}
 	
 	public function view ($erpUserId = null)
 	{
+        $this->authorize('view',$this->policyModel);
+        
 		$date = new \DateTime();
 		$datenow = $date->format('Y-m-01');
 		$erpUserId = $erpUserId ?? Auth::user()->erp_user_id;
@@ -154,11 +151,12 @@ class SaleGroupController extends BaseController
 		 'user'=> $user,
 		 'row'=>$row,
 		]);
-		//return view('saleGroup.setting.view',['data' => $this->resources]);
 	}
 	
 	public function post (Request $request,$type ='add')
 	{
+        $this->authorize('create',$this->policyModel);
+        
 		$inputDatas = $request->request->all();
 		
 		$inputDatas = collect($inputDatas);
