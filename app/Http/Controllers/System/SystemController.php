@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\System;
 
 use App\Http\Controllers\BaseController;
+use Gate;
 use Illuminate\Http\Request;
 
 class SystemController extends BaseController
@@ -14,8 +15,9 @@ class SystemController extends BaseController
      */
     public function index()
     {
-        //
-	    abort_if(!in_array(session('userData')['id'],session('role')['admin']['ids']), 403);
+        if(!auth()->user()->isAdmin()){
+            app(Gate::class)->authorize('system.index');
+        }
 
 	    return view('system.index',['data'=>$this->resources]);
     }

@@ -120,7 +120,7 @@
 				session()->forget('retrunUrl');
 				return redirect($returnUrl);
 			}
-			return redirect()->action('IndexController@index');
+			return redirect('/');
 			
 		}
 		
@@ -133,9 +133,9 @@
 		
 		public function setUserSession ($message)
 		{
-			
 			$userObj = new UserController();
 			$userObj->getErpUser();
+			
 			session(['department' => $userObj->department]);
 			session(['users' => $userObj->users]);
 			

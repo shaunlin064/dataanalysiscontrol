@@ -62,12 +62,9 @@
 		
 		public function edit($id)
 		{
-			//exists check
-			abort_if(Bonus::where('id',$id)->with('levels')->doesntExist(), 404);
-			
 			$this->authorize('create',$this->policyModel);
 			
-			$bonus = Bonus::where('id',$id)->with('levels')->first();
+			$bonus = Bonus::with('levels')->findOrfail($id);
 			
 			$erpUserId = $bonus->erp_user_id;
 			
@@ -120,31 +117,21 @@
 			$date = new \DateTime();
 			$request->merge(['set_date' => isset($setDate) ? $setDate :$date->format('Y-m-01') ]);
 			
-			if( !$this->checkbonusLevelsUni($request->bonus_levels) ){
-
-				$message= [
-				 'status' => 0,
-				 'status_string' => '',
-				 'message' => ''
-				];
-
-				$message['status_string'] = 'fail';
-				$message['message'] = '資料有誤 達成比例不能重複';
-
-				return view('handle',['message'=>$message,'data' => $this->resources,'returnUrl' => Route('bonus.setting.add') ]);
-			}
-			
 			$bonus = Bonus::create($request->all());
-			
+   
 			if($request->bonus_levels){
+			    
+                if( !$this->checkbonusLevelsUni($request->bonus_levels) ){
+                    return $this->notUni($bonus);
+                }
+                
 				foreach( $request->bonus_levels as $item){
 					$item['bonus_id'] = $bonus->id;
 					BonusLevels::create($item);
 				}
 			}
-			
-			return redirect()->action('Bonus\SettingController@edit',['id'=>$bonus->id]);
-			
+            
+            return redirect()->route('bonus.setting.edit',['id'=>$bonus->id]);
 		}
 		
 		public function update (Request $request)
@@ -155,32 +142,25 @@
 			
 			$date = new \DateTime();
 			//新月份
+   
 			if($bonus->set_date != $date->format('Y-m-01')){
 				$request->offsetUnset('bonus_id');
 				$request->merge(['erp_user_id' => $bonus->erp_user_id]);
 				
-				return $this->save($request);
+				$this->save($request);
+    
 			}else{
 				$bonus->boundary = $request->boundary;
 				$bonus->save();
+    
 				
-				
-				if( !$this->checkbonusLevelsUni($request->bonus_levels) ){
-					
-					$message= [
-					 'status' => 0,
-					 'status_string' => '',
-					 'message' => ''
-					];
-					
-					$message['status_string'] = 'fail';
-					$message['message'] = '資料有誤 達成比例不能重複';
-					
-					return view('handle',['message'=>$message,'data' => $this->resources,'returnUrl' => Route('bonus.setting.edit',['id' => $bonus->id]) ]);
-				}
 				
 				BonusLevels::where('bonus_id',$request->bonus_id)->delete();
 				if($request->bonus_levels){
+                    if( !$this->checkbonusLevelsUni($request->bonus_levels) ){
+                        return $this->notUni($bonus);
+                    }
+                    
 					foreach( $request->bonus_levels as $item){
 						$item['bonus_id'] = $bonus->id;
 						BonusLevels::create($item);
@@ -241,4 +221,22 @@
 			})->implode(',');
 			return $groupNames;
 		}
-	}
+        
+        /**
+         * @param $bonus
+         * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+         */
+        private function notUni ($bonus = null)
+        {
+            $message = [
+                'status' => 0,
+                'status_string' => '',
+                'message' => ''
+            ];
+            
+            $message['status_string'] = 'fail';
+            $message['message'] = '資料有誤 達成比例不能重複';
+            
+            return view('handle', ['message' => $message, 'data' => $this->resources, 'returnUrl' => Route('bonus.setting.edit', ['id' => $bonus->id])]);
+        }
+    }

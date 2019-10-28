@@ -30,9 +30,6 @@ class ExchangeRatesController extends BaseController
 		//permission check
 		$this->authorize('view',$this->policyModel);
 		
-		//$erpUserId = Auth::user()->erp_user_id;
-		//abort_if(!in_array($erpUserId,session('role')['admin']['ids']) && !in_array($erpUserId,session('role')['financial']['ids']), 403);
-		
 		$financialReceiptObj = new FinancialReceipt();
 		$financialReceiptObj->updateFinancialMoneyReceipt();
 		

@@ -31,7 +31,7 @@
 
 <!-- Content Wrapper. Contains page content -->
 @section('content')
-    <div class="row" id='bonusSetting'>
+    <div class="row" id='exchangeRateSetting'>
         <div class="col-xs-12">
             <div class="box">
                 @can('financial.exchangeRate.setting')

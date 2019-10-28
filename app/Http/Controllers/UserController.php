@@ -24,7 +24,7 @@
 			$url = env('API_GET_MEMBER_URL');
 			
 			$returnData = $apiObj->curlPost($data,$url,'form');
-   
+			
 			$this->department = $returnData['data']['department'];
    
 			foreach($returnData['data']['member'] as $key => $item){
@@ -34,8 +34,9 @@
 					$returnData['data']['member'][$key]['department_name'] = '';
 				}
 			}
-			
+   
 			$this->users = $returnData['data']['member'];
+   
 			return $returnData;
 		}
 		public function sortUserData($select = null){

@@ -92,8 +92,8 @@
                     $role->permissions()->attach($permission);
                 });
             }
-
-            return redirect()->action('System\RoleControl@roleEdit',['id'=>$role->id]);
+            
+            return redirect()->route('system.role.edit',['id'=>$role->id]);
         }
         /*角色相關end*/
     
@@ -147,7 +147,7 @@
                     });
             }
             
-            return redirect()->action('System\RoleControl@roleUserEdit',['id'=>$user->id]);
+            return redirect()->route('system.role.user.edit',['id' => $user->id ]);
         }
         /*user角色賦予end*/
         /**

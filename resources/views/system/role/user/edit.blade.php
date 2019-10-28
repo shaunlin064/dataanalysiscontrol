@@ -34,16 +34,15 @@
             </div>
             <!-- /.box-header -->
             <!-- form start -->
-            <form class="form-horizontal"  action='/system/roleUserPost' method='post' id='bonusSettingForm'>
+            <form class="form-horizontal"  action='/system/roleUserPost' method='post' id='roleUserSettingForm'>
                 <div class="box-body">
                     <div class="form-group">
-                        <input type='hidden' name="_token" value={{csrf_token()}}>
+                        @csrf
                     </div>
                     <div class="form-group">
                         <div>
 
                             <input type='hidden' name='id' value='{{$user->id}}'>
-
                             <label class="col-sm-2 control-label pull-left">名稱</label>
                             <label class='col-sm-2 control-label' >{{$user->name}}</label>
                         </div>

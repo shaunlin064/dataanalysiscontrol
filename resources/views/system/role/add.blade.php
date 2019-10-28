@@ -33,11 +33,9 @@
             </div>
             <!-- /.box-header -->
             <!-- form start -->
-            <form class="form-horizontal"  action='/system/rolePost' method='post' id='bonusSettingForm'>
+            <form class="form-horizontal"  action='/system/rolePost' method='post' id='roleSettingForm'>
                 <div class="box-body">
-                    <div class="form-group">
-                        <input type='hidden' name="_token" value={{csrf_token()}}>
-                    </div>
+                    @csrf
                     <div class="form-group">
                         <div>
                             @if( ( $type ?? '') == 'edit')
