@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Bonus;
+use App\Role;
+use App\SaleGroups;
+use App\User;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
@@ -26,6 +30,11 @@ class RouteServiceProvider extends ServiceProvider
         //
 
         parent::boot();
+    
+        Route::model('user', User::class);
+        Route::model('bonus', Bonus::class);
+        Route::model('saleGroup', SaleGroups::class);
+        Route::model('role', Role::class);
     }
 
     /**

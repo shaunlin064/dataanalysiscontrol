@@ -61,7 +61,7 @@
 		 'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
 		 'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
 		 'CheckLogin' => \App\Http\Middleware\CheckLogin::class,
-		 'CheckPermissions' => \App\Http\Middleware\CheckPermissions::class,
+		 'GetMenuList' => \App\Http\Middleware\GetMenuList::class,
 		];
 		
 		/**

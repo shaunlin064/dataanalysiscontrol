@@ -56,11 +56,9 @@
             return view( Route::currentRouteName() ,['data'=>$this->resources,'permissionList' => $permissionList,'columns' => $columns]);
         }
     
-        public function roleEdit ($id)
+        public function roleEdit ( Role $role )
         {
             $this->authorize('create',$this->policyModel);
-            
-            $role = Role::find($id);
             
             $permissionList = Permission::All();
     
@@ -115,11 +113,10 @@
             return view( Route::currentRouteName() ,['data'=>$this->resources,'userList' => $userList, 'columns' => $columns]);
         }
     
-        public function roleUserEdit ($id)
+        public function roleUserEdit (User $user)
         {
             $this->authorize('create',$this->policyModel);
-            
-            $user = User::find($id);
+
             $rolesList = Role::all();
     
             $columns = [

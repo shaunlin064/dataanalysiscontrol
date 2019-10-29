@@ -52,14 +52,14 @@ class SaleGroupController extends BaseController
 		]);
 	}
 	
-	public function edit ($id)
+	public function edit (SaleGroups $saleGroups)
 	{
         $this->authorize('create',$this->policyModel);
         
 		$date = new \DateTime();
 		$datenow = $date->format('Y-m-01');
 		
-		$saleGroups = SaleGroups::where('id',$id)->with('groupsUsers')->with('groupsBonus')->first();
+//		$saleGroups = SaleGroups::where('id',$id)->with('groupsUsers')->with('groupsBonus')->first();
 		
 		//get nowdata
 		$row = $saleGroups->toArray();
@@ -69,7 +69,7 @@ class SaleGroupController extends BaseController
 			return $v->getUserBonusBoundary;
 		})->sum('boundary');
 		
-		$groupsBonusHistory = $saleGroups->groupsBonus->groupBy('set_date')->map(function($v) use($id){
+		$groupsBonusHistory = $saleGroups->groupsBonus->groupBy('set_date')->map(function($v){
 		 return ['bonuslevel' => $v,'rate' => 5.5,'totalBoundary' => 0];
 		})->toArray();
 		

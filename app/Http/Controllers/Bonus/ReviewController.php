@@ -36,7 +36,7 @@
             $this->policyModel = new FinancialList();
         }
         
-		public function view($erpUserId = null)
+		public function view()
 		{
 			$loginUserId = Auth::user()->erp_user_id;
 			

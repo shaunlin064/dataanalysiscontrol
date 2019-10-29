@@ -127,19 +127,17 @@ class ProvideController extends BaseController
 
 	}
 	
-	public function view ($id= null)
+	public function view ()
 	{
-		
 		$date = new DateTime(date('Ym01'));
 		$erpUserId = Auth::user()->erp_user_id;
 		//
-		//$provideStart = '2019-10-01';
-		//$provideEnd = '2019-10-01';
-		//$saleGroupIds =[1,2,3,4];
-		//$userIds = [];
-		//$request = new Request(['startDate'=>$provideStart,'endDate'=>$provideEnd,'saleGroupIds'=>$saleGroupIds,'userIds'=>$userIds]);
-		//$ouput = $this->getAjaxProvideData($request);
-		//dd($ouput);
+//		$provideStart = '2019-09-01';
+//		$provideEnd = '2019-09-01';
+//		$saleGroupIds =[1,2,3,4];
+//		$userIds = [];
+//		$request = new Request(['startDate'=>$provideStart,'endDate'=>$provideEnd,'saleGroupIds'=>$saleGroupIds,'userIds'=>$userIds]);
+//		dd($this->getAjaxProvideData($request));
 		
 		list($saleGroups, $userList) = $this->getListData($erpUserId, $date);
 		
@@ -176,7 +174,7 @@ class ProvideController extends BaseController
 		
 		return view('financial.provide.view',
 		 [
-			'data' => $this->resources,
+          'data' => $this->resources,
 		  'provideBonusColumns'=> $provideBonusColumns,
 		  'provideBonus'=>[],
 		  'saleGroupsReachColumns' => $saleGroupsReachColumns,
@@ -339,13 +337,13 @@ class ProvideController extends BaseController
 		$allUserErpIds = Cache::store('memcached')->remember('allUserErpId', (4*360), function () {
 			return User::all()->pluck('erp_user_id')->toArray();
 		});
-		
+
 		foreach($dateRange as $date) {
 			$dateTimeObj = new DateTime($date);
 			if (!Cache::store('memcached')->has($this->cacheKeyFinancial  . $date)) {
 				$saleGroupRowData = $this->getSaleGroupProvide($dateTimeObj, $dateTimeObj, $allUserErpIds, []);
 				$bonusRowData = $this->getUserBounsProvide($dateTimeObj, $dateTimeObj, $allUserErpIds, [])->where('profit','<>',0);
-				
+
 				/*TODO::優化快取暫存時間判斷*/
 				$date2 = $dateTimeObj;
 				$cacheTime = 1;//hr
@@ -360,17 +358,17 @@ class ProvideController extends BaseController
 		}
 		$saleGroupRowData = collect([]);
 		$bonusRowData = collect([]);
-		
+
 		$cacheData->map(function($v,$setDate) use(&$saleGroupRowData,&$bonusRowData){
 			$saleGroupRowData = $saleGroupRowData->concat($v['saleGroupRowData']);
 			$bonusRowData = $bonusRowData->concat($v['bonusRowData']);
 		});
-		
+
 		$saleGroupRowData = $saleGroupRowData->whereIn('erp_user_id',$userIds)->values()->toArray();
-		
+
 		$bonusRowData = $bonusRowData->whereIn('erp_user_id',$userIds)->values()->toArray();
-		
-		
+
+
 		echo json_encode(["provide_groups_list" => $saleGroupRowData,"provide_bonus_list"=>$bonusRowData]);
 	}
 	/**

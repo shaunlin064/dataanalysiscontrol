@@ -41,7 +41,7 @@
             $addUserLists = $userObj->sortUserData('unsetOld');
             
 			$alreadySetUserIds = Bonus::groupBy('erp_user_id')->get()->pluck('erp_user_id');
-			
+   
 			return view('bonus.setting.add',['data' => $this->resources,'addUserLists' => $addUserLists,'alreadySetUserIds' => $alreadySetUserIds]);
 		}
 		
@@ -57,14 +57,14 @@
 			 return $v;
 			})->toArray();
 			
-			return view('bonus.setting.list',['data' => $this->resources,'row' => $listdata]);
+			return view('bonus.setting.list',['data' => $this->resources,'listdata' => $listdata]);
 		}
 		
-		public function edit($id)
+		public function edit(Bonus $bonus)
 		{
 			$this->authorize('create',$this->policyModel);
 			
-			$bonus = Bonus::with('levels')->findOrfail($id);
+            $bonus->levels;
 			
 			$erpUserId = $bonus->erp_user_id;
 			

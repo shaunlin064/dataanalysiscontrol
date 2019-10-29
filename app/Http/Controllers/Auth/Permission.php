@@ -20,9 +20,7 @@
 		public $menus;
 		public function __construct ()
 		{
-			$region = Str::before(Route::currentRouteName(),'.')  == 'system' ? 'system' : 'user';
-			$this->menus = Menu::where('region',$region )->get();
-			
+		
 		}
 		
 	}
