@@ -119,7 +119,7 @@
                     }
                 ],
             });
-            let listdata = {!! json_encode($row)  !!};
+            let listdata = {!! json_encode($listdata)  !!};
 
             dataTable.clear();
             dataTable.rows.add( listdata );
