@@ -44,7 +44,7 @@ class SetOldProvide extends Command
     public function handle()
     {
         //
-	    $financialList = FinancialList::with('receipt')->where(['status' => 1])->where('set_date','<=','2019-05-01')->get();
+	    $financialList = FinancialList::with('receipt')->where(['status' => 1])->where('set_date','<=','2019-06-01')->get();
 	    $finReceiptObj = new FinancialReceipt();
 	    $erpUserDatas = new UserController();
 	    $erpUserDatas->getErpUser();

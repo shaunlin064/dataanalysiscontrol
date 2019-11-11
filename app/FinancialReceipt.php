@@ -37,12 +37,11 @@ class FinancialReceipt extends Model
 	public function checkinPassData($v)
 	{
 		$nowAvalibelUser = ['ids' => [67, 84, 122, 131, 132, 133, 136, 153, 155, 170, 174, 181, 186, 188],
-		 'setDate' => '2019-06-01'];//5月以前不用
+		 'setDate' => '2019-07-01'];//5月以前不用
 		$leaveUser1 = ['ids' => [97, 175],
 		 'setDate' => '2019-03-01']; //3月以前不用
 		$leaveUser2 = ['ids' => [156, 161],
 		 'setDate' => '2019-04-01']; //4月以前不用
-		
 		if (in_array($v->erp_user_id, $leaveUser1['ids']) && $v->set_date < $leaveUser1['setDate']) {
 			$this->providOldData($v);
 		} elseif (in_array($v->erp_user_id, $leaveUser2['ids']) && $v->set_date < $leaveUser2['setDate']) {
