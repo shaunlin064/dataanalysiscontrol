@@ -29,10 +29,13 @@
 		 new \DateInterval('P1M'),
 		 new DateTime($last)
 		);
-		
-		foreach ($period as $date)
-			$dates[] = $date->format('Y-m-d');
-		
+        if($first == $last){
+            return [$first];
+        }
+		foreach ($period as $date) {
+            $dates[] = $date->format('Y-m-d');
+        }
+        
 		return $dates;
 	}
 	

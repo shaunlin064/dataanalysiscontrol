@@ -21,7 +21,6 @@
 	 */
 	
 	Route::get('/test',function(){
-	
 	});
 	
 	Route::get('/info',function(){

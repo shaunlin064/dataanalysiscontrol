@@ -64,12 +64,12 @@
 			 ];
 
 			////
-			//$dateStart =  $date->format('2019-06-01');
-			//$dateEnd = $date->format('Y-m-01');
-			////$userIds = collect($userList)->pluck('erp_user_id')->toArray();
-			//$request = new Request(['startDate' => $dateStart,'endDate'=>$dateEnd,'saleGroupIds' => [1,2,3,4],'userIds'=>[]]);
-			//$this->getAjaxData($request);
-		
+			$dateStart =  $date->format('2019-10-01');
+			$dateEnd = $date->format('Y-m-01');
+			//$userIds = collect($userList)->pluck('erp_user_id')->toArray();
+			$request = new Request(['startDate' => $dateStart,'endDate'=>$dateEnd,'saleGroupIds' => [1,2,3,4],'userIds'=>[]]);
+			$return = $this->getAjaxData($request,'return');
+			
 			$labels = [];
 			$chartDataBar = [
 			 [
@@ -272,7 +272,9 @@
 			
 			if($outType == 'echo'){
 				echo json_encode(["bonus_list" => $bonus_list, "chart_money_status" => $chartMoneyStatus, "chart_financial_bar" => $chartFinancialBar, 'progress_list' => $progress_list, 'group_progress_list' => $group_progress_list]);
-			}
+			}else{
+			    return ["bonus_list" => $bonus_list, "chart_money_status" => $chartMoneyStatus, "chart_financial_bar" => $chartFinancialBar, 'progress_list' => $progress_list, 'group_progress_list' => $group_progress_list];
+            }
 			
 			
 		}
@@ -353,13 +355,16 @@
 		private function getDataFromDataBase (array $userIds, $saleGroupIds, $dateStart, $dateEnd ): array
 		{
 			$SaleGroupsObj = new SaleGroups();
+			$resignUsers = collect(session('users'))->where('user_resign_date','!=','0000-00-00');
 			
 			$erpReturnData = collect($this->getFinancialData($userIds, $dateStart, $dateEnd));
 			
 			/*progressDatas*/
 			$progressDatas = collect([]);
+			
+   
 			$erpReturnData->groupBy(['set_date', 'erp_user_id'])->map(function ($items, $setDate) use (&$progressDatas) {
-				
+    
 				$items = $items->map(function ($v, $erpUserId) use ($setDate) {
 					$tmpData = $this->getUserBonus($erpUserId, $v->sum('profit'), $setDate);
 					$tmpData['totalProfit'] = number_format($v->sum('profit'));
@@ -371,7 +376,30 @@
 				})->values();
 				$progressDatas = $progressDatas->concat($items);
 			});
-			
+//			/*補齊該月沒有 金額的user 資料*/
+            foreach (date_range($dateStart,$dateEnd) as $dateRange){
+                $BonusList = Bonus::where('set_date',$dateRange)->whereIn('erp_user_id',$userIds)->get();
+                $setDate = substr($dateRange, 0, 7);
+                $haveValueProgressDatas = $progressDatas->where('set_date',$setDate)->pluck('erp_user_id');
+                
+                foreach($BonusList->whereNotin('erp_user_id',$haveValueProgressDatas) as $item){
+                    
+                        $thisResignUser = $resignUsers->whereIn('id',$item->erp_user_id)->first();
+                        if($thisResignUser['user_resign_date']){
+                            if($thisResignUser['user_resign_date'] <= $dateRange){
+                                continue;
+                            }
+                        }
+                        $tmpData = [];
+                        $tmpData = $this->getUserBonus($item->erp_user_id, 0, $dateRange);
+                        $tmpData['totalProfit'] = number_format(0);
+                        $tmpData['sale_group_name'] = $item->user->getUserGroupsName();
+                        $tmpData['user_name'] = $item->user->name;
+                        $tmpData['set_date'] = $setDate;
+                        $tmpData['erp_user_id'] = $item->erp_user_id;
+                        $progressDatas[] = $tmpData;
+                }
+            };
 			///*get group Profit */
 			$groupDateStart = new DateTime($dateStart);
 			$tmpGroups = [];
