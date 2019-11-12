@@ -54,7 +54,7 @@ class ReloadConvenerReach extends Command
 			}
 			/*過往 招集人獎金 直接發放*/
 	    collect($data)->flatten()->map(function($v,$k){
-	    	if($v->set_date < '2019-07-01'){
+	    	if($v->set_date < config('custom.setOldDateLine')){
 			    $date =  new DateTime($v->set_date);
 			    $v->updated_at = $date->modify('+4Month')->format('Y-m-d H:i:s');
 			    $v->status = 1;
