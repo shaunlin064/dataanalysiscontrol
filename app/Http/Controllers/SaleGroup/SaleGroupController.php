@@ -107,7 +107,7 @@ class SaleGroupController extends BaseController
 			$new['sale_groups_name'] = implode(',',SaleGroups::whereIn('id',$saleGroupIds)->get()->pluck('name')->toArray());
 			return $new;
 		})->sortBy('sale_groups_name')->values()->toArray();
-
+		
 		return view('saleGroup.setting.edit',[
 		 'data' => $this->resources,
 		 'user'=> $user,
@@ -214,6 +214,6 @@ class SaleGroupController extends BaseController
 		$message['status_string'] = 'success';
 		$message['message'] = '更新成功';
 		
-		return view('handle',['message'=>$message,'data' => $this->resources,'returnUrl' => Route('saleGroup.setting.edit',['id'=>$saleGroups->id]) ]);
+		return view('handle',['message'=>$message,'data' => $this->resources,'returnUrl' => Route('saleGroup.setting.edit',[$saleGroups->id]) ]);
 	}
 }
