@@ -10,8 +10,8 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-	
-	use App\User;
+
+    use App\User;
 	use Illuminate\Support\Facades\Auth;
 	use \Illuminate\Support\Facades\Cache;
 	use \Illuminate\Support\Facades\Artisan;
@@ -21,6 +21,7 @@
 	 */
 	
 	Route::get('/test',function(){
+
 	});
 	
 	Route::get('/info',function(){
@@ -71,6 +72,7 @@
 				Route::group(['namespace' => '\App\Http\Controllers\Financial'], function() {
 					/*匯率設定*/
 					Route::get('/exchangeRateSetting', 'ExchangeRatesController@setting')->name('financial.exchangeRate.setting');
+                    Route::get('/exchangeRateSetting/view', 'ExchangeRatesController@view')->name('financial.exchangeRate.view');
 					Route::post('/add', 'ExchangeRatesController@add')->name('financial.exchangeRate.add');
 					
 					/*獎金發放*/

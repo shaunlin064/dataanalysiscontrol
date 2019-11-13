@@ -79,6 +79,11 @@
 		    "region" => "user",
 		    "catalogue" => "financial",
 		    "subMenu" => [
+             [
+                "name" => "匯率檢視",
+                "icon" => "fa fa-circle-o",
+                "url" => "financial.exchangeRate.review",
+             ],
 		     [
 			    "name" => "匯率設定",
 			    "icon" => "fa fa-circle-o",

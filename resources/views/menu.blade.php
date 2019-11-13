@@ -8,7 +8,7 @@
 
 ?>
 	@foreach(session('menus') as $menu)
-        @if( auth()->user()->menuCheck($menu) )
+        @if( auth()->user()->menuCheck($menu))
             <li class="treeview {{ $menu['new_class'] }}">
             <a href="#">
                 <i class='{{$menu['icon'] }}'></i>

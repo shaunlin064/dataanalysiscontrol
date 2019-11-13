@@ -59,4 +59,16 @@ class ExchangeRatesController extends BaseController
 		
 		return view('financial.exchangeRate.setting',['data' => $this->resources,'currencys'=> self::CURRENCY_TYPE,'row'=>$row]);
 	}
+    
+    public function view ()
+    {
+        //permission check
+        $this->authorize('view',$this->policyModel);
+    
+        $financialReceiptObj = new FinancialReceipt();
+        $financialReceiptObj->updateFinancialMoneyReceipt();
+    
+        $row = ExchangeRate::orderBy('set_date','DESC')->get();
+        return view('financial.exchangeRate.view',['data' => $this->resources,'currencys'=> self::CURRENCY_TYPE,'row'=>$row]);
+	}
 }

@@ -21,7 +21,7 @@ class IndexController extends BaseController
 	 */
 	public function index(Request $request)
 	{
-	
+
 //		foreach($this->resources['menus'] as $keys => $items){
 //			$return = array_search('責任額',$items);
 ////			dd(Route::currentRouteName(),Route('index'),$return,$keys,$this->resources['menus']);
