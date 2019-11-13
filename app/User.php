@@ -82,8 +82,11 @@ class User extends Authenticatable
     {
         $check = false;
         $menus->subMenu->each(function($v,$k) use(&$check){
-            $check = $this->hasPermission($v->url);
+            if($check == false){
+                $check = $this->hasPermission($v->url);
+            }
         });
+        
         return $check;
     }
 }
