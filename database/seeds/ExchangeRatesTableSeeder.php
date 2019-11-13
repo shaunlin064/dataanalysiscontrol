@@ -274,11 +274,11 @@ class ExchangeRatesTableSeeder extends Seeder
                 //],
                 [
                     'currency' => 'JPY',
-                    'rate' => '0.28215'
+                    'rate' => '0.2803'
                 ],
                 [
                     'currency' => 'USD',
-                    'rate' => '30.985'
+                    'rate' => '30.44'
                 ]
             ],
 	    ];
