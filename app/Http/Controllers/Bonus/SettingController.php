@@ -93,7 +93,7 @@
             //check permission
             $bonus = $this->policyModel->where('erp_user_id',$uid)->first();
             
-            $this->authorize('viewAny',$bonus ?? $this->policyModel);
+//            $this->authorize('viewAny',$bonus ?? $this->policyModel);
    
 			list($highestProfit,$thisMonthProfit,$lastMonthProfit) = $this->getUserLatelyProfit($uid);
 			
