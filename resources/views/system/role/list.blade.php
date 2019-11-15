@@ -50,7 +50,7 @@
     <!-- page script -->
     <script>
         $(function () {
-            $('#roleSetting').on('click','#addNewRole',function(){
+            $('#roleList').on('click','#addNewRole',function(){
                 window.open('/system/roleAdd');
             });
         })

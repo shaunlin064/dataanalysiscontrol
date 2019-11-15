@@ -91,7 +91,7 @@
                 });
             }
             
-            return redirect()->route('system.role.edit',['id'=>$role->id]);
+            return redirect()->route('system.role.edit',[$role->id]);
         }
         /*角色相關end*/
     
@@ -144,7 +144,7 @@
                     });
             }
             
-            return redirect()->route('system.role.user.edit',['id' => $user->id ]);
+            return redirect()->route('system.role.user.edit',[$user->id ]);
         }
         /*user角色賦予end*/
         /**

@@ -131,7 +131,7 @@
 				}
 			}
             
-            return redirect()->route('bonus.setting.edit',['id'=>$bonus->id]);
+            return redirect()->route('bonus.setting.edit',[$bonus->id]);
 		}
 		
 		public function update (Request $request)
