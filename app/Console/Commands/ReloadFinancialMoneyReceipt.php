@@ -40,7 +40,12 @@ class ReloadFinancialMoneyReceipt extends Command
     public function handle()
     {
         //
+        $startTime = microtime(true);
+        
 	    $finanicalReceiptObj = new FinancialReceipt();
 	    $finanicalReceiptObj->updateFinancialMoneyReceipt('all');
+	    
+        $runTime = round(microtime(true) - $startTime, 2);
+        echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }
 }

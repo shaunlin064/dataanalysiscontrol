@@ -112,11 +112,12 @@
 		
 		public function save (Request $request,$setDate = null)/**/
 		{
+		 
 			$this->authorize('create',$this->policyModel);
 			
 			$date = new \DateTime();
 			$request->merge(['set_date' => isset($setDate) ? $setDate :$date->format('Y-m-01') ]);
-			
+   
 			$bonus = Bonus::create($request->all());
    
 			if($request->bonus_levels){
@@ -176,7 +177,7 @@
 				$message['status_string'] = 'success';
 				$message['message'] = '更新成功';
 				
-				return view('handle',['message'=>$message,'data' => $this->resources,'returnUrl' => Route('bonus.setting.edit',['id' => $bonus->id]) ]);
+				return view('handle',['message'=>$message,'data' => $this->resources,'returnUrl' => Route('bonus.setting.edit',[$bonus->id]) ]);
 			}
 			
 		}
@@ -237,6 +238,6 @@
             $message['status_string'] = 'fail';
             $message['message'] = '資料有誤 達成比例不能重複';
             
-            return view('handle', ['message' => $message, 'data' => $this->resources, 'returnUrl' => Route('bonus.setting.edit', ['id' => $bonus->id])]);
+            return view('handle', ['message' => $message, 'data' => $this->resources, 'returnUrl' => Route('bonus.setting.edit', [$bonus->id])]);
         }
     }

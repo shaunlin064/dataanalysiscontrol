@@ -41,10 +41,15 @@ class ReloadBonusReach extends Command
     public function handle()
     {
         //
+        $startTime = microtime(true);
+        
 	    DB::statement('SET FOREIGN_KEY_CHECKS=0');
 	    DB::table('bonus_reach')->truncate();
 	    DB::statement('SET FOREIGN_KEY_CHECKS = 1');
 	    $bonusReach = new BonusReachController();
 	    $bonusReach->update();
+	    
+        $runTime = round(microtime(true) - $startTime, 2);
+        echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }
 }

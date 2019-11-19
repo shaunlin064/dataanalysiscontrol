@@ -40,10 +40,15 @@ class ReloadFinanciaData extends Command
     public function handle()
     {
         //
+        $startTime = microtime(true);
+        
 	    $finanicalList = new FinancialList();
 	    DB::table('financial_lists')->truncate();
 	    DB::table('financial_receipts')->truncate();
 	    DB::table('financial_provides')->truncate();
 	    $finanicalList->saveUntilNowAllData();
+    
+        $runTime = round(microtime(true) - $startTime, 2);
+        echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }
 }

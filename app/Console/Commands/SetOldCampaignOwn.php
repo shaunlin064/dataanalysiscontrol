@@ -39,6 +39,8 @@ class SetOldCampaignOwn extends Command
     public function handle()
     {
         //
+        $startTime = microtime(true);
+        
 	    $changeCampaigns = [
 	     [
 	      'id'=>271,
@@ -86,5 +88,8 @@ class SetOldCampaignOwn extends Command
 			    });
 		    }
 	    }
+	    
+        $runTime = round(microtime(true) - $startTime, 2);
+        echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }
 }

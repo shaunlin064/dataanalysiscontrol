@@ -108,8 +108,8 @@
 	 
 	     ['erp_user_id' => 200,'set_date'=>'2019-11-01','boundary' => 600000],['set_date' => '2019-10-01' ,'erp_user_id' => 200, 'boundary' => 300000],
 	     ['erp_user_id' => 201,'set_date'=>'2019-11-01','boundary' => 600000],['set_date' => '2019-10-01' , 'erp_user_id' => 201,'boundary' => 300000],
-	     ['set_date' => '2019-10-01' ,'erp_user_id' => 204, 'boundary' => 200000],['erp_user_id' => 204,'set_date'=>'2019-11-01','boundary' => 250000],['erp_user_id' => 204,'set_date'=>'2019-12-01','boundary' => 550000],
-	     ['set_date' => '2019-10-01' ,'erp_user_id' => 205, 'boundary' => 200000],['erp_user_id' => 205,'set_date'=>'2019-11-01','boundary' => 300000],['erp_user_id' => 205,'set_date'=>'2019-12-01','boundary' => 600000],
+            ['erp_user_id' => 204,'set_date'=>'2019-12-01','boundary' => 550000],['set_date' => '2019-10-01' ,'erp_user_id' => 204, 'boundary' => 200000],['erp_user_id' => 204,'set_date'=>'2019-11-01','boundary' => 250000],
+            ['erp_user_id' => 205,'set_date'=>'2019-12-01','boundary' => 600000],['set_date' => '2019-10-01' ,'erp_user_id' => 205, 'boundary' => 200000],['erp_user_id' => 205,'set_date'=>'2019-11-01','boundary' => 300000]
 	    ];
 	    $otherrule = collect($otherrule);
 	    

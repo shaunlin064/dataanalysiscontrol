@@ -17,24 +17,19 @@ class FinancialReceipt extends Model
 		$erpReturnData = collect($financial->getBalancePayMentData($type));
 		$cpDetailIds = $erpReturnData->pluck('cp_detail_id');
 		
-		$v = FinancialList::whereIn('cp_detail_id',$cpDetailIds)->get();
-		FinancialList::whereIn('cp_detail_id',$cpDetailIds)->update(['status' => 1]);
+		$v = FinancialList::whereIn('cp_detail_id',$cpDetailIds);
+		$v->update(['status' => 1]);
+		$v = $v->get();
 		
-		$v->map(function ($v) use($erpReturnData){
-			if(!$this->where('financial_lists_id',$v->id)->exists()){
-				$balanceDate = $erpReturnData->where('cp_detail_id',$v->cp_detail_id)->first()['balance_date'];
-				$this->create(['financial_lists_id' => $v->id,'created_at' => $balanceDate]);
-			}
-			
-			//// 過往資料直接過濾至已發款
-			//if($v->set_date < '2019-06-01'){
-			//	$this->checkinPassData($v);
-			//}
-			
-		});
-		
+        $balanceDataArr = $erpReturnData->pluck('balance_date','cp_detail_id');
+
+       $v->reject(function($v){
+            return $this->where('financial_lists_id',$v->id)->exists();
+        })->map(function ($v) use($balanceDataArr){
+            $this->create(['financial_lists_id' => $v->id,'created_at' => $balanceDataArr[$v->cp_detail_id]]);
+        });
 	}
-	public function checkinPassData($v)
+	public function checkinPassData( FinancialList $v)
 	{
 		$nowAvalibelUser = ['ids' => [67, 84, 122, 131, 132, 133, 136, 153, 155, 170, 174, 181, 186, 188],
 		 'setDate' => config('custom.setOldDateLine')];
@@ -50,7 +45,7 @@ class FinancialReceipt extends Model
 			$this->providOldData($v);
 		}
 	}
-	public function providOldData($finListObj){
+	public function providOldData(FinancialList $finListObj){
 		//save financialList
 		$finListObj->status = 2;
 		$finListObj->save();

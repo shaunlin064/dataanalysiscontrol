@@ -38,7 +38,6 @@ class SetReload extends Command
      */
     public function handle()
     {
-        //
 	    Artisan::call('reload_financial_data');
 	    Artisan::call('set_old_campaign_own');
 	    Artisan::call('reload_financial_money_receipt');

@@ -44,28 +44,19 @@ class SetOldProvide extends Command
     public function handle()
     {
         //
+        $startTime = microtime(true);
+        
 	    $financialList = FinancialList::with('receipt')->where(['status' => 1])->where('set_date','<',config('custom.setOldDateLine'))->get();
 	    $finReceiptObj = new FinancialReceipt();
-	    $erpUserDatas = new UserController();
-	    $erpUserDatas->getErpUser();
-	    $leavelUser = collect($erpUserDatas->users)->where('user_resign_date','!=','0000-00-00');
-			
-	    $financialListObj = new FinancialList();
-	   
+	    
 	    //add && update
-	    $financialList->map(function ($v) use($financialListObj,$leavelUser,$finReceiptObj){
-		    
-	    	////離職員工 如果收款日期在離職後 不存入已放款
-	    	//if($leavelUser->where('id',$v->erp_user_id)->count() > 0){
-	    	//	$leaveDate = $leavelUser->where('id',$v->erp_user_id)->first()['user_resign_date'];
-	      //
-	    	//	if($leaveDate <= $v->receipt->created_at){
-				//    return;
-			  //  }
-		    //}
-		    // 過往資料直接過濾至已發款
+	    $financialList->map(function ($v) use($finReceiptObj){
+	     
 		    $finReceiptObj->checkinPassData($v);
 	    	
 	    });
+    
+        $runTime = round(microtime(true) - $startTime, 2);
+        echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }
 }

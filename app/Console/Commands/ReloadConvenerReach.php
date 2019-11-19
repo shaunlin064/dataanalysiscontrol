@@ -41,6 +41,8 @@ class ReloadConvenerReach extends Command
     public function handle()
     {
         //
+        $startTime = microtime(true);
+        
 	    $startDate = '2019-01-01';
 	    
 	    $date = new DateTime(date('Ym01'));
@@ -62,5 +64,8 @@ class ReloadConvenerReach extends Command
 		    }
 		    
 	    });
+    
+        $runTime = round(microtime(true) - $startTime, 2);
+        echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }
 }

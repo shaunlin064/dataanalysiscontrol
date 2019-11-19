@@ -41,19 +41,22 @@ class ExchangeRatesController extends BaseController
 	{
 		//permission check
 		$this->authorize('update',$this->policyModel);
-		
-		$date = new DateTime($request->set_date.'/01');
+        $newdata = $request->all();
+        
+        $date = new DateTime($request->set_date.'/01');
 		$date = $date->format('Y-m-01');
-		$erpUserId = Auth::user()->erp_user_id;
-		$request->request->set('set_date',$date);
-		$request->request->set('created_by_erp_user_id',$erpUserId);
 		
+  
+		$erpUserId = Auth::user()->erp_user_id;
+        $newdata['set_date'] = $date;
+        $newdata['created_by_erp_user_id'] = $erpUserId;
+
 		// exists check
-		if(ExchangeRate::where(['set_date'=>$date,'currency'=>$request->currency])->exists()){
+		if(ExchangeRate::where(['set_date'=>$date,'currency'=>$newdata['currency']])->exists()){
 			return redirect('financial/exchangeRateSetting')->withErrors("資料重複設定");
 		}
 		
-		ExchangeRate::create($request->all());
+		ExchangeRate::create($newdata);
 		
 		$row = ExchangeRate::all();
 		

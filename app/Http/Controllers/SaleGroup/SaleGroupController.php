@@ -72,7 +72,7 @@ class SaleGroupController extends BaseController
 		$groupsBonusHistory = $saleGroups->groupsBonus->groupBy('set_date')->map(function($v){
 		 return ['bonuslevel' => $v,'rate' => 5.5,'totalBoundary' => 0];
 		})->toArray();
-		
+  
 		$saleGroups->groupsUsers->map(function($v,$k) use(&$groupsBonusHistory){
 			$v['boundary'] = $v->getUserBonusBoundary->boundary ?? 0;
 			$v['name'] =  ucfirst($v->user->name);
@@ -83,7 +83,7 @@ class SaleGroupController extends BaseController
 			}
 			
 		});
-		
+  
 		$tmpUser = collect($row['groups_users']);
 		// get already select
 		$userNowSelect = $tmpUser->pluck('erp_user_id');
@@ -157,11 +157,8 @@ class SaleGroupController extends BaseController
 	{
         $this->authorize('create',$this->policyModel);
         
-		$inputDatas = $request->request->all();
-		
-		$inputDatas = collect($inputDatas);
-		$inputDatas->forget(['_token','user_table_length']);
-		
+		$inputDatas = collect($request->all())->forget(['_token','user_table_length']);
+  
 		//get date
 		$date = new \DateTime();
 		//$inputDatas['set_date'] = '2019-07-01';
@@ -176,7 +173,11 @@ class SaleGroupController extends BaseController
 		};
 		
 		//trim data
-		$tmpIsConvener = explode(',',$inputDatas['user_now_select_is_convener']);
+        $tmpIsConvener = [];
+        if(!empty($inputDatas['user_now_select_is_convener'])){
+            $tmpIsConvener = explode(',',$inputDatas['user_now_select_is_convener']);
+        }
+        
 		$inputDatas['groupsUsers'] = collect(explode(',',$inputDatas['user_now_select']))->map(function($v) use($setDate,$tmpIsConvener){
 			$arr = [];
 			$arr['erp_user_id'] = $v;
