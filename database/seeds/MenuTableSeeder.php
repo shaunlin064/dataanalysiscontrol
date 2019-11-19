@@ -82,7 +82,7 @@
              [
                 "name" => "匯率檢視",
                 "icon" => "fa fa-circle-o",
-                "url" => "financial.exchangeRate.review",
+                "url" => "financial.exchangeRate.view",
              ],
 		     [
 			    "name" => "匯率設定",
