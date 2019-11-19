@@ -42,6 +42,8 @@ class UpdateUserBonus extends Command
     public function handle()
     {
         //
+        $startTime = microtime(true);
+        
 	    $thisMonth = date('Y-m-01');
 	    $lastMonth = date('Y-m-01',strtotime("-1 month"));
 	    $bonus = Bonus::where('set_date',$lastMonth)->select(['id','erp_user_id','boundary'])->with('levels')->get();
@@ -77,10 +79,13 @@ class UpdateUserBonus extends Command
 		
 		    DB::commit();
 		
-	    } catch (\Exception $ex) {
+	    } catch (\Exception $ex)
+        {
 		    DB::rollback();
 		    \Log::error($ex->getMessage());
 	    }
-	    
+    
+        $runTime = round(microtime(true) - $startTime, 2);
+        echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }
 }

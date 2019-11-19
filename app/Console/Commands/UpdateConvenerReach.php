@@ -39,12 +39,15 @@ class UpdateConvenerReach extends Command
     public function handle()
     {
     	//
+        $startTime = microtime(true);
+        
 	    $date = new DateTime(date('Ym01'));
 	    $setDate = $date->modify('-1Month')->format('Y-m-d');
 	
 	    $saleGroupsReach = new SaleGroupsReach();
 	    $saleGroupsReach->setAllConvenerReach($setDate);
-	    
-			echo 'UpdateConvenerReach done';
+        
+        $runTime = round(microtime(true) - $startTime, 2);
+        echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }
 }

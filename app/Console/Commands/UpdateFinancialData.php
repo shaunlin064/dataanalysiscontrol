@@ -39,9 +39,13 @@ class UpdateFinancialData extends Command
     public function handle()
     {
         //
+        $startTime = microtime(true);
+        
 	    $finanicalList = new FinancialList();
 	
 	    $finanicalList->saveCloseData();
-	    
+    
+        $runTime = round(microtime(true) - $startTime, 2);
+        echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }
 }

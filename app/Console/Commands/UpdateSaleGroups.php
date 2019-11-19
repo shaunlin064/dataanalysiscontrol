@@ -41,6 +41,8 @@ class UpdateSaleGroups extends Command
     public function handle()
     {
         //
+        $startTime = microtime(true);
+        
 	    $thisMonth = date('Y-m-01');
 	    $allSale = SaleGroups::where('id','!=',0)->with(['groupsUsersLastMonth'])->with(['groupsBonusLastMonth'])->get();
 	    SaleGroupsBonusLevels::where('set_Date',$thisMonth)->delete();
@@ -67,6 +69,8 @@ class UpdateSaleGroups extends Command
 		    }
 		    $sale->push();
 	    };
-	    echo 'UpdateSaleGroups done';
+	    
+        $runTime = round(microtime(true) - $startTime, 2);
+        echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }
 }

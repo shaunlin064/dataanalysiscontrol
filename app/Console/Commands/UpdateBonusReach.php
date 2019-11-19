@@ -39,10 +39,15 @@ class UpdateBonusReach extends Command
     public function handle()
     {
         //
+        $startTime = microtime(true);
+        
 	    $bonusReach = new BonusReachController();
 	    $date_now =  new \DateTime();
 	    $date_now->modify('-1Month');
 	    
 	    $bonusReach->update($date_now->format('Y-m-01'));
+    
+        $runTime = round(microtime(true) - $startTime, 2);
+        echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }
 }
