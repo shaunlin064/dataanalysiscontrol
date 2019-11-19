@@ -17,9 +17,9 @@
 	function isDateSimple($str){
 		
 		if(!preg_match("/^[0-9]{4}(\-|\/)[0-9]{2}(\\1)[0-9]{2}$/", $str) && !preg_match("/^[0-9]{2}(\-|\/)[0-9]{2}$/", $str)){
-			return false;
+			return FALSE;
 		}
-		return true;
+		return TRUE;
 	}
 	
 	function date_range($first, $last)
@@ -48,3 +48,7 @@
 	}
 	/*END 字串相關*/
 	
+    function newRequest ($Array = NULL)
+    {
+        return new \Illuminate\Http\Request($Array);
+    }
