@@ -133,10 +133,6 @@
                                 this.$store.state.sale_channel_profitData = response.data.sale_channel_profitData;
                             }
                             
-                            if(response.data.customer_precentage_profit['date'] !== undefined){
-                            
-                            }
-                            
                             this.updataTable(rowData);
                         }
                     },
