@@ -13,7 +13,8 @@
         props: {
 			    id:String,
 			    multiple:Boolean,
-	        disabled:Boolean,
+	            disabled:Boolean,
+                selected:Boolean,
 			    placeholder:String,
 			    row:Array
         },

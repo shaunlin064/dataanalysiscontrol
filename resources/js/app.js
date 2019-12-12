@@ -83,7 +83,9 @@ Vue.component('box-progress-component', require('./components/BoxProgress').defa
 
 //chart
 Vue.component('chart-component', require('./components/Chart').default);
-
+Vue.component('chart-customer-precentage-profit', require('./components/CustomerPrecentagePie').default);
+Vue.component('chart-customer-profit-bar', require('./components/CustomerProfitBar').default);
+Vue.component('chart-all-year-profit-line', require('./components/AllYearProfit').default);
 
 Vue.component('test-component', require('./components/test.vue').default);
 Vue.component('test2-component', require('./components/test2.vue').default);
@@ -111,9 +113,13 @@ Vue.component('date-range', require('./components/DateRange').default);
 
 Vue.component('select2', require('./components/Select2').default);
 
+Vue.component('select2-customer', require('./components/CustomerSelect2').default);
+
 Vue.component('count-total', require('./components/CountTotal').default);
 
 Vue.component('provide-submit', require('./components/ProvideSubmit').default);
+
+Vue.component('select-button-group', require('./components/SelectButtonGroup').default);
 
 const app = new Vue({
     el: '#app',

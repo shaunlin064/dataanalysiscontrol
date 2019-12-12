@@ -2,6 +2,9 @@
     
     namespace App\Console;
     
+    use App\Console\Commands\CacheAll;
+    use App\Console\Commands\CacheFinancialList;
+    use App\Console\Commands\CacheReceiptTimes;
     use App\Console\Commands\UpdateBonusReach;
     use App\Console\Commands\UpdateConvenerReach;
     use App\Console\Commands\UpdateFinancialData;
@@ -26,6 +29,7 @@
             UpdateFinancialData::class,
             UpdateBonusReach::class,
             UpdateConvenerReach::class,
+            CacheAll::class,
         ];
         
         /**
@@ -42,6 +46,8 @@
             $schedule->command('update_financial_data')->monthlyOn('16', '00:00');
             $schedule->command('update_bonus_reach')->monthlyOn('16', '00:10');
             $schedule->command('update_convener_reach')->monthlyOn('16', '00:20');
+            /*cached*/
+            $schedule->command('cache_all')->twiceDaily(10, 15);
         }
         
         /**

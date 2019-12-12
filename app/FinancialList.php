@@ -14,7 +14,8 @@ class FinancialList extends Model
 	protected $guarded = ['med_group','dep_name','dep_id','username','priority'];
 	protected $attributes = [
 	 'status' => 0,
-		'profit_percentage' => 0,
+        'profit_percentage' => 0,
+        'companies_id' => 0,
 	];
 	
 	protected $keyReplace = [
@@ -339,5 +340,14 @@ class FinancialList extends Model
 		$orginal->forget('updated_at');
 		return count($orginal->diffAssoc($data)) > 0 ? true : false;
 	}
-	
+    
+    public function getDataList ($fieldName,$fieldid)
+    {
+        $data = $this->all()->pluck($fieldName,$fieldid)->filter()->unique()->map(function($v,$id){
+            $tmp = ['name'=>$v,'id'=>$id];
+            return $tmp;
+        })->sortBy('name')->values()->toArray();
+        
+        return $data;
+	}
 }

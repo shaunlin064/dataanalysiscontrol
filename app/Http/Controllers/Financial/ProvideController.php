@@ -464,12 +464,10 @@ class ProvideController extends BaseController
 			$saleGroups = SaleGroups::all();
 			$userList = Bonus::with('user')->groupBy('erp_user_id')->orderBy('erp_user_id')->get()->map(function($v,$k){
 				$newUser = $v->user;
-				$newUser->name =  ucfirst($newUser->name);
+                $newUser->name =  ucfirst($v->user->name);
 			 return $newUser;
 			});
-			
 		} else {
-			
 			if ($isConvener) {
 				$saleGroups = [$saleGroupsUsers->saleGroups];
 				

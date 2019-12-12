@@ -124,8 +124,21 @@
 
   }
 }
+
 .content-center{
-    margin: 0 25%;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.widget-user{
+    .widget-user-header{
+        //overflow: hidden;
+        //height: auto;
+        //min-height:180px;
+    }
+}
+.mt-5{
+    margin-top: 5px;
 }
 td.details-control {
   background: url('/img/details_open.png') no-repeat center center;

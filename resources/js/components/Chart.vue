@@ -1,80 +1,81 @@
 <template>
-	<div class="box box-danger" id="canvas-holder">
-		<canvas :id=table_id></canvas>
-	</div>
+    <div class="box box-info" id="canvas-holder">
+        <canvas :id=table_id></canvas>
+    </div>
 </template>
 
 <script>
-    import {mapState,mapMutations,mapActions} from 'vuex';
+    import {mapState, mapMutations, mapActions} from 'vuex';
+
     export default {
         name: "Chart",
-		    props:{
-            table_id:String,
-				    title:String,
-				    type:String,
-				    chart_data:Array,
-            labels:Array,
+        props: {
+            table_id: String,
+            title: String,
+            type: String,
+            chart_data: Array,
+            labels: Array,
             ajax_url: String,
             csrf: String,
-		    },
-        computed: {...mapState(['month_income','month_cost','month_profit','money_status_paid','money_status_unpaid','money_status_bonus_paid','money_status_bonus_unpaid','table_select','start_date','end_date','change_date','user_ids','sale_group_ids'])},
-		    data: function(){
+        },
+        computed: {...mapState(['month_income', 'month_cost', 'month_profit', 'money_status_paid', 'money_status_unpaid', 'money_status_bonus_paid', 'money_status_bonus_unpaid', 'table_select', 'start_date', 'end_date', 'change_date', 'user_ids', 'sale_group_ids'])},
+        data: function () {
             return {
-                default_color:{
-                  red: 'rgba(255, 99, 132,0.5)',
-                  orange: 'rgba(255, 159, 64,0.5)',
-                  yellow: 'rgba(255, 205, 86,0.5)',
-                  green: 'rgba(75, 192, 192,0.5)',
-                  blue: 'rgba(54, 162, 235,0.5)',
-                  purple: 'rgba(153, 102, 255,0.5)',
-                  grey: 'rgba(201, 203, 207,0.5)'
-	            },
-	            pie_color:[
-                  'rgb(255, 205, 86)',
-                  'rgb(75, 192, 192)',
-                  'rgb(255, 205, 86)',
-                  'rgb(75, 192, 192)',
-	            ],
-	            bar_color:[
-                  'rgba(255, 99, 132,0.5)',
-                  'rgba(54, 162, 235,0.5)',
-                  'rgba(75, 192, 192,0.5)',
-	            ],
-	            bar_label:[
-	                '收入',
-			            '成本',
-			            '毛利'
-	            ],
-					    config: {
-	                type: this.type,
-	                data: {
-                      'datasets':this.chart_data,
-                      // 'datasets':[
-                      //     {"data":[this.money_status_paid,this.money_status_unpaid,0,0]}
-                      //     ,{"data":[0,0,this.money_status_bonus_paid,this.money_status_bonus_unpaid]}
-                      // ],
-			                'labels' : this.labels,
-	                },
-	                options: {
-	                    responsive: true,
-	                    title: {
-	                        display: true,
-	                        text: this.title
-	                    },
-	                }
-	            },
-	            chart_obj :{},
-                chart_labels : [],
+                default_color: {
+                    red: 'rgba(255, 99, 132,0.5)',
+                    orange: 'rgba(255, 159, 64,0.5)',
+                    yellow: 'rgba(255, 205, 86,0.5)',
+                    green: 'rgba(75, 192, 192,0.5)',
+                    blue: 'rgba(54, 162, 235,0.5)',
+                    purple: 'rgba(153, 102, 255,0.5)',
+                    grey: 'rgba(201, 203, 207,0.5)'
+                },
+                pie_color: [
+                    'rgb(255, 205, 86)',
+                    'rgb(75, 192, 192)',
+                    'rgb(255, 205, 86)',
+                    'rgb(75, 192, 192)',
+                ],
+                bar_color: [
+                    'rgba(255, 99, 132,0.5)',
+                    'rgba(54, 162, 235,0.5)',
+                    'rgba(75, 192, 192,0.5)',
+                ],
+                bar_label: [
+                    '收入',
+                    '成本',
+                    '毛利'
+                ],
+                config: {
+                    type: this.type,
+                    data: {
+                        'datasets': this.chart_data,
+                        // 'datasets':[
+                        //     {"data":[this.money_status_paid,this.money_status_unpaid,0,0]}
+                        //     ,{"data":[0,0,this.money_status_bonus_paid,this.money_status_bonus_unpaid]}
+                        // ],
+                        'labels': this.labels,
+                    },
+                    options: {
+                        responsive: true,
+                        title: {
+                            display: true,
+                            text: this.title
+                        },
+                    }
+                },
+                chart_obj: {},
+                chart_labels: [],
             }
-		    },
-        created: function(){
+        },
+        created: function () {
             let vue_this = this;
             // var default_color = vue_this.default_color;
-            this.config.data.datasets.map( function(v,k,i){
-                
-                if(vue_this.type == 'pie'){
+            this.config.data.datasets.map(function (v, k, i) {
+
+                if (vue_this.type == 'pie') {
                     v.backgroundColor = vue_this.pie_color;
-                }else if (vue_this.type == 'bar'){
+                } else if (vue_this.type == 'bar') {
                     v.label = vue_this.bar_label[k];
                     v.backgroundColor = vue_this.bar_color[k];
                     // if(k <= 1){
@@ -86,41 +87,44 @@
                 }
             });
         },
-		    mounted: function(){
+        mounted: function () {
             var ctx = document.getElementById(this.table_id).getContext('2d');
             this.chart_obj = new Chart(ctx, this.config);
-		    },
-		    methods:{
-            getData(){
-                if(this.ajax_url === undefined){
+        },
+        methods: {
+            getData() {
+                if (this.ajax_url === undefined) {
                     return false;
                 }
                 let data = {
-                    _token : this.csrf,
-                    startDate : this.$store.state.start_date,
-                    endDate : this.$store.state.end_date,
-                    saleGroupIds : this.$store.state.sale_group_ids,
-                    userIds : this.$store.state.user_ids
+                    _token: this.csrf,
+                    startDate: this.$store.state.start_date,
+                    endDate: this.$store.state.end_date,
+                    saleGroupIds: this.$store.state.sale_group_ids,
+                    userIds: this.$store.state.user_ids
                 };
-                if( (data.saleGroupIds == '' && data.userIds == '') || data._token === undefined ){
+                if ((data.saleGroupIds == '' && data.userIds == '') || data._token === undefined) {
                     return false;
                 }
-                
-                axios.post(this.ajax_url,data).then(
+
+                axios.post(this.ajax_url, data).then(
                     response => {
                         let rowData = eval(`response.data.${this.table_id}`);
-		                    
-                        if(rowData){
-                            if(this.table_id == 'chart_money_status'){
-                                this.$store.commit('changeMoneyStatus',{paid:rowData.paid,unpaid:rowData.unpaid});
-                            }else if(this.table_id == 'chart_financial_bar'){
-                                this.$store.commit('changeMonthBalancen',{'month_income':rowData.totalIncome,'month_cost':rowData.totalCost,'month_profit':rowData.totalProfit});
+
+                        if (rowData) {
+                            if (this.table_id == 'chart_money_status') {
+                                this.$store.commit('changeMoneyStatus', {paid: rowData.paid, unpaid: rowData.unpaid});
+                            } else if (this.table_id == 'chart_financial_bar') {
+                                this.$store.commit('changeMonthBalancen', {
+                                    'month_income': rowData.totalIncome,
+                                    'month_cost': rowData.totalCost,
+                                    'month_profit': rowData.totalProfit
+                                });
                                 this.chart_labels = rowData.labels;
                             }
-                            
-                            this.update(this);
-                        };
 
+                            this.update(this);
+                        }
                     },
                     err => {
 
@@ -128,27 +132,27 @@
                     }
                 );
             },
-            update(vue_this){
-                
-                if(vue_this.type == 'pie'){
-                    vue_this.chart_obj.data.datasets.map( function(dataset,key){
-                        if(key == 0){
-                            dataset.data = [vue_this.money_status_unpaid,vue_this.money_status_paid,0,0];
+            update(vue_this) {
+
+                if (vue_this.type == 'pie') {
+                    vue_this.chart_obj.data.datasets.map(function (dataset, key) {
+                        if (key == 0) {
+                            dataset.data = [vue_this.money_status_unpaid, vue_this.money_status_paid, 0, 0];
                         }
                         // else{
                         //     dataset.data = [0,0,vue_this.money_status_bonus_paid,vue_this.money_status_bonus_unpaid];
                         // }
                     });
-                }else if(vue_this.type == 'bar'){
-                    
+                } else if (vue_this.type == 'bar') {
+
                     let monthdata = [
                         vue_this.month_income,
-		                    vue_this.month_cost,
+                        vue_this.month_cost,
                         vue_this.month_profit,
                     ];
                     vue_this.chart_obj.data.labels = vue_this.chart_labels;
-                    vue_this.chart_obj.data.datasets.map( function(dataset,key){
-		                    dataset.data = monthdata[key];
+                    vue_this.chart_obj.data.datasets.map(function (dataset, key) {
+                        dataset.data = monthdata[key];
                     });
                 }
                 vue_this.chart_obj.update();
@@ -156,29 +160,29 @@
             ...mapActions({
                 saveName: 'saveName'
             }),
-		    },
-        watch:{
+        },
+        watch: {
             start_date: {
                 immediate: true,    // 这句重要
-                handler (val, oldVal) {
-                    if(oldVal !== val  && oldVal !== undefined && oldVal !== '' && val !== '' && oldVal.length !== 0) {
-                        
+                handler(val, oldVal) {
+                    if (oldVal !== val && oldVal !== undefined && oldVal !== '' && val !== '' && oldVal.length !== 0) {
+
                         this.getData();
                     }
                 }
             },
             end_date: {
                 immediate: true,    // 这句重要
-                handler (val, oldVal) {
-                    if( oldVal !== undefined  && val !== '') {
+                handler(val, oldVal) {
+                    if (oldVal !== undefined && val !== '') {
                         this.getData();
                     }
                 }
             },
             user_ids: {
                 immediate: true,    // 这句重要
-                handler (val, oldVal) {
-                    if(oldVal !== val) {
+                handler(val, oldVal) {
+                    if (oldVal !== val) {
                         this.getData();
                     }
                 }
@@ -186,32 +190,32 @@
             sale_group_ids: {
                 immediate: true,// 这句重要
                 // lazy:true,
-                handler (val,oldVal) {
-                    if( oldVal !== undefined && val !== '' ) {
+                handler(val, oldVal) {
+                    if (oldVal !== undefined && val !== '') {
                         this.getData();
                     }
                 }
             },
             money_status_paid: {
                 immediate: true,
-                handler (val, oldVal) {
-                    if(oldVal !== undefined){
+                handler(val, oldVal) {
+                    if (oldVal !== undefined) {
                         this.update(this);
                     }
                 }
             },
-            month_income:{
+            month_income: {
                 immediate: true,
-                handler (val, oldVal) {
-                    if(oldVal !== undefined){
+                handler(val, oldVal) {
+                    if (oldVal !== undefined) {
                         this.update(this);
                     }
                 }
             },
-            month_cost:{
+            month_cost: {
                 immediate: true,
-                handler (val, oldVal) {
-                    if(oldVal !== undefined){
+                handler(val, oldVal) {
+                    if (oldVal !== undefined) {
                         this.update(this);
                     }
                 }

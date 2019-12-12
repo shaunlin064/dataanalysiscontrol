@@ -8,6 +8,9 @@
     
     namespace App\Http\Controllers\Bonus;
     
+    use App\Http\Controllers\FinancialController;
+    use Exception;
+    use Illuminate\Support\Collection;
     use Illuminate\Support\Facades\Artisan;
     use Illuminate\Support\Facades\Cache;
     use App\FinancialList;
@@ -41,7 +44,13 @@
         {
             $loginUserId = Auth::user()->erp_user_id;
             
-            $date = new \DateTime();
+            $date = new DateTime();
+            
+            $objFin = new FinancialList();
+            $agencyList = $objFin->getDataList('agency_name', 'agency_id');
+            $clientList = $objFin->getDataList('client_name', 'client_id');
+            $mediaCompaniesList = $objFin->getDataList('companies_name', 'companies_id');
+            $medias = $objFin->getDataList('media_channel_name', 'media_channel_name');
             
             $provideObj = new ProvideController();
             
@@ -64,13 +73,35 @@
                     ['data' => 'bonusStatus'],
                 ];
             
-            ////
-            //            $dateStart = $date->format('2019-10-01');
-            //            $dateEnd = $date->format('Y-m-01');
-            //            //$userIds = collect($userList)->pluck('erp_user_id')->toArray();
-            //            $request = new Request(['startDate' => $dateStart, 'endDate' => $dateEnd, 'saleGroupIds' => [1, 2, 3, 4], 'userIds' => []]);
-            //            $return = $this->getAjaxData($request, 'return');
+            $customerProfitColumns =
+                [
+                    ['data' => 'name'],
+                    ['data' => 'type' ,'render' => '<span class="badge bg-${style}">${data}</span>', 'parmas' => 'let style ="red"; if(data == "直客"){ style = "blue"}'],
+                    ['data' => 'receipt_times'],
+                    ['data' => 'profit'],
+                ];
+            $mediasProfitColumns =
+                [
+                    ['data' => 'name'],
+                    ['data' => 'sales_channel','render' => '<span class="badge bg-${style}">${data}</span>', 'parmas' => 'let style ="yellow"; if(data == "BR"){ style = "green"}else if(data == "EC"){ style = "purple"}'],
+                    ['data' => 'profit'],
+                ];
+            $mediaCompaniesProfitColumns =
+                [
+                    ['data' => 'name'],
+                    ['data' => 'profit'],
+                ];
             
+            $allYearProfit = $this->getAllYearProfit($userList);
+            
+            /*ajax check debug*/
+//            $dateStart = $date->format('2017-01-01');
+//            $dateEnd = $date->format('Y-m-01');
+//            $userIds = collect($userList)->pluck('erp_user_id')->toArray();
+//            $request = new Request(['startDate' => $dateStart, 'endDate' => $dateEnd, 'saleGroupIds' => [1,2,3,4,5], 'userIds' => []]);
+//            $return = $this->getAjaxData($request, 'return');
+//            dd($return);
+//
             $labels = [];
             $chartDataBar = [
                 [
@@ -80,7 +111,7 @@
                     'data' => 0,
                 ],
                 [
-                    'data' => 0,
+                    'type'=> 'line','data' => 0,
                 ],
             ];
             $chartData = [
@@ -117,7 +148,6 @@
                 ['data' => 'percentage', 'render' => '<span class="badge bg-${style}">${data}%</span>', 'parmas' => 'let style ="yellow"; if(data > 90){ style = "green"}else if(data < 0){ style = "red"}'],
             ];
             
-            
             return view('bonus.review.view', [
                     'data' => $this->resources,
                     'chartData' => $chartData,
@@ -130,7 +160,15 @@
                     'groupProgressDatas' => [],
                     'groupProgressColumns' => $groupsProgressColumns,
                     'saleGroups' => $saleGroups,
-                    'userList' => $userList
+                    'clientList' => $clientList,
+                    'agencyList' => $agencyList,
+                    'mediaCompaniesList' => $mediaCompaniesList,
+                    'medias' => $medias,
+                    'userList' => $userList,
+                    'customerProfitColumns' => $customerProfitColumns,
+                    'mediasProfitColumns' => $mediasProfitColumns,
+                    'mediaCompaniesProfitColumns' => $mediaCompaniesProfitColumns,
+                    'allYearProfit' => $allYearProfit
                 ]
             );
         }
@@ -141,6 +179,10 @@
             $dateEnd = $request->endDate;
             $saleGroupIds = $request->saleGroupIds;
             $userIds = $request->userIds;
+            $agencyIdArrays = collect($request->agencyIdArrays)->filter()->toArray();
+            $clientIdArrays = collect($request->clientIdArrays)->filter()->toArray();
+            $mediaCompaniesIdArrays = collect($request->mediaCompaniesIdArrays)->filter()->toArray();
+            $mediasNameArrays = collect($request->mediasNameArrays)->filter()->toArray();
             
             $SaleGroupsObj = new SaleGroups();
             if (!empty($userIds)) {
@@ -150,11 +192,7 @@
             if ($saleGroupIds && empty($userIds)) {
                 $userIds = $SaleGroupsObj->all()->map(function ($v, $k) {
                     return $v->groupsUsers;
-                    //return ['groupId'=>$v->id,'items'=>$v->groupsUsers];
-                    //return $v->groupsUsers->pluck('erp_user_id');
                 })->flatten();
-                //})->flatten()->unique()->values()->toArray();
-                
             }
             
             /*cache all user erp Id*/
@@ -176,10 +214,9 @@
             /*check cache exists*/
             $cahceKey = 'financial.review';
             foreach ($dateRange as $date) {
-                /*TODO::優化快取暫存時間判斷*/
+                
                 $date2 = new DateTime($date);
-                $cacheTime = 1;//hr
-                $dateDistance = ($dateNow->getTimestamp() - $date2->getTimestamp()) / (60 * 60 * 24) / 365;
+                $dateDistance = round(($dateNow->getTimestamp() - $date2->getTimestamp()) / (3600 * 24) / 365);
                 if ($dateDistance > 2) { // over two year
                     $cacheTime = 24 * 30; // 1 month
                 } elseif ($dateDistance > 1) { // over one year
@@ -193,15 +230,19 @@
                 if (!Cache::store('memcached')->has($cahceKey . $date)) {
                     //
                     list($erpReturnData, $progressDatas, $groupProfitDatas) = $this->getDataFromDataBase($allUserErpIds, $allGroupIds, $date, $date);
+                    
                     Cache::store('memcached')->put($cahceKey . $date, ["bonus_list" => $erpReturnData, 'progress_list' => $progressDatas, 'group_progress_list' => $groupProfitDatas], ($cacheTime * 3600));
+                    
+                    $cacheData[] = ["bonus_list" => $erpReturnData, 'progress_list' => $progressDatas, 'group_progress_list' => $groupProfitDatas];
+                }else{
+                    $cacheData[] = Cache::store('memcached')->get($cahceKey . $date);
                 }
-                $cacheData[] = Cache::store('memcached')->get($cahceKey . $date);
             }
             
             $group_progress_list = collect([]);
             $bonus_list = collect([]);
             $progress_list = collect([]);
-            $cacheData->map(function ($v, $setDate) use (&$progress_list, &$bonus_list, &$group_progress_list) {
+            $cacheData->each(function ($v, $setDate) use (&$progress_list, &$bonus_list, &$group_progress_list) {
                 //$bonus_list = array_merge($bonus_list,$v['bonus_list']->toArray());
                 $bonus_list = $bonus_list->concat($v['bonus_list']);
                 $progress_list = $progress_list->concat($v['progress_list']);
@@ -210,7 +251,6 @@
             
             $tmpBonus = collect([]);
             $tmpProgressList = collect([]);
-            
             foreach ($dateRange as $dateItem) {
                 if ($saleGroupIds) {
                     foreach ($saleGroupIds as $saleGroupId) {
@@ -220,14 +260,14 @@
                         $tmpProgressList = $tmpProgressList->concat($progress_list->where('set_date', substr($dateItem, 0, 7))->whereIn('erp_user_id', $tmpUserIds));
                     }
                 } elseif ($userIds) {
-                    
                     $tmpBonus = $bonus_list->whereIn('erp_user_id', $userIds);
                     $tmpProgressList = $progress_list->whereIn('erp_user_id', $userIds);
                 }
             }
             
+            $bonus_list = $this->getFilterData($tmpBonus->toArray(), $agencyIdArrays, $clientIdArrays, $mediaCompaniesIdArrays, $mediasNameArrays);
+            
             $progress_list = $tmpProgressList->values()->toArray();
-            $bonus_list = $tmpBonus;
             
             $chartMoneyStatus = [
                 'unpaid' => round($bonus_list->where('status', '=', 0)->sum('income')),
@@ -266,18 +306,258 @@
                 return $v;
             });
             
+            list($customerPrecentageProfit, $customerProfitData) = $this->getCustomerAllAnalysis($bonus_list,$dateRange);
+            
+            list($mediaCompaniesProfitData, $mediasProfitData,$saleChannelProfitData) = $this->getMediaAllAnalysis($bonus_list);
+            
             $bonus_list = $bonus_list->values()->toArray();
-            //dd($progress_list,$userIds,$saleGroupIds);
-            //$progress_list = $progress_list->whereIn('erp_user_id',$userIds)->values()->toArray();
+            
             $group_progress_list = $group_progress_list->whereIn('id', $saleGroupIds)->values()->toArray();
             
+            $returnData = [
+                "bonus_list" => $bonus_list,
+                "chart_money_status" => $chartMoneyStatus,
+                "chart_financial_bar" => $chartFinancialBar,
+                'progress_list' => $progress_list,
+                'group_progress_list' => $group_progress_list,
+                'customer_precentage_profit' => $customerPrecentageProfit,
+                'customer_profit_data' => $customerProfitData,
+                'medias_profit_data' => $mediasProfitData,
+                'media_companies_profit_data' => $mediaCompaniesProfitData,
+                'sale_channel_profitData' => $saleChannelProfitData,
+            ];
+            
             if ($outType == 'echo') {
-                echo json_encode(["bonus_list" => $bonus_list, "chart_money_status" => $chartMoneyStatus, "chart_financial_bar" => $chartFinancialBar, 'progress_list' => $progress_list, 'group_progress_list' => $group_progress_list]);
+                echo json_encode($returnData);
             } else {
-                return ["bonus_list" => $bonus_list, "chart_money_status" => $chartMoneyStatus, "chart_financial_bar" => $chartFinancialBar, 'progress_list' => $progress_list, 'group_progress_list' => $group_progress_list];
+                return $returnData;
+            }
+        }
+        
+        /**
+         * @param array $userIds
+         * @param $dateStart
+         * @param $dateEnd
+         * @param SaleGroups $SaleGroupsObj
+         * @param $saleGroupIds
+         * @return array
+         * @throws Exception
+         */
+        private function getDataFromDataBase (array $userIds, $saleGroupIds, $dateStart, $dateEnd): array
+        {
+            $SaleGroupsObj = new SaleGroups();
+            $resignUsers = collect(session('users'))->where('user_resign_date', '!=', '0000-00-00');
+            
+            $erpReturnData = collect($this->getFinancialData($userIds, $dateStart, $dateEnd));
+            
+            /*progressDatas*/
+            $progressDatas = $this->getProgressDatas($erpReturnData);
+            
+            //			/*補齊該月沒有 金額的user 資料*/
+            foreach (date_range($dateStart, $dateEnd) as $dateRange) {
+                $BonusList = Bonus::where('set_date', $dateRange)->whereIn('erp_user_id', $userIds)->get();
+                $setDate = substr($dateRange, 0, 7);
+                $haveValueProgressDatas = $progressDatas->where('set_date', $setDate)->pluck('erp_user_id');
+                
+                foreach ($BonusList->whereNotin('erp_user_id', $haveValueProgressDatas) as $item) {
+                    
+                    $thisResignUser = $resignUsers->whereIn('id', $item->erp_user_id)->first();
+                    if ($thisResignUser['user_resign_date']) {
+                        if ($thisResignUser['user_resign_date'] <= $dateRange) {
+                            continue;
+                        }
+                    }
+                    $tmpData = $this->getUserBonus($item->erp_user_id, 0, $dateRange);
+                    $tmpData['totalProfit'] = number_format(0);
+                    $tmpData['sale_group_name'] = $item->user->getUserGroupsName();
+                    $tmpData['user_name'] = $item->user->name;
+                    $tmpData['set_date'] = $setDate;
+                    $tmpData['erp_user_id'] = $item->erp_user_id;
+                    $progressDatas[] = $tmpData;
+                }
+            };
+            
+            ///*get group Profit */
+            $groupDateStart = new DateTime($dateStart);
+            $tmpGroups = [];
+            /*getGroupBoundary*/
+            if ($dateEnd == $groupDateStart->format('Y-m-01')) {
+                $tmpGroups[] = $SaleGroupsObj->getGroupBoundary($saleGroupIds, $groupDateStart->format('Y-m-01'));
+            }
+            while ($dateEnd != $groupDateStart->format('Y-m-01')) {
+                $tmpGroups[] = $SaleGroupsObj->getGroupBoundary($saleGroupIds, $groupDateStart->format('Y-m-01'));
+                $groupDateStart->modify('+1Month');
+            }
+            /*calculation profit percentage*/
+            $groupProfitDatas = $this->getGroupProfitDatas($tmpGroups, $erpReturnData);
+            
+            $erpReturnData = $erpReturnData->map(function ($v, $k) {
+                $v['set_date'] = substr($v['set_date'], 0, 7);
+                return $v;
+            });
+            
+            return [$erpReturnData->toArray(), $progressDatas->toArray(), $groupProfitDatas->toArray()];
+        }
+        
+        /**
+         * @param $id
+         * @param string $yearMonthDay
+         * @return bool|mixed|string
+         */
+        private function getFinancialData (Array $erpUserIds, string $dateStart, string $dateEnd)
+        {
+            $financialListObj = new FinancialList();
+            return $financialListObj->getFinancialData($erpUserIds, $dateStart, $dateEnd);
+        }
+        
+        /**
+         * @param $uId
+         * @param $totalProfit
+         * @param string $yearMonthDay
+         * @return array
+         */
+        public function getUserBonus ($erpUserId, $totalProfit, string $yearMonthDay): array
+        {
+            // getUserBonus
+            $bonus = new Bonus();
+            $returnBonusData = $bonus->getUserBonus($erpUserId, $totalProfit, $yearMonthDay);
+            
+            // set output Data
+            $boxData = [
+                'profit' => number_format($returnBonusData['estimateBonus']),
+                'bonus_rate' => isset($returnBonusData['reachLevle']['bonus_rate']) ? $returnBonusData['reachLevle']['bonus_rate'] : 0,
+                'bonus_next_amount' => isset($returnBonusData['nextLevel']['bonus_next_amount']) ? round($returnBonusData['nextLevel']['bonus_next_amount']) : 0,
+                'bonus_next_percentage' => isset($returnBonusData['nextLevel']['bonus_next_percentage']) ? $returnBonusData['nextLevel']['bonus_next_percentage'] : 0,
+                'bonus_direct' => number_format($returnBonusData['bonusDirect'])
+            ];
+            
+            return $boxData;
+        }
+        
+        public function getFilterData ($financialDataArrays, $agencyIdArrays, $clientIdArrays, $mediaCompaniesIdArrays, $mediasNameArrays)
+        {
+           
+            $financialDataArrays = collect($financialDataArrays);
+            
+            if (!empty($agencyIdArrays)) {
+                $financialDataArrays = $financialDataArrays->whereIn('agency_id', $agencyIdArrays);
+            }
+
+            if (!empty($clientIdArrays)) {
+                $financialDataArrays = $financialDataArrays->whereIn('client_id', $clientIdArrays);
+            }
+
+            if (!empty($mediaCompaniesIdArrays)) {
+                $financialDataArrays = $financialDataArrays->whereIn('companies_id', $mediaCompaniesIdArrays);
             }
             
+            if (!empty($mediasNameArrays)) {
+                $financialDataArrays = $financialDataArrays->whereIn('media_channel_name', $mediasNameArrays);
+            }
             
+            return $financialDataArrays;
+        }
+        
+        /**
+         * @param Collection $bonus_list
+         */
+        private function getCustomerAllAnalysis (Collection $bonus_list,$dateRange)
+        {
+            list($customerPrecentageProfit, $customerProfitData) = [[],[]];
+            /*部份資料前置時有做 number_format 這邊做還原*/
+            $bonus_list = $bonus_list->map(function ($v, $k) {
+                $v['profit'] = str_replace(',', '', $v['profit']);
+                return $v;
+            });
+           
+            $dateRange = collect($dateRange)->map(function($v,$k){
+                return str_replace('-', '', substr($v,0,-2));
+            });
+            
+            $customerProfitData = $this->getCustomerReceiptTimes($bonus_list, $dateRange);
+            $customerPrecentageProfit = $this->getCustomerProfitSum($bonus_list, $dateRange);
+            
+            return array($customerPrecentageProfit, $customerProfitData);
+        }
+        
+        /**
+         * @param Collection $bonus_list
+         * @param Collection $dateRangerArray
+         * @return mixed
+         */
+        private function getCustomerReceiptTimes (Collection $bonus_list, Collection $dateRangerArray)
+        {
+            $customerProfitData = [];
+            
+            $receiptTimesData = collect($this->getreceiptTimes($dateRangerArray))->flatten(1);
+            
+            if($receiptTimesData->count() > 0){
+                $bonus_list->filter(function ($v) {
+                    return $v['agency_id'] != 0;
+                })->groupBy('agency_id')->each(function ($v, $id) use (&$customerProfitData, $receiptTimesData) {
+                    $customerProfitData[] = [
+                        'name' => $v->max('agency_name'),
+                        'type' => '代理商',
+                        'receipt_times' => $receiptTimesData->where('agency_id', $v->max('agency_id'))->sum('receipt_count_times'),
+                        'profit' => number_format($v->sum('profit')),
+                    ];
+                    return $v;
+                });
+    
+                $bonus_list->filter(function ($v) {
+                    return $v['agency_id'] == 0;
+                })->groupBy('client_id')->each(function ($v, $id) use (&$customerProfitData, $receiptTimesData) {
+                    $customerProfitData[] = [
+                        'name' => $v->max('client_name'),
+                        'type' => '直客',
+                        'receipt_times' => $receiptTimesData->where('client_id', $v->max('client_id'))->sum('receipt_count_times'),
+                        'profit' => number_format($v->sum('profit')),
+                    ];
+                    return $v;
+                });
+            }
+            
+            return $customerProfitData;
+        }
+        
+        public function getreceiptTimes ($dateRangerArray)
+        {
+            $erpFin = new FinancialController();
+            $data = [];
+            foreach ($dateRangerArray as $dateMonth) {
+                if (Cache::store('memcached')->has('receiptTimes' . $dateMonth)) {
+                    $data[] = Cache::store('memcached')->get('receiptTimes' . $dateMonth);
+                } else {
+                    $results = $erpFin->getReciptTimes($dateMonth);
+                    Cache::store('memcached')->put('receiptTimes' . $dateMonth, $results, (1 * 3600));
+                    $data[] = $results;
+                }
+            }
+            return $data;
+        }
+        
+        /**
+         * @param Collection $bonus_list
+         * @return mixed
+         */
+        private function getCustomerProfitSum (Collection $bonus_list,$dateRange)
+        {
+            $customerPrecentageProfit['date'] = $dateRange;
+            
+            $bonus_list->groupBy('set_date')->map(function ($v, $date) use (&$customerPrecentageProfit) {
+                $customerPrecentageProfit['agency_profit'][] = $v->where(
+                    'agency_id', '!=', 0
+                )->sum('profit');
+                
+                $customerPrecentageProfit['client_profit'][] = $v->where(
+                    'agency_id', '=', 0
+                )->sum('profit');
+            });
+            if(empty($customerPrecentageProfit['agency_profit'])){
+                $customerPrecentageProfit['agency_profit'][] = 0;
+                $customerPrecentageProfit['client_profit'][] = 0;
+            }
+            return $customerPrecentageProfit;
         }
         
         /**
@@ -308,64 +588,58 @@
             }
             return array($totalIncome, $totalCost, $totalProfit, $erpReturnData);
         }
-        
+    
         /**
-         * @param $uId
-         * @param $totalProfit
-         * @param string $yearMonthDay
+         * @param Collection $bonus_list
          * @return array
          */
-        public function getUserBonus ($erpUserId, $totalProfit, string $yearMonthDay): array
+        private function getMediaAllAnalysis (Collection $bonus_list): array
         {
-            // getUserBonus
-            $bonus = new Bonus();
-            $returnBonusData = $bonus->getUserBonus($erpUserId, $totalProfit, $yearMonthDay);
+            list($mediaCompaniesProfitData, $mediasProfitData) = [[],[]];
+            /*部份資料前置時有做 number_format 這邊做還原*/
+            $bonus_list = $bonus_list->map(function ($v, $k) {
+                $v['profit'] = str_replace(',', '', $v['profit']);
+                return $v;
+            });
             
-            // set output Data
-            $boxData = [
-                'profit' => number_format($returnBonusData['estimateBonus']),
-                'bonus_rate' => isset($returnBonusData['reachLevle']['bonus_rate']) ? $returnBonusData['reachLevle']['bonus_rate'] : 0,
-                'bonus_next_amount' => isset($returnBonusData['nextLevel']['bonus_next_amount']) ? round($returnBonusData['nextLevel']['bonus_next_amount']) : 0,
-                'bonus_next_percentage' => isset($returnBonusData['nextLevel']['bonus_next_percentage']) ? $returnBonusData['nextLevel']['bonus_next_percentage'] : 0,
-                'bonus_direct' => number_format($returnBonusData['bonusDirect'])
+            $saleChannelProfitData = [
+                'AP' => 0,
+                'BR' => 0,
+                'EC' => 0,
             ];
+            $bonus_list->groupBy('sales_channel')->each(function($v,$k) use(&$saleChannelProfitData){
+                $saleChannelProfitData[$v->max('sales_channel')] = $v->sum('profit');
+            });
             
-            return $boxData;
-        }
+            $mediaCompaniesProfitData = $bonus_list->groupBy('companies_id')->map(function ($v, $k) {
+                $data = [
+                    'name' => $v->max('companies_name'),
+                    'profit' => number_format($v->sum('profit')),
+                ];
+                return $data;
+            })->values();
         
-        /**
-         * @param $id
-         * @param string $yearMonthDay
-         * @return bool|mixed|string
-         */
-        private function getFinancialData (Array $erpUserIds, string $dateStart, string $dateEnd)
-        {
-            $financialListObj = new FinancialList();
-            return $financialListObj->getFinancialData($erpUserIds, $dateStart, $dateEnd);
+            $mediasProfitData = $bonus_list->groupBy('media_channel_name')->map(function ($v, $k) {
+                $data = [
+                    'name' => $v->max('media_channel_name'),
+                    'sales_channel' => $v->max('sales_channel'),
+                    'profit' => number_format($v->sum('profit')),
+                ];
+                return $data;
+            })->values();
+            
+            return array($mediaCompaniesProfitData, $mediasProfitData,$saleChannelProfitData);
         }
-        
+    
         /**
-         * @param array $userIds
-         * @param $dateStart
-         * @param $dateEnd
-         * @param SaleGroups $SaleGroupsObj
-         * @param $saleGroupIds
-         * @return array
-         * @throws \Exception
+         * @param Collection $erpReturnData
+         * @return Collection
          */
-        private function getDataFromDataBase (array $userIds, $saleGroupIds, $dateStart, $dateEnd): array
+        private function getProgressDatas (Collection $erpReturnData): Collection
         {
-            $SaleGroupsObj = new SaleGroups();
-            $resignUsers = collect(session('users'))->where('user_resign_date', '!=', '0000-00-00');
-            
-            $erpReturnData = collect($this->getFinancialData($userIds, $dateStart, $dateEnd));
-            
-            /*progressDatas*/
             $progressDatas = collect([]);
-            
-            
             $erpReturnData->groupBy(['set_date', 'erp_user_id'])->map(function ($items, $setDate) use (&$progressDatas) {
-                
+            
                 $items = $items->map(function ($v, $erpUserId) use ($setDate) {
                     $tmpData = $this->getUserBonus($erpUserId, $v->sum('profit'), $setDate);
                     $tmpData['totalProfit'] = number_format($v->sum('profit'));
@@ -377,47 +651,21 @@
                 })->values();
                 $progressDatas = $progressDatas->concat($items);
             });
-            //			/*補齊該月沒有 金額的user 資料*/
-            foreach (date_range($dateStart, $dateEnd) as $dateRange) {
-                $BonusList = Bonus::where('set_date', $dateRange)->whereIn('erp_user_id', $userIds)->get();
-                $setDate = substr($dateRange, 0, 7);
-                $haveValueProgressDatas = $progressDatas->where('set_date', $setDate)->pluck('erp_user_id');
-                
-                foreach ($BonusList->whereNotin('erp_user_id', $haveValueProgressDatas) as $item) {
-                    
-                    $thisResignUser = $resignUsers->whereIn('id', $item->erp_user_id)->first();
-                    if ($thisResignUser['user_resign_date']) {
-                        if ($thisResignUser['user_resign_date'] <= $dateRange) {
-                            continue;
-                        }
-                    }
-                    $tmpData = [];
-                    $tmpData = $this->getUserBonus($item->erp_user_id, 0, $dateRange);
-                    $tmpData['totalProfit'] = number_format(0);
-                    $tmpData['sale_group_name'] = $item->user->getUserGroupsName();
-                    $tmpData['user_name'] = $item->user->name;
-                    $tmpData['set_date'] = $setDate;
-                    $tmpData['erp_user_id'] = $item->erp_user_id;
-                    $progressDatas[] = $tmpData;
-                }
-            };
-            ///*get group Profit */
-            $groupDateStart = new DateTime($dateStart);
-            $tmpGroups = [];
-            /*getGroupBoundary*/
-            if ($dateEnd == $groupDateStart->format('Y-m-01')) {
-                $tmpGroups[] = $SaleGroupsObj->getGroupBoundary($saleGroupIds, $groupDateStart->format('Y-m-01'));
-            }
-            
-            while ($dateEnd != $groupDateStart->format('Y-m-01')) {
-                $tmpGroups[] = $SaleGroupsObj->getGroupBoundary($saleGroupIds, $groupDateStart->format('Y-m-01'));
-                $groupDateStart->modify('+1Month');
-            }
-            /*calculation profit percentage*/
+            return $progressDatas;
+        }
+    
+        /**
+         * @param array $tmpGroups
+         * @param Collection $erpReturnData
+         * @return Collection
+         */
+        private function getGroupProfitDatas (array $tmpGroups, Collection $erpReturnData): Collection
+        {
             $groupProfitDatas = collect([]);
+        
             collect($tmpGroups)->map(function ($items, $k) use (&$groupProfitDatas, $erpReturnData) {
                 $items = collect($items)->map(function ($item, $k) use ($erpReturnData) {
-                    
+                
                     $item['profit'] = round($erpReturnData->where('sale_group_id', $item['id'])->where('set_date', $item['set_date'])->sum('profit'));
                     $item['percentage'] = ($item['profit'] == 0 || $item['boundary'] == 0) ? 0 : round($item['profit'] / $item['boundary'] * 100);
                     $item['profit'] = number_format($item['profit']);
@@ -426,15 +674,43 @@
                 });
                 $groupProfitDatas = $groupProfitDatas->concat($items);
             });
+            return $groupProfitDatas;
+        }
+    
+        /**
+         * @param DateTime $date
+         * @param $userList
+         * @return mixed
+         * @throws \Psr\SimpleCache\InvalidArgumentException
+         */
+        private function getAllYearProfit ()
+        {
+            $allYearProfit = [
+                'data' => [],
+                'stack' => ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+            ];
             
-            $erpReturnData = $erpReturnData->map(function ($v, $k) {
-                $v['set_date'] = substr($v['set_date'], 0, 7);
-                return $v;
+            /*取所有年度毛利統計資料*/
+            $date = new DateTime();
+            $dateStart = '2018-01-01';
+            $dateEnd = $date->format('Y-12-01');
+            
+            $cacheDate = new DateTime();
+            $cacheDate = $cacheDate->modify('-2Month')->format('Y-m-01');
+            
+            $dateRange = date_range($dateStart, $dateEnd);
+            $dateRange[] = $dateEnd;
+            
+            $saleGroupIds = SaleGroups::all()->pluck('id')->toArray();
+            $request = new Request(['startDate' => $dateStart, 'endDate' => $dateEnd, 'saleGroupIds' => $saleGroupIds, 'userIds' => []]);
+            $return = $this->getAjaxData($request, 'return');
+            
+            collect($return['chart_financial_bar']['totalProfit'])->chunk(12)->each(function($v,$k) use(&$allYearProfit){
+                $allYearProfit['data'][2018+$k] = $v->values()->toArray();
             });
             
-            return [$erpReturnData->toArray(), $progressDatas->toArray(), $groupProfitDatas->toArray()];
+            return $allYearProfit;
         }
-        
     }
 	
 	

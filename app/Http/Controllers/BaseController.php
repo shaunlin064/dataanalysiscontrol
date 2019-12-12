@@ -53,7 +53,10 @@
 			 //	<!-- Google Font -->
 			//'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic',
 			 // global css
-			'/css/global.css'
+			'/css/global.css',
+//             owl
+             '/adminLte_componets/OwlCarousel2-2.3.4/dist/assets/owl.carousel.css',
+             '/adminLte_componets/OwlCarousel2-2.3.4/dist/assets/owl.theme.default.css',
 		 ],
 		 'jsPath' => [
 			
@@ -105,6 +108,7 @@
 			 //		<!-- AdminLTE for demo purposes -->
 			'/js/demo.js',
 			'/js/helper.js',
+             '/adminLte_componets/OwlCarousel2-2.3.4/dist/owl.carousel.min.js',
 		 ],
 		];
 		

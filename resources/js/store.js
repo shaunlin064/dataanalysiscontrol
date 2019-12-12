@@ -24,7 +24,15 @@ export default {
         month_income: [],
         month_cost: [],
         month_profit: [],
+        month_label: [],
         loading:false,
+        agency_ids: [],
+        client_ids: [],
+        media_companies_ids: [],
+        medias_names: [],
+        agency_profit: [],
+        client_profit: [],
+        sale_channel_profitData: [],
     },
     getters:{
         getTableSelect(state){
@@ -84,6 +92,18 @@ export default {
         },
         changeSaleGroupId(state,value){
             state.sale_group_ids = value;
-        }
+        },
+        changeAgencyIds(state,value){
+            state.agency_ids = value;
+        },
+        changeClientIds(state,value){
+            state.client_ids = value;
+        },
+        changeMediaCompaniesIds(state,value){
+            state.media_companies_ids = value;
+        },
+        changeMediasNames(state,value){
+            state.medias_names = value;
+        },
     }
 };

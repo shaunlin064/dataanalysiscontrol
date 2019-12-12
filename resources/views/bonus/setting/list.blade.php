@@ -129,6 +129,9 @@
                 window.open('/bonus/setting/add');
             });
 
+        });
+        $(document).ready(function () {
+            console.log($('tbody tr:first-child button[html="編輯"]'));
         })
     </script>
 @endsection

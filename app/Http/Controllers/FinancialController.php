@@ -40,9 +40,7 @@
 		public function getErpMemberFinancial (Array $userIds,String $dateYearMonth = null ,String  $organizationStr = 'all',$outgroup = null)
 		{
 			
-			if($dateYearMonth){
-				$dateYearMonth = $dateYearMonth;
-			}else{
+			if(empty($dateYearMonth)){
 				$dateYearMonth = new \DateTime();
 				$dateYearMonth = $dateYearMonth->format('Ym');
 			}
@@ -71,8 +69,24 @@
 //				$returnData[$key] = $this->exchangeMoney($items);
 				$returnData[$key] = $items;
 			}
-			
 			return $returnData;
+		}
+        
+        public function getReciptTimes ($dateMonth = null)
+        {
+            $apiObj = new ApiController();
+    
+            $data = [
+                'token' => env('API_TOKEN'),
+                'action' => 'receiptTimes',
+                'data' => [
+                    'yearMonthStr' => $dateMonth,
+                ]
+            ];
+            
+            $url = env('API_GET_RECEIPT_TIMES_URL');
+            return $apiObj->curlPost(json_encode($data),$url,'json');
+            
 		}
 		
 		public function apiKeyFieldNameChange ($items)

@@ -135,7 +135,25 @@
 			    $dateStart = $dateStart->modify('+1 Month');
 		    }
 	    }
-	
+        /*後勤員工*/
+        $supperUser =  [16,33,48,78,89];
+        foreach ($supperUser as $item){
+            $dateStart = new \DateTime('2018-01-01');
+            while($nextMonth != $dateStart->format('Y-m-01')) {
+                $data = ['set_date' => $dateStart->format('Y-m-01'), 'erp_user_id' => $item, 'boundary' => 0];
+            
+                $otherData = $otherrule->where('erp_user_id',$item);
+                if( $otherData->where('set_date',$dateStart->format('Y-m-01'))->count() > 0 ){
+                    $data['boundary'] = $otherData->where('set_date',$dateStart->format('Y-m-01'))->first()['boundary'];
+                }else if($otherData->count() > 0){
+                    $data['boundary'] = $otherData->first()['boundary'];
+                }
+                $this->save($data, $bonusLevels, $exileUserId, $exileRuleLevels);
+            
+                $dateStart = $dateStart->modify('+1 Month');
+            }
+        }
+        
 	    /*離職員工*/
 	    $leaveUser =  [97,156,161,175];
 	    foreach ($leaveUser as $item){
