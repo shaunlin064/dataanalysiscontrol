@@ -11,14 +11,46 @@
     |
     */
     
+    use App\FinancialList;
+    use App\Http\Controllers\FinancialController;
+    use App\SaleGroups;
+    use Illuminate\Support\Facades\Artisan;
     use Illuminate\Support\Facades\Cache;
-    
+    use Illuminate\Support\Facades\Storage;
     /*
      * 登入系統
      */
     
     Route::get('/test', function () {
-    
+        $erpFin = new FinancialController();
+        
+        $objFin = new FinancialList();
+        $data = $objFin->all();
+        
+        $agency = $data->where('agency_id','!=',0)->groupBy('agency_id')->map(function($v,$k){
+            if($k == 0){
+                $new['name'] = '直客';
+            }else{
+                $new['name'] = $v->max('agency_name');
+            }
+            $new['profit'] = $v->sum('profit');
+            return $new;
+        })->sortByDesc('profit');
+        
+        $client = $data->where('client_id','!=',0)->where('agency_id',0)->groupBy('client_id')->map(function($v,$k){
+            if($k == 0){
+                $new['name'] = '直客';
+            }else{
+                $new['name'] = $v->max('client_name');
+            }
+            $new['profit'] = $v->sum('profit');
+            return $new;
+        })->sortByDesc('profit');
+       $customer = $client->merge($agency);
+       
+//       取前百分之20
+//       round(count($agency)/5)
+       dd($agency,$client, count($client)/5);
     });
     
     Route::get('/info', function () {

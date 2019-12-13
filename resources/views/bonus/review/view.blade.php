@@ -35,7 +35,7 @@
                    <select-button-group></select-button-group>
                 </div>
                 <div class="form-group col-xs-8 col-md-6 pull-left">
-                    <date-range :input_start_date='"{{date('Y-m-01')}}"' :input_end_date='"{{date('Y-m-01')}}"'></date-range>
+                    <date-range :dom_id='"review_date_ranger"' :input_start_date='"{{date('Y-m-01')}}"' :input_end_date='"{{date('Y-m-01')}}"'></date-range>
                 </div>
             </div>
             <div class="box-footer">
