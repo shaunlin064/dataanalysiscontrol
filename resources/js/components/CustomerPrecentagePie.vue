@@ -37,7 +37,7 @@
                     data: {
                         'datasets': [
                             {"data":[0,0,0,0,0]},
-                            {"data":[0,0,1000,1000,1000]
+                            {"data":[0,0,0,0,0]
                         }],
                         'labels': this.labels,
                     },
@@ -78,9 +78,9 @@
                 vue_this.chart_obj.data.datasets[1].data = [
                     0,
                     0,
-                    vue_this.sale_channel_profitData['AP'],
-                    vue_this.sale_channel_profitData['BR'],
-                    vue_this.sale_channel_profitData['EC']
+                    vue_this.$store.state.sale_channel_profitData['AP'],
+                    vue_this.$store.state.sale_channel_profitData['BR'],
+                    vue_this.$store.state.sale_channel_profitData['EC']
                 ];
                 vue_this.chart_obj.update();
             },

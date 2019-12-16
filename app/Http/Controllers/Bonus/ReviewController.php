@@ -8,6 +8,7 @@
     
     namespace App\Http\Controllers\Bonus;
     
+    use App\CustomerGroups;
     use App\Http\Controllers\FinancialController;
     use Exception;
     use Illuminate\Support\Collection;
@@ -24,6 +25,7 @@
     use DateTime;
     use Gate;
     use Illuminate\Http\Request;
+    use Illuminate\Support\Facades\DB;
     use Illuminate\Support\Facades\Input;
     use Auth;
     
@@ -53,8 +55,7 @@
             $medias = $objFin->getDataList('media_channel_name', 'media_channel_name');
             
             $provideObj = new ProvideController();
-            
-            list($saleGroups, $userList) = $provideObj->getListData($loginUserId, $date);
+            list($saleGroups, $userList) = $provideObj->getDataList($loginUserId, $date);
             
             $bonusColumns =
                 [
@@ -72,7 +73,11 @@
                     ['data' => 'paymentStatus'],
                     ['data' => 'bonusStatus'],
                 ];
-            
+            $customerGroupProfitColumns = [
+                ['data' => 'name'],
+                ['data' => 'receipt_times'],
+                ['data' => 'profit'],
+            ];
             $customerProfitColumns =
                 [
                     ['data' => 'name'],
@@ -91,18 +96,17 @@
                     ['data' => 'name'],
                     ['data' => 'profit'],
                 ];
-            
-            $allYearProfit = $this->getAllYearProfit($userList);
-            
+           
             /*ajax check debug*/
-//            $dateStart = $date->format('2017-01-01');
+//            $dateStart = $date->format('2019-12-01');
 //            $dateEnd = $date->format('Y-m-01');
 //            $userIds = collect($userList)->pluck('erp_user_id')->toArray();
 //            $request = new Request(['startDate' => $dateStart, 'endDate' => $dateEnd, 'saleGroupIds' => [1,2,3,4,5], 'userIds' => []]);
 //            $return = $this->getAjaxData($request, 'return');
 //            dd($return);
-//
-            $labels = [];
+            
+            $allYearProfit = $this->getAllYearProfit($userList);
+            
             $chartDataBar = [
                 [
                     'data' => 0,
@@ -152,12 +156,8 @@
                     'data' => $this->resources,
                     'chartData' => $chartData,
                     'chartDataBar' => $chartDataBar,
-                    'chartDataBarLabels' => $labels,
-                    'bonusData' => [],
                     'bonusColumns' => $bonusColumns,
-                    'progressDatas' => [],
                     'progressColumns' => $progressColumns,
-                    'groupProgressDatas' => [],
                     'groupProgressColumns' => $groupsProgressColumns,
                     'saleGroups' => $saleGroups,
                     'clientList' => $clientList,
@@ -168,7 +168,8 @@
                     'customerProfitColumns' => $customerProfitColumns,
                     'mediasProfitColumns' => $mediasProfitColumns,
                     'mediaCompaniesProfitColumns' => $mediaCompaniesProfitColumns,
-                    'allYearProfit' => $allYearProfit
+                    'allYearProfit' => $allYearProfit,
+                    'customerGroupProfitColumns' => $customerGroupProfitColumns
                 ]
             );
         }
@@ -213,6 +214,7 @@
             $dateNow = new DateTime();
             /*check cache exists*/
             $cahceKey = 'financial.review';
+            
             foreach ($dateRange as $date) {
                 
                 $date2 = new DateTime($date);
@@ -306,10 +308,10 @@
                 return $v;
             });
             
-            list($customerPrecentageProfit, $customerProfitData) = $this->getCustomerAllAnalysis($bonus_list,$dateRange);
+            list($customerPrecentageProfit, $customerProfitData,$customerGroupsProfitData) = $this->getCustomerAllAnalysis($bonus_list,$dateRange);
             
             list($mediaCompaniesProfitData, $mediasProfitData,$saleChannelProfitData) = $this->getMediaAllAnalysis($bonus_list);
-            
+    
             $bonus_list = $bonus_list->values()->toArray();
             
             $group_progress_list = $group_progress_list->whereIn('id', $saleGroupIds)->values()->toArray();
@@ -324,7 +326,8 @@
                 'customer_profit_data' => $customerProfitData,
                 'medias_profit_data' => $mediasProfitData,
                 'media_companies_profit_data' => $mediaCompaniesProfitData,
-                'sale_channel_profitData' => $saleChannelProfitData,
+                'sale_channel_profit_data' => $saleChannelProfitData,
+                'customer_groups_profit_data' => $customerGroupsProfitData
             ];
             
             if ($outType == 'echo') {
@@ -476,8 +479,9 @@
             
             $customerProfitData = $this->getCustomerReceiptTimes($bonus_list, $dateRange);
             $customerPrecentageProfit = $this->getCustomerProfitSum($bonus_list, $dateRange);
+            $customerGroupsProfitData = $this->getCustomerGroupsProfit($bonus_list,$dateRange);
             
-            return array($customerPrecentageProfit, $customerProfitData);
+            return array($customerPrecentageProfit, $customerProfitData,$customerGroupsProfitData);
         }
         
         /**
@@ -689,27 +693,66 @@
                 'data' => [],
                 'stack' => ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
             ];
-            
-            /*取所有年度毛利統計資料*/
-            $date = new DateTime();
-            $dateStart = '2018-01-01';
-            $dateEnd = $date->format('Y-12-01');
-            
-            $cacheDate = new DateTime();
-            $cacheDate = $cacheDate->modify('-2Month')->format('Y-m-01');
-            
-            $dateRange = date_range($dateStart, $dateEnd);
-            $dateRange[] = $dateEnd;
-            
+    
+    
+    
             $saleGroupIds = SaleGroups::all()->pluck('id')->toArray();
-            $request = new Request(['startDate' => $dateStart, 'endDate' => $dateEnd, 'saleGroupIds' => $saleGroupIds, 'userIds' => []]);
-            $return = $this->getAjaxData($request, 'return');
+            $date = new DateTime();
+            if(!Cache::store('memcached')->has('yearProfit')){
+                /*取所有年度毛利統計資料*/
+                $dateStart = '2018-01-01';
+                $dateEnd = $date->format('Y-12-01');
+                $dateRange = date_range($dateStart, $dateEnd);
+                $dateRange[] = $dateEnd;
+                
+                $request = new Request(['startDate' => $dateStart, 'endDate' => $dateEnd, 'saleGroupIds' => $saleGroupIds, 'userIds' => []]);
+                $return = $this->getAjaxData($request, 'return')['chart_financial_bar']['totalProfit'];
+                
+                collect($return)->chunk(12)->each(function($v,$k) use(&$allYearProfit){
+                    $allYearProfit['data'][2018+$k] = $v->values()->toArray();
+                });
+                /*最後進兩個月資料不存cache*/
+                array_pop($return);
+                array_pop($return);
+    
+                Cache::store('memcached')->forever('yearProfit', $return);
+            }else{
+                $cacheData = Cache::store('memcached')->get('yearProfit');
+                $thisMonth = $date->format('Y-m-01');
+                $lastMonth = $date->modify('-1Month')->format('Y-m-01');
+                $dateRange = date_range($lastMonth, $thisMonth);
+                $request = new Request(['startDate' => $lastMonth, 'endDate' => $thisMonth, 'saleGroupIds' => $saleGroupIds, 'userIds' => []]);
+                $return = $this->getAjaxData($request, 'return')['chart_financial_bar']['totalProfit'];
+                
+                collect(array_merge($cacheData,$return))->chunk(12)->each(function($v,$k) use(&$allYearProfit){
+                    $allYearProfit['data'][2018+$k] = $v->values()->toArray();
+                });
+            }
+
+            return $allYearProfit;
+        }
+    
+        private function getCustomerGroupsProfit (Collection $bonus_list,$dateRange)
+        {
+            $customerGroup = new CustomerGroups();
+            $customerGroup = collect($customerGroup->getCustomerGroupDatas());
+            $receiptTimesData = collect($this->getreceiptTimes($dateRange))->flatten(1);
             
-            collect($return['chart_financial_bar']['totalProfit'])->chunk(12)->each(function($v,$k) use(&$allYearProfit){
-                $allYearProfit['data'][2018+$k] = $v->values()->toArray();
+            $customerGroupsProfit = $customerGroup->map(function($v,$k) use($bonus_list,$receiptTimesData){
+                
+                $profit = $bonus_list->whereIn('agency_id',$v['customer']['agency'])->concat($bonus_list->whereIn('client_id',$v['customer']['client']))->sum('profit');
+                
+                $receiptTimes = $receiptTimesData->whereIn('agency_id',$v['customer']['agency'])->concat($receiptTimesData->whereIn('client_id',$v['customer']['client']))->sum('receipt_count_times');
+                
+                $newdata = [
+                  'name' => $v['name'],
+                  'profit' => number_format($profit),
+                'receipt_times' => $receiptTimes,
+                ];
+                return $newdata;
             });
             
-            return $allYearProfit;
+            return $customerGroupsProfit;
         }
     }
 	

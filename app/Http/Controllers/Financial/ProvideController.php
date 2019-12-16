@@ -139,7 +139,7 @@ class ProvideController extends BaseController
 //		$request = new Request(['startDate'=>$provideStart,'endDate'=>$provideEnd,'saleGroupIds'=>$saleGroupIds,'userIds'=>$userIds]);
 //		dd($this->getAjaxProvideData($request));
 		
-		list($saleGroups, $userList) = $this->getListData($erpUserId, $date);
+		list($saleGroups, $userList) = $this->getDataList($erpUserId, $date);
 		
 		//$provideStart = new DateTime();
 		//$provideEnd = new DateTime();
@@ -441,7 +441,7 @@ class ProvideController extends BaseController
 	 * @param DateTime $date
 	 * @return array
 	 */
-	public function getListData ($erpUserId, DateTime $date): array
+	public function getDataList ($erpUserId, DateTime $date): array
 	{
 		/*permission check select*/
 		$isAdmin = User::where('erp_user_id',$erpUserId)->first()->isAdmin();

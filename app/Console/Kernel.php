@@ -48,6 +48,7 @@
             $schedule->command('update_convener_reach')->monthlyOn('16', '00:20');
             /*cached*/
             $schedule->command('cache_all')->twiceDaily(10, 15);
+            $schedule->command('cache_clean')->monthlyOn('1', '00:30');
         }
         
         /**

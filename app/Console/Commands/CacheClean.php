@@ -3,23 +3,23 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 
-class SetReload extends Command
+class CacheClean extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'set_reload';
+    protected $signature = 'cache_clean';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = '重啟所有reload';
+    protected $description = '清除快取';
 
     /**
      * Create a new command instance.
@@ -38,12 +38,7 @@ class SetReload extends Command
      */
     public function handle()
     {
-	    Artisan::call('reload_financial_data');
-	    Artisan::call('set_old_campaign_own');
-	    Artisan::call('reload_financial_money_receipt');
-	    Artisan::call('reload_bonus_reach');
-	    Artisan::call('reload_convener_reach');
-	    Artisan::call('set_old_provide');
-	    Artisan::call('cache_all');
+        //
+        Cache::store('memcached')->forget('yearProfit');
     }
 }

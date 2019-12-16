@@ -130,7 +130,7 @@
                                 this.$store.state.agency_profit  = response.data.customer_precentage_profit['agency_profit'];
                                 this.$store.state.client_profit  = response.data.customer_precentage_profit['client_profit'];
                                 this.$store.state.month_label = response.data.customer_precentage_profit['date'];
-                                this.$store.state.sale_channel_profitData = response.data.sale_channel_profitData;
+                                this.$store.state.sale_channel_profitData = response.data.sale_channel_profit_data;
                             }
                             
                             this.updataTable(rowData);

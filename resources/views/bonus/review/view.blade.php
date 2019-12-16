@@ -83,7 +83,7 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">資料篩選</h3>
                     <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='data_filter'><i
                                 class="fa fa-minus"></i>
                         </button>
                     </div>
@@ -140,16 +140,16 @@
         <div class='col-md-6 col-sm-12 col-xs-12 border-right'>
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <h3 class="box-title">客戶列表</h3>
+                    <h3 class="box-title">客戶圖表</h3>
                     <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='customer_char'><i
                                 class="fa fa-minus"></i>
                         </button>
                     </div>
                     <!-- /.box-tools -->
                 </div>
                 <div class="box-body">
-                    <div class='owl-carousel owl-theme'>
+                    <div class='owl-carousel owl-theme' data-owl-name='customer_char'>
                         <chart-customer-precentage-profit
                             :table_id='"customer_precentage_profit"'
                             :title='"總毛利佔比"'
@@ -167,14 +167,14 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">客戶列表</h3>
                     <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='customer_list'><i
                                 class="fa fa-minus"></i>
                         </button>
                     </div>
                     <!-- /.box-tools -->
                 </div>
                 <div class="box-body">
-                    <div class='owl-carousel owl-theme'>
+                    <div class='owl-carousel owl-theme' data-owl-name='customer_list'>
                         <div class="col-xs-12">
                             <simple-data-table-componet
                                 :table_id='"customer_profit_data"'
@@ -184,6 +184,20 @@
                                 {{--                        :ex_buttons= '["excel"]'--}}
                                 :csrf='"{{csrf_token()}}"'
                                 :columns='{!!json_encode($customerProfitColumns)!!}'
+                                :ajax_url='"/bonus/review/getAjaxData"'
+                                :page_length='15'
+                                :length_change='"hide"'
+                            ></simple-data-table-componet>
+                        </div>
+                        <div class="col-xs-12">
+                            <simple-data-table-componet
+                                :table_id='"customer_groups_profit_data"'
+                                :table_head='"集團列表"'
+                                :table_title='["名稱","發稿量","毛利"]'
+                                :row='[]'
+                                {{--                        :ex_buttons= '["excel"]'--}}
+                                :csrf='"{{csrf_token()}}"'
+                                :columns='{!!json_encode($customerGroupProfitColumns)!!}'
                                 :ajax_url='"/bonus/review/getAjaxData"'
                                 :page_length='15'
                                 :length_change='"hide"'
@@ -224,23 +238,23 @@
         <div class='col-md-6 col-sm-12 col-xs-12 border-right'>
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <h3 class="box-title">業績列表</h3>
+                    <h3 class="box-title">業績圖表</h3>
                     <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='sale_char'><i
                                 class="fa fa-minus"></i>
                         </button>
                     </div>
                     <!-- /.box-tools -->
                 </div>
                 <div class="box-body">
-                    <div class='owl-carousel owl-theme'>
+                    <div class='owl-carousel owl-theme' data-owl-name='sale_char'>
                         <chart-component
                             :table_id='"chart_financial_bar"'
                             :type='"bar"'
                             :title='"業績統計"'
                             :ajax_url='"/bonus/review/getAjaxData"'
                             :csrf='"{{csrf_token()}}"'
-                            :labels='{{json_encode($chartDataBarLabels)}}'
+                            :labels='[]'
                             :chart_data='{{ json_encode($chartDataBar) }}'
                         ></chart-component>
                         <chart-component
@@ -257,27 +271,27 @@
             </div>
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <h3 class="box-title">業績圖表</h3>
+                    <h3 class="box-title">業績列表</h3>
                     <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='sale_list'><i
                                 class="fa fa-minus"></i>
                         </button>
                     </div>
                     <!-- /.box-tools -->
                 </div>
                 <div class="box-body">
-                    <div class='owl-carousel owl-theme'>
+                    <div class='owl-carousel owl-theme' data-owl-name='sale_list'>
                         <div class="col-xs-12">
                             <simple-data-table-componet
                                 :table_id='"progress_list"'
                                 :table_head='"成員績效表"'
                                 :table_title='["月份","業務","團隊","毛利","達成率","%","獎金","英雄榜"]'
-                                :row='{!! json_encode($progressDatas) !!}'
+                                :row='[]'
                                 {{--:ex_buttons= '["excel"]'--}}
                                 :csrf='"{{csrf_token()}}"'
                                 :columns='{!!json_encode($progressColumns)!!}'
                                 :ajax_url='"/bonus/review/getAjaxData"'
-                                :page_length='10'
+                                :page_length='15'
                                 :length_change='"hide"'
                             ></simple-data-table-componet>
                         </div>
@@ -286,7 +300,7 @@
                                 :table_id='"group_progress_list"'
                                 :table_head='"團隊績效表"'
                                 :table_title='["月份","團隊","毛利","達成率"]'
-                                :row='{!! json_encode($groupProgressDatas) !!}'
+                                :row='[]'
                                 {{--:ex_buttons= '["excel"]'--}}
                                 :csrf='"{{csrf_token()}}"'
                                 :columns='{!!json_encode($groupProgressColumns)!!}'
@@ -300,18 +314,30 @@
             </div>
         </div>
         <div class='col-xs-12 content-center'>
-            <chart-all-year-profit-line
-                :table_id='"customer_profit_bar1"'
-                :title='"年度統計"'
-                :datas='{!! json_encode($allYearProfit) !!}'
-            ></chart-all-year-profit-line>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">年度統計</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='all_year_profit_char'><i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                    <!-- /.box-tools -->
+                </div>
+                <div class="box-body">
+                    <chart-all-year-profit-line
+                        :table_id='"all_year_profit_bar"'
+                        :title='"年度統計"'
+                        :datas='{!! json_encode($allYearProfit) !!}'
+                    ></chart-all-year-profit-line>
+                </div>
+            </div>
         </div>
         <div class="col-xs-12">
             <div class="box box-primary">
                 <div class="box-header with-border">
                     <h3 class="box-title">業績列表</h3>
                     <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='detail_list'><i
                                 class="fa fa-minus"></i>
                         </button>
                     </div>
@@ -322,7 +348,7 @@
                         :table_id='"bonus_list"'
                         :table_head='"財報清單"'
                         :table_title='["月份","業務","團隊","案件","媒體","類型","幣別","公司","收入","成本","毛利","收款狀態","發放狀態"]'
-                        :row='{!! json_encode($bonusData) !!}'
+                        :row='[]'
                         :ex_buttons='["excel"]'
                         :csrf='"{{csrf_token()}}"'
                         :columns='{!!json_encode($bonusColumns)!!}'
@@ -341,9 +367,30 @@
 @section('script')
     <!-- page script -->
     <script type="text/javascript">
-        $(document).ready(function () {
 
-            $('.owl-carousel').owlCarousel({
+        $(document).ready(function () {
+            /*紀錄 user 開關哪個box 存cookie 下次自動還原習用者習慣*/
+            if(cookie.bonus_review === undefined){
+                cookie.bonus_review = {};
+            }
+            let boxToggleCookie = cookie.bonus_review;
+            $('button[data-ui-contorl]').click(function(){
+                let field = $(this).data('ui-contorl');
+                eval(`boxToggleCookie.${field} = $(this).children('i').hasClass('fa-plus') ? 1 : 0;`);
+                setCookie('ui-contorl',JSON.stringify(cookie));
+            });
+
+            if(boxToggleCookie !== undefined){
+                Object.keys(boxToggleCookie).forEach(key=>{
+                    if(boxToggleCookie[key] === 0){
+                        $('*[data-ui-contorl="'+key+'"]').parents('.box.box-primary').addClass('collapsed-box');
+                        $('*[data-ui-contorl="'+key+'"]').children('i.fa').removeClass('fa-minus').addClass('fa-plus');
+                    }
+                });
+            }
+
+
+           $('.owl-carousel').owlCarousel({
                 loop: false,
                 center: true,
                 items: 1,
@@ -353,7 +400,23 @@
                         items: 1
                     }
                 }
-            })
+            });
+            /*cookie 紀錄使用者 習慣看哪個 owl item*/
+            if(cookie.bonus_review_owl === undefined){
+                cookie.bonus_review_owl = {};
+            }
+            let owlShowItemCookie = cookie.bonus_review_owl;
+            $('.owl-carousel').on('changed.owl.carousel', function(event) {
+                eval(`owlShowItemCookie.${$(this).data('owlName')} = event.item.index;`);
+                setCookie('ui-contorl',JSON.stringify(cookie));
+            });
+            if(owlShowItemCookie !== undefined){
+                Object.keys(owlShowItemCookie).forEach(key=>{
+                    if(owlShowItemCookie[key] !== 0){
+                        $('.owl-carousel[data-owl-name="'+key+'"]').data('owl.carousel').to(owlShowItemCookie[key]);
+                    }
+                });
+            }
         });
     </script>
 @endsection
