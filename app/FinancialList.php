@@ -170,6 +170,12 @@ class FinancialList extends Model
             $this->saveCloseData($dateStart->format('Ym01'));
         }else if($dateEnd->format('Ym01') >= $datetime->format('Ym01')){
             $this->saveCloseData($dateEnd->format('Ym01'));
+        }else{
+            $nowdate = new DateTime();
+            if($nowdate->format('d') < 16){
+                $datetime->modify('-1Month');
+                $this->saveCloseData($datetime->format('Ym01'));
+            }
         }
         
 		$erpReturnData = $this->whereIn('erp_user_id' , $erpUserIds)->whereBetween('set_date' ,[$dateStart->format('Y-m-01'),$dateEnd->format('Y-m-01')])->with('receipt')->with('provide')->get()
