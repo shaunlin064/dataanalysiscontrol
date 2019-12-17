@@ -164,7 +164,14 @@ class FinancialList extends Model
 		$dateStart = new \DateTime($dateStart);
 		$dateEnd = $dateEnd ? new \DateTime($dateEnd) :  $dateStart;
 		
-		//確認是否已有資料 反之call API
+        $datetime = new DateTime(date('Ym01'));
+        
+        if($dateStart->format('Ym01') >= $datetime->format('Ym01') ) {
+            $this->saveCloseData($dateStart->format('Ym01'));
+        }else if($dateEnd->format('Ym01') >= $datetime->format('Ym01')){
+            $this->saveCloseData($dateEnd->format('Ym01'));
+        }
+        
 		$erpReturnData = $this->whereIn('erp_user_id' , $erpUserIds)->whereBetween('set_date' ,[$dateStart->format('Y-m-01'),$dateEnd->format('Y-m-01')])->with('receipt')->with('provide')->get()
 			->map(function ($v){
 				
@@ -176,7 +183,7 @@ class FinancialList extends Model
 				//return $this->exchangeMoney($v->revertKeyChange()->revertValueChange());
 			})
 		 ->where('profit','!=',0)->values()->toArray();
-		
+   
 		return $erpReturnData;
 	}
 	
@@ -203,16 +210,21 @@ class FinancialList extends Model
 	}
 	
 	//存入現在已完成結帳月份的資料
-	public function saveCloseData ()
+	public function saveCloseData ( $yearMonthDayStr = null )
 	{
 		$financial = new FinancialController();
-		$date = new DateTime(date('Ym01'));
+		
+		if(empty($yearMonthDayStr)){
+            $date = new DateTime(date('Ym01'));
+        }else{
+            $date = new DateTime($yearMonthDayStr);
+        }
 		
 		$erpReturnData = collect($financial->getErpMemberFinancial(['all'],$date->format('Ym')));
+		
 		$alreadySetData = $this->where('set_date','>=',$date->format('Y-m-d'))->get();
 		
 		$updateDataTmp = [];
-		//dd($erpReturnData->where('memberid',181)->where('year_month','201908'));
 		// 先過濾已新增過的資料 做 UPDATA 為新增的資料做 insert
 		$erpReturnData = $erpReturnData->filter(function($v,$k) use($alreadySetData,&$updateDataTmp){
 			
@@ -228,15 +240,15 @@ class FinancialList extends Model
 				$this->updateSet($data['id'],$v);
 			}
 		});
-		
+  
 		DB::beginTransaction();
-		
 		try{
 			$erpReturnData->each(function($v){
 				$financeList = new FinancialList();
 				$financeList->fill($v)->dataFormat()->save();
 			});
 			DB::commit();
+   
 			
 		} catch (\Exception $ex) {
 			DB::rollback();

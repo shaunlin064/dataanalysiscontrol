@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\FinancialList;
+use DateTime;
 use Illuminate\Console\Command;
 
 class UpdateFinancialData extends Command
@@ -30,11 +31,12 @@ class UpdateFinancialData extends Command
     {
         parent::__construct();
     }
-
+    
     /**
      * Execute the console command.
      *
      * @return mixed
+     * @throws \Exception
      */
     public function handle()
     {
@@ -42,8 +44,9 @@ class UpdateFinancialData extends Command
         $startTime = microtime(true);
         
 	    $finanicalList = new FinancialList();
-	
-	    $finanicalList->saveCloseData();
+        $datetime = new DateTime(date('Ym01'));
+        $datetime->modify('-1Month');
+	    $finanicalList->saveCloseData($datetime->format('Ym01'));
     
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");

@@ -98,13 +98,13 @@
                 ];
            
             /*ajax check debug*/
-//            $dateStart = $date->format('2019-12-01');
-//            $dateEnd = $date->format('Y-m-01');
+//            $dateStart = $date->format('2020-01-01');
+//            $dateEnd = $date->format('2020-01-01');
 //            $userIds = collect($userList)->pluck('erp_user_id')->toArray();
 //            $request = new Request(['startDate' => $dateStart, 'endDate' => $dateEnd, 'saleGroupIds' => [1,2,3,4,5], 'userIds' => []]);
 //            $return = $this->getAjaxData($request, 'return');
 //            dd($return);
-            
+//
             $allYearProfit = $this->getAllYearProfit($userList);
             
             $chartDataBar = [
@@ -256,7 +256,14 @@
             foreach ($dateRange as $dateItem) {
                 if ($saleGroupIds) {
                     foreach ($saleGroupIds as $saleGroupId) {
+                        
                         $tmpUserIds = $userIds->where('sale_groups_id', $saleGroupId)->where('set_date', $dateItem)->pluck('erp_user_id');
+                        if($tmpUserIds->count() == 0){
+                            $tmpdate = new DateTime($dateItem);
+                            $tmpdate->modify('-1Month');
+                            $tmpUserIds = $userIds->where('sale_groups_id', $saleGroupId)->where('set_date', $tmpdate->format('Y-m-01'))->pluck('erp_user_id');
+                        }
+                        
                         $tmpBonus = $tmpBonus->concat($bonus_list->where('set_date', substr($dateItem, 0, 7))->whereIn('erp_user_id', $tmpUserIds));
                         
                         $tmpProgressList = $tmpProgressList->concat($progress_list->where('set_date', substr($dateItem, 0, 7))->whereIn('erp_user_id', $tmpUserIds));
@@ -266,7 +273,6 @@
                     $tmpProgressList = $progress_list->whereIn('erp_user_id', $userIds);
                 }
             }
-            
             $bonus_list = $this->getFilterData($tmpBonus->toArray(), $agencyIdArrays, $clientIdArrays, $mediaCompaniesIdArrays, $mediasNameArrays);
             
             $progress_list = $tmpProgressList->values()->toArray();
@@ -309,7 +315,6 @@
             });
             
             list($customerPrecentageProfit, $customerProfitData,$customerGroupsProfitData) = $this->getCustomerAllAnalysis($bonus_list,$dateRange);
-            
             list($mediaCompaniesProfitData, $mediasProfitData,$saleChannelProfitData) = $this->getMediaAllAnalysis($bonus_list);
     
             $bonus_list = $bonus_list->values()->toArray();
@@ -477,8 +482,8 @@
                 return str_replace('-', '', substr($v,0,-2));
             });
             
-            $customerProfitData = $this->getCustomerReceiptTimes($bonus_list, $dateRange);
             $customerPrecentageProfit = $this->getCustomerProfitSum($bonus_list, $dateRange);
+            $customerProfitData = $this->getCustomerReceiptTimes($bonus_list, $dateRange);
             $customerGroupsProfitData = $this->getCustomerGroupsProfit($bonus_list,$dateRange);
             
             return array($customerPrecentageProfit, $customerProfitData,$customerGroupsProfitData);
@@ -494,15 +499,17 @@
             $customerProfitData = [];
             
             $receiptTimesData = collect($this->getreceiptTimes($dateRangerArray))->flatten(1);
-            
-            if($receiptTimesData->count() > 0){
+   
                 $bonus_list->filter(function ($v) {
                     return $v['agency_id'] != 0;
                 })->groupBy('agency_id')->each(function ($v, $id) use (&$customerProfitData, $receiptTimesData) {
+                    if($receiptTimesData->count() > 0){
+                        $receiptAgencyTimes = $receiptTimesData->where('agency_id', $v->max('agency_id'))->sum('receipt_count_times');
+                    }
                     $customerProfitData[] = [
                         'name' => $v->max('agency_name'),
                         'type' => '代理商',
-                        'receipt_times' => $receiptTimesData->where('agency_id', $v->max('agency_id'))->sum('receipt_count_times'),
+                        'receipt_times' => $receiptAgencyTimes ?? 0,
                         'profit' => number_format($v->sum('profit')),
                     ];
                     return $v;
@@ -511,15 +518,18 @@
                 $bonus_list->filter(function ($v) {
                     return $v['agency_id'] == 0;
                 })->groupBy('client_id')->each(function ($v, $id) use (&$customerProfitData, $receiptTimesData) {
+                    if($receiptTimesData->count() > 0){
+                        $receiptClientTimes = $receiptTimesData->where('client_id', $v->max('client_id'))->sum('receipt_count_times');
+                    }
                     $customerProfitData[] = [
                         'name' => $v->max('client_name'),
                         'type' => '直客',
-                        'receipt_times' => $receiptTimesData->where('client_id', $v->max('client_id'))->sum('receipt_count_times'),
+                        'receipt_times' => $receiptClientTimes ?? 0,
                         'profit' => number_format($v->sum('profit')),
                     ];
                     return $v;
                 });
-            }
+            
             
             return $customerProfitData;
         }
@@ -549,18 +559,29 @@
             $customerPrecentageProfit['date'] = $dateRange;
             
             $bonus_list->groupBy('set_date')->map(function ($v, $date) use (&$customerPrecentageProfit) {
-                $customerPrecentageProfit['agency_profit'][] = $v->where(
+                $key = $customerPrecentageProfit['date']->search(str_replace('-', '', $date));
+                $customerPrecentageProfit['agency_profit'][$key] = $v->where(
                     'agency_id', '!=', 0
                 )->sum('profit');
                 
-                $customerPrecentageProfit['client_profit'][] = $v->where(
+                $customerPrecentageProfit['client_profit'][$key] = $v->where(
                     'agency_id', '=', 0
                 )->sum('profit');
             });
+            foreach ($customerPrecentageProfit['date'] as $key => $item){
+                if(!isset($customerPrecentageProfit['agency_profit'][$key])){
+                    $customerPrecentageProfit['agency_profit'][$key] = 0;
+                    $customerPrecentageProfit['client_profit'][$key] = 0;
+                }
+            }
+            
             if(empty($customerPrecentageProfit['agency_profit'])){
                 $customerPrecentageProfit['agency_profit'][] = 0;
                 $customerPrecentageProfit['client_profit'][] = 0;
             }
+            $customerPrecentageProfit['agency_profit'] = collect($customerPrecentageProfit['agency_profit'])->sortKeys();
+            $customerPrecentageProfit['client_profit'] = collect($customerPrecentageProfit['client_profit'])->sortKeys();
+            
             return $customerPrecentageProfit;
         }
         
