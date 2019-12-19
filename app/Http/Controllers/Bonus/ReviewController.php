@@ -108,8 +108,8 @@
             ];
             
             /*ajax check debug*/
-//            $dateStart = $date->format('2020-01-01');
-//            $dateEnd = $date->format('2020-01-01');
+//            $dateStart = $date->format('2019-01-01');
+//            $dateEnd = $date->format('2019-12-01');
 //            $userIds = collect($userList)->pluck('erp_user_id')->toArray();
 //            $request = new Request(['startDate' => $dateStart, 'endDate' => $dateEnd, 'saleGroupIds' => [1,2,3,4,5], 'userIds' => []]);
 //            $return = $this->getAjaxData($request, 'return');
@@ -413,7 +413,7 @@
             }
 
             if (!empty($clientIdArrays)) {
-                $financialDataArrays = $financialDataArrays->whereIn('client_id', $clientIdArrays);
+                $financialDataArrays = $financialDataArrays->whereIn('agency_id',0)->whereIn('client_id', $clientIdArrays);
             }
 
             if (!empty($mediaCompaniesIdArrays)) {
@@ -598,8 +598,10 @@
             });
             
             $mediaCompaniesProfitData = $bonus_list->groupBy('companies_id')->map(function ($v, $k) {
+                
                 $data = [
                     'name' => $v->max('companies_name'),
+//                    'name' => $v->max('companies_name') ?? sprintf('campaign未指定對應公司 id:%s',$v->pluck('campaign_id')->unique()->values()),
                     'profit' => number_format($v->sum('profit')),
                 ];
                 return $data;
