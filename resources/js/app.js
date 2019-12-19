@@ -121,6 +121,9 @@ Vue.component('provide-submit', require('./components/ProvideSubmit').default);
 
 Vue.component('select-button-group', require('./components/SelectButtonGroup').default);
 
+
+//item
+Vue.component('load-item', require('./components/LoadItem').default);
 const app = new Vue({
     el: '#app',
     store:store1

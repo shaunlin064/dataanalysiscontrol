@@ -30,14 +30,16 @@
             <!-- Add the bg color to the header using any of the bg-* classes -->
             <div class="widget-user-header bg-aqua">
                 <!-- small box -->
-                <div class="form-group col-md-6 col-sm-12 col-xs-12">
+                <div class="form-group col-md-6 col-sm-6 col-xs-12">
                     <label>快速查詢:</label>
                    <select-button-group></select-button-group>
+                    <load-item></load-item>
                 </div>
-                <div class="form-group col-xs-8 col-md-6 pull-left">
+                <div class="form-group col-md-6 col-sm-6 pull-left">
                     <date-range :dom_id='"review_date_ranger"' :input_start_date='"{{date('Y-m-01')}}"' :input_end_date='"{{date('Y-m-01')}}"'></date-range>
                 </div>
             </div>
+
             <div class="box-footer">
                 <div class="row">
                     <div class="col-lg-6">
