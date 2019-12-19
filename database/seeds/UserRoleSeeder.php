@@ -19,7 +19,7 @@ class UserRoleSeeder extends Seeder
             //set default
             $user->assignRole('default');
             //set admin
-            if(in_array($user->name,['van','shaun','alvin'])){
+            if(in_array($user->name,['van','shaun','alvin','jason'])){
                 $user->assignRole('admin');
             }
             //financial
@@ -31,7 +31,7 @@ class UserRoleSeeder extends Seeder
                 $user->assignRole('hr');
             }
             //business_director
-            if(in_array($user->name,['johnny','elynn'])){
+            if(in_array($user->name,['johnny','elynn','ravin'])){
                 $user->assignRole('business_director');
             }
             //sale_convener
