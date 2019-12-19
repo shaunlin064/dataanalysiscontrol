@@ -58,6 +58,10 @@ class User extends Authenticatable
 		return $this->hasRole('admin');
 	}
     
+    public function isBusinessDirector ()
+    {
+        return $this->hasRole('business_director');
+	}
     public function getUserGroupsName ()
     {
         return $this->userGroups->map(function ($v) {

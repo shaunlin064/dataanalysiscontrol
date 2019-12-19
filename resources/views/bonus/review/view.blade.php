@@ -181,7 +181,6 @@
                                 :table_head='"客戶列表"'
                                 :table_title='["名稱","類型","發稿量","毛利"]'
                                 :row='[]'
-                                {{--                        :ex_buttons= '["excel"]'--}}
                                 :csrf='"{{csrf_token()}}"'
                                 :columns='{!!json_encode($customerProfitColumns)!!}'
                                 :ajax_url='"/bonus/review/getAjaxData"'
@@ -195,7 +194,6 @@
                                 :table_head='"集團列表"'
                                 :table_title='["名稱","發稿量","毛利"]'
                                 :row='[]'
-                                {{--                        :ex_buttons= '["excel"]'--}}
                                 :csrf='"{{csrf_token()}}"'
                                 :columns='{!!json_encode($customerGroupProfitColumns)!!}'
                                 :ajax_url='"/bonus/review/getAjaxData"'
@@ -209,7 +207,6 @@
                                 :table_head='"媒體代理商列表"'
                                 :table_title='["名稱","毛利"]'
                                 :row='[]'
-                                {{--                        :ex_buttons= '["excel"]'--}}
                                 :csrf='"{{csrf_token()}}"'
                                 :columns='{!!json_encode($mediaCompaniesProfitColumns)!!}'
                                 :ajax_url='"/bonus/review/getAjaxData"'
@@ -223,7 +220,6 @@
                                 :table_head='"媒體列表"'
                                 :table_title='["名稱","銷售區域","毛利"]'
                                 :row='[]'
-                                {{--                        :ex_buttons= '["excel"]'--}}
                                 :csrf='"{{csrf_token()}}"'
                                 :columns='{!!json_encode($mediasProfitColumns)!!}'
                                 :ajax_url='"/bonus/review/getAjaxData"'
@@ -255,7 +251,7 @@
                             :ajax_url='"/bonus/review/getAjaxData"'
                             :csrf='"{{csrf_token()}}"'
                             :labels='[]'
-                            :chart_data='{{ json_encode($chartDataBar) }}'
+                            :chart_data='{{ json_encode([ ["data"=>0],["data"=>0],["data"=>0,"type"=> 'line'] ]) }}'
                         ></chart-component>
                         <chart-component
                             :table_id='"chart_money_status"'
@@ -264,7 +260,7 @@
                             :labels='["未收款","已收款"]'
                             :ajax_url='"/bonus/review/getAjaxData"'
                             :csrf='"{{csrf_token()}}"'
-                            :chart_data='{{ json_encode($chartData) }}'
+                            :chart_data='{{ json_encode([ ["data"=>[0,0,0,0]] ]) }}'
                         ></chart-component>
                     </div>
                 </div>

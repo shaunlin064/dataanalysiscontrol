@@ -35,53 +35,54 @@
             $returnData = null;
             $checkHasUpdate = $this->getApiUpdateGroup();
             
-            if (empty($checkHasUpdate)) {
+            /*先確認是否有更新資料 沒有直接取上次cache*/
+            if (empty($checkHasUpdate['data'])) {
                 $returnData = Cache::store('memcached')->get($this->cacheKey);
             }
-            
+            /*如果上次也沒有cache資料 重新call 取全部資料*/
             if (empty($returnData)) {
                 try {
                     $returnData = $this->getApiAllGroupData();
-                    Cache::forget($this->cacheKey);
                     if ($returnData['status'] == 1) {
-                        Cache::store('memcached')->forever($this->cacheKey, $returnData['data']);
+                        Cache::forget($this->cacheKey);
+                        Cache::store('memcached')->forever($this->cacheKey, $returnData);
+                    }else {
+                        return '集團資料api錯誤'.$returnData['message'];
                     }
-//                    else {
-//                        dd($returnData['message']);
-//                    }
                 } catch (Exception $ex) {
                     echo $ex->getMessage();
                 }
             }
-            if (1) {
-                $returnData = [
-                    [
-                        "id" => 1,
-                        "name" => "亞力山大集團",
-                        "customer" => [
-                            "agency" => [
-                                219,183,136
-                            ],
-                            "client" => [
-                                227,1656,1437
-                            ]
-                        ]
-                    ],
-                    [
-                        "id" => 2,
-                        "name" => "亞力山小集團",
-                        "customer" => [
-                            "agency" => [
-                                19,259,30
-                            ],
-                            "client" => [
-                                2006,2005,49
-                            ]
-                        ]
-                    ]
-                ];
-            }
-            return $returnData;
+            
+//            if (1) {
+//                $returnData['data'] = [
+//                    [
+//                        "id" => 1,
+//                        "name" => "亞力山大集團",
+//                        "customer" => [
+//                            "agency" => [
+//                                219,183,136
+//                            ],
+//                            "client" => [
+//                                227,1656,1437
+//                            ]
+//                        ]
+//                    ],
+//                    [
+//                        "id" => 2,
+//                        "name" => "亞力山小集團",
+//                        "customer" => [
+//                            "agency" => [
+//                                19,259,30
+//                            ],
+//                            "client" => [
+//                                2006,2005,49
+//                            ]
+//                        ]
+//                    ]
+//                ];
+//            }
+            return collect($returnData['data'])->values()->toArray();
         }
         
         public function getApiUpdateGroup (String $dateTimeStr = null)

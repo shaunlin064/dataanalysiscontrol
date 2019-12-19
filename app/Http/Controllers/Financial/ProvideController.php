@@ -445,6 +445,7 @@ class ProvideController extends BaseController
 	{
 		/*permission check select*/
 		$isAdmin = User::where('erp_user_id',$erpUserId)->first()->isAdmin();
+        $isBusinessDirector = User::where('erp_user_id',$erpUserId)->first()->isBusinessDirector();
 		$dateStr = $date->format('Y-m-01');
 		/*convener check*/
 		$saleGroupsUsers = SaleGroupsUsers::where(['erp_user_id'=> $erpUserId,'set_date'=>$dateStr])->first();
@@ -460,7 +461,7 @@ class ProvideController extends BaseController
 		$userList = [];
 		$userIds = [];
 		
-		if ($isAdmin) {
+		if ($isAdmin || $isBusinessDirector) {
 			$saleGroups = SaleGroups::all();
 			$userList = Bonus::with('user')->groupBy('erp_user_id')->orderBy('erp_user_id')->get()->map(function($v,$k){
 				$newUser = $v->user;

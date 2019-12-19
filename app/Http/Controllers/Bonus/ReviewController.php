@@ -12,12 +12,9 @@
     use App\Http\Controllers\FinancialController;
     use Exception;
     use Illuminate\Support\Collection;
-    use Illuminate\Support\Facades\Artisan;
     use Illuminate\Support\Facades\Cache;
     use App\FinancialList;
-    use App\Http\Controllers\Auth\Permission;
     use App\Http\Controllers\BaseController;
-    use App\Http\Controllers\Financial\FinancialListController;
     use App\Http\Controllers\Financial\ProvideController;
     use App\Bonus;
     use App\SaleGroups;
@@ -25,7 +22,6 @@
     use DateTime;
     use Gate;
     use Illuminate\Http\Request;
-    use Illuminate\Support\Facades\DB;
     use Illuminate\Support\Facades\Input;
     use Auth;
     
@@ -56,47 +52,61 @@
             
             $provideObj = new ProvideController();
             list($saleGroups, $userList) = $provideObj->getDataList($loginUserId, $date);
+           
+            $allYearProfit = $this->getAllYearProfit($userList);
             
-            $bonusColumns =
-                [
-                    ['data' => 'set_date'],
-                    ['data' => 'user_name'],
-                    ['data' => 'sale_group_name'],
-                    ['data' => 'campaign_name', 'render' => sprintf('<a href="http://%s/jsadwaysN2/campaign_view.php?id=${row.campaign_id}" target="_blank">${row.campaign_name}</a>', env('ERP_URL'))],
-                    ['data' => 'media_channel_name'],
-                    ['data' => 'sell_type_name'],
-                    ['data' => 'currency'],
-                    ['data' => 'organization'],
-                    ['data' => 'income'],
-                    ['data' => 'cost'],
-                    ['data' => 'profit', 'render' => '<p style="${style}">${row.profit}</p>', 'parmas' => 'let style = row.organization == "hk" ? "color:red" : "" '],
-                    ['data' => 'paymentStatus'],
-                    ['data' => 'bonusStatus'],
-                ];
             $customerGroupProfitColumns = [
                 ['data' => 'name'],
                 ['data' => 'receipt_times'],
                 ['data' => 'profit'],
             ];
-            $customerProfitColumns =
-                [
+            $customerProfitColumns = [
                     ['data' => 'name'],
                     ['data' => 'type' ,'render' => '<span class="badge bg-${style}">${data}</span>', 'parmas' => 'let style ="red"; if(data == "直客"){ style = "blue"}'],
                     ['data' => 'receipt_times'],
                     ['data' => 'profit'],
                 ];
-            $mediasProfitColumns =
-                [
+            $mediasProfitColumns = [
                     ['data' => 'name'],
                     ['data' => 'sales_channel','render' => '<span class="badge bg-${style}">${data}</span>', 'parmas' => 'let style ="yellow"; if(data == "BR"){ style = "green"}else if(data == "EC"){ style = "purple"}'],
                     ['data' => 'profit'],
                 ];
-            $mediaCompaniesProfitColumns =
-                [
+            $mediaCompaniesProfitColumns = [
                     ['data' => 'name'],
                     ['data' => 'profit'],
                 ];
-           
+            $progressColumns = [
+                ['data' => 'set_date', "width" => "50px"],
+                ['data' => 'user_name', "width" => "50px"],
+                ['data' => 'sale_group_name', "width" => "50px"],
+                ['data' => 'totalProfit'],
+                ['data' => 'bonus_next_percentage', 'render' => '<span class="badge bg-${style}">${data}%</span>', 'parmas' => 'let style ="yellow"; if(data > 90){ style = "green"}else if(data < 0){ style = "red"}', "width" => "50px"],
+                ['data' => 'bonus_rate', 'render' => '${data}%'],
+                ['data' => 'profit'],
+                ['data' => 'bonus_direct']
+            ];
+            $groupsProgressColumns = [
+                ['data' => 'set_date'],
+                ['data' => 'name'],
+                ['data' => 'profit'],
+                ['data' => 'percentage', 'render' => '<span class="badge bg-${style}">${data}%</span>', 'parmas' => 'let style ="yellow"; if(data > 90){ style = "green"}else if(data < 0){ style = "red"}'],
+            ];
+            $bonusColumns =[
+                ['data' => 'set_date'],
+                ['data' => 'user_name'],
+                ['data' => 'sale_group_name'],
+                ['data' => 'campaign_name', 'render' => sprintf('<a href="http://%s/jsadwaysN2/campaign_view.php?id=${row.campaign_id}" target="_blank">${row.campaign_name}</a>', env('ERP_URL'))],
+                ['data' => 'media_channel_name'],
+                ['data' => 'sell_type_name'],
+                ['data' => 'currency'],
+                ['data' => 'organization'],
+                ['data' => 'income'],
+                ['data' => 'cost'],
+                ['data' => 'profit', 'render' => '<p style="${style}">${row.profit}</p>', 'parmas' => 'let style = row.organization == "hk" ? "color:red" : "" '],
+                ['data' => 'paymentStatus'],
+                ['data' => 'bonusStatus'],
+            ];
+            
             /*ajax check debug*/
 //            $dateStart = $date->format('2020-01-01');
 //            $dateEnd = $date->format('2020-01-01');
@@ -105,57 +115,8 @@
 //            $return = $this->getAjaxData($request, 'return');
 //            dd($return);
 //
-            $allYearProfit = $this->getAllYearProfit($userList);
-            
-            $chartDataBar = [
-                [
-                    'data' => 0,
-                ],
-                [
-                    'data' => 0,
-                ],
-                [
-                    'type'=> 'line','data' => 0,
-                ],
-            ];
-            $chartData = [
-                ['data' => [
-                    0,
-                    0,
-                    0,
-                    0
-                ]],
-                //[ 'data' => [
-                //	 0,
-                //	 0,
-                //	 1,
-                //	 1]]
-            ];
-            //
-            $progressColumns = [
-                ['data' => 'set_date', "width" => "50px"],
-                ['data' => 'user_name', "width" => "50px"],
-                ['data' => 'sale_group_name', "width" => "50px"],
-                //['data' => 'bonus_next_percentage' , 'render' => '<span style="display: none">${data}</span><div class="progress progress-xs progress-striped active" style="${rotate}"><div class="progress-bar progress-bar-${style}" style="width: ${Math.abs(data)}%;"></div></div>','parmas' => 'let style="yellow"; let rotate=""; if(data > 90){ style = "success"}else if(data < 0){ style = "danger"; rotate = "transform: rotate(180deg)";}'],
-                ['data' => 'totalProfit'],
-                ['data' => 'bonus_next_percentage', 'render' => '<span class="badge bg-${style}">${data}%</span>', 'parmas' => 'let style ="yellow"; if(data > 90){ style = "green"}else if(data < 0){ style = "red"}', "width" => "50px"],
-                ['data' => 'bonus_rate', 'render' => '${data}%'],
-                ['data' => 'profit'],
-                ['data' => 'bonus_direct']
-            ];
-            
-            $groupsProgressColumns = [
-                ['data' => 'set_date'],
-                ['data' => 'name'],
-                ['data' => 'profit'],
-                //['data' => 'percentage' , 'render' => '<span style="display: none">${data}</span><div class="progress progress-xs progress-striped active" style="${rotate}"><div class="progress-bar progress-bar-${style}" style="width: ${Math.abs(data)}%;"></div></div>','parmas' => 'let style="yellow"; let rotate=""; if(data > 90){ style = "success"}else if(data < 0){ style = "danger"; rotate = "transform: rotate(180deg)";}'],
-                ['data' => 'percentage', 'render' => '<span class="badge bg-${style}">${data}%</span>', 'parmas' => 'let style ="yellow"; if(data > 90){ style = "green"}else if(data < 0){ style = "red"}'],
-            ];
-            
             return view('bonus.review.view', [
                     'data' => $this->resources,
-                    'chartData' => $chartData,
-                    'chartDataBar' => $chartDataBar,
                     'bonusColumns' => $bonusColumns,
                     'progressColumns' => $progressColumns,
                     'groupProgressColumns' => $groupsProgressColumns,
@@ -204,7 +165,7 @@
             $allGroupIds = Cache::store('memcached')->remember('allGroupId', (10 * 60), function () {
                 return SaleGroups::all()->pluck('id')->toArray();
             });
-            
+
             /*cache start*/
             if ($dateStart != $dateEnd) {
                 $dateRange = date_range($dateStart, $dateEnd);
@@ -758,7 +719,7 @@
             $customerGroup = new CustomerGroups();
             $customerGroup = collect($customerGroup->getCustomerGroupDatas());
             $receiptTimesData = collect($this->getreceiptTimes($dateRange))->flatten(1);
-            
+           
             $customerGroupsProfit = $customerGroup->map(function($v,$k) use($bonus_list,$receiptTimesData){
                 
                 $profit = $bonus_list->whereIn('agency_id',$v['customer']['agency'])->concat($bonus_list->whereIn('client_id',$v['customer']['client']))->sum('profit');

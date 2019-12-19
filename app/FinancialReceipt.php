@@ -14,19 +14,22 @@ class FinancialReceipt extends Model
 	{
 		$financial = new FinancialController();
 		/*cp_detail_id and balance date */
-		$erpReturnData = collect($financial->getBalancePayMentData($type));
-		$cpDetailIds = $erpReturnData->pluck('cp_detail_id');
-		
-		$v = FinancialList::whereIn('cp_detail_id',$cpDetailIds);
-		$v->update(['status' => 1]);
-		$v = $v->get();
-		
-        $balanceDataArr = $erpReturnData->pluck('balance_date','cp_detail_id');
-
-       $v->reject(function($v){
-            return $this->where('financial_lists_id',$v->id)->exists();
-        })->map(function ($v) use($balanceDataArr){
-            $this->create(['financial_lists_id' => $v->id,'created_at' => $balanceDataArr[$v->cp_detail_id]]);
+        collect($financial->getBalancePayMentData($type))->each(function($balanceData){
+            
+            $results = FinancialList::where('cp_detail_id',$balanceData['cp_detail_id'])->get();
+            $financialListIdReceipMoney = $results->filter(function($item,$k) use($balanceData){
+                /*一對多的情況 需要判斷 financial set_date 是小於 收款日 才更新*/
+                return $item['set_date'] < date("Y-m-d",strtotime($balanceData['balance_date']));
+            })->pluck('id');
+            /*更新financialList狀態*/
+            FinancialList::whereIn('cp_detail_id',$financialListIdReceipMoney)->update(['status' => 1]);
+            /*建立 financialReceipt 未存在才建立*/
+            $financialListIdReceipMoney->reject(function($v){
+                return $this->where('financial_lists_id',$v)->exists();
+            })->map(function ($v) use($balanceData){
+                $this->create(['financial_lists_id' => $v,'created_at' => $balanceData['balance_date']]);
+            });
+            
         });
 	}
 	public function checkinPassData( FinancialList $v)
@@ -84,7 +87,11 @@ class FinancialReceipt extends Model
 			$provideData['created_at'] = $oldCreated_at->format('Y-m-01 H:i:s');
 			$provideData['updated_at'] = $oldCreated_at->format('Y-m-01 H:i:s');
 			$oldCreated_at->modify('-1 month');
-			$finListObj->receipt->update(['created_at'=> $oldCreated_at->format('Y-m-01 H:i:s'),'updated_at'=> $oldCreated_at->format('Y-m-01 H:i:s')]);
+			
+			if(isset($finListObj->receipt)){
+                $finListObj->receipt->update(['created_at'=> $oldCreated_at->format('Y-m-01 H:i:s'),'updated_at'=> $oldCreated_at->format('Y-m-01 H:i:s')]);
+            }
+			
 			Provide::create($provideData);
 		}
 	}
