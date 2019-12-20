@@ -8,8 +8,6 @@ import store from "./store";
 
 require('./bootstrap');
 
-// window.Vue = require('vue');
-
 import Vue from 'vue';
 import Vuex from 'vuex';
 
@@ -22,13 +20,6 @@ let store1 =  new Vuex.Store(test);
 
 // jquery
 window.$ = window.jQuery = require('jquery');
-//datatable
-// // import buttons and plugins
-// import '../../public/plugins/datatables.net-buttons/js/dataTables.buttons.js';
-// import '../../public/plugins/datatables.net-buttons/js/buttons.html5.js';
-// import '../../public/plugins/datatables.net-buttons/js/buttons.print.js';
-// // // import the rest
-// import '../../public/plugins/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css';
 
 import DataTable from 'datatables.net-bs4';
 window.DataTable = DataTable;
@@ -44,13 +35,11 @@ window.moment = moment;
 import datepicker from '../../public/adminLte_componets/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js';
 window.datepicker = datepicker;
 
-//daterangepicker
-// import daterangepicker from 'bootstrap-daterangepicker';
+
 
 //select2
 import select2 from '../../public/adminLte_componets/select2/dist/js/select2.full.min.js';
-// require('./adminLte_componets/select2/dist/js/select2.full.min.js');
-// select2.full.min.js
+
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue

@@ -112,7 +112,7 @@
 				session()->forget('retrunUrl');
 				return redirect($returnUrl);
 			}
-			return redirect('/');
+			return  Redirect::route('bonus.review.view');
 		}
 		
 		public function logout ()
