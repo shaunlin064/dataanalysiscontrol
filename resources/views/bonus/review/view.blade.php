@@ -81,7 +81,7 @@
                     <!-- /.col-lg-6 -->
                 </div>
             </div>
-            <div class="box box-primary">
+            <div class="box box-warning">
                 <div class="box-header with-border">
                     <h3 class="box-title">資料篩選</h3>
                     <div class="box-tools pull-right">
@@ -140,7 +140,7 @@
             </div>
         </div>
         <div class='col-md-6 col-sm-12 col-xs-12 border-right'>
-            <div class="box box-primary">
+            <div class="box box-warning">
                 <div class="box-header with-border">
                     <h3 class="box-title">客戶圖表</h3>
                     <div class="box-tools pull-right">
@@ -165,7 +165,7 @@
                     </div>
                 </div>
             </div>
-            <div class="box box-primary">
+            <div class="box box-warning">
                 <div class="box-header with-border">
                     <h3 class="box-title">客戶列表</h3>
                     <div class="box-tools pull-right">
@@ -331,7 +331,7 @@
             </div>
         </div>
         <div class="col-xs-12">
-            <div class="box box-primary">
+            <div class="box box-warning">
                 <div class="box-header with-border">
                     <h3 class="box-title">業績列表</h3>
                     <div class="box-tools pull-right">
