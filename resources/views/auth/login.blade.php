@@ -1,77 +1,55 @@
-<?php
-
-  ?>
-
 @extends('layouts.app')
 
-@section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('DataAnalysisControl  |  Login') }}</div>
-
-                <div class="card-body">
-                    <form method="POST" action="{{ route('auth.login') }}">
-                        @csrf
-
-                        <div class="form-group row">
-                            <label for="name" class="col-md-4 col-form-label text-md-right">{{ __('帳號') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus>
-
-                                @error('name')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('密碼') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password"  autocomplete="current-password">
-
-                                @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-{{--                        <div class="form-group row">--}}
-{{--                            <div class="col-md-6 offset-md-4">--}}
-{{--                                <div class="form-check">--}}
-{{--                                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>--}}
-
-{{--                                    <label class="form-check-label" for="remember">--}}
-{{--                                        {{ __('Remember Me') }}--}}
-{{--                                    </label>--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-
-                        <div class="form-group row mb-0">
-                            <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Login') }}
-                                </button>
-
-{{--                                @if (Route::has('password.request'))--}}
-{{--                                    <a class="btn btn-link" href="{{ route('password.request') }}">--}}
-{{--                                        {{ __('Forgot Your Password?') }}--}}
-{{--                                    </a>--}}
-{{--                                @endif--}}
-                            </div>
-                        </div>
-                    </form>
+@section('body')
+    <div class="container" id="container">
+        <div class="form-container sign-up-container">
+            <form action="#">
+                <h1>Login In</h1>
+                <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+            </form>
+        </div>
+        <div class="form-container sign-in-container">
+            <form method="POST" action="{{ route('auth.login') }}">
+                @csrf
+                <h1>Sign in</h1>
+                <span>use Js-Adways Erp Account</span>
+                <input name='name' placeholder="Account" />
+                <input name='password' type="password" placeholder="Password" />
+                <button type='button' id='loginIn'>Login In</button>
+            </form>
+        </div>
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>Welcome Back!</h1>
+                    <p>Login with your personal info</p>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>Hello, Friend!</h1>
+                    <p>Enter your Js-Adways Account Get To Start</p>
                 </div>
             </div>
         </div>
     </div>
-</div>
+@endsection
+
+@section('script')
+    <script type="text/javascript">
+        const loginInButton = document.getElementById('loginIn');
+        const container = document.getElementById('container');
+
+            loginInButton.addEventListener('click', () => {
+                container.classList.add("right-panel-active");
+                run();
+            });
+
+        async function sleep(ms = 0) {
+            return new Promise(r => setTimeout(r, ms));
+        }
+
+        async function run() {
+            await sleep(1000);
+            $('form').submit();
+        }
+    </script>
 @endsection

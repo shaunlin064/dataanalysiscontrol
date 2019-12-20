@@ -16,7 +16,8 @@ mix.js('resources/js/app.js', 'public/js')
     // .js('node_modules/bootstrap-select/dist/js/bootstrap-select.min.js','public/plugins/bootstrap/select')
     // .js('node_modules/bootstrap-select/dist/js/i18n/defaults-zh_TW.min.js','public/plugins/bootstrap/select/i18n')
     .sass('resources/sass/app.scss', 'public/css')
-    .sass('resources/sass/global.scss', 'public/css');
+    .sass('resources/sass/global.scss', 'public/css')
+    .sass('resources/sass/login.scss', 'public/css');
 mix.copy('node_modules/material-design-lite/material.min.css', 'public/plugins/material');
 
 mix.copyDirectory('node_modules/pdfmake', 'public/plugins/pdfmake');

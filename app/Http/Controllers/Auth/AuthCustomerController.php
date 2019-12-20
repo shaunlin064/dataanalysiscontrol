@@ -9,7 +9,8 @@
 	namespace App\Http\Controllers\Auth;
 	ini_set('max_execution_time', 600);
 	use App\Http\Controllers\ApiController;
-	use App\Http\Controllers\Bonus\ReviewController;
+    use App\Http\Controllers\BaseController;
+    use App\Http\Controllers\Bonus\ReviewController;
 	use App\Http\Controllers\UserController;
     use App\Role;
     use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -21,18 +22,20 @@
 	use Session;
 	use Auth;
 	
-	class AuthCustomerController
+	class AuthCustomerController extends BaseController
 	{
 		use AuthenticatesUsers;
 		
 		public static $encrypt = "FAA2C53CA77AEF2F77C6E3C83C81B798";
 		
+		
 		public function index (Request $request)
 		{
+			$this->resources['cssPath'][] = '/css/login.css';
 			
 			$key = $request->key;
 			if( $key == null ){
-				return view('auth.login');
+				return view('auth.login',['data' => $this->resources]);
 			}
 			
 			$result = explode('_', Crypt::decrypt($key, 'AES-256-CBC'));

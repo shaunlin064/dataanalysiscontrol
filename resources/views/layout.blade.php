@@ -25,6 +25,7 @@
 		<link rel='stylesheet' href='{{$path}}'>
 	@endforeach
 </head>
+
 @include('loading')
 <body class='hold-transition skin-blue sidebar-mini'>
 
@@ -102,6 +103,6 @@
     }
 
 </script>
-@yield('script')
+
 </body>
 </html>

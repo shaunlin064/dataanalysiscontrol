@@ -47,7 +47,7 @@ class ProvideController extends BaseController
 			$erpUSerId = Bonus::all()->pluck('erp_user_id')->unique()->values();
 			$bonuslist = FinancialList::where('status',1)->where('profit','<>',0)->whereIn('erp_user_id',$erpUSerId)->get();
 			$bonuslist = $bonuslist->map(function ($v, $k) {
-				$v['receipt_date'] = $v->receipt->created_at->format('Y-m-d');
+//				$v['receipt_date'] = empty($v->receipt->created_at) ? '' : $v->receipt->created_at->format('Y-m-d');
 				$v['sale_group_name'] = $v->saleGroups->saleGroups->name ?? '';
 				$v['user_name'] =  ucfirst($v->user->name);
 				$v['rate'] = $v->bonus->bonusReach->reach_rate ?? 0;
