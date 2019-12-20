@@ -42,9 +42,15 @@ class ProvideController extends BaseController
 		
 		/*check cache exists*/
 		$cacheData = collect([]);
-		
+  
+  
 		if (!Cache::store('memcached')->has($this->cacheKeyProvide)) {
-			$erpUSerId = Bonus::all()->pluck('erp_user_id')->unique()->values();
+		    /*過濾後勤單位*/
+            $erpUSerId = Bonus::all()->filter(function ($v){
+                if($v->saleGroups->count() > 0){
+                    return $v->saleGroups->max('sale_groups_id') != 4;
+                }
+            })->pluck('erp_user_id')->unique()->values();
 			$bonuslist = FinancialList::where('status',1)->where('profit','<>',0)->whereIn('erp_user_id',$erpUSerId)->get();
 			$bonuslist = $bonuslist->map(function ($v, $k) {
 //				$v['receipt_date'] = empty($v->receipt->created_at) ? '' : $v->receipt->created_at->format('Y-m-d');
