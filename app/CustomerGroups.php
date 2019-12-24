@@ -107,7 +107,7 @@
             $this->apiData['id'] = $this::CUSTOMER_TYPE[$customerType];
             $apiUrl = env('API_GET_CUSTOMER_GROUP');
             
-            return $this->api->curlPost(json_encode($this->apiData), $apiUrl);
+            return $this->api->curlPost(json_encode($this->apiData), $apiUrl, 'json');
         }
         
         public function getApiGroupCustomer (Integer $customerGrouupId)
