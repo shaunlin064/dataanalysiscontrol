@@ -9,12 +9,12 @@
             </form>
         </div>
         <div class="form-container sign-in-container">
-            <form method="POST" action="{{ route('auth.login') }}">
+            <form id='loginForm' method="POST" action="{{ route('auth.login') }}">
                 @csrf
                 <h1>Sign in</h1>
                 <span>use Js-Adways Erp Account</span>
-                <input name='name' placeholder="Account" />
-                <input name='password' type="password" placeholder="Password" />
+                <input id='name' name='name' placeholder="Account" />
+                <input id='password' name='password' type="password" placeholder="Password" />
                 <button type='button' id='loginIn'>Login In</button>
             </form>
         </div>
@@ -34,14 +34,30 @@
 @endsection
 
 @section('script')
+    <script src='/adminLte_componets/jquery/dist/jquery.js'></script>
     <script type="text/javascript">
         const loginInButton = document.getElementById('loginIn');
         const container = document.getElementById('container');
+        const inputsubmit = [
+            document.getElementById('name'),
+            document.getElementById('password'),
+        ];
 
-            loginInButton.addEventListener('click', () => {
-                container.classList.add("right-panel-active");
-                run();
+        inputsubmit.map(function(dom){
+            $(dom).keypress(function(e){
+                code = (e.keyCode ? e.keyCode : e.which);
+                if (code == 13)
+                {
+                    container.classList.add("right-panel-active");
+                    run();
+                }
             });
+        });
+
+        loginInButton.addEventListener('click', () => {
+            container.classList.add("right-panel-active");
+            run();
+        });
 
         async function sleep(ms = 0) {
             return new Promise(r => setTimeout(r, ms));
