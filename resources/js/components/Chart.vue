@@ -18,7 +18,7 @@
             ajax_url: String,
             csrf: String,
         },
-        computed: {...mapState(['month_income', 'month_cost', 'month_profit', 'money_status_paid', 'money_status_unpaid', 'money_status_bonus_paid', 'money_status_bonus_unpaid', 'table_select', 'start_date', 'end_date', 'change_date', 'user_ids', 'sale_group_ids'])},
+        computed: {...mapState(['month_income', 'month_cost', 'month_profit', 'money_status_paid', 'money_status_unpaid', 'money_status_bonus_paid', 'money_status_bonus_unpaid','month_label'])},
         data: function () {
             return {
                 default_color: {
@@ -92,50 +92,10 @@
             this.chart_obj = new Chart(ctx, this.config);
         },
         methods: {
-            getData() {
-                if (this.ajax_url === undefined) {
-                    return false;
-                }
-                let data = {
-                    _token: this.csrf,
-                    startDate: this.$store.state.start_date,
-                    endDate: this.$store.state.end_date,
-                    saleGroupIds: this.$store.state.sale_group_ids,
-                    userIds: this.$store.state.user_ids
-                };
-                if ((data.saleGroupIds == '' && data.userIds == '') || data._token === undefined) {
-                    return false;
-                }
-
-                axios.post(this.ajax_url, data).then(
-                    response => {
-                        let rowData = eval(`response.data.${this.table_id}`);
-
-                        if (rowData) {
-                            if (this.table_id == 'chart_money_status') {
-                                this.$store.commit('changeMoneyStatus', {paid: rowData.paid, unpaid: rowData.unpaid});
-                            } else if (this.table_id == 'chart_financial_bar') {
-                                this.$store.commit('changeMonthBalancen', {
-                                    'month_income': rowData.totalIncome,
-                                    'month_cost': rowData.totalCost,
-                                    'month_profit': rowData.totalProfit
-                                });
-                                this.chart_labels = rowData.labels;
-                            }
-
-                            this.update(this);
-                        }
-                    },
-                    err => {
-
-                        reject(err);
-                    }
-                );
-            },
             update(vue_this) {
-
                 if (vue_this.type == 'pie') {
                     vue_this.chart_obj.data.datasets.map(function (dataset, key) {
+                        
                         if (key == 0) {
                             dataset.data = [vue_this.money_status_unpaid, vue_this.money_status_paid, 0, 0];
                         }
@@ -150,7 +110,7 @@
                         vue_this.month_cost,
                         vue_this.month_profit,
                     ];
-                    vue_this.chart_obj.data.labels = vue_this.chart_labels;
+                    vue_this.chart_obj.data.labels = vue_this.month_label;
                     vue_this.chart_obj.data.datasets.map(function (dataset, key) {
                         dataset.data = monthdata[key];
                     });
@@ -162,37 +122,27 @@
             }),
         },
         watch: {
-            start_date: {
-                immediate: true,    // 这句重要
-                handler(val, oldVal) {
-                    if (oldVal !== val && oldVal !== undefined && oldVal !== '' && val !== '' && oldVal.length !== 0) {
-
-                        this.getData();
+            money_status_bonus_paid: {
+                immediate: true,
+                    handler(val, oldVal) {
+                    if (oldVal !== undefined) {
+                        this.update(this);
                     }
                 }
             },
-            end_date: {
-                immediate: true,    // 这句重要
-                handler(val, oldVal) {
-                    if (oldVal !== undefined && val !== '') {
-                        this.getData();
+            money_status_bonus_unpaid: {
+                immediate: true,
+                    handler(val, oldVal) {
+                    if (oldVal !== undefined) {
+                        this.update(this);
                     }
                 }
             },
-            user_ids: {
-                immediate: true,    // 这句重要
-                handler(val, oldVal) {
-                    if (oldVal !== val) {
-                        this.getData();
-                    }
-                }
-            },
-            sale_group_ids: {
-                immediate: true,// 这句重要
-                // lazy:true,
-                handler(val, oldVal) {
-                    if (oldVal !== undefined && val !== '') {
-                        this.getData();
+            money_status_unpaid: {
+                immediate: true,
+                    handler(val, oldVal) {
+                    if (oldVal !== undefined) {
+                        this.update(this);
                     }
                 }
             },

@@ -25,6 +25,7 @@
 @extends('headerbar')
 
 @section('content')
+    <bonus-review-ajax-component :csrf='"{{csrf_token()}}"'></bonus-review-ajax-component>
     <div class="row">
         <div class="box box-widget widget-user">
             <!-- Add the bg color to the header using any of the bg-* classes -->
@@ -371,6 +372,7 @@
             if(cookie.bonus_review === undefined){
                 cookie.bonus_review = {};
             }
+
             let boxToggleCookie = cookie.bonus_review;
             $('button[data-ui-contorl]').click(function(){
                 let field = $(this).data('ui-contorl');
@@ -381,7 +383,7 @@
             if(boxToggleCookie !== undefined){
                 Object.keys(boxToggleCookie).forEach(key=>{
                     if(boxToggleCookie[key] === 0){
-                        $('*[data-ui-contorl="'+key+'"]').parents('.box.box-primary').addClass('collapsed-box');
+                        $('*[data-ui-contorl="'+key+'"]').parents('.box-header.with-border').parent().addClass('collapsed-box');
                         $('*[data-ui-contorl="'+key+'"]').children('i.fa').removeClass('fa-minus').addClass('fa-plus');
                     }
                 });

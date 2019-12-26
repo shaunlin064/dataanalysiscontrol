@@ -27,6 +27,7 @@
 
 <!-- Content Wrapper. Contains page content -->
 @section('content')
+    <financial-provide-ajax-component :csrf='"{{csrf_token()}}"'></financial-provide-ajax-component>
     <div class='row'>
         <div class="box box-widget widget-user">
             <!-- Add the bg color to the header using any of the bg-* classes -->

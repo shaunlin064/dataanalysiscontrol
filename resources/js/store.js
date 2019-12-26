@@ -13,6 +13,7 @@ export default {
         bonus_total_money : 0,
         provide_total_money : 0,
         sale_group_total_money: 0,
+        bonus_list: [],
         bonus_rate: 0,
         bonus_next_amount: 0,
         bonus_next_percentage: 0,
@@ -33,6 +34,14 @@ export default {
         agency_profit: [],
         client_profit: [],
         sale_channel_profitData: [],
+        customer_profit_data: [],
+        customer_groups_profit_data: [],
+        media_companies_profit_data: [],
+        medias_profit_data: [],
+        progress_list: [],
+        group_progress_list: [],
+        provide_bonus_list: [],
+        provide_groups_list: [],
     },
     getters:{
         getTableSelect(state){

@@ -62,7 +62,7 @@
         },
         computed: {
             // ...mapGetters(['getTableSelect','getUserIds','getSaleGroupIds','getStartDate','getEndDate']),
-            ...mapState(['provide_money', 'table_select', 'start_date', 'end_date', 'change_date', 'user_ids', 'sale_group_ids', 'loading', 'agency_ids', 'client_ids', 'media_companies_ids', 'medias_names']),
+            ...mapState(['provide_money','loading','customer_profit_data','customer_groups_profit_data','medias_profit_data','media_companies_profit_data','group_progress_list','progress_list','bonus_list','provide_bonus_list','provide_groups_list']),
         },
         methods: {
             change_render(item) {
@@ -82,66 +82,8 @@
                     this.dataTable.clear();
                     this.dataTable.rows.add(row);
                     this.dataTable.draw();
+                    this.$store.state.loading = false;
                 }
-            },
-            getData() {
-                if (this.ajax_url === undefined) {
-                    return false;
-                }
-                let data = {
-                    _token: this.csrf,
-                    startDate: this.$store.state.start_date,
-                    endDate: this.$store.state.end_date,
-                    saleGroupIds: this.$store.state.sale_group_ids,
-                    userIds: this.$store.state.user_ids,
-                    agencyIdArrays: this.$store.state.agency_ids,
-                    clientIdArrays: this.$store.state.client_ids,
-                    mediaCompaniesIdArrays: this.$store.state.media_companies_ids,
-                    mediasNameArrays: this.$store.state.medias_names,
-                };
-                if ((data.saleGroupIds == '' && data.userIds == '') || data._token === undefined) {
-                    return false;
-                }
-                var table_id = this.table_id;
-                this.$store.state.loading = true;
-                this.tableClear();
-
-                /*TODO::return ajax 資料 建立一個center 集中控管回傳至vuex*/
-                axios.post(this.ajax_url, data).then(
-                    response => {
-                        this.$store.state.loading = false;
-                        let rowData = eval(`response.data.${this.table_id}`);
-                       
-                        let total = parseInt(0);
-
-                        if (rowData) {
-                   
-                            rowData.map(function (v) {
-                                total += parseInt(v.provide_money);
-                            });
-
-                            if (this.table_id == 'provide_bonus_list') {
-                                this.$store.state.bonus_total_money = total;
-                            } else {
-                                this.$store.state.sale_group_total_money = total;
-                            }
-                            
-                            if(this.table_id == 'customer_profit_data'){
-                                this.$store.state.agency_profit  = response.data.customer_precentage_profit['agency_profit'];
-                                this.$store.state.client_profit  = response.data.customer_precentage_profit['client_profit'];
-                                this.$store.state.month_label = response.data.customer_precentage_profit['date'];
-                                this.$store.state.sale_channel_profitData = response.data.sale_channel_profit_data;
-                            }
-                            
-                            this.updataTable(rowData);
-                        }
-                    },
-                    err => {
-
-                        reject(err);
-                    }
-                );
-
             },
             getExportFileName() {
                 return `${this.table_head}_${this.start_date.substr(0, 7)}-${this.end_date.substr(0, 7)}`;
@@ -246,7 +188,6 @@
                 vue.dataTable.clear();
                 vue.dataTable.rows.add(rowData);
                 vue.dataTable.draw();
-                vue.getData();
                 if (type == 'select') {
 
                     // Handle click on checkbox
@@ -308,76 +249,120 @@
 
         },
         watch: {
-            start_date: {
+            customer_profit_data: {
                 immediate: true,    // 这句重要
                 handler(val, oldVal) {
-                    if (oldVal !== undefined && val !== '') {
-                        this.getData();
+                    if (oldVal !== undefined && val !== '' && this.table_id == 'customer_profit_data') {
+                        
+                        this.updataTable(val);
                     }
                 }
             },
-            end_date: {
+            customer_groups_profit_data : {
                 immediate: true,    // 这句重要
                 handler(val, oldVal) {
-                    if (oldVal !== undefined && val !== '') {
-                        this.getData();
+                    if (oldVal !== undefined && val !== ''  && this.table_id == 'customer_groups_profit_data') {
+                        
+                        this.updataTable(val);
                     }
                 }
             },
-            user_ids: {
+            medias_profit_data: {
                 immediate: true,    // 这句重要
                 handler(val, oldVal) {
-                    if (oldVal !== undefined && val !== '') {
-                        this.getData();
+                    if (oldVal !== undefined && val !== ''  && this.table_id == 'medias_profit_data') {
+                        
+                        this.updataTable(val);
                     }
                 }
             },
-            sale_group_ids: {
-                immediate: true,// 这句重要
-                // lazy:true,
+            media_companies_profit_data : {
+                immediate: true,    // 这句重要
                 handler(val, oldVal) {
-                    if (oldVal !== undefined && val !== '') {
-                        this.getData();
+                    if (oldVal !== undefined && val !== '' && this.table_id == 'media_companies_profit_data') {
+                        
+                        this.updataTable(val);
                     }
                 }
             },
-            agency_ids: {
-                immediate: true,// 这句重要
-                // lazy:true,
+            group_progress_list:{
+                immediate: true,    // 这句重要
                 handler(val, oldVal) {
-                    if (oldVal !== undefined && val !== '') {
-                        this.getData();
+                    if (oldVal !== undefined && val !== '' && this.table_id == 'group_progress_list') {
+                        
+                        this.updataTable(val);
                     }
                 }
             },
-            client_ids: {
-                immediate: true,// 这句重要
-                // lazy:true,
+            progress_list:{
+                immediate: true,    // 这句重要
                 handler(val, oldVal) {
-                    if (oldVal !== undefined && val !== '') {
-                        this.getData();
+                    if (oldVal !== undefined && val !== '' && this.table_id == 'progress_list') {
+                        
+                        this.updataTable(val);
                     }
                 }
             },
-            media_companies_ids: {
-                
-                immediate: true,// 这句重要
-                // lazy:true,
+            bonus_list:{
+                immediate: true,    // 这句重要
                 handler(val, oldVal) {
-                    if (oldVal !== undefined && val !== '') {
-                        this.getData();
+                    if (oldVal !== undefined && val !== '' && this.table_id == 'bonus_list') {
+                        
+                        this.updataTable(val);
                     }
                 }
             },
-            medias_names: {
-                immediate: true,// 这句重要
-                // lazy:true,
+            provide_bonus_list: {
+                immediate: true,    // 这句重要
                 handler(val, oldVal) {
-                    if (oldVal !== undefined && val !== '') {
-                        this.getData();
+                    if (oldVal !== undefined && val !== '' && this.table_id == 'provide_bonus_list') {
+
+                        this.updataTable(val);
                     }
                 }
-            }
+            },
+            provide_groups_list:  {
+                immediate: true,    // 这句重要
+                handler(val, oldVal) {
+                    if (oldVal !== undefined && val !== '' && this.table_id == 'provide_groups_list') {
+
+                        this.updataTable(val);
+                    }
+                }
+            },
+            // start_date: {
+            //     immediate: true,    // 这句重要
+            //     handler(val, oldVal) {
+            //         if (oldVal !== undefined && val !== '') {
+            //             this.getData();
+            //         }
+            //     }
+            // },
+            // end_date: {
+            //     immediate: true,    // 这句重要
+            //     handler(val, oldVal) {
+            //         if (oldVal !== undefined && val !== '') {
+            //             this.getData();
+            //         }
+            //     }
+            // },
+            // user_ids: {
+            //     immediate: true,    // 这句重要
+            //     handler(val, oldVal) {
+            //         if (oldVal !== undefined && val !== '') {
+            //             this.getData();
+            //         }
+            //     }
+            // },
+            // sale_group_ids: {
+            //     immediate: true,// 这句重要
+            //     // lazy:true,
+            //     handler(val, oldVal) {
+            //         if (oldVal !== undefined && val !== '') {
+            //             this.getData();
+            //         }
+            //     }
+            // },
         }
     }
 </script>
