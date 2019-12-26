@@ -127,7 +127,7 @@
                         </div>
                     </div>
                     <div class="form-group col-sm-6">
-                        <label class="col-sm-4 control-label input-md">媒體代理商 : </label>
+                        <label class="col-sm-4 control-label input-md">媒體經銷商 : </label>
                         <div class="col-sm-8">
                             <select2-customer :id='"media_companies_ids"'
                                               :selected='false'
@@ -207,7 +207,7 @@
                         <div class="col-xs-12">
                             <simple-data-table-componet
                                 :table_id='"media_companies_profit_data"'
-                                :table_head='"媒體代理商列表"'
+                                :table_head='"媒體經銷商列表"'
                                 :table_title='["名稱","毛利"]'
                                 :row='[]'
                                 :csrf='"{{csrf_token()}}"'
