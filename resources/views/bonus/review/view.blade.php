@@ -235,7 +235,7 @@
             </div>
         </div>
         <div class='col-md-6 col-sm-12 col-xs-12 border-right'>
-            <div class="box box-primary">
+            <div class="box box-warning">
                 <div class="box-header with-border">
                     <h3 class="box-title">業績圖表</h3>
                     <div class="box-tools pull-right">
