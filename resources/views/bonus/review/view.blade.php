@@ -312,25 +312,25 @@
                 </div>
             </div>
         </div>
-        <div class='col-xs-12 content-center'>
-            <div class="box box-primary">
-                <div class="box-header with-border">
-                    <h3 class="box-title">年度統計</h3>
-                    <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='all_year_profit_char'><i class="fa fa-minus"></i>
-                        </button>
-                    </div>
-                    <!-- /.box-tools -->
-                </div>
-                <div class="box-body">
-                    <chart-all-year-profit-line
-                        :table_id='"all_year_profit_bar"'
-                        :title='"年度統計"'
-                        :datas='{!! json_encode($allYearProfit) !!}'
-                    ></chart-all-year-profit-line>
-                </div>
-            </div>
-        </div>
+{{--        <div class='col-xs-12 content-center'>--}}
+{{--            <div class="box box-primary">--}}
+{{--                <div class="box-header with-border">--}}
+{{--                    <h3 class="box-title">年度統計</h3>--}}
+{{--                    <div class="box-tools pull-right">--}}
+{{--                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='all_year_profit_char'><i class="fa fa-minus"></i>--}}
+{{--                        </button>--}}
+{{--                    </div>--}}
+{{--                    <!-- /.box-tools -->--}}
+{{--                </div>--}}
+{{--                <div class="box-body">--}}
+{{--                    <chart-all-year-profit-line--}}
+{{--                        :table_id='"all_year_profit_bar"'--}}
+{{--                        :title='"年度統計"'--}}
+{{--                        :datas='{!! json_encode($allYearProfit) !!}'--}}
+{{--                    ></chart-all-year-profit-line>--}}
+{{--                </div>--}}
+{{--            </div>--}}
+{{--        </div>--}}
         <div class="col-xs-12">
             <div class="box box-warning">
                 <div class="box-header with-border">
