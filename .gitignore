@@ -2,6 +2,7 @@
 /public/hot
 /public/storage
 /public/css
+/public/js/helper.js
 /public/plugins/*
 /public/mix-manifest.json
 /storage/*.key
