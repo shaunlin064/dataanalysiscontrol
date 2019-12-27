@@ -123,7 +123,7 @@
 //            $dateStart = $date->format('2019-12-01');
 //            $dateEnd = $date->format('2019-12-01');
 //            $userIds = collect($userList)->pluck('erp_user_id')->toArray();
-//            $request = new Request(['startDate' => $dateStart, 'endDate' => $dateEnd, 'saleGroupIds' => [1,2,3,4,5], 'userIds' => []]);
+//            $request = new Request(['startDate' => $dateStart, 'endDate' => $dateEnd, 'saleGroupIds' => [], 'userIds' => [144]]);
 //            $return = $this->getAjaxData($request, 'return');
 //            dd($return);
             
@@ -300,6 +300,7 @@
             if(!Cache::store('file')->has($cahceKey.'filterData' . $hash)){
                 
                 $tmpBonus = collect([]);
+                $tmpBonusLastRecord = collect([]);
                 $tmpProgressList = collect([]);
                 foreach ($dateRange as $dateItem) {
                     if ($saleGroupIds) {
@@ -313,17 +314,19 @@
                             }
                 
                             $tmpBonus = $tmpBonus->concat($bonus_list->where('set_date', substr($dateItem, 0, 7))->whereIn('erp_user_id', $tmpUserIds));
+                            $tmpBonusLastRecord = $tmpBonus->concat($last_record_bonus_list->where('set_date', substr($dateItem, 0, 7))->whereIn('erp_user_id', $tmpUserIds));
                 
                             $tmpProgressList = $tmpProgressList->concat($progress_list->where('set_date', substr($dateItem, 0, 7))->whereIn('erp_user_id', $tmpUserIds));
                         }
                     } elseif ($userIds) {
                         $tmpBonus = $bonus_list->whereIn('erp_user_id', $userIds);
+                        $tmpBonusLastRecord = $last_record_bonus_list->whereIn('erp_user_id', $userIds);
                         $tmpProgressList = $progress_list->whereIn('erp_user_id', $userIds);
                     }
                 }
     
                 $bonus_list = $this->getFilterData($tmpBonus->toArray(), $agencyIdArrays, $clientIdArrays, $mediaCompaniesIdArrays, $mediasNameArrays);
-    
+                $last_record_bonus_list = $this->getFilterData($tmpBonusLastRecord->toArray(), $agencyIdArrays, $clientIdArrays, $mediaCompaniesIdArrays, $mediasNameArrays);
                 $progress_list = $tmpProgressList->values()->toArray();
                 
                 $chartMoneyStatus = [
