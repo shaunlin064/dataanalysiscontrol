@@ -123,9 +123,9 @@
 //            $dateStart = $date->format('2019-12-01');
 //            $dateEnd = $date->format('2019-12-01');
 //            $userIds = collect($userList)->pluck('erp_user_id')->toArray();
-//            $request = new Request(['startDate' => $dateStart, 'endDate' => $dateEnd, 'saleGroupIds' => [], 'userIds' => [144]]);
+//            $request = new Request(['startDate' => $dateStart, 'endDate' => $dateEnd, 'saleGroupIds' => [1,2,3,4,5], 'userIds' => []]);
 //            $return = $this->getAjaxData($request, 'return');
-//            dd($return);
+//            dd($return['chart_financial_bar_last_record'],$return['chart_financial_bar']);
             
             return view('bonus.review.view', [
                     'data' => $this->resources,
@@ -270,7 +270,7 @@
                     $cacheData[] = Cache::store('memcached')->get($cahceKey . $date);
                     
                 }
-    
+                /*抓取比對資料*/
                 if(!Cache::store('memcached')->has($cahceKey . $lastRecordDate)){
                     list($erpReturnData, $progressDatas, $groupProfitDatas) = $this->getDataFromDataBase($allUserErpIds, $allGroupIds, $lastRecordDate, $lastRecordDate);
                     Cache::store('memcached')->put($cahceKey . $lastRecordDate, ["bonus_list" => $erpReturnData, 'progress_list' => $progressDatas, 'group_progress_list' => $groupProfitDatas], ($cacheTime * 3600));
@@ -302,9 +302,11 @@
                 $tmpBonus = collect([]);
                 $tmpBonusLastRecord = collect([]);
                 $tmpProgressList = collect([]);
+                
                 foreach ($dateRange as $dateItem) {
                     if ($saleGroupIds) {
                         foreach ($saleGroupIds as $saleGroupId) {
+                            /*抓出該月份該團隊userid*/
                             $tmpUserIds = $userIds->where('sale_groups_id', $saleGroupId)->where('set_date', $dateItem)->pluck('erp_user_id');
                             /*如果該月抓不到責任額 則抓上月資料*/
                             if ($tmpUserIds->count() == 0) {
@@ -314,9 +316,23 @@
                             }
                 
                             $tmpBonus = $tmpBonus->concat($bonus_list->where('set_date', substr($dateItem, 0, 7))->whereIn('erp_user_id', $tmpUserIds));
-                            $tmpBonusLastRecord = $tmpBonus->concat($last_record_bonus_list->where('set_date', substr($dateItem, 0, 7))->whereIn('erp_user_id', $tmpUserIds));
-                
                             $tmpProgressList = $tmpProgressList->concat($progress_list->where('set_date', substr($dateItem, 0, 7))->whereIn('erp_user_id', $tmpUserIds));
+                            
+                            /*取比對月份資料*/
+                            /*TODO::簡化抓取比對資料的流程*/
+                            $tmpdatelast = new DateTime($dateItem);
+                            $tmpdatelast->modify('-1Year');
+                            /*抓出該月份該團隊userid*/
+                            $tmpUserIdslast = $userIds->where('sale_groups_id', $saleGroupId)->where('set_date', $tmpdatelast->format('Y-m-01'))->pluck('erp_user_id');
+                            /*如果該月抓不到責任額 則抓上月資料*/
+                            if ($tmpUserIdslast->count() == 0) {
+                                $tmpdate2 = new DateTime($dateItem);
+                                $tmpdate2->modify('-1Month');
+                                $tmpUserIdslast = $userIds->where('sale_groups_id', $saleGroupId)->where('set_date', $tmpdate2->format('Y-m-01'))->pluck('erp_user_id');
+                            }
+                            
+                            $tmpBonusLastRecord = $tmpBonusLastRecord->concat($last_record_bonus_list->where('set_date', $tmpdatelast->format('Y-m'))->whereIn('erp_user_id', $tmpUserIdslast));
+                            
                         }
                     } elseif ($userIds) {
                         $tmpBonus = $bonus_list->whereIn('erp_user_id', $userIds);
@@ -324,9 +340,10 @@
                         $tmpProgressList = $progress_list->whereIn('erp_user_id', $userIds);
                     }
                 }
-    
+                
                 $bonus_list = $this->getFilterData($tmpBonus->toArray(), $agencyIdArrays, $clientIdArrays, $mediaCompaniesIdArrays, $mediasNameArrays);
                 $last_record_bonus_list = $this->getFilterData($tmpBonusLastRecord->toArray(), $agencyIdArrays, $clientIdArrays, $mediaCompaniesIdArrays, $mediasNameArrays);
+               
                 $progress_list = $tmpProgressList->values()->toArray();
                 
                 $chartMoneyStatus = [
@@ -378,6 +395,7 @@
                 $last_record_bonus_list->groupBy('set_date')->map(function ($v, $k) use (&$chartFinancialBarLastRecord) {
                     $tmpDate = new DateTime($k);
                     $key = array_search($tmpDate->format('Ym'), $chartFinancialBarLastRecord['labels']);
+                    
                     //$chartFinancialBar['labels'][] = $tmpDate->format('Ym');
                     $chartFinancialBarLastRecord['totalIncome'][$key] = round($v->sum('income'));
                     $chartFinancialBarLastRecord['totalCost'][$key] = round($v->sum('cost'));
