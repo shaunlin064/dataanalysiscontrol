@@ -5,6 +5,12 @@
 	 * Date: 2019-06-19
 	 * Time: 12:24
 	 */
+
+//	width: 100px;
+//    display: inline-block;
+//    white-space: nowrap;
+//    overflow: hidden;
+//    text-overflow: ellipsis;
 ?>
 
 @extends('layout')
@@ -140,6 +146,41 @@
                 </form>
             </div>
         </div>
+        <div class='col-sm-12 col-xs-12 border-right'>
+            <div class="box box-warning">
+                <div class="box-header with-border">
+                    <h3 class="box-title">比較圖表</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='compare_char'><i
+                                class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                    <!-- /.box-tools -->
+                </div>
+                <div class="box-body">
+                        <chart-component
+                            :table_id='"chart_financial_bar2"'
+                            :type='"bar"'
+                            :title='"選擇年度"'
+                            :ajax_url='"/bonus/review/getAjaxData"'
+                            :csrf='"{{csrf_token()}}"'
+                            :labels='[]'
+                            :height='300'
+                            :chart_data='{{ json_encode([ ["data"=>0],["data"=>0],["data"=>0,"type"=> 'line'] ]) }}'
+                        ></chart-component>
+                        <chart-component
+                            :table_id='"chart_financial_bar_last_record"'
+                            :type='"bar"'
+                            :title='"對比年度"'
+                            :ajax_url='"/bonus/review/getAjaxData"'
+                            :csrf='"{{csrf_token()}}"'
+                            :labels='[]'
+                            :height='300'
+                            :chart_data='{{ json_encode([ ["data"=>0],["data"=>0],["data"=>0,"type"=> 'line'] ]) }}'
+                        ></chart-component>
+                </div>
+            </div>
+        </div>
         <div class='col-md-6 col-sm-12 col-xs-12 border-right'>
             <div class="box box-warning">
                 <div class="box-header with-border">
@@ -182,7 +223,7 @@
                             <simple-data-table-componet
                                 :table_id='"customer_profit_data"'
                                 :table_head='"客戶列表"'
-                                :table_title='["名稱","類型","發稿量","毛利"]'
+                                :table_title='["名稱","類型","發稿量","收入","成本","毛利","毛利率"]'
                                 :row='[]'
                                 :csrf='"{{csrf_token()}}"'
                                 :columns='{!!json_encode($customerProfitColumns)!!}'
@@ -195,7 +236,7 @@
                             <simple-data-table-componet
                                 :table_id='"customer_groups_profit_data"'
                                 :table_head='"集團列表"'
-                                :table_title='["名稱","發稿量","毛利"]'
+                                :table_title='["名稱","發稿量","收入","成本","毛利","毛利率"]'
                                 :row='[]'
                                 :csrf='"{{csrf_token()}}"'
                                 :columns='{!!json_encode($customerGroupProfitColumns)!!}'
@@ -208,7 +249,7 @@
                             <simple-data-table-componet
                                 :table_id='"media_companies_profit_data"'
                                 :table_head='"媒體經銷商列表"'
-                                :table_title='["名稱","毛利"]'
+                                :table_title='["名稱","收入","成本","毛利","毛利率"]'
                                 :row='[]'
                                 :csrf='"{{csrf_token()}}"'
                                 :columns='{!!json_encode($mediaCompaniesProfitColumns)!!}'
@@ -221,7 +262,7 @@
                             <simple-data-table-componet
                                 :table_id='"medias_profit_data"'
                                 :table_head='"媒體列表"'
-                                :table_title='["名稱","銷售區域","毛利"]'
+                                :table_title='["名稱","銷售區域","收入","成本","毛利","毛利率"]'
                                 :row='[]'
                                 :csrf='"{{csrf_token()}}"'
                                 :columns='{!!json_encode($mediasProfitColumns)!!}'

@@ -1,5 +1,7 @@
 <template>
-    <div class="box box-info" id="canvas-holder">
+    <div class="box box-info" id="canvas-holder" :style="{
+            'height': `${height ? height : 'auto'}px`
+     }">
         <canvas :id=table_id></canvas>
     </div>
 </template>
@@ -17,8 +19,9 @@
             labels: Array,
             ajax_url: String,
             csrf: String,
+            height:Number
         },
-        computed: {...mapState(['month_income', 'month_cost', 'month_profit', 'money_status_paid', 'money_status_unpaid', 'money_status_bonus_paid', 'money_status_bonus_unpaid','month_label'])},
+        computed: {...mapState(['month_income', 'month_cost', 'month_profit', 'money_status_paid', 'money_status_unpaid', 'money_status_bonus_paid', 'money_status_bonus_unpaid','month_label','last_record_month_income','last_record_month_cost', 'last_record_month_profit','last_record_month_label'])},
         data: function () {
             return {
                 default_color: {
@@ -58,6 +61,7 @@
                     },
                     options: {
                         responsive: true,
+                        maintainAspectRatio: this.height ? false : true,
                         title: {
                             display: true,
                             text: this.title
@@ -104,16 +108,28 @@
                         // }
                     });
                 } else if (vue_this.type == 'bar') {
-
-                    let monthdata = [
-                        vue_this.month_income,
-                        vue_this.month_cost,
-                        vue_this.month_profit,
-                    ];
-                    vue_this.chart_obj.data.labels = vue_this.month_label;
-                    vue_this.chart_obj.data.datasets.map(function (dataset, key) {
-                        dataset.data = monthdata[key];
-                    });
+                    if(vue_this.table_id == 'chart_financial_bar_last_record'){
+                        let monthdata = [
+                            vue_this.last_record_month_income,
+                            vue_this.last_record_month_cost,
+                            vue_this.last_record_month_profit,
+                        ];
+                        vue_this.chart_obj.data.labels = vue_this.last_record_month_label;
+                        vue_this.chart_obj.data.datasets.map(function (dataset, key) {
+                            dataset.data = monthdata[key];
+                        });
+                    }else{
+                        let monthdata = [
+                            vue_this.month_income,
+                            vue_this.month_cost,
+                            vue_this.month_profit,
+                        ];
+                        vue_this.chart_obj.data.labels = vue_this.month_label;
+                        vue_this.chart_obj.data.datasets.map(function (dataset, key) {
+                            dataset.data = monthdata[key];
+                        });
+                    }
+                    
                 }
                 vue_this.chart_obj.update();
             },

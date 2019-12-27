@@ -60,6 +60,12 @@
                                 'month_cost': response.data.chart_financial_bar.totalCost,
                                 'month_profit': response.data.chart_financial_bar.totalProfit
                             });
+                            
+                            this.$store.state.last_record_month_income  = response.data.chart_financial_bar_last_record.totalIncome;
+                            this.$store.state.last_record_month_cost  = response.data.chart_financial_bar_last_record.totalCost;
+                            this.$store.state.last_record_month_profit = response.data.chart_financial_bar_last_record.totalProfit;
+                            this.$store.state.last_record_month_label = response.data.chart_financial_bar_last_record.labels;
+                            
                             /*sales list*/
                             this.$store.state.group_progress_list = response.data.group_progress_list;
                             this.$store.state.progress_list = response.data.progress_list;

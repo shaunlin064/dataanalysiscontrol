@@ -39,6 +39,7 @@ class CacheClean extends Command
     public function handle()
     {
         //
-        Cache::store('memcached')->forget('yearProfit');
+        Cache::store('memcached')->flush();
+        Cache::store('file')->flush();
     }
 }

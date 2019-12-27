@@ -53,27 +53,39 @@
             $provideObj = new ProvideController();
             list($saleGroups, $userList) = $provideObj->getDataList($loginUserId, $date);
             
-            $allYearProfit = $this->getAllYearProfit($userList);
-            
-            $customerGroupProfitColumns = [
-                ['data' => 'name'],
-                ['data' => 'receipt_times'],
-                ['data' => 'profit'],
-            ];
+//            $allYearProfit = $this->getAllYearProfit($userList);
+    
             $customerProfitColumns = [
                 ['data' => 'name'],
                 ['data' => 'type', 'render' => '<span class="badge bg-${style}">${data}</span>', 'parmas' => 'let style ="red"; if(data == "直客"){ style = "blue"}'],
                 ['data' => 'receipt_times'],
+                ['data' => 'income'],
+                ['data' => 'cost'],
                 ['data' => 'profit'],
+                ['data' => 'profit_percenter']
+            ];
+            $customerGroupProfitColumns = [
+                ['data' => 'name'],
+                ['data' => 'receipt_times'],
+                ['data' => 'income'],
+                ['data' => 'cost'],
+                ['data' => 'profit'],
+                ['data' => 'profit_percenter']
             ];
             $mediasProfitColumns = [
                 ['data' => 'name'],
                 ['data' => 'sales_channel', 'render' => '<span class="badge bg-${style}">${data}</span>', 'parmas' => 'let style ="yellow"; if(data == "BR"){ style = "green"}else if(data == "EC"){ style = "purple"}'],
+                ['data' => 'income'],
+                ['data' => 'cost'],
                 ['data' => 'profit'],
+                ['data' => 'profit_percenter']
             ];
             $mediaCompaniesProfitColumns = [
                 ['data' => 'name'],
+                ['data' => 'income'],
+                ['data' => 'cost'],
                 ['data' => 'profit'],
+                ['data' => 'profit_percenter']
             ];
             $progressColumns = [
                 ['data' => 'set_date', "width" => "50px"],
@@ -129,7 +141,7 @@
                     'customerProfitColumns' => $customerProfitColumns,
                     'mediasProfitColumns' => $mediasProfitColumns,
                     'mediaCompaniesProfitColumns' => $mediaCompaniesProfitColumns,
-                    'allYearProfit' => $allYearProfit,
+//                    'allYearProfit' => $allYearProfit,
                     'customerGroupProfitColumns' => $customerGroupProfitColumns
                 ]
             );
@@ -195,6 +207,7 @@
             $clientIdArrays = collect($request->clientIdArrays)->filter()->toArray();
             $mediaCompaniesIdArrays = collect($request->mediaCompaniesIdArrays)->filter()->toArray();
             $mediasNameArrays = collect($request->mediasNameArrays)->filter()->toArray();
+            $hash = $this->gethash($dateStart, $dateEnd, $saleGroupIds, $userIds, $agencyIdArrays, $clientIdArrays, $mediaCompaniesIdArrays, $mediasNameArrays);
             
             $SaleGroupsObj = new SaleGroups();
             if (!empty($userIds)) {
@@ -222,6 +235,7 @@
             }
             $dateRange[] = $dateEnd;
             $cacheData = collect([]);
+            $cacheDataLastRecord = collect([]);
             $dateNow = new DateTime();
             /*check cache exists*/
             $cahceKey = 'financial.review';
@@ -231,14 +245,18 @@
                 $date2 = new DateTime($date);
                 $dateDistance = round(($dateNow->getTimestamp() - $date2->getTimestamp()) / (3600 * 24) / 365);
                 if ($dateDistance > 2) { // over two year
-                    $cacheTime = 24 * 30; // 1 month
+                    $cacheTime = 24 * 365; // 12 month
                 } elseif ($dateDistance > 1) { // over one year
                     $cacheTime = 24 * 15; // 2 week
                 } elseif ($dateDistance > 0.125) { // over 1.5 month
                     $cacheTime = 24; // 1 day
                 } else { // close one month
-                    $cacheTime = 1; // 1 hr
+                    $cacheTime = 3; // 3 hr
                 };
+                
+                $lastRecordDate = new DateTime($date);
+                $lastRecordDate->modify('-1Year');
+                $lastRecordDate = $lastRecordDate->format('Y-m-d');
                 
                 if (!Cache::store('memcached')->has($cahceKey . $date)) {
                     //
@@ -247,8 +265,18 @@
                     Cache::store('memcached')->put($cahceKey . $date, ["bonus_list" => $erpReturnData, 'progress_list' => $progressDatas, 'group_progress_list' => $groupProfitDatas], ($cacheTime * 3600));
                     
                     $cacheData[] = ["bonus_list" => $erpReturnData, 'progress_list' => $progressDatas, 'group_progress_list' => $groupProfitDatas];
+                    
                 } else {
                     $cacheData[] = Cache::store('memcached')->get($cahceKey . $date);
+                    
+                }
+    
+                if(!Cache::store('memcached')->has($cahceKey . $lastRecordDate)){
+                    list($erpReturnData, $progressDatas, $groupProfitDatas) = $this->getDataFromDataBase($allUserErpIds, $allGroupIds, $lastRecordDate, $lastRecordDate);
+                    Cache::store('memcached')->put($cahceKey . $lastRecordDate, ["bonus_list" => $erpReturnData, 'progress_list' => $progressDatas, 'group_progress_list' => $groupProfitDatas], ($cacheTime * 3600));
+                    $cacheDataLastRecord[] =["bonus_list" => $erpReturnData, 'progress_list' => $progressDatas, 'group_progress_list' => $groupProfitDatas];
+                }else{
+                    $cacheDataLastRecord[] = Cache::store('memcached')->get($cahceKey . $lastRecordDate);
                 }
             }
             
@@ -261,72 +289,115 @@
                 $progress_list = $progress_list->concat($v['progress_list']);
                 $group_progress_list = $group_progress_list->concat($v['group_progress_list']);
             });
+    
+            $last_record_bonus_list = collect([]);
             
-            $tmpBonus = collect([]);
-            $tmpProgressList = collect([]);
-            foreach ($dateRange as $dateItem) {
-                if ($saleGroupIds) {
-                    foreach ($saleGroupIds as $saleGroupId) {
-                        
-                        $tmpUserIds = $userIds->where('sale_groups_id', $saleGroupId)->where('set_date', $dateItem)->pluck('erp_user_id');
-                        if ($tmpUserIds->count() == 0) {
-                            $tmpdate = new DateTime($dateItem);
-                            $tmpdate->modify('-1Month');
-                            $tmpUserIds = $userIds->where('sale_groups_id', $saleGroupId)->where('set_date', $tmpdate->format('Y-m-01'))->pluck('erp_user_id');
-                        }
-                        
-                        $tmpBonus = $tmpBonus->concat($bonus_list->where('set_date', substr($dateItem, 0, 7))->whereIn('erp_user_id', $tmpUserIds));
-                        
-                        $tmpProgressList = $tmpProgressList->concat($progress_list->where('set_date', substr($dateItem, 0, 7))->whereIn('erp_user_id', $tmpUserIds));
-                    }
-                } elseif ($userIds) {
-                    $tmpBonus = $bonus_list->whereIn('erp_user_id', $userIds);
-                    $tmpProgressList = $progress_list->whereIn('erp_user_id', $userIds);
-                }
-            }
-            $bonus_list = $this->getFilterData($tmpBonus->toArray(), $agencyIdArrays, $clientIdArrays, $mediaCompaniesIdArrays, $mediasNameArrays);
-            
-            $progress_list = $tmpProgressList->values()->toArray();
-            
-            $chartMoneyStatus = [
-                'unpaid' => round($bonus_list->where('status', '=', 0)->sum('income')),
-                'paid' => round($bonus_list->where('status', '>=', 1)->sum('income'))
-            ];
-            $chartFinancialBar = [
-                'labels' => [],
-                'totalIncome' => [],
-                'totalCost' => [],
-                'totalProfit' => []
-            ];
-            foreach ($dateRange as $dateItem) {
-                $newtmpDate = new DateTime($dateItem);
-                $chartFinancialBar['labels'][] = $newtmpDate->format('Ym');
-                $chartFinancialBar['totalIncome'][] = 0;
-                $chartFinancialBar['totalCost'][] = 0;
-                $chartFinancialBar['totalProfit'][] = 0;
-            }
-            
-            
-            $bonus_list->groupBy('set_date')->map(function ($v, $k) use (&$chartFinancialBar) {
-                $tmpDate = new DateTime($k);
-                $key = array_search($tmpDate->format('Ym'), $chartFinancialBar['labels']);
-                //$chartFinancialBar['labels'][] = $tmpDate->format('Ym');
-                $chartFinancialBar['totalIncome'][$key] = round($v->sum('income'));
-                $chartFinancialBar['totalCost'][$key] = round($v->sum('cost'));
-                $chartFinancialBar['totalProfit'][$key] = round($v->sum('profit'));
+            $cacheDataLastRecord->each(function ($v) use (&$last_record_bonus_list) {
+                $last_record_bonus_list = $last_record_bonus_list->concat($v['bonus_list']);
             });
             
-            $bonus_list = $bonus_list->map(function ($v, $k) {
+            /*get other cache data*/
+            if(!Cache::store('file')->has($cahceKey.'filterData' . $hash)){
                 
+                $tmpBonus = collect([]);
+                $tmpProgressList = collect([]);
+                foreach ($dateRange as $dateItem) {
+                    if ($saleGroupIds) {
+                        foreach ($saleGroupIds as $saleGroupId) {
+                            $tmpUserIds = $userIds->where('sale_groups_id', $saleGroupId)->where('set_date', $dateItem)->pluck('erp_user_id');
+                            /*如果該月抓不到責任額 則抓上月資料*/
+                            if ($tmpUserIds->count() == 0) {
+                                $tmpdate = new DateTime($dateItem);
+                                $tmpdate->modify('-1Month');
+                                $tmpUserIds = $userIds->where('sale_groups_id', $saleGroupId)->where('set_date', $tmpdate->format('Y-m-01'))->pluck('erp_user_id');
+                            }
+                
+                            $tmpBonus = $tmpBonus->concat($bonus_list->where('set_date', substr($dateItem, 0, 7))->whereIn('erp_user_id', $tmpUserIds));
+                
+                            $tmpProgressList = $tmpProgressList->concat($progress_list->where('set_date', substr($dateItem, 0, 7))->whereIn('erp_user_id', $tmpUserIds));
+                        }
+                    } elseif ($userIds) {
+                        $tmpBonus = $bonus_list->whereIn('erp_user_id', $userIds);
+                        $tmpProgressList = $progress_list->whereIn('erp_user_id', $userIds);
+                    }
+                }
+    
+                $bonus_list = $this->getFilterData($tmpBonus->toArray(), $agencyIdArrays, $clientIdArrays, $mediaCompaniesIdArrays, $mediasNameArrays);
+    
+                $progress_list = $tmpProgressList->values()->toArray();
+                
+                $chartMoneyStatus = [
+                    'unpaid' => round($bonus_list->where('status', '=', 0)->sum('income')),
+                    'paid' => round($bonus_list->where('status', '>=', 1)->sum('income'))
+                ];
+                
+                $chartFinancialBar = [
+                    'labels' => [],
+                    'totalIncome' => [],
+                    'totalCost' => [],
+                    'totalProfit' => []
+                ];
+                
+                foreach ($dateRange as $dateItem) {
+                    $newtmpDate = new DateTime($dateItem);
+                    $chartFinancialBar['labels'][] = $newtmpDate->format('Ym');
+                    $chartFinancialBar['totalIncome'][] = 0;
+                    $chartFinancialBar['totalCost'][] = 0;
+                    $chartFinancialBar['totalProfit'][] = 0;
+                }
+                
+                $bonus_list->groupBy('set_date')->map(function ($v, $k) use (&$chartFinancialBar) {
+                    $tmpDate = new DateTime($k);
+                    $key = array_search($tmpDate->format('Ym'), $chartFinancialBar['labels']);
+                    //$chartFinancialBar['labels'][] = $tmpDate->format('Ym');
+                    $chartFinancialBar['totalIncome'][$key] = round($v->sum('income'));
+                    $chartFinancialBar['totalCost'][$key] = round($v->sum('cost'));
+                    $chartFinancialBar['totalProfit'][$key] = round($v->sum('profit'));
+                });
+    
+                $chartFinancialBarLastRecord = [
+                    'labels' => [],
+                    'totalIncome' => [],
+                    'totalCost' => [],
+                    'totalProfit' => []
+                ];
+                
+                foreach ($dateRange as $dateItem) {
+                    $newtmpDate = new DateTime($dateItem);
+                    $newtmpDate->modify('-1Year');
+                    
+                    $chartFinancialBarLastRecord['labels'][] = $newtmpDate->format('Ym');
+                    $chartFinancialBarLastRecord['totalIncome'][] = 0;
+                    $chartFinancialBarLastRecord['totalCost'][] = 0;
+                    $chartFinancialBarLastRecord['totalProfit'][] = 0;
+                }
+                
+                $last_record_bonus_list->groupBy('set_date')->map(function ($v, $k) use (&$chartFinancialBarLastRecord) {
+                    $tmpDate = new DateTime($k);
+                    $key = array_search($tmpDate->format('Ym'), $chartFinancialBarLastRecord['labels']);
+                    //$chartFinancialBar['labels'][] = $tmpDate->format('Ym');
+                    $chartFinancialBarLastRecord['totalIncome'][$key] = round($v->sum('income'));
+                    $chartFinancialBarLastRecord['totalCost'][$key] = round($v->sum('cost'));
+                    $chartFinancialBarLastRecord['totalProfit'][$key] = round($v->sum('profit'));
+                });
+                
+                list($customerPrecentageProfit, $customerProfitData, $customerGroupsProfitData) = $this->getCustomerAllAnalysis($bonus_list, $dateRange);
+                list($mediaCompaniesProfitData, $mediasProfitData, $saleChannelProfitData) = $this->getMediaAllAnalysis($bonus_list);
+                
+                Cache::store('file')->put($cahceKey.'filterData' .$hash , [$customerPrecentageProfit, $customerProfitData, $customerGroupsProfitData,$mediaCompaniesProfitData, $mediasProfitData, $saleChannelProfitData,$chartMoneyStatus,$chartFinancialBar,$bonus_list,$progress_list,$chartFinancialBarLastRecord], ($cacheTime * 3600));
+                
+            }else{
+                
+                list($customerPrecentageProfit, $customerProfitData, $customerGroupsProfitData,$mediaCompaniesProfitData, $mediasProfitData, $saleChannelProfitData,$chartMoneyStatus,$chartFinancialBar,$bonus_list,$progress_list,$chartFinancialBarLastRecord) = Cache::store('file')->get($cahceKey.'filterData' .$hash);
+                
+            }
+            
+            $bonus_list = $bonus_list->map(function ($v, $k) {
                 $v['income'] = number_format($v['income']);
                 $v['cost'] = number_format($v['cost']);
                 $v['profit'] = number_format($v['profit']);
-                
                 return $v;
             });
-            
-            list($customerPrecentageProfit, $customerProfitData, $customerGroupsProfitData) = $this->getCustomerAllAnalysis($bonus_list, $dateRange);
-            list($mediaCompaniesProfitData, $mediasProfitData, $saleChannelProfitData) = $this->getMediaAllAnalysis($bonus_list);
             
             $bonus_list = $bonus_list->values()->toArray();
             
@@ -336,6 +407,7 @@
                 "bonus_list" => $bonus_list,
                 "chart_money_status" => $chartMoneyStatus,
                 "chart_financial_bar" => $chartFinancialBar,
+                "chart_financial_bar_last_record" => $chartFinancialBarLastRecord,
                 'progress_list' => $progress_list,
                 'group_progress_list' => $group_progress_list,
                 'customer_precentage_profit' => $customerPrecentageProfit,
@@ -532,6 +604,8 @@
             /*部份資料前置時有做 number_format 這邊做還原*/
             $bonus_list = $bonus_list->map(function ($v, $k) {
                 $v['profit'] = str_replace(',', '', $v['profit']);
+                $v['income'] = str_replace(',', '', $v['income']);
+                $v['cost'] = str_replace(',', '', $v['cost']);
                 return $v;
             });
             
@@ -540,7 +614,6 @@
             });
             
             $customerPrecentageProfit = $this->getCustomerProfitSum($bonus_list, $dateRange);
-            
             $customerProfitData = $this->getCustomerReceiptTimes($bonus_list, $dateRange);
             $customerGroupsProfitData = $this->getCustomerGroupsProfit($bonus_list, $dateRange);
             
@@ -599,14 +672,23 @@
                 if ($receiptTimesData->count() > 0) {
                     $receiptAgencyTimes = $receiptTimesData->where('agency_id', $v->max('agency_id'))->sum('receipt_count_times');
                 }
-                $customerProfitData[] = [
+    
+                list($income, $profit, $cost, $profitPercenter) = $this->getNumberSum($v);
+                
+                $customerProfitData[$id] = [
                     'name' => $v->max('agency_name'),
                     'type' => '代理商',
                     'receipt_times' => $receiptAgencyTimes ?? 0,
-                    'profit' => number_format($v->sum('profit')),
+                    'income' => number_format($income),
+                    'cost' => number_format($cost),
+                    'profit' => number_format($profit),
+                    'profit_percenter' => $profitPercenter
                 ];
+                
                 return $v;
             });
+            
+            sort($customerProfitData);
             
             $bonus_list->filter(function ($v) {
                 return $v['agency_id'] == 0;
@@ -614,11 +696,16 @@
                 if ($receiptTimesData->count() > 0) {
                     $receiptClientTimes = $receiptTimesData->where('client_id', $v->max('client_id'))->sum('receipt_count_times');
                 }
+                list($income, $profit, $cost, $profitPercenter) = $this->getNumberSum($v);
+                
                 $customerProfitData[] = [
                     'name' => $v->max('client_name'),
                     'type' => '直客',
                     'receipt_times' => $receiptClientTimes ?? 0,
-                    'profit' => number_format($v->sum('profit')),
+                    'income' => number_format($income),
+                    'cost' => number_format($cost),
+                    'profit' => number_format($profit),
+                    'profit_percenter' => $profitPercenter
                 ];
                 return $v;
             });
@@ -642,6 +729,24 @@
             }
             return $data;
         }
+        /**
+         * @param $items
+         * @return array
+         */
+        public function getNumberSum ($items): array
+        {
+            $income = $items->sum('income');
+            $profit = $items->sum('profit');
+            $cost = $items->sum('cost');
+            if ($profit < 0 && $income <= 0) {
+                $profitPercenter = '-100%';
+            } else if ($profit > 0 && $income <= 0) {
+                $profitPercenter = '100%';
+            } else {
+                $profitPercenter = round($profit / $income * 100, 1) . '%';
+            }
+            return array($income, $profit, $cost, $profitPercenter);
+        }
         
         private function getCustomerGroupsProfit (Collection $bonus_list, $dateRange)
         {
@@ -651,14 +756,19 @@
             
             $customerGroupsProfit = $customerGroup->map(function ($v, $k) use ($bonus_list, $receiptTimesData) {
                 
-                $profit = $bonus_list->whereIn('agency_id', $v['customer']['agency'])->concat($bonus_list->whereIn('client_id', $v['customer']['client']))->sum('profit');
+                $items = $bonus_list->whereIn('agency_id', $v['customer']['agency'])->concat($bonus_list->whereIn('client_id', $v['customer']['client']));
+    
+                list($income, $profit, $cost, $profitPercenter) = $this->getNumberSum($items);
                 
                 $receiptTimes = $receiptTimesData->whereIn('agency_id', $v['customer']['agency'])->concat($receiptTimesData->whereIn('client_id', $v['customer']['client']))->sum('receipt_count_times');
                 
                 $newdata = [
                     'name' => $v['name'],
-                    'profit' => number_format($profit),
                     'receipt_times' => $receiptTimes,
+                    'income' => number_format($income),
+                    'cost' => number_format($cost),
+                    'profit' => number_format($profit),
+                    'profit_percenter' => $profitPercenter,
                 ];
                 return $newdata;
             });
@@ -690,26 +800,65 @@
             
             $mediaCompaniesProfitData = $bonus_list->groupBy('companies_id')->map(function ($v, $k) {
                 
+                list($income, $profit, $cost, $profitPercenter) = $this->getNumberSum($v);
+                
                 $data = [
                     'name' => $v->max('companies_name'),
-                    //                    'name' => $v->max('companies_name') ?? sprintf('campaign未指定對應公司 id:%s',$v->pluck('campaign_id')->unique()->values()),
-                    'profit' => number_format($v->sum('profit')),
+                    'income' => number_format($income),
+                    'cost' => number_format($cost),
+                    'profit' => number_format($profit),
+                    'profit_percenter' => $profitPercenter
                 ];
                 return $data;
             })->values();
             
             $mediasProfitData = $bonus_list->groupBy('media_channel_name')->map(function ($v, $k) {
+                
+                list($income, $profit, $cost, $profitPercenter) = $this->getNumberSum($v);
+                
                 $data = [
                     'name' => $v->max('media_channel_name'),
                     'sales_channel' => $v->max('sales_channel'),
-                    'profit' => number_format($v->sum('profit')),
+                    'income' => number_format($income),
+                    'cost' => number_format($cost),
+                    'profit' => number_format($profit),
+                    'profit_percenter' => $profitPercenter
                 ];
                 return $data;
             })->values();
             
             return array($mediaCompaniesProfitData, $mediasProfitData, $saleChannelProfitData);
         }
-        
+    
+        /**
+         * @param $dateStart
+         * @param $dateEnd
+         * @param $saleGroupIds
+         * @param $userIds
+         * @param array $agencyIdArrays
+         * @param array $clientIdArrays
+         * @param array $mediaCompaniesIdArrays
+         * @param array $mediasNameArrays
+         * @return string
+         */
+        private function gethash ($dateStart, $dateEnd, $saleGroupIds, $userIds, array $agencyIdArrays, array $clientIdArrays, array $mediaCompaniesIdArrays, array $mediasNameArrays): string
+        {
+            $hash = '';
+            
+            foreach ( [$dateStart, $dateEnd, $saleGroupIds, $userIds, $agencyIdArrays, $clientIdArrays, $mediaCompaniesIdArrays, $mediasNameArrays] as $key =>  $item){
+                if($key <= 1){
+                    $hash .= $item;
+                }else{
+                    $hash .= '_';
+                    if(!empty($item)){
+                        $hash .= implode('',$item);
+                    }
+                }
+            }
+            
+            return $hash;
+        }
+    
     }
 	
 	
