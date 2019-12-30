@@ -404,12 +404,12 @@
                 
                 list($customerPrecentageProfit, $customerProfitData, $customerGroupsProfitData) = $this->getCustomerAllAnalysis($bonus_list, $dateRange);
                 list($mediaCompaniesProfitData, $mediasProfitData, $saleChannelProfitData) = $this->getMediaAllAnalysis($bonus_list);
-                
-                Cache::store('file')->put($cahceKey.'filterData' .$hash , [$customerPrecentageProfit, $customerProfitData, $customerGroupsProfitData,$mediaCompaniesProfitData, $mediasProfitData, $saleChannelProfitData,$chartMoneyStatus,$chartFinancialBar,$bonus_list,$progress_list,$chartFinancialBarLastRecord], ($cacheTime * 3600));
+                $chart_bar_max_y = collect(array_merge($chartFinancialBar['totalIncome'],$chartFinancialBarLastRecord['totalIncome']))->max();
+                Cache::store('file')->put($cahceKey.'filterData' .$hash , [$customerPrecentageProfit, $customerProfitData, $customerGroupsProfitData,$mediaCompaniesProfitData, $mediasProfitData, $saleChannelProfitData,$chartMoneyStatus,$chartFinancialBar,$bonus_list,$progress_list,$chartFinancialBarLastRecord,$chart_bar_max_y], ($cacheTime * 3600));
                 
             }else{
                 
-                list($customerPrecentageProfit, $customerProfitData, $customerGroupsProfitData,$mediaCompaniesProfitData, $mediasProfitData, $saleChannelProfitData,$chartMoneyStatus,$chartFinancialBar,$bonus_list,$progress_list,$chartFinancialBarLastRecord) = Cache::store('file')->get($cahceKey.'filterData' .$hash);
+                list($customerPrecentageProfit, $customerProfitData, $customerGroupsProfitData,$mediaCompaniesProfitData, $mediasProfitData, $saleChannelProfitData,$chartMoneyStatus,$chartFinancialBar,$bonus_list,$progress_list,$chartFinancialBarLastRecord,$chart_bar_max_y) = Cache::store('file')->get($cahceKey.'filterData' .$hash);
                 
             }
             
@@ -437,7 +437,7 @@
                 'media_companies_profit_data' => $mediaCompaniesProfitData,
                 'sale_channel_profit_data' => $saleChannelProfitData,
                 'customer_groups_profit_data' => $customerGroupsProfitData,
-                'chart_bar_max_y' => collect(array_merge($chartFinancialBar['totalIncome'],$chartFinancialBarLastRecord['totalIncome']))->max()
+                'chart_bar_max_y' => $chart_bar_max_y
             ];
             
             if ($outType == 'echo') {
