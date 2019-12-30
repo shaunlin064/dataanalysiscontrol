@@ -120,12 +120,12 @@
             ];
             
             /*ajax check debug*/
-//            $dateStart = $date->format('2019-12-01');
+//            $dateStart = $date->format('2019-10-01');
 //            $dateEnd = $date->format('2019-12-01');
 //            $userIds = collect($userList)->pluck('erp_user_id')->toArray();
 //            $request = new Request(['startDate' => $dateStart, 'endDate' => $dateEnd, 'saleGroupIds' => [1,2,3,4,5], 'userIds' => []]);
 //            $return = $this->getAjaxData($request, 'return');
-//            dd($return['chart_financial_bar_last_record'],$return['chart_financial_bar']);
+//            dd($return);
             
             return view('bonus.review.view', [
                     'data' => $this->resources,
@@ -436,7 +436,8 @@
                 'medias_profit_data' => $mediasProfitData,
                 'media_companies_profit_data' => $mediaCompaniesProfitData,
                 'sale_channel_profit_data' => $saleChannelProfitData,
-                'customer_groups_profit_data' => $customerGroupsProfitData
+                'customer_groups_profit_data' => $customerGroupsProfitData,
+                'chart_bar_max_y' => collect(array_merge($chartFinancialBar['totalIncome'],$chartFinancialBarLastRecord['totalIncome']))->max()
             ];
             
             if ($outType == 'echo') {

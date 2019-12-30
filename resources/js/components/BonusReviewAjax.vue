@@ -66,6 +66,7 @@
                             this.$store.state.last_record_month_profit = response.data.chart_financial_bar_last_record.totalProfit;
                             this.$store.state.last_record_month_label = response.data.chart_financial_bar_last_record.labels;
                             
+                            this.$store.state.chart_bar_max_y =  response.data.chart_bar_max_y;
                             /*sales list*/
                             this.$store.state.group_progress_list = response.data.group_progress_list;
                             this.$store.state.progress_list = response.data.progress_list;

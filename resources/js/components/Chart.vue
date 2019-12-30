@@ -21,7 +21,7 @@
             csrf: String,
             height:Number
         },
-        computed: {...mapState(['month_income', 'month_cost', 'month_profit', 'money_status_paid', 'money_status_unpaid', 'money_status_bonus_paid', 'money_status_bonus_unpaid','month_label','last_record_month_income','last_record_month_cost', 'last_record_month_profit','last_record_month_label'])},
+        computed: {...mapState(['month_income', 'month_cost', 'month_profit', 'money_status_paid', 'money_status_unpaid', 'money_status_bonus_paid', 'money_status_bonus_unpaid','month_label','last_record_month_income','last_record_month_cost', 'last_record_month_profit','last_record_month_label','chart_bar_max_y'])},
         data: function () {
             return {
                 default_color: {
@@ -65,6 +65,14 @@
                         title: {
                             display: true,
                             text: this.title
+                        },
+                        scales: {
+                            yAxes: [{
+                                display: true,
+                                ticks: {
+                                    beginAtZero: true,
+                                }
+                            }]
                         },
                     }
                 },
@@ -118,6 +126,7 @@
                         vue_this.chart_obj.data.datasets.map(function (dataset, key) {
                             dataset.data = monthdata[key];
                         });
+
                     }else{
                         let monthdata = [
                             vue_this.month_income,
@@ -129,9 +138,14 @@
                             dataset.data = monthdata[key];
                         });
                     }
+                    /*update yAxes max 確保比對圖表兩邊比例一樣 */
+                    vue_this.config.options.scales.yAxes[0].ticks.max = vue_this.chart_bar_max_y;
+                    vue_this.chart_obj.options = vue_this.chart_obj.config.options;
                     
                 }
-                vue_this.chart_obj.update();
+                vue_this.chart_obj.update({
+                    duration: 700,
+                    easing: 'linear'});
             },
             ...mapActions({
                 saveName: 'saveName'
