@@ -44,10 +44,22 @@ class UpdateFinancialData extends Command
         $startTime = microtime(true);
         
 	    $finanicalList = new FinancialList();
+        
         $datetime = new DateTime(date('Ym01'));
-        $datetime->modify('-1Month');
-	    $finanicalList->saveCloseData($datetime->format('Ym01'));
+        $nowdate = new DateTime();
+        /*last month*/
+        if($nowdate->format('d') < 16){
+            $datetime->modify('-1Month');
+            $finanicalList->saveCloseData($datetime->format('Ym01'));
+        }
+        /*this month*/
+	    $finanicalList->saveCloseData($nowdate->format('Ym01'));
     
+	    /*next month*/
+        $dateNextMonth = new DateTime(date('Ym01'));
+        $dateNextMonth->modify('+1Month');
+        $finanicalList->saveCloseData($dateNextMonth->format('Ym01'));
+        
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }

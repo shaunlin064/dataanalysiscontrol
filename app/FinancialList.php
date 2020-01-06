@@ -12,6 +12,7 @@ class FinancialList extends Model
     //
 
 	protected $guarded = ['med_group','dep_name','dep_id','username','priority'];
+	
 	protected $attributes = [
 	 'status' => 0,
         'profit_percentage' => 0,
@@ -164,20 +165,18 @@ class FinancialList extends Model
 		$dateStart = new \DateTime($dateStart);
 		$dateEnd = $dateEnd ? new \DateTime($dateEnd) :  $dateStart;
 		
-        $datetime = new DateTime(date('Ym01'));
-        
-        if($dateStart->format('Ym01') >= $datetime->format('Ym01') ) {
-            $this->saveCloseData($dateStart->format('Ym01'));
-        }else if($dateEnd->format('Ym01') >= $datetime->format('Ym01')){
-            $this->saveCloseData($dateEnd->format('Ym01'));
-        }else{
-            $nowdate = new DateTime();
-            if($nowdate->format('d') < 16){
-                $datetime->modify('-1Month');
-                $this->saveCloseData($datetime->format('Ym01'));
-            }
-        }
-        
+//        $datetime = new DateTime(date('Ym01'));
+
+//        if($dateStart->format('Ym01') >= $datetime->format('Ym01') || $dateEnd->format('Ym01') >= $datetime->format('Ym01') ) {
+//            $this->saveCloseData($dateStart->format('Ym01'));
+//        }else{
+//            $nowdate = new DateTime();
+//            if($nowdate->format('d') < 16){
+//                $datetime->modify('-1Month');
+//                $this->saveCloseData($datetime->format('Ym01'));
+//            }
+//        }
+  
 		$erpReturnData = $this->whereIn('erp_user_id' , $erpUserIds)->whereBetween('set_date' ,[$dateStart->format('Y-m-01'),$dateEnd->format('Y-m-01')])->with('receipt')->with('provide')->get()
 			->map(function ($v){
 				
@@ -227,26 +226,36 @@ class FinancialList extends Model
         }
 		
 		$erpReturnData = collect($financial->getErpMemberFinancial(['all'],$date->format('Ym')));
-		
-		$alreadySetData = $this->where('set_date','>=',$date->format('Y-m-d'))->get();
-		
-		$updateDataTmp = [];
-		// 先過濾已新增過的資料 做 UPDATA 為新增的資料做 insert
-		$erpReturnData = $erpReturnData->filter(function($v,$k) use($alreadySetData,&$updateDataTmp){
-			
-			$tmpDate = new DateTime($v['year_month'].'01');
-			$setDate = $tmpDate->format('Y-m-d');
-			$data = $alreadySetData->where('cp_detail_id',$v['o_id'])->where('set_date',$setDate)->first();
-			
-			if(empty($data)){
-				return $v;
-			}else if(!empty($data)){
-				//debug check
-				$updateDataTmp[]= $v;
-				$this->updateSet($data['id'],$v);
-			}
-		});
-  
+        
+        $erpReturnData = $erpReturnData->filter(function($v,$k) {
+            $tmpDate = new DateTime($v['year_month'].'01');
+            $setDate = $tmpDate->format('Y-m-d');
+            $searchData = $this->where(['cp_detail_id'=>$v['o_id'] , 'set_date' => $setDate]);
+            if($searchData->exists()){
+                $this->updateSet($searchData->first()['id'],$v);
+            }else{
+                return $v;
+            }
+        });
+        
+//		$alreadySetData = $this->where('set_date','>=',$date->format('Y-m-d'))->get();
+//
+//		$updateDataTmp = [];
+//		// 先過濾已新增過的資料 做 UPDATA 為新增的資料做 insert
+//		$erpReturnData = $erpReturnData->filter(function($v,$k) use($alreadySetData,&$updateDataTmp){
+//
+//			$tmpDate = new DateTime($v['year_month'].'01');
+//			$setDate = $tmpDate->format('Y-m-d');
+//			$data = $alreadySetData->where('cp_detail_id',$v['o_id'])->where('set_date',$setDate)->first();
+//
+//			if(empty($data)){
+//				return $v;
+//			}else if(!empty($data)){
+//				//debug check
+//				$updateDataTmp[]= $v;
+//				$this->updateSet($data['id'],$v);
+//			}
+//		});
 		DB::beginTransaction();
 		try{
 			$erpReturnData->each(function($v){
