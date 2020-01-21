@@ -5,6 +5,9 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 
+ini_set('max_execution_time', 600);
+ini_set('memory_limit','1024M');
+
 class CacheAll extends Command
 {
     /**

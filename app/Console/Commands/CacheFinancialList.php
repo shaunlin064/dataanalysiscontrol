@@ -7,9 +7,6 @@ use App\SaleGroups;
 use Illuminate\Console\Command;
 use Illuminate\Http\Request;
 
-ini_set('max_execution_time', 600);
-ini_set('memory_limit','256M');
-
 class CacheFinancialList extends Command
 {
     /**
