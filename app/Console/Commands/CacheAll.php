@@ -42,9 +42,10 @@ class CacheAll extends Command
     public function handle()
     {
         //
+        Artisan::call('down');
         Artisan::call('cache_clean');
         Artisan::call('cache_financial_list');
         Artisan::call('cache_receipt_times');
-        
+        Artisan::call('up');
     }
 }
