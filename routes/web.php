@@ -37,7 +37,7 @@
         Route::any('/logout', 'AuthCustomerController@logout')->name('auth.logout');
     });
     
-    Route::group(['middleware' => ['CheckLogin', 'GetMenuList']], function () {
+    Route::group(['middleware' => ['auth', 'GetMenuList']], function () {
         /*
          * index home
          */

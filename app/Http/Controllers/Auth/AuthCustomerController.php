@@ -16,11 +16,11 @@
     use Illuminate\Foundation\Auth\AuthenticatesUsers;
 	use App\User;
 	use Illuminate\Http\Request;
-	use Illuminate\Support\Facades\Hash;
+    use Illuminate\Support\Facades\Auth;
+    use Illuminate\Support\Facades\Hash;
 	use Illuminate\Support\Facades\Redirect;
 	use App\Http\Controllers\Help\Crypt;
 	use Session;
-	use Auth;
 	
 	class AuthCustomerController extends BaseController
 	{
@@ -117,8 +117,11 @@
 		
 		public function logout ()
 		{
-			
+   
 			session()->forget('userData');
+           
+            Auth::logout();
+           
 			return Redirect::route('auth.login');
 		}
 		
