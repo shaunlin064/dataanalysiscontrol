@@ -68,7 +68,7 @@
                 let dateStrEnd;
                 let year = d.getFullYear();
                 let month = d.getMonth();
-
+                
                 switch (dataSelectType) {
                     case 'lY':
                         dateStrStart = `${d.getFullYear() - 1}-01-01`;
@@ -79,6 +79,10 @@
                             year = d.getFullYear() - 1;
                             month = 12;
                         }
+                        /*月份補零*/
+                        if( month.toString().length == 1 ){
+                            month = "0" + month;
+                        }
                         dateStrStart = `${year}-${month}-01`;
                         dateStrEnd = `${year}-${month}-01`;
                         break;
@@ -87,8 +91,14 @@
                         dateStrEnd = `${d.getFullYear()}-12-01`;
                         break;
                     case 'tM':
-                        dateStrStart = `${year}-${month+1}-01`;
-                        dateStrEnd = `${year}-${month+1}-01`;
+                        month = month+1;
+                        /*月份補零*/
+                        if( month.toString().length == 1 ){
+                            month = "0" + month;
+                        }
+                        dateStrStart = `${year}-${month}-01`;
+                        dateStrEnd = `${year}-${month}-01`;
+                        
                         break;
                     case 'q1':
                         dateStrStart = `${year}-01-01`;
