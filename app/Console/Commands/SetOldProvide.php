@@ -46,7 +46,7 @@ class SetOldProvide extends Command
         //
         $startTime = microtime(true);
         
-	    $financialList = FinancialList::with('receipt')->where(['status' => 1])->where('set_date','<',config('custom.setOldDateLine'))->get();
+	    $financialList = FinancialList::with('receipt')->where('set_date','<',config('custom.setOldDateLine'))->get();
 	    $finReceiptObj = new FinancialReceipt();
 	    
 	    //add && update

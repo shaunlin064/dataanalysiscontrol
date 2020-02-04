@@ -34,17 +34,25 @@ class FinancialReceipt extends Model
 	}
 	public function checkinPassData( FinancialList $v)
 	{
-		$nowAvalibelUser = ['ids' => [67, 84, 122, 131, 132, 133, 136, 153, 155, 170, 174, 181, 186, 188],
+		$nowAvalibelUser = ['ids' => [67, 84, 131, 132, 133, 136, 153, 170, 174, 181, 186, 188,200,201,204,205],
 		 'setDate' => config('custom.setOldDateLine')];
 		$leaveUser1 = ['ids' => [97, 175],
 		 'setDate' => '2019-03-01']; //3月以前不用
 		$leaveUser2 = ['ids' => [156, 161],
 		 'setDate' => '2019-04-01']; //4月以前不用
+        $leaveUser3 = ['ids' => [122],
+            'setDate' => '2019-07-01']; //7月以前不用
+        $leaveUser4 = ['ids' => [155],
+            'setDate' => '2019-08-01']; //8月以前不用
 		if (in_array($v->erp_user_id, $leaveUser1['ids']) && $v->set_date < $leaveUser1['setDate']) {
 			$this->providOldData($v);
 		} elseif (in_array($v->erp_user_id, $leaveUser2['ids']) && $v->set_date < $leaveUser2['setDate']) {
 			$this->providOldData($v);
-		}elseif(in_array($v->erp_user_id,$nowAvalibelUser['ids']) && $v->set_date < $nowAvalibelUser['setDate']){
+		}elseif (in_array($v->erp_user_id, $leaveUser3['ids']) && $v->set_date < $leaveUser3['setDate']) {
+            $this->providOldData($v);
+        }elseif (in_array($v->erp_user_id, $leaveUser4['ids']) && $v->set_date < $leaveUser4['setDate']) {
+            $this->providOldData($v);
+        }elseif(in_array($v->erp_user_id,$nowAvalibelUser['ids']) && $v->set_date < $nowAvalibelUser['setDate']){
 			$this->providOldData($v);
 		}
 	}
