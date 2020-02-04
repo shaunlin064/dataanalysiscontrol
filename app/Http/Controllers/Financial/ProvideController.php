@@ -257,8 +257,8 @@ class ProvideController extends BaseController
 	private function save (array $selectFincialIds): void
 	{
 		$createdTime = new DateTime();
-		if($createdTime->format('d') <= 5){
-			$createdTime->modify('-1Month');
+		if($createdTime->format('d') >= 5){
+			$createdTime->modify('+1Month');
 		}
 		
 		$financialList = FinancialList::whereIn('id', $selectFincialIds)->get();
