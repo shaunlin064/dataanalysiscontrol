@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 ini_set('max_execution_time', 600);
-ini_set('memory_limit','256M');
+ini_set('memory_limit','1024M');
 use App\FinancialReceipt;
 use Illuminate\Console\Command;
 

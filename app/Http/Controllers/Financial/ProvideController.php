@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Financial;
-ini_set('max_execution_time', 180);
+ini_set('max_execution_time', 600);
+ini_set('memory_limit','1024M');
 
 use App\Bonus;
 use App\FinancialList;
@@ -37,13 +38,12 @@ class ProvideController extends BaseController
 	
 	public function list ()
 	{
-		
+  
 		$this->authorize('viewSetting',$this->policyModel);
-		
+  
 		/*check cache exists*/
 		$cacheData = collect([]);
-  
-  
+		
 		if (!Cache::store('memcached')->has($this->cacheKeyProvide)) {
 		    /*過濾後勤單位*/
             $erpUSerId = Bonus::all()->filter(function ($v){
@@ -65,6 +65,7 @@ class ProvideController extends BaseController
 			})->values();
 			
 			$saleGroupsReach = SaleGroupsReach::where('status',0)->get();
+   
 			$saleGroupsReach = $saleGroupsReach->map(function($v,$k){
 				$v->user_name =  ucfirst($v->saleUser->user->name);
 				$v->group_name = $v->saleGroups->name;
@@ -75,10 +76,9 @@ class ProvideController extends BaseController
 			Cache::store('memcached')->put($this->cacheKeyProvide, ["bonuslist" =>$bonuslist, 'saleGroupsReach' => $saleGroupsReach],( 8 * 3600 ));
 		}
 		$cacheData = Cache::store('memcached')->get($this->cacheKeyProvide);
-		
+  
 		$bonuslist = $cacheData['bonuslist'];
 		$saleGroupsReach = $cacheData['saleGroupsReach'];
-		
 		
 		$saleGroupsTableColumns =
 		 [
@@ -116,8 +116,8 @@ class ProvideController extends BaseController
 			'saleGroupsTableColumns' => $saleGroupsTableColumns,
 			'bonuslistColumns' => $bonuslistColumns,
 			'bonuslist' => $bonuslist,
-		  'autoSelectIds' => $autoSelectIds,
-		  'total_mondey' => $total_mondey ,
+            'autoSelectIds' => $autoSelectIds,
+            'total_mondey' => $total_mondey,
 		 ]);
 		
 		//columns : [
@@ -137,6 +137,7 @@ class ProvideController extends BaseController
 	{
 		$date = new DateTime(date('Ym01'));
 		$erpUserId = Auth::user()->erp_user_id;
+		
 		//
 //		$provideStart = '2019-09-01';
 //		$provideEnd = '2019-09-01';
