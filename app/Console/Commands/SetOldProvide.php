@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Console\Commands;
-ini_set('max_execution_time', 300);
+ini_set('max_execution_time', 600);
 
 use App\FinancialReceipt;
 use App\FinancialList;

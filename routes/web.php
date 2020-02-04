@@ -1,5 +1,6 @@
 <?php
-    
+    ini_set('max_execution_time', 1200);
+    ini_set('memory_limit','1024M');
     /*
     |--------------------------------------------------------------------------
     | Web Routes
@@ -16,10 +17,16 @@
     use App\SaleGroups;
     use Illuminate\Support\Facades\Artisan;
     use Illuminate\Support\Facades\Cache;
+    use Illuminate\Support\Facades\DB;
     use Illuminate\Support\Facades\Storage;
     use Illuminate\Http\Request;
     use Maatwebsite\Excel\Facades\Excel;
-    
+    use SebastianBergmann\Comparator\Factory;
+    use SebastianBergmann\Comparator\ComparisonFailure;
+    use App\Mail\CronTab;
+    Route::get('/cache_all', function () {
+        Artisan::call('cache_all');
+    });
     /*
      * 登入系統
      */
@@ -41,12 +48,15 @@
         /*
          * index home
          */
+        
         Route::get('/', '\App\Http\Controllers\Bonus\ReviewController@view')->name('index');
         
         //bonus start
         Route::group(['namespace' => '\App\Http\Controllers\Bonus'], function () {
             //setting
+            
             Route::prefix('bonus/setting')->group(function () {
+                
                 Route::get('/list', 'SettingController@list')->name('bonus.setting.list');
                 Route::get('/add', 'SettingController@add')->name('bonus.setting.add');
                 Route::get('/edit/{bonus?}', 'SettingController@edit')->name('bonus.setting.edit');
