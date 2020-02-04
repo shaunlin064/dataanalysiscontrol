@@ -305,6 +305,16 @@ class ExchangeRatesTableSeeder extends Seeder
                     'rate' => '30.03'
                 ]
             ],
+            '202001' => [
+                [
+                    'currency' => 'JPY',
+                    'rate' => '0.279'
+                ],
+                [
+                    'currency' => 'USD',
+                    'rate' => '30.24'
+                ]
+            ],
 	    ];
 	    
 	    foreach( $datas  as $setDate => $data){
