@@ -498,7 +498,11 @@ class ProvideController extends BaseController
 	private function setSaleGroupsReachProvide (array $selectSaleGroupsReachIds): void
 	{
 		$saleGroupReach = new SaleGroupsReach();
-		$saleGroupReach->whereIn('id', $selectSaleGroupsReachIds)->update(['status' => 1]);
+        $createdTime = new DateTime();
+        if($createdTime->format('d') >= 5){
+            $createdTime->modify('+1Month');
+        }
+		$saleGroupReach->whereIn('id', $selectSaleGroupsReachIds)->update(['status' => 1,'created_at' => $createdTime->format('Y-m-01'),]);
 	}
 	
 	private function getProvideBalanceSelectedId ($dataList) {
