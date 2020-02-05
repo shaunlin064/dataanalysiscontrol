@@ -47,6 +47,7 @@
             $schedule->command('update_bonus_reach')->monthlyOn('16', '00:10');
             $schedule->command('update_convener_reach')->monthlyOn('16', '00:20');
             /*cached*/
+            $schedule->command('cache_all')->dailyAt('01:00');
             $schedule->command('cache_all')->twiceDaily(11, 16);
             $schedule->command('cache_clean')->monthlyOn('1', '00:30');
             /*telescope*/

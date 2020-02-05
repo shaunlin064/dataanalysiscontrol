@@ -43,6 +43,10 @@ class ProvideController extends BaseController
   
 		/*check cache exists*/
 		$cacheData = collect([]);
+		$dataDate = now();
+        if(now()->format('d') < 16){
+            $dataDate->modify('-1Month');
+        }
 		
 		if (!Cache::store('memcached')->has($this->cacheKeyProvide)) {
 		    /*過濾後勤單位*/
@@ -51,7 +55,12 @@ class ProvideController extends BaseController
                     return $v->saleGroups->max('sale_groups_id') != 4;
                 }
             })->pluck('erp_user_id')->unique()->values();
-			$bonuslist = FinancialList::where('status',1)->where('profit','<>',0)->whereIn('erp_user_id',$erpUSerId)->get();
+			$bonuslist = FinancialList::where('status',1)
+                ->where('set_date','<',$dataDate->format('Y-m-01'))
+                ->where('profit','<>',0)
+                ->whereIn('erp_user_id',$erpUSerId)
+                ->get();
+			
 			$bonuslist = $bonuslist->map(function ($v, $k) {
 //				$v['receipt_date'] = empty($v->receipt->created_at) ? '' : $v->receipt->created_at->format('Y-m-d');
 				$v['sale_group_name'] = $v->saleGroups->saleGroups->name ?? '';
@@ -236,6 +245,7 @@ class ProvideController extends BaseController
 		$this->authorize('create',$this->policyModel);
 		
 		$selectSaleGroupsReachIds = explode(',',$request->provide_sale_groups_bonus);
+		
 		$this->setSaleGroupsReachProvide($selectSaleGroupsReachIds);
 		
 		$selectFincialIds = $request->provide_bonus;
@@ -502,7 +512,8 @@ class ProvideController extends BaseController
         if($createdTime->format('d') >= 5){
             $createdTime->modify('+1Month');
         }
-		$saleGroupReach->whereIn('id', $selectSaleGroupsReachIds)->update(['status' => 1,'created_at' => $createdTime->format('Y-m-01'),]);
+        
+		$saleGroupReach->whereIn('id', $selectSaleGroupsReachIds)->update(['status' => 1,'updated_at' => $createdTime->format('Y-m-01')]);
 	}
 	
 	private function getProvideBalanceSelectedId ($dataList) {
