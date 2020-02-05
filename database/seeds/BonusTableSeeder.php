@@ -142,12 +142,8 @@
             while($nextMonth != $dateStart->format('Y-m-01')) {
                 $data = ['set_date' => $dateStart->format('Y-m-01'), 'erp_user_id' => $item, 'boundary' => 0];
             
-                $otherData = $otherrule->where('erp_user_id',$item);
-                if( $otherData->where('set_date',$dateStart->format('Y-m-01'))->count() > 0 ){
-                    $data['boundary'] = $otherData->where('set_date',$dateStart->format('Y-m-01'))->first()['boundary'];
-                }else if($otherData->count() > 0){
-                    $data['boundary'] = $otherData->first()['boundary'];
-                }
+                $data['boundary'] = 9999999;
+
                 $this->save($data, $bonusLevels, $exileUserId, $exileRuleLevels);
             
                 $dateStart = $dateStart->modify('+1 Month');
