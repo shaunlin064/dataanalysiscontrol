@@ -40,7 +40,7 @@
                     </div>
                 </div>
                 <div class="form-group col-xs-8 col-md-6 pull-left">
-                    <date-range :dom_id='"provide_date_ranger"' :input_start_date='"{{date("Y-m-01", strtotime('-1 month'))}}"' :input_end_date='"{{date("Y-m-01", strtotime('-1 month'))}}"'></date-range>
+                    <date-range :dom_id='"provide_date_ranger"' :input_start_date='"{{date("Y-m-01")}}"' :input_end_date='"{{date("Y-m-01")}}"'></date-range>
                 </div>
             </div>
             <div class="box-footer">
