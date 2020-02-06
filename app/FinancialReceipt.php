@@ -16,14 +16,12 @@ class FinancialReceipt extends Model
 		$financial = new FinancialController();
 		/*cp_detail_id and balance date */
         collect($financial->getBalancePayMentData($type))->each(function($balanceData){
-           
             $results = FinancialList::where('cp_detail_id',$balanceData['cp_detail_id'])->get();
             $financialListIdReceipMoney = $results->filter(function($item,$k) use($balanceData){
                 /*一對多的情況 需要判斷 financial set_date 是小於 收款日 才更新*/
                 return $item['set_date'] < date("Y-m-d",strtotime($balanceData['balance_date']));
             })->pluck('id');
-            /*更新financialList狀態*/
-            
+            /*更新financialList狀態 只更改狀態0 避免已發獎金又被修改為狀態1*/
             FinancialList::whereIn('id',$financialListIdReceipMoney)->where('status',0)->update(['status' => 1]);
             /*建立 financialReceipt 未存在才建立*/
             $financialListIdReceipMoney->reject(function($v){

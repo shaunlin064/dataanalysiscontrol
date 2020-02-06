@@ -294,10 +294,10 @@ class ProvideController extends BaseController
 			$provideData = [
 			 'bonus_id' => $bonusId,
 			 'financial_lists_id' => $financial_lists_id,
-			 'provide_money' => $provideMoney > 0 ? $provideMoney  : 0,
+			 'provide_money' => $provideMoney,
 			 'created_at' => $createdTime->format('Y-m-01'),
 			];
-			
+   
 			if (isset($provide)) {
 				//update
 				foreach ($provideData as $key => $item) {
