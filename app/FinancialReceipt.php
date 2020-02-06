@@ -14,7 +14,6 @@ class FinancialReceipt extends Model
 	public function updateFinancialMoneyReceipt ($type='select')
 	{
 		$financial = new FinancialController();
-		
 		/*cp_detail_id and balance date */
         collect($financial->getBalancePayMentData($type))->each(function($balanceData){
            
@@ -25,7 +24,7 @@ class FinancialReceipt extends Model
             })->pluck('id');
             /*更新financialList狀態*/
             
-            FinancialList::whereIn('id',$financialListIdReceipMoney)->update(['status' => 1]);
+            FinancialList::whereIn('id',$financialListIdReceipMoney)->where('status',0)->update(['status' => 1]);
             /*建立 financialReceipt 未存在才建立*/
             $financialListIdReceipMoney->reject(function($v){
                 return $this->where('financial_lists_id',$v)->exists();
