@@ -49,5 +49,8 @@ class UpdateConvenerReach extends Command
         
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
+        
+        /*mail notice Job*/
+        \App\Jobs\SentMail::dispatch('crontab',['name'=>'admin', 'title' => 'update_convener_reach schedule down']);
     }
 }
