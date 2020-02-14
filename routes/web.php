@@ -14,6 +14,7 @@
     
     use App\FinancialList;
     use App\Http\Controllers\FinancialController;
+    use App\Http\Controllers\MenuController;
     use App\SaleGroups;
     use Illuminate\Support\Facades\Artisan;
     use Illuminate\Support\Facades\Cache;
@@ -24,9 +25,8 @@
     use SebastianBergmann\Comparator\Factory;
     use SebastianBergmann\Comparator\ComparisonFailure;
     use App\Mail\CronTab;
-    Route::get('/cache_all', function () {
-        Artisan::call('cache_all');
-    });
+    
+    Route::get('/test', 'MenuController@list')->name('menu.list');
     /*
      * 登入系統
      */
@@ -125,6 +125,17 @@
                 Route::get('/roleUserList', 'RoleControl@roleUserList')->name('system.role.user.list');
                 Route::get('/roleUserEdit/{user?}', 'RoleControl@roleUserEdit')->name('system.role.user.edit');
                 Route::post('/roleUserPost', 'RoleControl@roleUserPost')->name('system.role.user.post');
+            });
+        });
+        
+        /*
+         * adminlte page
+         */
+        Route::group(['namespace' => '\App\Http\Controllers'], function () {
+            Route::prefix('adminlte')->group(function () {
+                Route::group(['namespace' => '\App\Http\Controllers\Adminlte'], function () {
+                    Route::get('/icons', 'AdminlteController@icon')->name('admin.icons');
+                });
             });
         });
     });

@@ -7,7 +7,6 @@
 	 */
 	$css = $data['cssPath'];
 	$js = $data['jsPath'];
-
 ?>
 <!DOCTYPE html>
 <html>
