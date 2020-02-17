@@ -26,7 +26,6 @@
     use SebastianBergmann\Comparator\ComparisonFailure;
     use App\Mail\CronTab;
     
-    Route::get('/test', 'MenuController@list')->name('menu.list');
     /*
      * 登入系統
      */
@@ -125,6 +124,15 @@
                 Route::get('/roleUserList', 'RoleControl@roleUserList')->name('system.role.user.list');
                 Route::get('/roleUserEdit/{user?}', 'RoleControl@roleUserEdit')->name('system.role.user.edit');
                 Route::post('/roleUserPost', 'RoleControl@roleUserPost')->name('system.role.user.post');
+    
+                Route::prefix('menu')->group(function () {
+                    Route::Get('/list', 'MenuController@list')->name('system.menu.list');
+                    Route::Post('/menuPost', 'MenuController@menuPost')->name('system.menu.post');
+                    Route::Post('/menuDelete', 'MenuController@menuDelete')->name('system.menu.delete');
+                    Route::Post('/menuSubPost', 'MenuController@menuSubPost')->name('system.menuSub.post');
+                    Route::Post('/menuSubDelete', 'MenuController@menuSubDelete')->name('system.menuSub.delete');
+        
+                });
             });
         });
         

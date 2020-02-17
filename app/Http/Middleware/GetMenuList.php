@@ -22,13 +22,10 @@ class GetMenuList
     {
         $urlName = Route::currentRouteName();
         $region = Str::before($urlName,'.')  == 'system' ? 'system' : 'user';
-
-        $menus = Cache::store('memcached')->remember('menu'.$region, (31536000), function () use($region) {
-            return Menu::where('region',$region )->get();
-        });
         
+        $menus = Menu::where('region',$region )->get();
         $pageNow = MenuSub::where('url',$urlName)->first();
-        
+       
         if($pageNow){
             $parentMenuId = $pageNow->menu_id;
             $menus->map(function ($menu) use($parentMenuId){
@@ -44,8 +41,9 @@ class GetMenuList
 	     * menus_subs table 需要增加 new class 欄位
 	     *
 	     * */
-	    session(['menus' =>  $menus ]) ;
 	    
+	    
+	    session(['menus' =>  $menus ]) ;
         return $next($request);
     }
 }

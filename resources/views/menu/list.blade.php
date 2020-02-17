@@ -27,6 +27,15 @@
 <!-- Content Wrapper. Contains page content -->
 @section('content')
     <div class="row" id='menuSetting'>
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         {{--add new Menu template--}}
         <div class="modal fade" id="add-menu-template">
                 <div class="modal-dialog">
@@ -37,8 +46,9 @@
                             <h4 class="modal-title">Add New Menu</h4>
                         </div>
                         <div class="modal-body">
-                            <form role="form">
+                            <form role="form" action='./menuPost' method='post'>
                                 <!-- text input -->
+                                @csrf
                                 <div class="form-group">
                                     <label>Name</label>
                                     <input name="name" type="text" class="form-control" placeholder="name ...">
@@ -59,11 +69,11 @@
                                     <label for="icon_class">Catalogue</label>
                                     <input name="catalogue" type="text" class="form-control" placeholder="catalogue ...">
                                 </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
                             </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Submit</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -81,8 +91,9 @@
                         <h4 class="modal-title">Edit SubMenu</h4>
                     </div>
                     <div class="modal-body">
-                        <form role="form">
+                        <form action='./menuSubPost' method='post' role="form">
                             <!-- text input -->
+                            @csrf
                             <div class="form-group">
                                 <label>Name</label>
                                 <input name="name" type="text" class="form-control" placeholder="name ..." value=''>
@@ -106,13 +117,13 @@
                                     <option value='_self' >Same Tab/Window</option>
                                     <option value='_blank' >New Tab/Window</option>
                                 </select>
-                                <input name="id" type="hidden" class="form-control" placeholder="catalogue ..." value='0'>
+                                <input name="menu_id" type="hidden" class="form-control" placeholder="catalogue ..." value=''>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Submit</button>
                             </div>
                         </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </div>
                 <!-- /.modal-content -->
@@ -173,8 +184,9 @@
                             <h4 class="modal-title">Edit Menu</h4>
                         </div>
                         <div class="modal-body">
-                            <form role="form">
+                            <form role="form" action='./menuPost' method='post'>
                                 <!-- text input -->
+                                @csrf
                                 <div class="form-group">
                                     <label>Name</label>
                                     <input name="name" type="text" class="form-control" placeholder="name ..." value='{{$menu->name}}'>
@@ -196,12 +208,13 @@
                                     <input name="catalogue" type="text" class="form-control" placeholder="catalogue ..." value='{{$menu->catalogue}}'>
                                     <input name="id" type="hidden" class="form-control" placeholder="catalogue ..." value='{{$menu->id}}'>
                                 </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
                             </form>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                        </div>
+
                     </div>
                     <!-- /.modal-content -->
                 </div>
@@ -217,8 +230,9 @@
                             <h4 class="modal-title">Edit SubMenu</h4>
                         </div>
                         <div class="modal-body">
-                            <form role="form">
+                            <form role="form" action='./menuSubPost' method='post'>
                                 <!-- text input -->
+                                @csrf
                                 <div class="form-group">
                                     <label>Name</label>
                                     <input name="name" type="text" class="form-control" placeholder="name ..." value='{{$subMenu->name}}'>
@@ -242,13 +256,14 @@
                                         <option value='_self' @if($subMenu->target == '_self') selected @endif>Same Tab/Window</option>
                                         <option value='_blank' @if($subMenu->target == '_blank') selected @endif>New Tab/Window</option>
                                     </select>
+                                    <input name="menu_id" type="hidden" class="form-control" placeholder="catalogue ..." value='{{$menu->id}}'>
                                     <input name="id" type="hidden" class="form-control" placeholder="catalogue ..." value='{{$subMenu->id}}'>
                                 </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
                             </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Submit</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -278,7 +293,9 @@
                             <td>${d.sub_menu[key]['url']}</td>
                             <td>${d.sub_menu[key]['icon']}</td>
                             <td>${d.sub_menu[key]['target']}</td>
-                            <td><button type="button" data-toggle="modal" data-target="#edit-sub-menu-template-${d.sub_menu[key]['id']}" data-action='EditSubMenu' class="btn btn-primary btn-flat">編輯</button>
+                            <td>
+<button type="button" data-toggle="modal" data-target="#edit-sub-menu-template-${d.sub_menu[key]['id']}" class="btn btn-primary btn-flat">編輯</button>
+<button data-action='DeleteMenuSub' type="button" data-id='${d.sub_menu[key]['id']}' class="btn btn-danger btn-flat">刪除</button>
 </td>
 </tr>`;
 
@@ -340,8 +357,10 @@
                         { data: 'id',
                             render: function (data) {
                                 if(data != 0){
-                                    return `<button data-action='EditMenu' type="button" data-toggle="modal" data-target="#edit-menu-template-${data}"  class="btn btn-primary btn-flat">編輯</button>
-<button data-action='AddSubMenu' type="submit"  data-toggle="modal" data-target="#add-sub-menu-template" class="btn btn-success">新增子選單</button>`;
+                                    return `
+<button data-action='EditMenu' type="button" data-toggle="modal" data-target="#edit-menu-template-${data}"  class="btn btn-primary btn-flat">編輯</button>
+<button type="button"  data-action='AddMenuSub' data-id="${data}" data-toggle="modal" data-target="#add-sub-menu-template" class="btn btn-success btn-flat">新增子選單</button>
+<button data-action='DeleteMenu' type="button" data-id='${data}' class="btn btn-danger btn-flat">刪除</button>`;
                                 }else{
                                     return `<button data-action='AddMenu' type="button" class="btn btn-success btn-flat">送出</button>`;
                                 }
@@ -374,20 +393,46 @@
             //
             //     console.log(dataTable.data());
             // });
+            function Post(URL, PARAMTERS) {
+                //创建form表单
+                var temp_form = document.createElement("form");
+                temp_form.action = URL;
+                //如需打开新窗口，form的target属性要设置为'_blank'
+                temp_form.target = "_self";
+                temp_form.method = "post";
+                temp_form.style.display = "none";
+
+                //添加参数
+                for (var item in PARAMTERS) {
+                    var opt = document.createElement("textarea");
+                    opt.name = PARAMTERS[item].name;
+                    opt.value = PARAMTERS[item].value;
+                    temp_form.appendChild(opt);
+
+                }
+
+                document.body.appendChild(temp_form);
+
+                //提交数据
+
+                temp_form.submit();
+
+            }
 
             $('#menuSetting').on('click','.btn',function(){
                if( $(this).data('action') !== undefined){
                    let btnAction = $(this).data('action');
+
                  switch(btnAction){
-                     case 'AddMenu':
-                         console.log(btnAction);
+                     case 'DeleteMenu':
+                         Post('menuDelete',[{'name':'_token','value':'{{csrf_token()}}'},{'name':'id','value':$(this).data('id')}]);
                          break;
-                     case 'EditMenu':
+                     case 'AddMenuSub':
+                         $('#add-sub-menu-template').find('input[name="menu_id"]').val($(this).data('id'));
+                         break;
+                     case 'DeleteMenuSub':
                          /*do edit open*/
-                         console.log(btnAction);
-                         break;
-                     case 'AddSubMenu':
-                         console.log(btnAction);
+                         Post('menuSubDelete',[{'name':'_token','value':'{{csrf_token()}}'},{'name':'id','value':$(this).data('id')}]);
                          break;
                  }
                };

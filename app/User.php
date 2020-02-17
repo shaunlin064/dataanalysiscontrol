@@ -85,11 +85,16 @@ class User extends Authenticatable
     public function menuCheck (Menu $menus)
     {
         $check = false;
+        
         $menus->subMenu->each(function($v,$k) use(&$check){
             if($check == false){
                 $check = $this->hasPermission($v->url);
             }
         });
+    
+        if(auth()->user()->isAdmin()){
+            $check=true;
+        }
         
         return $check;
     }
