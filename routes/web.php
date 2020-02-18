@@ -109,6 +109,16 @@
                 });
             });
         });
+    
+        //info
+        Route::group(['namespace' => '\App\Http\Controllers'], function () {
+            Route::prefix('info')->group(function () {
+                Route::group(['namespace' => '\App\Http\Controllers\Info'], function () {
+                    Route::get('/scheduleList', 'InfoController@scheduleList')->name('info.scheduleList');
+                    Route::get('/updateList', 'InfoController@updateList')->name('info.updateList');
+                });
+            });
+        });
         /*
          * system
          */
