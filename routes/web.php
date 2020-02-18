@@ -116,6 +116,9 @@
                 Route::group(['namespace' => '\App\Http\Controllers\Info'], function () {
                     Route::get('/scheduleList', 'InfoController@scheduleList')->name('info.scheduleList');
                     Route::get('/updateList', 'InfoController@updateList')->name('info.updateList');
+                    
+                    Route::post('/articlesPost', 'InfoController@articlesPost')->name('info.articlesPost');
+                    
                 });
             });
         });

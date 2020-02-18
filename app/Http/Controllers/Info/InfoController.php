@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Info;
 
+use App\Articles;
+use App\ArticlesClass;
 use App\Http\Controllers\BaseController;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -9,19 +11,24 @@ use Illuminate\Http\Request;
 class InfoController extends BaseController
 {
     //
+    
     public function __construct () {
         parent::__construct();
+        
         $this->resources['jsPath'][] = '/plugins/fullcalendar/core/main.js';
         $this->resources['jsPath'][] = '/plugins/fullcalendar/interaction/main.js';
         $this->resources['jsPath'][] = '/plugins/fullcalendar/daygrid/main.js';
         $this->resources['jsPath'][] = '/plugins/fullcalendar/timeline/main.js';
         $this->resources['jsPath'][] = '/plugins/fullcalendar/resource-common/main.js';
         $this->resources['jsPath'][] = '/plugins/fullcalendar/resource-timeline/main.js';
+        $this->resources['jsPath'][] = '/adminLte_componets/ckeditor/ckeditor.js';
         
         $this->resources['cssPath'][] = '/plugins/fullcalendar/core/main.css';
         $this->resources['cssPath'][] = '/plugins/fullcalendar/daygrid/main.css';
         $this->resources['cssPath'][] = '/plugins/fullcalendar/timeline/main.css';
         $this->resources['cssPath'][] = '/plugins/fullcalendar/resource-timeline/main.css';
+        
+        
     }
     
     public function scheduleList ()
@@ -59,6 +66,24 @@ class InfoController extends BaseController
     
     public function updateList ()
     {
-        return view('info.updateList',['data' => $this->resources]);
+        $articles = Articles::where('articles_classes_id',1)->orderBy('created_at','desc')->get();
+        
+        return view('info.updateList',['data' => $this->resources,'articles' => $articles]);
+    }
+    
+    public function articlesPost (Request $request)
+    {
+        $datas = $request->all();
+        unset($datas['_token']);
+        
+        if(isset($datas['id'])){
+            Articles::where('id', $datas['id'])->update($datas);
+        }else{
+            $datas['users_id'] = auth()->user()->id;
+            $datas['articles_classes_id'] = ArticlesClass::where('name','updateList')->first()->id;
+            Articles::create($datas);
+        }
+        
+        return redirect('info/updateList');
     }
 }
