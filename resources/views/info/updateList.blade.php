@@ -83,7 +83,7 @@
                     <!-- timeline icon -->
                     <i class="fa fa-envelope bg-blue"></i>
                     <div class="timeline-item">
-                        <span class="time"><i class="fa fa-clock-o"></i> {{$article->created_at->format('H:i:s')}}</span>
+                        <span class="time">{{$article->user->name}}<i class="fa fa-clock-o"></i>{{$article->created_at->format('H:i:s')}}</span>
 
                         <h3 class="timeline-header"><a href="#">{{$article->title}}</a></h3>
 
