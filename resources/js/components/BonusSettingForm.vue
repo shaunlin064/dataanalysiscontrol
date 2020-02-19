@@ -138,7 +138,6 @@
 						// console.log(this.items);
 				},
 		    methods: {
-		
 		            add() {
 		                // console.log(this.items);
 		                this.originalData = null;

@@ -29,38 +29,33 @@
 <body class='hold-transition skin-blue sidebar-mini'>
 
 <div id="app" class='app_hide'>
+    <div class='wrapper'>
+        @yield('headerbar')
+        <!-- Left side column. contains the logo and sidebar -->
+        @include('sidebar')
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
 
-<div class='wrapper'>
+                <section class="content-header">
+                    @yield('content-header')
+                </section>
 
-	@yield('headerbar')
-	<!-- Left side column. contains the logo and sidebar -->
-	@include('sidebar')
-	<!-- Content Wrapper. Contains page content -->
-	<div class="content-wrapper">
-		<!-- Content Header (Page header) -->
+                <!-- Main content -->
+            <section class="content">
+                @yield('content')
+            </section>
+                @yield('invoice')
 
-			<section class="content-header">
-				@yield('content-header')
-			</section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
 
-			<!-- Main content -->
-		<section class="content">
-			@yield('content')
-		</section>
-			@yield('invoice')
-
-		<!-- /.content -->
-	</div>
-	<!-- /.content-wrapper -->
-
-	{{--<footer class="main-footer">--}}
-	{{--	<div class="pull-right hidden-xs">--}}
-	{{--	</div>--}}
-	{{--</footer>--}}
-
-
-
-</div>
+        {{--<footer class="main-footer">--}}
+        {{--	<div class="pull-right hidden-xs">--}}
+        {{--	</div>--}}
+        {{--</footer>--}}
+    </div>
 </div>
 
 @foreach($js as $path)

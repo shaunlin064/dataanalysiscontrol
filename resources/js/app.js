@@ -111,9 +111,13 @@ Vue.component('provide-submit', require('./components/ProvideSubmit').default);
 
 Vue.component('select-button-group', require('./components/SelectButtonGroup').default);
 
-
 //item
 Vue.component('load-item', require('./components/LoadItem').default);
+
+//menu page
+Vue.component('menu-list', require('./components/menu/menuList').default);
+Vue.component('menu-form', require('./components/menu/menuForm').default);
+Vue.component('menu-sub-form', require('./components/menu/menuSubForm').default);
 const app = new Vue({
     el: '#app',
     store:store1
