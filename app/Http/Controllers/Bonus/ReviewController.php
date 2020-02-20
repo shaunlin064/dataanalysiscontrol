@@ -760,11 +760,14 @@
             $income = $items->sum('income');
             $profit = $items->sum('profit');
             $cost = $items->sum('cost');
+            
             if ($profit < 0 && $income <= 0) {
                 $profitPercenter = '-100%';
             } else if ($profit > 0 && $income <= 0) {
                 $profitPercenter = '100%';
-            } else {
+            } else if($income == 0 && $profit == 0){
+                $profitPercenter = '0%';
+            }else {
                 $profitPercenter = round($profit / $income * 100, 1) . '%';
             }
             return array($income, $profit, $cost, $profitPercenter);
