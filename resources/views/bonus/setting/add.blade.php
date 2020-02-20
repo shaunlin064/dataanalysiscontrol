@@ -28,7 +28,7 @@
     <div class="row">
         <!-- /.col -->
         <div class="col-md-12">
-            <bonus-group-component :arg='{type:"add",add_user_lists:{{ json_encode($addUserLists) }},csrf_token:"{{ csrf_token()}}" ,alreadySetUserIds : {{ json_encode( $alreadySetUserIds ) }}}'></bonus-group-component>
+            <bonus-setting-group :arg='{type:"add",add_user_lists:{{ json_encode($addUserLists) }},csrf_token:"{{ csrf_token()}}" ,alreadySetUserIds : {{ json_encode( $alreadySetUserIds ) }}}'></bonus-setting-group>
         </div>
         <!-- /.col -->
     </div>

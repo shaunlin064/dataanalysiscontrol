@@ -95,7 +95,13 @@
         var cval=getCookie(name);
         if(cval!=null) document.cookie= name + "="+cval+";expires="+exp.toGMTString();
     }
+    $(function () {
+        document.getElementById('start').addEventListener('click', function() {
+            introJs().setOption('showProgress', true).setOption('showBullets', false).start();
+        });
 
+        $('#guided_number').html($('*[data-intro]').length);
+    })
 </script>
 @yield('script')
 </body>

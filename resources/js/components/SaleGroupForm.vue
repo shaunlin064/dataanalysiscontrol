@@ -12,9 +12,9 @@
 						<!-- Add the bg color to the header using any of the bg-* classes -->
 						<div class="widget-user-header bg-aqua-active">
 								<div class="col-sm-4 border-right">
-									<div class="description-block">
+									<div class="description-block" >
 										<h5 class="">獎金比例</h5>
-										<h3 class="description-text">{{this.bonus_rate | percentage}}</h3>
+										<h3 class="description-text" data-step="2" data-intro="召集人獎金比例 從5.5% 下修每增加1人 -0.25%">{{this.bonus_rate | percentage}}</h3>
 									</div>
 									<!-- /.description-block -->
 								</div>
@@ -23,7 +23,7 @@
 									<div class="description-block">
 										<h5 class="">團隊名稱</h5>
 										<div class="description-text" :class="{'has-error' : has_error}">
-											<input type='text' name='name' class="form-control text-center" id="groupName" placeholder="請輸入團隊名稱" v-model='name'>
+											<input type='text' name='name' class="form-control text-center" id="groupName" placeholder="請輸入團隊名稱" v-model='name' data-step="3" data-intro="團隊名稱">
 											<span class="help-block" :class="{'hidden' : !has_error }">團隊名稱 不能為空</span>
 										</div>
 										<input type='hidden' name='sale_group_id' :value='this.sale_group_id'>
@@ -34,7 +34,7 @@
 								<div class="col-sm-4">
 									<div class="description-block">
 										<h5 class="">責任額總計</h5>
-										<h3 class="description-text" id='total_boundary'>{{total_boundary | money}}</h3>
+										<h3 class="description-text" id='total_boundary'  data-step="4" data-intro="責任額總計為團隊內所有人當月責任額">{{total_boundary | money}}</h3>
 									</div>
 									<!-- /.description-block -->
 								</div>
@@ -47,10 +47,10 @@
 								<thead class="thead-light">
 								<tr>
 									<th width="1">#</th>
-									<th width="25%">達成比例</th>
+									<th width="25%" data-step="5" data-intro="團隊毛利達成比例">達成比例</th>
 									<!--<th width="25%">獎金比例</th>-->
-									<th width="25%">額外獎金</th>
-									<th width="25%">Action</th>
+									<th width="25%" data-step="6" data-intro="額外獎金為召集人的英雄榜獎金">額外獎金</th>
+									<th width="25%" data-step="7" data-intro="編輯須按下儲存">Action</th>
 								</tr>
 								</thead>
 								<tbody>
@@ -103,8 +103,8 @@
 					 :table_title='["選擇","招集人","名稱","責任額","部門"]'
 					 :row = JSON.parse(this.arg.userdata)
 					 :columns = 'columns'
-					></simple-data-table-componet>
-						<button type="button" @click='submit' class="btn btn-info pull-right">送出</button>
+                     data-step="9" data-intro="團隊人員選擇 一個團隊只能有一個召集人 且召集人也需要被選入團隊" ></simple-data-table-componet>
+						<button type="button" @click='submit' class="btn btn-info pull-right" data-step="8" data-intro="最後送出才會完成修改">送出</button>
 				</div>
 				<!-- /.box-body -->
 				

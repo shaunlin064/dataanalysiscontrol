@@ -34,7 +34,7 @@
             <div class="widget-user-header bg-aqua">
                 <!-- small box -->
                 <div class="small-box no-shadow col-xs-12">
-                    <div class="inner text-center">
+                    <div class="inner text-center" data-step="1" data-intro="此次已勾選發放獎金總金額">
                         <count-total :domid='"total_money"'></count-total>
                         <p>總計發放金額</p>
                     </div>
@@ -65,6 +65,7 @@
                 :row = '{{ json_encode($saleGroupsReach) }}'
                 :columns = '{!!json_encode($saleGroupsTableColumns)!!}'
                 :type = '"select"'
+                data-step="2" data-intro="召集人獎金須自行手動勾選,每月16號後計算上月獎金..<a href='/info/scheduleList'>可參考系統排程表</a>"
         ></simple-data-table-componet>
         </div>
     </div>
@@ -72,7 +73,8 @@
 {{--    </div>--}}
     {{--list --}}
     <div class='row'>
-        <div class='col-md-12'>
+        <div class='col-md-12' >
+            <p data-step="3" data-intro="個人獎金 每次系統都會自動勾選可發獎金人員,條件為目前所有該員獎金加總會正數,注意搜索並不會取消已勾選人員"></p>
             <simple-data-table-componet
                     :table_id='"provide_bonus"'
                     :table_head='"個人獎金"'
@@ -88,7 +90,7 @@
                     :csrf= '"{{csrf_token()}}"'
                     :domid='"provide_submit"'
                     :post_action_url='"post"'
-            ></provide-submit>
+                    data-step="4" data-intro="最後記得要送出" ></provide-submit>
             {{--<provide-data-table-component :arg='{--}}
             {{--"csrf_token" : "{{csrf_token()}}",--}}
             {{--"paginate_count": {{$paginate->count()}},--}}

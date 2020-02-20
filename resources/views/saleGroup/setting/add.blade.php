@@ -39,7 +39,7 @@
                         userdata : '{{ json_encode($user) }}'
                         }"
                         ></sale-group-form-component>
-                {{--<bonus-history-component v-if="type == 'edit' || type == 'view'" :items='history' :active="type != 'edit'"></bonus-history-component>--}}
+                {{--<bonus-setting-history v-if="type == 'edit' || type == 'view'" :items='history' :active="type != 'edit'"></bonus-setting-history>--}}
             </div>
             <!-- /.tab-content -->
         </div>

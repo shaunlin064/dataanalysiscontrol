@@ -54,7 +54,7 @@
                             </div>
                             <!-- /.box-header -->
                             <!-- form start -->
-                            <form class="form-horizontal" action='add' method='post' id='exchangeRateForm'>
+                            <form class="form-horizontal" action='add' method='post' id='exchangeRateForm' data-step="1" data-intro="幣別月份設定不能重複,須注意在時間內輸入匯率..<a href='/info/scheduleList'>可參考系統排程表</a>">
                                 <div class="box-body">
                                     @csrf
                                     <div class="form-group">

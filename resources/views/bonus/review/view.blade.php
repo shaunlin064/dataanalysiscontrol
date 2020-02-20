@@ -31,23 +31,23 @@
 @extends('headerbar')
 
 @section('content')
-    <bonus-review-ajax-component :csrf='"{{csrf_token()}}"'></bonus-review-ajax-component>
+    <bonus-review-ajax :csrf='"{{csrf_token()}}"'></bonus-review-ajax>
     <div class="row">
         <div class="box box-widget widget-user">
             <!-- Add the bg color to the header using any of the bg-* classes -->
             <div class="widget-user-header bg-aqua">
                 <!-- small box -->
-                <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                <div class="form-group col-md-6 col-sm-6 col-xs-12" data-step="1" data-intro="快速選擇月份區間">
                     <label>快速查詢:</label>
                    <select-button-group></select-button-group>
                     <load-item></load-item>
                 </div>
-                <div class="form-group col-md-6 col-sm-6 pull-left">
+                <div class="form-group col-md-6 col-sm-6 pull-left" data-step="2" data-intro="條件1:自訂時間">
                     <date-range :dom_id='"review_date_ranger"' :input_start_date='"{{date('Y-m-01')}}"' :input_end_date='"{{date('Y-m-01')}}"'></date-range>
                 </div>
             </div>
 
-            <div class="box-footer">
+            <div class="box-footer" data-step="3" data-intro="條件2:人員團隊選擇">
                 <div class="row">
                     <div class="col-lg-6">
                         <label>選擇成員</label>
@@ -88,7 +88,7 @@
                     <!-- /.col-lg-6 -->
                 </div>
             </div>
-            <div class="box box-warning">
+            <div class="box box-warning" data-step="4" data-intro="條件3:客戶媒體類型選擇">
                 <div class="box-header with-border">
                     <h3 class="box-title">資料篩選</h3>
                     <div class="box-tools pull-right">
@@ -192,7 +192,7 @@
                     </div>
                     <!-- /.box-tools -->
                 </div>
-                <div class="box-body">
+                <div class="box-body" data-step="5" data-intro="圖表可以左右切換">
                     <div class='owl-carousel owl-theme' data-owl-name='customer_char'>
                         <chart-customer-precentage-profit
                             :table_id='"customer_precentage_profit"'
@@ -208,10 +208,10 @@
                 </div>
             </div>
             <div class="box box-warning">
-                <div class="box-header with-border">
+                <div class="box-header with-border" data-step="6" data-intro="媒體經銷商列表 如有名稱為空白,代表後台案件媒體審核沒有設定媒體公司">
                     <h3 class="box-title">客戶列表</h3>
                     <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='customer_list'><i
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='customer_list' data-step="7" data-intro="區塊圖表可以關閉收起"><i
                                 class="fa fa-minus"></i>
                         </button>
                     </div>
@@ -353,25 +353,6 @@
                 </div>
             </div>
         </div>
-{{--        <div class='col-xs-12 content-center'>--}}
-{{--            <div class="box box-primary">--}}
-{{--                <div class="box-header with-border">--}}
-{{--                    <h3 class="box-title">年度統計</h3>--}}
-{{--                    <div class="box-tools pull-right">--}}
-{{--                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='all_year_profit_char'><i class="fa fa-minus"></i>--}}
-{{--                        </button>--}}
-{{--                    </div>--}}
-{{--                    <!-- /.box-tools -->--}}
-{{--                </div>--}}
-{{--                <div class="box-body">--}}
-{{--                    <chart-all-year-profit-line--}}
-{{--                        :table_id='"all_year_profit_bar"'--}}
-{{--                        :title='"年度統計"'--}}
-{{--                        :datas='{!! json_encode($allYearProfit) !!}'--}}
-{{--                    ></chart-all-year-profit-line>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--        </div>--}}
         <div class="col-xs-12">
             <div class="box box-warning">
                 <div class="box-header with-border">
@@ -458,6 +439,7 @@
                     }
                 });
             }
+
         });
     </script>
 @endsection

@@ -1,12 +1,12 @@
 <template>
-	<div class="nav-tabs-custom">
+	<div class="nav-tabs-custom" >
 		<ul class="nav nav-tabs">
-			<li class="active" v-show="type !== 'view'"><a href="#settings" data-toggle="tab">設定</a></li>
-			<li :class="{'active':type == 'view'}" v-if="type == 'edit' || type == 'view'" ><a href="#hirstory" data-toggle="tab">歷史資料</a></li>
+			<li class="active" v-show="type !== 'view'" data-step="1" data-intro="設定責任額頁面"><a href="#settings" data-toggle="tab">設定</a></li>
+			<li :class="{'active':type == 'view'}" v-if="type == 'edit' || type == 'view'"  data-step="8" data-intro="責任額歷史資料檢視"><a href="#hirstory" data-toggle="tab">歷史資料</a></li>
 		</ul>
 		<div class="tab-content">
-			<bonus-form-component v-if="type !== 'view'" :row='setting' :already_set_user_ids='already_set_user_ids' :form_action='form_action' :type='type' :add_user_lists='add_user_lists' :csrf_token='csrf_token'></bonus-form-component>
-			<bonus-history-component v-if="type == 'edit' || type == 'view'" :items='history' :active="type != 'edit'"></bonus-history-component>
+			<bonus-setting-form v-if="type !== 'view'" :row='setting' :already_set_user_ids='already_set_user_ids' :form_action='form_action' :type='type' :add_user_lists='add_user_lists' :csrf_token='csrf_token'></bonus-setting-form>
+			<bonus-setting-history v-if="type == 'edit' || type == 'view'" :items='history' :active="type != 'edit'"></bonus-setting-history>
 		</div>
 		<!-- /.tab-content -->
 	</div>

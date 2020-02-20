@@ -57,6 +57,8 @@
                 //             owl
                 '/adminLte_componets/OwlCarousel2-2.3.4/dist/assets/owl.carousel.css',
                 '/adminLte_componets/OwlCarousel2-2.3.4/dist/assets/owl.theme.default.css',
+                // intro.js
+                '/adminLte_componets/intro.js/introjs.css',
             ],
             'jsPath' => [
                 
@@ -109,7 +111,9 @@
                 '/js/demo.js',
                 '/js/helper.js',
                 '/adminLte_componets/OwlCarousel2-2.3.4/dist/owl.carousel.min.js',
-                '/adminLte_componets/moment/moment.js'
+                '/adminLte_componets/moment/moment.js',
+                // intro.js
+                '/adminLte_componets/intro.js/intro.js',
             ],
         ];
         

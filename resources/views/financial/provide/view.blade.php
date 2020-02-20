@@ -35,19 +35,20 @@
                 <!-- small box -->
                 <div class="small-box no-shadow col-md-6 col-sm-6 col-xs-12">
                     <div class="inner text-center">
-                        <count-total :domid='"total_money"'></count-total>
+                        <count-total :domid='"total_money"' data-step="4" data-intro="該條件發放總金額..<a href='/info/scheduleList'>獎金發放規則請見</a>"></count-total>
                         <p>總計發放金額</p>
                     </div>
                 </div>
                 <div class="form-group col-xs-8 col-md-6 pull-left">
-                    <date-range :dom_id='"provide_date_ranger"' :input_start_date='"{{date("Y-m-01")}}"' :input_end_date='"{{date("Y-m-01")}}"'></date-range>
+                    <date-range :dom_id='"provide_date_ranger"' :input_start_date='"{{date("Y-m-01")}}"' :input_end_date='"{{date("Y-m-01")}}"'
+                                data-step="1" data-intro="選擇要檢視的月份區間"></date-range>
                 </div>
             </div>
             <div class="box-footer">
                 <div class="row">
                     <div class="col-lg-6">
                         <label>選擇成員</label>
-                        <div class="input-group">
+                        <div class="input-group" data-step="2" data-intro="選擇成員">
                             <span class="input-group-addon">
                               <input type="radio" name='selectType' data-type='select_user' @if(empty($saleGroups)){{'checked'}}@endif>
                             </span>
@@ -64,7 +65,7 @@
 {{--                    @if($saleGroups)--}}
                     <div class="col-lg-6">
                         <label>選擇團隊</label>
-                        <div class="input-group">
+                        <div class="input-group" data-step="3" data-intro="選擇團隊">
                             <span class="input-group-addon">
                               <input type="radio" name='selectType' data-type='select_groups' @if($saleGroups){{'checked'}}@else{{'disabled'}}@endif >
                             </span>

@@ -54,11 +54,11 @@ import select2 from '../../public/adminLte_componets/select2/dist/js/select2.ful
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('menu-component', require('./components/MenuBar.vue').default);
 
-Vue.component('bonus-group-component', require('./components/BonusSettingGroup.vue').default);
-Vue.component('bonus-form-component', require('./components/BonusSettingForm.vue').default);
-Vue.component('bonus-history-component', require('./components/BonusSettingHistory.vue').default);
+Vue.component('bonus-setting-group', require('./components/BonusSettingGroup.vue').default);
+Vue.component('bonus-setting-form', require('./components/BonusSettingForm.vue').default);
+Vue.component('bonus-setting-history', require('./components/BonusSettingHistory.vue').default);
 
-Vue.component('bonus-review-ajax-component', require('./components/BonusReviewAjax.vue').default);
+Vue.component('bonus-review-ajax', require('./components/BonusReviewAjax.vue').default);
 Vue.component('financial-provide-ajax-component', require('./components/FinancialProvideAjax.vue').default);
 
 Vue.component('profile-component', require('./components/PersonProfile.vue').default);

@@ -31,8 +31,8 @@
     <div class="row">
         <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
-                <li class="active" ><a href="#settings" data-toggle="tab">設定</a></li>
-                <li class="" ><a href="#hirstory" data-toggle="tab">歷史資料</a></li>
+                <li class="active" ><a href="#settings" data-toggle="tab" data-step="1" data-intro="設定召集人團隊">設定</a></li>
+                <li class="" ><a href="#hirstory" data-toggle="tab" data-step="10" data-intro="歷史資料">歷史資料</a></li>
                 {{--<li :class="{'active':type == 'view'}" v-if="type == 'edit' || type == 'view'" ><a href="#hirstory" data-toggle="tab">歷史資料</a></li>--}}
             </ul>
             <div class="tab-content">

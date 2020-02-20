@@ -16,9 +16,12 @@
     <h1>
         責任額設定
     </h1>
+
     <ol class="breadcrumb">
+
         <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
         <li class="active">責任額設定清單頁面</li>
+
     </ol>
 @endsection
 
@@ -36,7 +39,6 @@
                     <button type="button" id='addNewUser' class="btn btn-block btn-success">新增</button>
                 </div>
             </div>
-
             <!-- /.box-header -->
             <div class="box-body">
                 <table id="bonusTable" class="table table-bordered table-striped">

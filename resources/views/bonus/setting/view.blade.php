@@ -32,7 +32,7 @@
         </div>
         <!-- /.col -->
         <div class="col-md-8">
-            <bonus-group-component :arg='{type:"view",history:{{ json_encode($userBonusHistory) }}}'></bonus-group-component>
+            <bonus-setting-group :arg='{type:"view",history:{{ json_encode($userBonusHistory) }}}'></bonus-setting-group>
         </div>
         <!-- /.col -->
     </div>

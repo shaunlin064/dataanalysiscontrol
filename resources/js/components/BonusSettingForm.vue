@@ -25,21 +25,21 @@
 						</div>
 						<input type='hidden' name='bonus_id' :value='this.row.id' v-if='type == "edit"'>
 						<label for="inputBoundary" class="col-sm-2 control-label pull-left">責任額</label>
-						<div class="col-sm-3" :class="{'has-error' : has_error}">
+						<div class="col-sm-3" :class="{'has-error' : has_error}" data-step="2" data-intro="責任額">
 							<input type='number' name='boundary' class="form-control" id="inputBoundary" placeholder="個人責任額" v-model='boundary' >
 							<span class="help-block" :class="{'hidden' : !has_error }">個人責任額 不能為0</span>
 						</div>
 					</div>
 					<div class='form-group'>
-						<div class="box-body">
+						<div class="box-body" data-step="3" data-intro="責任額級距">
 							<table class="table table-bordered table-striped">
 								<thead class="thead-light">
 								<tr>
 									<th width="1">#</th>
-									<th width="25%">達成比例</th>
-									<th width="25%">獎金比例</th>
-									<th width="25%">額外獎金</th>
-									<th width="25%">Action</th>
+									<th width="25%" data-step="3" data-intro="毛利達成責任額百分比">達成比例</th>
+									<th width="25%" data-step="4" data-intro="獎金比例 為 毛利乘上該百分比">獎金比例</th>
+									<th width="25%" data-step="5" data-intro="額外獎金 為英雄榜使用 此欄為直接加於金額">額外獎金</th>
+									<th width="25%" data-step="6" data-intro="編輯須按下儲存">Action</th>
 								</tr>
 								</thead>
 								<tbody>
@@ -48,22 +48,22 @@
 									<td :class="{'has-error' : detail_has_error[index]['achieving_rate']}">
 										<span v-if="editIndex !== index">{{ item.achieving_rate }}</span>
 										<span v-if="editIndex === index">
-				              <input type='number' class="form-control form-control-sm" v-model="item.achieving_rate">
-				            </span>
+				                            <input type='number' class="form-control form-control-sm" v-model="item.achieving_rate">
+				                        </span>
 										<span class="help-block" :class="{'hidden' : !detail_has_error[index]['achieving_rate'] }">達成比例不能為0</span>
 									</td>
 									<td :class="{'has-error' : detail_has_error[index]['bonus_rate']}">
 										<span v-if="editIndex !== index">{{ item.bonus_rate }}</span>
-										<span v-if="editIndex === index">
-				              <input type='number' class="form-control form-control-sm" v-model="item.bonus_rate">
-				            </span>
+                                        <span v-if="editIndex === index">
+                                          <input type='number' class="form-control form-control-sm" v-model="item.bonus_rate">
+                                        </span>
 										<span class="help-block" :class="{'hidden' : !detail_has_error[index]['bonus_rate'] }">獎金比例不能為0</span>
 									</td>
 									<td :class="{'has-error' : detail_has_error[index]['bonus_direct']}">
 										<span v-if="editIndex !== index">{{ item.bonus_direct }}</span>
 										<span v-if="editIndex === index">
-				              <input type='number' class="form-control form-control-sm" v-model="item.bonus_direct">
-				            </span>
+                                          <input type='number' class="form-control form-control-sm" v-model="item.bonus_direct">
+                                        </span>
 									</td>
 									<td>
 				            <span v-if="editIndex !== index">
@@ -75,7 +75,7 @@
 					              <button type="button" @click="edit(item, index)" class="btn btn-info">編輯</button>
 					              <button type="button" @click="remove(item, index)" class="btn btn-danger">刪除</button>
 				            </span>
-										<span v-else>
+                            <span v-else>
 											<button type="button" class="btn btn-info" @click="save(item)">儲存</button>
 				              <button type="button" class="btn btn-danger" @click="cancel(item)">取消</button>
 				            </span>
@@ -84,7 +84,7 @@
 								</tbody>
 							</table>
 							
-							<div class="col-3 offset-9 text-right my-3">
+							<div class="col-3 offset-9 text-right my-3" >
 								<button type='button' v-show="!editIndex" @click="add" class="btn btn-success">新增</button>
 							</div>
 						
@@ -93,8 +93,8 @@
 				
 				</div>
 				<!-- /.box-body -->
-				<div class="box-footer">
-					<button type="button" @click='submit()' class="btn btn-info pull-right">送出</button>
+				<div class="box-footer" >
+					<button type="button" @click='submit()' class="btn btn-info pull-right" data-step="7" data-intro="最後送出才會完成修改">送出</button>
 				</div>
 				<!-- /.box-footer -->
 			</form>

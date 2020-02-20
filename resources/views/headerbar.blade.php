@@ -27,6 +27,12 @@
 		<div class='navbar-custom-menu'>
 			<ul class='nav navbar-nav'>
 				<!-- User Account: style can be found in dropdown.less -->
+                <li class="dropdown notifications-menu open">
+                    <a href="#" id='start' class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+                        <i class="fa fa-star-half-o">導覽</i>
+                        <span id="guided_number" class="label label-warning"></span>
+                    </a>
+                </li>
 				<li class='dropdown user user-menu'>
 					<a href='/#' class='dropdown-toggle' data-toggle='dropdown'>
 						<div class='user-image customer-font-1e'>
