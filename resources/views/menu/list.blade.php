@@ -8,7 +8,7 @@
     ?>
 @extends('layout')
 
-@section('title','DAC | title')
+@section('title','DAC | Menu設定')
 
 {{--導航 麵包屑--}}
 @section('content-header')

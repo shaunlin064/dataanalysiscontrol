@@ -9,7 +9,7 @@
 
 @extends('layout')
 
-@section('新增群組權限','DAC | title')
+@section('title','DAC | 新增群組權限')
 
 {{--導航 麵包屑--}}
 @section('content-header')

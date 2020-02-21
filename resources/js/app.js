@@ -114,6 +114,10 @@ Vue.component('select-button-group', require('./components/SelectButtonGroup').d
 //item
 Vue.component('load-item', require('./components/LoadItem').default);
 
+//role
+Vue.component('role-form', require('./components/role/roleForm').default);
+Vue.component('role-form-submit', require('./components/role/roleFormSubmit').default);
+
 //menu page
 Vue.component('menu-list', require('./components/menu/menuList').default);
 Vue.component('menu-form', require('./components/menu/menuForm').default);

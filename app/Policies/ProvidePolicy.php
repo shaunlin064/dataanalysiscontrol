@@ -32,6 +32,9 @@ class ProvidePolicy
 		public function view(User $user, Provide $provide)
 		{
 			//
+            if(!$user->isAdmin()){
+                return true;
+            }
 			return app(Gate::class)->authorize('financial.provide.view');
 		}
 	
@@ -45,6 +48,9 @@ class ProvidePolicy
     public function viewSetting(User $user, Provide $provide)
     {
         //
+        if(!$user->isAdmin()){
+            return true;
+        }
 	    return app(Gate::class)->authorize('financial.provide.list');
     }
 

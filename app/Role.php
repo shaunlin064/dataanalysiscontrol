@@ -22,10 +22,13 @@ class Role extends Model
                 Permission::whereName($permission)->firstOrFail()
             );
 		}
-		
 		//如果是Collection
 		return $this->permissions()->save($permission);//將這個權限保存
 		
 	}
+    
+    public function user(){
+        return $this->belongsToMany(User::class,'role_user');
+    }
 
 }

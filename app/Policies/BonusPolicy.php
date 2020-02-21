@@ -50,6 +50,10 @@ class BonusPolicy
      */
     public function create(User $user)
     {
+        if(!$user->isAdmin()){
+            return true;
+        }
+        
 	    return app(Gate::class)->authorize('bonus.setting.list');
     }
 

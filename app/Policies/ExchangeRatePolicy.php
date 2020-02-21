@@ -19,6 +19,9 @@ class ExchangeRatePolicy
      */
     public function view(User $user)
     {
+        if(!$user->isAdmin()){
+            return true;
+        }
 	    return app(Gate::class)->authorize('financial.exchangeRate.view');
     }
     
@@ -32,6 +35,9 @@ class ExchangeRatePolicy
     public function update(User $user)
     {
         //
+        if(!$user->isAdmin()){
+            return true;
+        }
 	    return app(Gate::class)->authorize('financial.exchangeRate.setting');
     }
     

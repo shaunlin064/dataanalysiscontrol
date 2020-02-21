@@ -52,10 +52,10 @@
                 $schedule->command('cache_all')->twiceDaily(11, 16);
                 $schedule->command('cache_clean')->monthlyOn('1', '00:30');
                 /*telescope*/
-                $schedule->command('telescope:prune --hours=48')->daily();
+                $schedule->command('telescope:prune')->daily();
             }
         }
-        
+   
         /**
          * Register the commands for the application.
          *

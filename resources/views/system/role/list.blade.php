@@ -49,9 +49,19 @@
 
     <!-- page script -->
     <script>
+
         $(function () {
+
             $('#roleList').on('click','#addNewRole',function(){
                 window.open('/system/roleAdd');
+            });
+            $('#roleList').on('click','#roleDelete',function(){
+
+                let paramters = {
+                    '_token' : '{{csrf_token()}}',
+                };
+
+                urlPost(`/system/roleDelete/${$(this).data('id')}`,paramters,'_self');
             });
         })
     </script>

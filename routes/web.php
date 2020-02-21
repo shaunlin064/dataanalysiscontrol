@@ -86,7 +86,7 @@
                     /*獎金發放*/
                     Route::prefix('/provide')->group(function () {
                         Route::get('/list', 'ProvideController@list')->name('financial.provide.list');
-                        Route::get('/view', 'ProvideController@view')->name('financial.provide.view');
+                        Route::get('/view', 'ProvideController@view')->name('bonus.provide.view');
                         Route::post('/getAjaxProvideData', 'ProvideController@getAjaxProvideData')->name('financial.provide.getAjaxProvideData');
                         Route::any('/getAllSelectId', 'ProvideController@getAllSelectId')->name('financial.provide.getAllSelectId');
                         Route::any('/getAjaxData', 'ProvideController@getAjaxData')->name('financial.provide.getAjaxData');
@@ -133,6 +133,7 @@
                 Route::get('/roleAdd', 'RoleControl@roleAdd')->name('system.role.add');
                 Route::get('/roleEdit/{role?}', 'RoleControl@roleEdit')->name('system.role.edit');
                 Route::post('/rolePost', 'RoleControl@rolePost')->name('system.role.post');
+                Route::post('/roleDelete/{role}', 'RoleControl@roleDelete')->name('system.role.delete');
                 /*使用者角色*/
                 Route::get('/roleUserList', 'RoleControl@roleUserList')->name('system.role.user.list');
                 Route::get('/roleUserEdit/{user?}', 'RoleControl@roleUserEdit')->name('system.role.user.edit');

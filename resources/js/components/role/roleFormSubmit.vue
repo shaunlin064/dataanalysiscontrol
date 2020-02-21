@@ -1,15 +1,16 @@
 <template>
-	<button type="button" :id='domid' class="btn btn-block btn-success" @click='post'>送出</button>
+    <button type="button" :id='domid' class="btn btn-block btn-success" @click='post'>送出</button>
 </template>
 
 <script>
     import {mapState,mapMutations,mapActions,mapGetters} from 'vuex';
     export default {
-        name: "ProvideSubmit",
+        name: "roleFormSubmit",
         props: {
-          domid:String,
+            domid:String,
             csrf: String,
-          post_action_url:String,
+            post_action_url:String,
+            role_id:String,
         },
         data() {
             return {}
@@ -29,8 +30,10 @@
                 //添加参数
                 let paramters = {
                     '_token' : this.csrf,
-                    'provide_bonus' : this.$store.state.table_select.provide_bonus,
-                    'provide_sale_groups_bonus' : this.$store.state.table_select.provide_sale_groups_bonus,
+                    'permission_ids' : eval(`this.$store.state.table_select.${this.domid}`),
+                    'id': this.role_id,
+                    'name':$('input[name="name"]').val(),
+                    'label':$('input[name="label"]').val()
                 };
                 // paramters.map(function(v){
                 //     console.log(v);
@@ -41,17 +44,24 @@
                     opt.value = paramters[key];
                     temp_form.appendChild(opt);
                 });
-                
                 document.body.appendChild(temp_form);
                 // //提交数据
                 temp_form.submit();
             },
         },
         mounted: function(){
-        
+
         },
         watch:{
-        
+            // change_date: {
+            //     immediate: true,    // 这句重要
+            //     handler (val, oldVal) {
+            //         if(oldVal !== undefined) {
+            //
+            //             console.log(val,oldVal);
+            //         }
+            //     }
+            // }
         }
     }
 </script>

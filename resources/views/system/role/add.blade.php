@@ -8,7 +8,7 @@
 ?>
 @extends('layout')
 
-@section('新增群組權限','DAC | title')
+@section('title','DAC | 新增群組權限')
 
 {{--導航 麵包屑--}}
 @section('content-header')
@@ -32,51 +32,38 @@
                 <h3 class="box-title">新增群組</h3>
             </div>
             <!-- /.box-header -->
-            <!-- form start -->
-            <form class="form-horizontal"  action='/system/rolePost' method='post' id='roleSettingForm'>
-                <div class="box-body">
-                    @csrf
-                    <div class="form-group">
-                        <div>
-                            @if( ( $type ?? '') == 'edit')
-                                <input type='hidden' name='id' value='{{$role->id}}'>
-                            @endif
-                            <label class="col-sm-2 control-label pull-left">名稱</label>
-                            <div class="col-sm-3">
-                                @if( ($type ?? '') == 'edit')
-                                    <input type='text' name='name' value='{{$role->name}}' required>
-                                @else
-                                    <input type='text' name='name' required>
-                                @endif
-                            </div>
-                        </div>
-                        <label class="col-sm-2 control-label pull-left">備註</label>
-
-                        @if( ($type ?? '') == 'edit')
-                            <input type='text' name='label' value='{{$role->label}}' required>
-                        @else
-                            <input type='text' name='label' required>
-                        @endif
-                    </div>
-                    <simple-data-table-componet
-                        :table_id='"permission_list"'
-                        :table_head='"權限列表"'
-                        :table_title='["選擇","名稱"]'
-                        :type = '"select"'
-                        @if( ($type ?? '') == 'edit')
-                        :select_id='{{ json_encode( $role->permissions->pluck('id')) }}'
-                        @endif
-                        :row = '{!! json_encode($permissionList) !!}'
+                    <role-form
+                        :table_id='"permissionsTable"'
                         :csrf= '"{{csrf_token()}}"'
-                        :columns = '{!!json_encode($columns)!!}'
-                    ></simple-data-table-componet>
-                </div>
+                        :row = '{!! json_encode($permissionList) !!}'
+                        :type='"{{$type ?? 'add'}}"'
+                        @if( ($type ?? '') == 'edit')
+                            :role='{!! json_encode($role) !!}'
+                            :select_id='{{ json_encode( $role->permissions->pluck('id')) }}'
+                        @endif
+                    ></role-form>
+{{--                    <simple-data-table-componet--}}
+{{--                        :table_id='"permission_list"'--}}
+{{--                        :table_head='"權限列表"'--}}
+{{--                        :table_title='["選擇","名稱"]'--}}
+{{--                        :type = '"select"'--}}
+{{--                        @if( ($type ?? '') == 'edit')--}}
+{{--                        :select_id='{{ json_encode( $role->permissions->pluck('id')) }}'--}}
+{{--                        @endif--}}
+{{--                        :row = '{!! json_encode($permissionList) !!}'--}}
+{{--                        :csrf= '"{{csrf_token()}}"'--}}
+{{--                        :columns = '{!!json_encode($columns)!!}'--}}
+{{--                    ></simple-data-table-componet>--}}
                 <!-- /.box-body -->
                 <div class="box-footer">
-                    <button type="submit" class="btn btn-info pull-right">送出</button>
+                    <role-form-submit
+                        :csrf= '"{{csrf_token()}}"'
+                        :domid='"permissionsTable"'
+                        :post_action_url='"/system/rolePost"'
+                        :role_id='"{{$role->id ?? 0}}"'
+                    ></role-form-submit>
+{{--                    <button type="submit" class="btn btn-info pull-right">送出</button>--}}
                 </div>
-                <!-- /.box-footer -->
-            </form>
         </div>
 
         <!-- /.col -->

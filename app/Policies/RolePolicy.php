@@ -43,7 +43,11 @@ class RolePolicy
     public function create(User $user)
     {
         //
-        return app(Gate::class)->authorize('system.role.list');
+        if(!$user->isAdmin()){
+            return app(Gate::class)->authorize('system.role.list');
+        }else{
+            return true;
+        }
     }
 
     /**

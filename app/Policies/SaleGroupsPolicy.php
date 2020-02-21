@@ -32,6 +32,9 @@ class SaleGroupsPolicy
     public function view(User $user, SaleGroups $saleGroups)
     {
         //
+        if(!$user->isAdmin()){
+            return true;
+        }
         return app(Gate::class)->authorize('saleGroup.setting.view');
     }
 
@@ -44,6 +47,9 @@ class SaleGroupsPolicy
     public function create(User $user)
     {
         //
+        if(!$user->isAdmin()){
+            return true;
+        }
         return app(Gate::class)->authorize('saleGroup.setting.list');
     }
 

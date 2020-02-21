@@ -11,9 +11,11 @@
     use App\Http\Controllers\BaseController;
     use App\Http\Controllers\UserController;
     use App\Permission;
+    use App\PermissionsClass;
     use App\Role;
     use App\User;
     use Illuminate\Http\Request;
+    use Illuminate\Support\Facades\DB;
     use Route;
 
     class RoleControl extends BaseController
@@ -37,7 +39,7 @@
                     ['data'=> 'name'],
                     ['data'=> 'label'],
                     ['data'=> 'id','render' => '<a href="/system/roleEdit/${data}">
-<button type="button" class="btn btn-primary btn-flat">編輯</button>'],
+<button type="button" class="btn btn-primary btn-flat">編輯</button></a> <a><button type="button" id="roleDelete" data-id="${data}" class="btn btn-danger btn-flat">刪除</button></a> '],
                 ];
             
             return view( Route::currentRouteName() ,['data'=>$this->resources,'roleList' => $roleList,'columns' => $columns]);
@@ -46,28 +48,20 @@
         public function roleAdd ()
         {
             $this->authorize('create',$this->policyModel);
-            $permissionList = Permission::All();
+            $permissionList = PermissionsClass::where('id','<>',0)->with('permissions')->get();
             
-            $columns = [
-                ['data'=> 'id','render' => '<p class="hidden">${data}</p><input id="checkbox${data}" name="permission_ids[]" class="permission" type="checkbox" value=${data}>'],
-                ['data'=> 'label'],
-            ];
+ 
 
-            return view( Route::currentRouteName() ,['data'=>$this->resources,'permissionList' => $permissionList,'columns' => $columns]);
+            return view( Route::currentRouteName() ,['data'=>$this->resources,'permissionList' => $permissionList]);
         }
     
         public function roleEdit ( Role $role )
         {
             $this->authorize('create',$this->policyModel);
             
-            $permissionList = Permission::All();
-    
-            $columns = [
-                ['data'=> 'id','render' => '<p class="hidden">${data}</p><input id="checkbox${data}" name="permission_ids[]" class="permission" type="checkbox" value=${data}>'],
-                ['data'=> 'label'],
-            ];
-    
-            return view( 'system.role.add' ,['data'=>$this->resources,'permissionList' => $permissionList,'columns' => $columns,'role' => $role,'type' => 'edit']);
+            $permissionList = PermissionsClass::where('id','<>',0)->with('permissions')->get();
+            
+            return view( 'system.role.add' ,['data'=>$this->resources,'permissionList' => $permissionList,'role' => $role,'type' => 'edit']);
         }
     
         public function rolePost (Request $request)
@@ -83,15 +77,35 @@
                 $role = new Role($request->all());
                 $role->save();
             }
-
+            
             if( $request->permission_ids ){
-            Permission::whereIn('id',$request->permission_ids)->get()
-                ->each(function($permission) use($role){
-                    $role->permissions()->attach($permission);
-                });
+                /*字串轉陣列*/
+                $request->permission_ids = explode(',',$request->permission_ids);
+                Permission::whereIn('id',$request->permission_ids)->get()
+                    ->each(function($permission) use($role){
+                        $role->permissions()->attach($permission);
+                    });
             }
             
             return redirect()->route('system.role.edit',[$role->id]);
+        }
+    
+        public function roleDelete (Role $role)
+        {
+            try {
+                DB::beginTransaction();
+    
+                $role->permissions()->detach();
+                $role->user()->detach();
+                $role->delete();
+        
+                DB::commit();
+            } catch(\Exception $e) {
+                DB::rollback();
+                // Handle Error
+            }
+            
+            return redirect()->route('system.role.list');
         }
         /*角色相關end*/
     
