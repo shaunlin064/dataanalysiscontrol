@@ -75,7 +75,7 @@
 								<a href='/#' class='btn btn-default btn-flat'>業績管理</a>
 							</div>
                             @can('system.index')
-							<div class='pull-left'>
+							<div class='pull-left pl-5'>
 								<a href='/system' class='btn btn-default btn-flat'>系統管理</a>
 							</div>
                             @endcan

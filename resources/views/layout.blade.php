@@ -23,6 +23,7 @@
 	@foreach($css as $path)
 		<link rel='stylesheet' href='{{$path}}'>
 	@endforeach
+    @yield('css')
 </head>
 
 @include('loading')
@@ -61,7 +62,7 @@
 @foreach($js as $path)
 	<script src='{{ $path }}'></script>
 @endforeach
-
+@yield('js')
 <script type="text/javascript">
 
     var cookie = JSON.parse(getCookie('ui-contorl') ? getCookie('ui-contorl') : '{}');

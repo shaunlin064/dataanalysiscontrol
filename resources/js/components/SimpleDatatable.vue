@@ -110,7 +110,7 @@
                         paging: true,
                         ordering: true,
                         info: true,
-                        autoWidth: true,
+                        autoWidth: false,
                         /* 因水平開啟會導致table 放大 跑版 故依靠jq偵測寬度開啟*/
                         scrollX: document.body.clientWidth < 813 ? true : false,
                         aaSorting: [[0, 'desc']], //預設的排序方式，第2列，升序排列

@@ -15,44 +15,44 @@
                 <input v-else type='text' name='label' required>
             </div>
             <div class="col-xs-12">
-        <div class="box">
-            <div class="box-header">
-                <h3 class="box-title pull-left">清單</h3>
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title pull-left">清單</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <table :id='table_id' class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th>選擇</th>
+                                <th>name</th>
+                                <th>region</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <th></th>
+                                <th>選擇</th>
+                                <th>name</th>
+                                <th>region</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
             </div>
-            <!-- /.box-header -->
-            <div class="box-body">
-                <table :id='table_id' class="table table-bordered table-striped">
-                    <thead>
-                    <tr>
-                        <th></th>
-                        <th>選擇</th>
-                        <th>name</th>
-                        <th>region</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                    <tfoot>
-                    <tr>
-                        <th></th>
-                        <th>選擇</th>
-                        <th>name</th>
-                        <th>region</th>
-                    </tr>
-                    </tfoot>
-                </table>
-            </div>
-            <!-- /.box-body -->
-        </div>
-        <!-- /.box -->
-    </div>
         </div>
     </form>
 </template>
 
 <script>
     import {mapState, mapMutations, mapActions, mapGetters} from 'vuex';
-    
+
     export default {
         name: "roleForm",
         props: {
@@ -60,28 +60,27 @@
             csrf: String,
             row: Array,
             select_id: Array,
-            type:String,
-            role:Object,
+            type: String,
+            role: Object,
         },
         data() {
-            return {
-            }
+            return {}
         },
         methods: {
             format(d) {
                 // `d` is the original data object for the row
                 let itemTemplate = '';
                 let vue = this;
-                Object.keys(d.permissions).forEach(key=>{
+                Object.keys(d.permissions).forEach(key => {
                     itemTemplate += `<tr>
                             <td></td>
-                            <td><input type='checkbox' name="permission_ids[]" class="permission" value='${d.permissions[key]['id']}'></td>
+                            <td><input type='checkbox' name='permission_ids[]' class='permission' value='${d.permissions[key]['id']}'></td>
                             <td>${d.permissions[key]['label']}</td>
                             <td>${d.permissions[key]['name']}</td>
                             </tr>`;
                 });
 
-                return `<table class='table table-bordered table-striped dataTable' cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">
+                return `<table class='table table-bordered table-striped dataTable' cellpadding='5' cellspacing='0' border='0' style='padding-left:50px;'>
                             <thead>
                             <tr>
                                 <th></th>
@@ -95,18 +94,18 @@
                         </tbody>
                         </table>`;
             },
-            checkChildAllSelect(target){
+            checkChildAllSelect(target) {
                 let check = true;
                 let parentDom = $(target).closest('table').closest('tr').prev('tr');
-                $(target).closest('tbody').find('.permission').each(function(e,d){
-                    if(d.checked === false){
+                $(target).closest('tbody').find('.permission').each(function (e, d) {
+                    if (d.checked === false) {
                         check = false;
                     }
                 });
-                if(check){
+                if (check) {
                     parentDom.addClass('selected');
                     parentDom.find('input[name="permission_class_ids[]"]').prop('checked', true);
-                }else{
+                } else {
                     parentDom.removeClass('selected');
                     parentDom.find('input[name="permission_class_ids[]"]').prop('checked', false);
                 }
@@ -115,9 +114,9 @@
         beforeMount: function () {
             var vue = this;
             var rowData = vue.row;
-            
+
             $(document).ready(function () {
-                let domtable = $('#permissionsTable');
+                let domtable = $('#'+vue.table_id);
                 let dataTableConfig =
                     {
                         paging: true,
@@ -147,20 +146,19 @@
                             }
                         },
                         columns: [
-
                             {
-                                "className":'details-control',
-                                "orderable":      false,
-                                "data":           null,
+                                "className": 'details-control',
+                                "orderable": false,
+                                "data": null,
                                 "defaultContent": ''
                             },
                             {
-                                data: 'id', "render": function (data, type, row, ) {
-                                    return  `<p class="hidden">${data}</p><input id="checkbox${data}" name="permission_class_ids[]" type="checkbox" value=${data}>`;
+                                data: 'id', "render": function (data, type, row,) {
+                                    return `<p class='hidden'>${data}</p><input id='checkbox${data}' name='permission_class_ids[]' type='checkbox' value=''${data}>`;
                                 }
                             },
-                            { data: "name" },
-                            { data: "region" },
+                            {data: "name"},
+                            {data: "region"},
                         ],
                     };
                 dataTableConfig.columnDefs = [{
@@ -174,28 +172,28 @@
                     }
                 }];
                 dataTableConfig.order = [1, 'asc'];
-                
+
                 vue.dataTable = domtable.DataTable(dataTableConfig);
                 vue.dataTable.clear();
                 vue.dataTable.rows.add(rowData);
                 vue.dataTable.draw();
-                
+
                 /*開啟所有 子選單*/
-                domtable.find('tbody').find('tr').each(function(e,d){
+                domtable.find('tbody').find('tr').each(function (e, d) {
                     var tr = $(d);
-                    var row = vue.dataTable.row( tr );
-                    
+                    var row = vue.dataTable.row(tr);
+
                     // Open all child
-                    row.child( vue.format(row.data()) ).show();
+                    row.child(vue.format(row.data())).show();
                     tr.addClass('shown');
                 });
-                
+
                 // Array holding selected row IDs
                 var rows_selected = vue.$store.getters.getTableSelect;
                 rows_selected[vue.table_id] = vue.select_id ? vue.select_id : [];
-                
+
                 //頁面載入確認已勾選項目 修改css
-                $('.permission').each(function(e,d){
+                $('.permission').each(function (e, d) {
                     var rowId = parseInt($(d).val());
                     // If row ID is in the list of selected row IDs
                     if ($.inArray(rowId, rows_selected[vue.table_id]) !== -1) {
@@ -204,35 +202,35 @@
                         vue.checkChildAllSelect(d);
                     }
                 });
-                
+
                 /*父選單選取 開啟子選單與 勾選全子選單*/
                 domtable.find('tbody').on('click', 'input[type="checkbox"]', function (e) {
                     var $row = $(this).closest('tr');
-                    
+
                     /*第一層選擇後 打開子選單一併勾選*/
-                    if($row.find('.details-control').parent().hasClass('shown') === false){
+                    if ($row.find('.details-control').parent().hasClass('shown') === false) {
                         $row.find('.details-control').click();
                     }
-                    
+
                     if (this.checked) {
                         $row.addClass('selected');
-                        $(this).closest('tr').next('tr').find('table').find('input').each(function(e,d){
+                        $(this).closest('tr').next('tr').find('table').find('input').each(function (e, d) {
                             let rowId = parseInt($(this).val());
                             eval(`rows_selected.${vue.table_id}`).push(rowId);
-                            $(d).prop("checked",true);
+                            $(d).prop("checked", true);
                             $(d).closest('tr').addClass('selected');
                         });
                     } else {
                         $row.removeClass('selected');
-                        $(this).closest('tr').next('tr').find('table').find('input').each(function(e,d){
+                        $(this).closest('tr').next('tr').find('table').find('input').each(function (e, d) {
                             let rowId = parseInt($(this).val());
                             let index = $.inArray(rowId, rows_selected[vue.table_id]);
                             eval(`rows_selected.${vue.table_id}`).splice(index, 1);
-                            $(d).prop("checked",false);
+                            $(d).prop("checked", false);
                             $(d).closest('tr').removeClass('selected');
                         });
                     }
-                    
+
                     // Prevent click event from propagating to parent
                     e.stopPropagation();
                 });
@@ -241,19 +239,18 @@
                 $('#permissionsTable tbody').on('click', 'td.details-control', function () {
 
                     var tr = $(this).closest('tr');
-                    var row = vue.dataTable.row( tr );
-                    
-                    if ( row.child.isShown() ) {
+                    var row = vue.dataTable.row(tr);
+
+                    if (row.child.isShown()) {
                         // This row is already open - close it
                         row.child.hide();
                         tr.removeClass('shown');
-                    }
-                    else {
+                    } else {
                         // Open this row
-                        row.child( vue.format(row.data()) ).show();
+                        row.child(vue.format(row.data())).show();
                         tr.addClass('shown');
                     }
-                    tr.next('tr').find('table').find('input').each(function(e,d){
+                    tr.next('tr').find('table').find('input').each(function (e, d) {
                         var rowId = parseInt($(d).val());
                         if ($.inArray(rowId, rows_selected[vue.table_id]) !== -1) {
                             let tr = $(d).closest('tr');
@@ -265,14 +262,14 @@
 
                 // 子選單 select
                 $('#permissionsTable tbody').on('click', 'input.permission', function () {
-                    
+
                     if (this.checked) {
-                            let rowId = parseInt($(this).val());
-                            eval(`rows_selected.${vue.table_id}`).push(rowId);
+                        let rowId = parseInt($(this).val());
+                        eval(`rows_selected.${vue.table_id}`).push(rowId);
                     } else {
                         let rowId = parseInt($(this).val());
-                            let index = $.inArray(rowId, rows_selected[vue.table_id]);
-                            eval(`rows_selected.${vue.table_id}`).splice(index, 1);
+                        let index = $.inArray(rowId, rows_selected[vue.table_id]);
+                        eval(`rows_selected.${vue.table_id}`).splice(index, 1);
                     }
                     vue.checkChildAllSelect(this);
                 });

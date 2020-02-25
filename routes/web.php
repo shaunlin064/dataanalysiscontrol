@@ -15,6 +15,7 @@
     use App\FinancialList;
     use App\Http\Controllers\FinancialController;
     use App\Http\Controllers\MenuController;
+    use App\PermissionsClass;
     use App\SaleGroups;
     use Illuminate\Support\Facades\Artisan;
     use Illuminate\Support\Facades\Cache;
@@ -128,6 +129,19 @@
         Route::group(['namespace' => '\App\Http\Controllers\System'], function () {
             Route::prefix('system')->group(function () {
                 Route::get('/', 'SystemController@index')->name('system.index');
+                /*權限設定*/
+                Route::get('/permissionList', 'PermissionController@list')->name('system.permission.list');
+                Route::post('/permissionGetList', 'PermissionController@getList')->name('system.permission.getList');
+    
+                Route::post('/permissionAddAjaxPost', 'PermissionController@permissionAddAjaxPost')->name('system.permission.add.ajaxPost');
+                Route::post('/permissionEditAjaxPost/{permission}', 'PermissionController@permissionEditAjaxPost')->name('system.permission.edit.ajaxPost');
+                Route::post('/permissionDeleteAjaxPost/{permission}', 'PermissionController@permissionDeleteAjaxPost')->name('system.permission.ajaxPost');
+                
+                Route::post('/permissionClassAddAjaxPost', 'PermissionController@permissionClassAddAjaxPost')->name('system.permission.class.add.ajaxPost');
+                Route::any('/permissionClassDeleteAjaxPost/{permissionsClass}', 'PermissionController@permissionClassDeleteAjaxPost')->name('system.permission.class.delete.ajaxPost');
+                Route::any('/permissionClassEditAjaxPost/{permissionsClass}', 'PermissionController@permissionClassEditAjaxPost')->name('system.permission.class.edit.ajaxPost');
+                
+                
                 /*權限角色設定*/
                 Route::get('/roleList', 'RoleControl@roleList')->name('system.role.list');
                 Route::get('/roleAdd', 'RoleControl@roleAdd')->name('system.role.add');

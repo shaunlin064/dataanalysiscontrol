@@ -118,6 +118,9 @@ Vue.component('load-item', require('./components/LoadItem').default);
 Vue.component('role-form', require('./components/role/roleForm').default);
 Vue.component('role-form-submit', require('./components/role/roleFormSubmit').default);
 
+//permission
+Vue.component('permission-data-table', require('./components/permissions/permissionsDataTable').default);
+Vue.component('permission-class-data-table', require('./components/permissions/permissionsClassDataTable').default);
 //menu page
 Vue.component('menu-list', require('./components/menu/menuList').default);
 Vue.component('menu-form', require('./components/menu/menuForm').default);

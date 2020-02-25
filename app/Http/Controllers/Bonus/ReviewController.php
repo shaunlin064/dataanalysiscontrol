@@ -126,7 +126,6 @@
 //            $request = new Request(['startDate' => $dateStart, 'endDate' => $dateEnd, 'saleGroupIds' => [1,2,3,4,5], 'userIds' => []]);
 //            $return = $this->getAjaxData($request, 'return');
 //            dd($return);
-            
             return view('bonus.review.view', [
                     'data' => $this->resources,
                     'bonusColumns' => $bonusColumns,

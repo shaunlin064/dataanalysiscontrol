@@ -48,7 +48,7 @@
         public function roleAdd ()
         {
             $this->authorize('create',$this->policyModel);
-            $permissionList = PermissionsClass::where('id','<>',0)->with('permissions')->get();
+            $permissionList = PermissionsClass::where('id','<>',0)->with('role')->get();
             
  
 
@@ -60,7 +60,6 @@
             $this->authorize('create',$this->policyModel);
             
             $permissionList = PermissionsClass::where('id','<>',0)->with('permissions')->get();
-            
             return view( 'system.role.add' ,['data'=>$this->resources,'permissionList' => $permissionList,'role' => $role,'type' => 'edit']);
         }
     

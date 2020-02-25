@@ -47,6 +47,8 @@ export default {
         provide_bonus_list: [],
         provide_groups_list: [],
         chart_bar_max_y: 0,
+        permission_data:[],
+        permission_class_data:[]
     },
     getters:{
         getTableSelect(state){

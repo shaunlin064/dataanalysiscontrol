@@ -25,7 +25,6 @@ class GetMenuList
         
         $menus = Menu::where('region',$region )->get();
         $pageNow = MenuSub::where('url',$urlName)->first();
-       
         if($pageNow){
             $parentMenuId = $pageNow->menu_id;
             $menus->map(function ($menu) use($parentMenuId){

@@ -48,7 +48,7 @@
 {{--                        :table_title='["選擇","名稱"]'--}}
 {{--                        :type = '"select"'--}}
 {{--                        @if( ($type ?? '') == 'edit')--}}
-{{--                        :select_id='{{ json_encode( $role->permissions->pluck('id')) }}'--}}
+{{--                        :select_id='{{ json_encode( $role->role->pluck('id')) }}'--}}
 {{--                        @endif--}}
 {{--                        :row = '{!! json_encode($permissionList) !!}'--}}
 {{--                        :csrf= '"{{csrf_token()}}"'--}}

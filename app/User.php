@@ -72,6 +72,10 @@ class User extends Authenticatable
     public function hasPermission(String $permission)
     {
         $check = false;
+        if(auth()->user()->isAdmin()){
+            return true;
+        }
+        
         $this->roles->each(function($role) use($permission,&$check){
             if($role->permissions->contains('name',$permission)){
                 $check = true;

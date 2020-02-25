@@ -41,6 +41,7 @@
         },
         computed: mapState(['user_ids','sale_group_ids']),
         mounted: function(){
+            
             $('#'+this.id+'').select2();
 		        
             var domId = this.id;

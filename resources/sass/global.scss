@@ -51,6 +51,9 @@ $phones-media:479px;
 .point{
   cursor: pointer;
 }
+.pl-5{
+    padding-left: 5px;
+}
 .p-20{
   padding: 20px;
 }
@@ -253,6 +256,13 @@ $phones-media:479px;
 }
 .mt-5{
     margin-top: 5px;
+}
+
+.vis{
+    visibility:hidden;
+}
+.abs{
+    position: absolute;
 }
 td.details-control {
   background: url('/img/details_open.png') no-repeat center center;

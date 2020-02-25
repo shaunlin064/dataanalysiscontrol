@@ -8,7 +8,7 @@ use App\Role;
 class Permission extends Model
 {
     //
-	protected $fillable = ['name','label'];
+	protected $fillable = ['name','label','permissions_class_id'];
 	
 	public function roles ()
 	{
