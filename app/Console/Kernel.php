@@ -7,6 +7,7 @@
     use App\Console\Commands\CacheReceiptTimes;
     use App\Console\Commands\UpdateBonusReach;
     use App\Console\Commands\UpdateConvenerReach;
+    use App\Console\Commands\UpdateExchangeRate;
     use App\Console\Commands\UpdateFinancialData;
     use App\Console\Commands\UpdateFinancialMoneyReceipt;
     use App\Console\Commands\UpdateSaleGroups;
@@ -29,6 +30,7 @@
             UpdateFinancialData::class,
             UpdateBonusReach::class,
             UpdateConvenerReach::class,
+            UpdateExchangeRate::class,
             CacheAll::class,
         ];
         
@@ -45,6 +47,7 @@
                 $schedule->command('update_financial_money_receipt')->dailyAt('00:20');
                 $schedule->command('update_user_bonus')->monthlyOn('1', '00:00');
                 $schedule->command('update_sale_groups')->monthlyOn('1', '00:10');
+                $schedule->command('update_exchange_rate')->monthlyOn('1', '00:30');
                 $schedule->command('update_bonus_reach')->monthlyOn('16', '00:10');
                 $schedule->command('update_convener_reach')->monthlyOn('16', '00:20');
                 /*cached*/

@@ -62,7 +62,7 @@
         },
         computed: {
             // ...mapGetters(['getTableSelect','getUserIds','getSaleGroupIds','getStartDate','getEndDate']),
-            ...mapState(['provide_money','loading','customer_profit_data','customer_groups_profit_data','medias_profit_data','media_companies_profit_data','group_progress_list','progress_list','bonus_list','provide_bonus_list','provide_groups_list','start_date','end_date']),
+            ...mapState(['provide_money','loading','customer_profit_data','customer_groups_profit_data','medias_profit_data','media_companies_profit_data','group_progress_list','progress_list','bonus_list','provide_bonus_list','provide_groups_list','start_date','end_date','exchange_rates_list','currency']),
         },
         methods: {
             change_render(item) {
@@ -326,6 +326,14 @@
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'provide_groups_list') {
 
+                        this.updataTable(val);
+                    }
+                }
+            },
+            exchange_rates_list:{
+                immediate: true,    // 这句重要
+                handler(val, oldVal) {
+                    if (oldVal !== undefined && val !== '' && this.table_id == 'exchange_rates_list') {
                         this.updataTable(val);
                     }
                 }

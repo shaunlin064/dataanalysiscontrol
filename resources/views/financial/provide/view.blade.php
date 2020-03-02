@@ -53,7 +53,7 @@
                               <input type="radio" name='selectType' data-type='select_user' @if(empty($saleGroups)){{'checked'}}@endif>
                             </span>
                             <select2 :id='"select_user"'
-                                     :multiple='true'
+                                     :multiple='"multiple"'
                                      :disabled='{{empty($saleGroups) ? "false" : "true" }}'
                                      :placeholder='"選擇成員"'
                                      :row='{!! json_encode($userList) !!}'
@@ -70,7 +70,7 @@
                               <input type="radio" name='selectType' data-type='select_groups' @if($saleGroups){{'checked'}}@else{{'disabled'}}@endif >
                             </span>
                             <select2 :id='"select_groups"'
-                                     :multiple='true'
+                                     :multiple='"multiple"'
                                      :placeholder='"選擇團隊"'
                                      :disabled='{{$saleGroups ? "false" : "true" }}'
                                      :row='{!! json_encode($saleGroups) !!}'

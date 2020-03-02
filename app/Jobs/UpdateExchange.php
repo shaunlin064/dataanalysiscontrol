@@ -2,31 +2,24 @@
 
 namespace App\Jobs;
 
-use App\Mail\CronTab;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Mail;
 
-class SentMail implements ShouldQueue
+class UpdateExchange implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $action;
-    private $arg;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(string $action,array $arg)
+    public function __construct()
     {
         //
-        $this->action = $action;
-        $this->arg = $arg;
-       
     }
 
     /**
@@ -37,12 +30,6 @@ class SentMail implements ShouldQueue
     public function handle()
     {
         //
-        switch ($this->action){
-            case 'crontab':
-                extract($this->arg);
-                Mail::to($mail)
-                    ->send(new CronTab($name, $title));
-                break;
-        }
+        Artisan::call('update_exchange_rate');
     }
 }

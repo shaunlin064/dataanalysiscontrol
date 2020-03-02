@@ -57,7 +57,7 @@
                                      data-type='select_user' @if(empty($saleGroups)){{'checked'}}@endif>
                             </span>
                             <select2 :id='"select_user"'
-                                     :multiple='true'
+                                     :multiple='"multiple"'
                                      :selected='true'
                                      :disabled='{{empty($saleGroups) ? "false" : "true" }}'
                                      :placeholder='"選擇成員"'
@@ -76,7 +76,7 @@
                                      data-type='select_groups' @if($saleGroups){{'checked'}}@else{{'disabled'}}@endif >
                             </span>
                             <select2 :id='"select_groups"'
-                                     :multiple='true'
+                                     :multiple='"multiple"'
                                      :placeholder='"選擇團隊"'
                                      :selected='true'
                                      :disabled='{{$saleGroups ? "false" : "true" }}'

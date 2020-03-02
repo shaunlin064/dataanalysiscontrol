@@ -48,7 +48,10 @@ export default {
         provide_groups_list: [],
         chart_bar_max_y: 0,
         permission_data:[],
-        permission_class_data:[]
+        permission_class_data:[],
+        currency:'',
+        exchange_rates_list:[],
+        chart_exchange_line:[],
     },
     getters:{
         getTableSelect(state){

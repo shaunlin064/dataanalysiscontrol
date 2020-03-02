@@ -106,7 +106,7 @@
         <div class="box">
             <div class="box-header">
                 <h3 class="box-title pull-left">清單</h3>
-                <div class='col-md-2 pull-right'>
+                <div class='col-md-2 pull-right' data-step="1" data-intro="新增menu">
                     <button type="button" id='addNewMenu' data-toggle="modal" data-target="#add-menu-template" class="btn btn-block btn-success">新增</button>
                 </div>
             </div>
@@ -117,10 +117,10 @@
                     <tr>
                         <th></th>
                         <th>name</th>
-                        <th>priority</th>
-                        <th>icon</th>
-                        <th>region</th>
-                        <th>catalogue</th>
+                        <th data-step="2" data-intro="menu排序">priority</th>
+                        <th data-step="3" data-intro="menu前icon">icon</th>
+                        <th data-step="4" data-intro="region 影響menu出現在系統管理or一般user">region</th>
+                        <th data-step="5" data-intro="影響css 子分類錨點顯示 子分類前贅詞與父級相同 該父css會開啟menu">catalogue</th>
                         <th>Action</th>
                     </tr>
                     </thead>

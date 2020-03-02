@@ -3,13 +3,13 @@
         <div class="box-body">
             <div class="form-group">
                 <div>
-                    <label class="col-sm-2 control-label pull-left">名稱</label>
+                    <label class="col-sm-2 control-label pull-left" data-step="1" data-intro="權限名稱">名稱</label>
                     <div class="col-sm-3">
                         <input v-if="type == 'edit'" type='text' name='name' :value='role.name' required>
                         <input v-else type='text' name='name' required>
                     </div>
                 </div>
-                <label class="col-sm-2 control-label pull-left">備註</label>
+                <label class="col-sm-2 control-label pull-left" data-step="2" data-intro="權限名稱">備註</label>
                 
                 <input v-if="type == 'edit'" type='text' name='label' :value='role.label' required>
                 <input v-else type='text' name='label' required>

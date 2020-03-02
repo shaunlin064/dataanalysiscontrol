@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class CreateExchangeRatesTable extends Migration
+class CreateExchageRatesAllsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,11 @@ class CreateExchangeRatesTable extends Migration
      */
     public function up()
     {
-        Schema::create('exchange_rates', function (Blueprint $table) {
+        Schema::create('exchange_rates_alls', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->date('set_date');
+            $table->char('year_month');
             $table->string('currency',10);
-              $table->double( 'rate');
-              $table->integer('created_by_erp_user_id');
+            $table->json('data');
             $table->timestamps();
         });
     }
@@ -30,6 +29,6 @@ class CreateExchangeRatesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('exchange_rates');
+        Schema::dropIfExists('exchange_rates_alls');
     }
 }

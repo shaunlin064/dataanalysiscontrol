@@ -2,7 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\ExchangeRate;
 use App\Http\Controllers\Bonus\BonusReachController;
+use App\Jobs\SentMail;
+use App\Jobs\UpdateExchange;
 use Illuminate\Console\Command;
 
 class UpdateBonusReach extends Command
@@ -44,7 +47,17 @@ class UpdateBonusReach extends Command
 	    $bonusReach = new BonusReachController();
 	    $date_now =  new \DateTime();
 	    $date_now->modify('-1Month');
-	    
+    
+        if(!ExchangeRate::checkDataExsist(now()->setDays(1)->subMonth()->format('Y-m-d'),"USD")){
+            /*mail notice Job*/
+            SentMail::dispatch('crontab',['name'=>'admin', 'title' => 'update_bonus_reach 更新失敗沒有該月匯率資料']);
+            //加入隊列
+            /*重新更新匯率 重新更資資料*/
+            UpdateExchange::dispatch()->delay(now()->addHour(10));
+            \App\Jobs\UpdateBonusReach::dispatch()->delay(now()->addHour(10)->addMinute(10));
+            die;
+        }
+        
 	    $bonusReach->update($date_now->format('Y-m-01'));
     
         $runTime = round(microtime(true) - $startTime, 2);

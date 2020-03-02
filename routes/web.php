@@ -12,6 +12,7 @@
     |
     */
     
+    use App\ExchangeRate;
     use App\FinancialList;
     use App\Http\Controllers\FinancialController;
     use App\Http\Controllers\MenuController;
@@ -27,6 +28,10 @@
     use SebastianBergmann\Comparator\ComparisonFailure;
     use App\Mail\CronTab;
     
+    Route::get('/test', function () {
+//        $exchangeRate = ExchangeRate::checkDataExsist('2020-02-01',"JPY");
+        dd(now()->setDays(1)->subMonth()->format('Y-m-d'));
+    });
     /*
      * 登入系統
      */
@@ -83,7 +88,7 @@
                     Route::get('/exchangeRateSetting', 'ExchangeRatesController@setting')->name('financial.exchangeRate.setting');
                     Route::get('/exchangeRateSetting/view', 'ExchangeRatesController@view')->name('financial.exchangeRate.view');
                     Route::post('/add', 'ExchangeRatesController@add')->name('financial.exchangeRate.add');
-                    
+                    Route::any('/exchangeRateSetting/getAjaxData', 'ExchangeRatesController@getAjaxData')->name('financial.exchangeRate.getAjaxData');
                     /*獎金發放*/
                     Route::prefix('/provide')->group(function () {
                         Route::get('/list', 'ProvideController@list')->name('financial.provide.list');

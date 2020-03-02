@@ -1,5 +1,5 @@
 <template>
-		<select class="form-control select2" :id='id' :multiple='multiple ? "multiple" : ""' :data-placeholder='placeholder' :disabled='disabled'
+		<select class="form-control select2" :id='id' :multiple='multiple' :data-placeholder='placeholder' :disabled='disabled'
 		        style="width: 100%;">
 			<option :value='item.id' v-for='item in row' :selected='!disabled'> {{item.name}} </option>
 		</select>
@@ -30,6 +30,9 @@
                 case 'select_groups' :
                     this.changeSaleGroupId($('#'+domId+'').val());
                     break;
+              case 'select_currency':
+                      this.$store.state.currency = $('#'+domId+'').val();
+                  break;
               }
             },
             changeUserId(ids) {

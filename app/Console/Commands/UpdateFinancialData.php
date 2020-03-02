@@ -64,6 +64,6 @@ class UpdateFinancialData extends Command
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     
         /*mail notice Job*/
-        \App\Jobs\SentMail::dispatch('crontab',['name'=>'admin', 'title' => 'update_financial_data schedule down']);
+        \App\Jobs\SentMail::dispatch('crontab',['mail'=>'shaun@js-adways.com.tw','name'=>'admin', 'title' => 'update_financial_data schedule down']);
     }
 }

@@ -3,9 +3,9 @@
             <div class="col-xs-12">
                 <div class="box">
                     <div class="box-header">
-                        <h3 class="box-title pull-left">權限Class</h3>
+                        <h3 class="box-title pull-left" data-step="1" data-intro="權限分類表" >權限Class</h3>
                         <div class='col-md-2 pull-right'>
-                            <button type="button" @click='addPost' class="btn btn-block btn-success">新增</button>
+                            <button type="button" @click='addPost' data-step="2" data-intro="新增權限分類" class="btn btn-block btn-success">新增</button>
                         </div>
                     </div>
                     <!-- /.box-header -->
@@ -14,8 +14,8 @@
                             <thead>
                             <tr>
                                 <th>id</th>
-                                <th>名稱</th>
-                                <th>歸屬</th>
+                                <th data-step="3" data-intro="分類名稱 影響群組權限分類的list顯示" >名稱</th>
+                                <th data-step="4" data-intro="分類歸屬 影響群組權限分類的list排列">歸屬</th>
                                 <th>action</th>
                             </tr>
                             </thead>

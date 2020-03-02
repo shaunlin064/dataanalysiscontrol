@@ -36,13 +36,13 @@
         },
         created: function(){
             // let domEle = $('#'+this.dom_id+'');
-            let d = new Date();
+            let d = new Date(this.date);
 						this.changeDate(moment(d).format('YYYY/MM'));
             // domEle.val(moment(d).format('YYYY/MM'));
         },
 		    mounted: function() {
             let vue = this;
-            let d = this.date_start;
+            let d = this.date ? this.date :this.date_start;
             let m = moment(d).format('MM');
             let y = moment(d).format('YYYY');
             let td = moment(d).format('DD');
