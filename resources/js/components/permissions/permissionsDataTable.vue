@@ -226,7 +226,9 @@
                domtable.on('click','.btn',function(e){
                     switch($(this).data('action')){
                         case 'delete':
-                            vue.deletePost($(this).data('id'));
+                            if(confirm('確認刪除')){
+                                vue.deletePost($(this).data('id'));
+                            }
                             break;
                     }
                 });
