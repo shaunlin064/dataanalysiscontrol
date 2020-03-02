@@ -37,10 +37,9 @@
                 </div>
                 <div class="box-footer">
                     <h4>QA:</h4>
-                    <span>1.匯率輸入如未再16號前輸入,他國幣別獎金計算,將會採用預設值 usd: 31 jpy:0.2875 將會造成資料金額浮動不準確,<storge style='color:red;'>須注意在時間內完成輸入</storge></span></br>
-                    <span>2.獎金發放作業 在每月4號以前發放皆為 當月,5號開始發放將為次月 <storge style='color:blue;'>例： 1.5號 發放獎金 獎金發放檢視 查詢該筆資料 將會在2月, 1.4號 發放獎金 獎金發放檢視 查詢該筆資料 將會在1月</storge></span></br>
-                    <span>3.召集人團隊資料與個人責任額資料 每月系統會自動新增,任何責任額調整、團隊人員異動,需要在下月資料產生前完成異動</span></br>
-                    <span>4.每月16號 計算前月獎金與鎖定財報資料,代表未鎖定的月份 目前業績查詢的金額數字都會動態的,直到16完成計算後,不應再有任何異動</span></br>
+                    <span>1.獎金發放作業 在每月4號以前發放皆為 當月,5號開始發放將為次月 <storge style='color:blue;'>例： 1.5號 發放獎金 獎金發放檢視 查詢該筆資料 將會在2月, 1.4號 發放獎金 獎金發放檢視 查詢該筆資料 將會在1月</storge></span></br>
+                    <span>2.召集人團隊資料與個人責任額資料 每月系統會自動新增,任何責任額調整、團隊人員異動,需要在下月資料產生前完成異動</span></br>
+                    <span>3.每月16號 計算前月獎金與鎖定財報資料,代表未鎖定的月份 目前業績查詢的金額數字都會動態的,直到16完成計算後,不應再有任何異動</span></br>
                 </div>
             </div>
             <div class="box box-primary">
@@ -110,9 +109,8 @@
                         borderColor    : '#f39c12' //yellow
                     },
                     {
-                        title          : '前月匯率輸入',
+                        title          : '前月匯率更新',
                         start          : new Date(y, m, 1),
-                        end            : new Date(y, m, 16),
                         allDay         : true,
                         backgroundColor: '#0073b7', //Blue
                         borderColor    : '#0073b7' //Blue

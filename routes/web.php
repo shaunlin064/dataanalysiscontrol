@@ -28,10 +28,6 @@
     use SebastianBergmann\Comparator\ComparisonFailure;
     use App\Mail\CronTab;
     
-    Route::get('/test', function () {
-//        $exchangeRate = ExchangeRate::checkDataExsist('2020-02-01',"JPY");
-        dd(now()->setDays(1)->subMonth()->format('Y-m-d'));
-    });
     /*
      * 登入系統
      */
