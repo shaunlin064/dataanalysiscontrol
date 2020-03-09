@@ -37,7 +37,7 @@
                 </div>
                 <div class="box-footer">
                     <h4>QA:</h4>
-                    <span>1.獎金發放作業 在每月4號以前發放皆為 當月,5號開始發放將為次月 <storge style='color:blue;'>例： 1.5號 發放獎金 獎金發放檢視 查詢該筆資料 將會在2月, 1.4號 發放獎金 獎金發放檢視 查詢該筆資料 將會在1月</storge></span></br>
+                    <span>1.獎金發放作業 在每月5號以前發放皆為當月,6號開始發放將為次月 <storge style='color:blue;'>例： 1.6號 發放獎金 獎金發放檢視 查詢該筆資料 將會在2月, 1.5號 發放獎金 獎金發放檢視 查詢該筆資料 將會在1月</storge></span></br>
                     <span>2.召集人團隊資料與個人責任額資料 每月系統會自動新增,任何責任額調整、團隊人員異動,需要在下月資料產生前完成異動</span></br>
                     <span>3.每月16號 計算前月獎金與鎖定財報資料,代表未鎖定的月份 目前業績查詢的金額數字都會動態的,直到16完成計算後,不應再有任何異動</span></br>
                 </div>
@@ -118,7 +118,7 @@
                     {
                         title          : '發放本月獎金',
                         start          : new Date(y, m, 1),
-                        end            : new Date(y, m, 5),
+                        end            : new Date(y, m, 6),
                         allDay         : true,
                         backgroundColor: '#00a65a', //Success (green)
                         borderColor    : '#00a65a' //Success (green)

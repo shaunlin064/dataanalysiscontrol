@@ -57,6 +57,42 @@
 
     </div>
     <div class='row'>
+        <div class='col-md-12 col-sm-12 col-xs-12 border-right'>
+            <div class="box box-warning">
+                <div class="box-header with-border">
+                    <h3 class="box-title">發放統計</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='sale_char'><i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                    <!-- /.box-tools -->
+                </div>
+                <div class="box-body">
+                    <chart-component
+                        :table_id='"chart_provide_bar"'
+                        :type='"bar"'
+                        :title='"個人獎金"'
+                        :labels='[]'
+                        :height='300'
+                        :chart_data='{{ json_encode([ ["data"=>0] ]) }}'
+                    ></chart-component>
+                    <chart-component
+                        :table_id='"chart_provide_pie"'
+                        :type='"pie"'
+                        :title='"團隊獎金發放統計"'
+                        :labels='[]'
+                        :height='300'
+                        :chart_data='{{ json_encode([ ["data"=>[0]],["data"=>[0] ]  ]) }}'
+                    ></chart-component>
+                </div>
+            </div>
+        </div>
+        <div class='col-md-12'>
+
+
+        </div>
+    </div>
+    <div class='row'>
         <div class='col-md-12'>
         <simple-data-table-componet
                 :table_id='"provide_sale_groups_bonus"'
@@ -85,6 +121,8 @@
                     :select_id='{!! json_encode($autoSelectIds) !!}'
                     :total_money='{{$total_mondey}}'
                     :csrf= '"{{csrf_token()}}"'
+                    :page_length='99999'
+                    :length_change='"hide"'
             ></simple-data-table-componet>
             <provide-submit
                     :csrf= '"{{csrf_token()}}"'

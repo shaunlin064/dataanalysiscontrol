@@ -57,6 +57,9 @@
         {{--	</div>--}}
         {{--</footer>--}}
     </div>
+    <div class="back-to-top vis" style="">
+        <a href="#"><img title="Back to Top" src="/img/gototop.png" alt="Icon backtotop"></a>
+    </div>
 </div>
 
 @foreach($js as $path)
@@ -102,6 +105,14 @@
         });
 
         $('#guided_number').html($('*[data-intro]').length);
+        $(document).on('scroll', function() {
+            if($(window).scrollTop() > 100){
+                $('.back-to-top').removeClass('vis');
+            }else if( $(window).scrollTop() < 100 ){
+                $('.back-to-top').addClass('vis');
+            }
+        });
+
     })
 </script>
 @yield('script')

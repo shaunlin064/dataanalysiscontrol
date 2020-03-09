@@ -115,8 +115,8 @@ class ProvideController extends BaseController
 			['data'=> 'provide_money','render' => '<div data-money="${data}">${data}</div>'],
 		 ];
 		
-		$autoSelectIds = $this->getProvideBalanceSelectedId($bonuslist);
-		$total_mondey = $bonuslist->whereIn('id',$autoSelectIds)->sum('provide_money');
+//		$autoSelectIds = $this->getProvideBalanceSelectedId($bonuslist);
+//		$total_mondey = $bonuslist->whereIn('id',$autoSelectIds)->sum('provide_money');
 		
 		return view('financial.provide.list',
 		 [
@@ -125,8 +125,8 @@ class ProvideController extends BaseController
 			'saleGroupsTableColumns' => $saleGroupsTableColumns,
 			'bonuslistColumns' => $bonuslistColumns,
 			'bonuslist' => $bonuslist,
-            'autoSelectIds' => $autoSelectIds,
-            'total_mondey' => $total_mondey,
+            'autoSelectIds' => [],
+            'total_mondey' => 0,
 		 ]);
 		
 		//columns : [

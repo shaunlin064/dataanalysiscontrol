@@ -46,6 +46,7 @@ export default {
         group_progress_list: [],
         provide_bonus_list: [],
         provide_groups_list: [],
+        provide_statistics_list:{},
         chart_bar_max_y: 0,
         permission_data:[],
         permission_class_data:[],

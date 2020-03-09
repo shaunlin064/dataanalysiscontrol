@@ -19,11 +19,29 @@
             labels: Array,
             ajax_url: String,
             csrf: String,
-            height:Number
+            height: Number,
         },
-        computed: {...mapState(['month_income', 'month_cost', 'month_profit', 'money_status_paid', 'money_status_unpaid', 'money_status_bonus_paid', 'money_status_bonus_unpaid','month_label','last_record_month_income','last_record_month_cost', 'last_record_month_profit','last_record_month_label','chart_bar_max_y'])},
+        computed: {...mapState(['month_income', 'month_cost', 'month_profit', 'money_status_paid', 'money_status_unpaid', 'money_status_bonus_paid', 'money_status_bonus_unpaid', 'month_label', 'last_record_month_income', 'last_record_month_cost', 'last_record_month_profit', 'last_record_month_label', 'chart_bar_max_y', 'provide_statistics_list', 'provide_total_money'])},
         data: function () {
             return {
+                color:[
+                    'rgba(142,197,252,0.5)',
+                    'rgba(251,171,126,0.5)',
+                    'rgba(255, 99, 132,0.5)',
+                    'rgba(255, 159, 64,0.5)',
+                    'rgba(255, 205, 86,0.5)',
+                    'rgba(75, 192, 192,0.5)',
+                    'rgba(54, 162, 235,0.5)',
+                    'rgba(153, 102, 255,0.5)',
+                    'rgba(201, 203, 207,0.5)'
+                ],
+                group_id_color:{
+                    1:'rgba(142,197,252,0.5)',
+                    2:'rgba(251,171,126,0.5)',
+                    3:'rgba(255, 99, 132,0.5)',
+                    4:'rgba(255, 159, 64,0.5)',
+                    5:'rgba(201, 203, 207,0.5)'
+                },
                 default_color: {
                     red: 'rgba(255, 99, 132,0.5)',
                     orange: 'rgba(255, 159, 64,0.5)',
@@ -34,8 +52,6 @@
                     grey: 'rgba(201, 203, 207,0.5)'
                 },
                 pie_color: [
-                    'rgb(255, 205, 86)',
-                    'rgb(75, 192, 192)',
                     'rgb(255, 205, 86)',
                     'rgb(75, 192, 192)',
                 ],
@@ -104,19 +120,62 @@
             this.chart_obj = new Chart(ctx, this.config);
         },
         methods: {
+            getRandom(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            },
             update(vue_this) {
                 if (vue_this.type == 'pie') {
                     vue_this.chart_obj.data.datasets.map(function (dataset, key) {
-                        
+
                         if (key == 0) {
                             dataset.data = [vue_this.money_status_unpaid, vue_this.money_status_paid, 0, 0];
                         }
-                        // else{
-                        //     dataset.data = [0,0,vue_this.money_status_bonus_paid,vue_this.money_status_bonus_unpaid];
-                        // }
                     });
+                    if (vue_this.table_id == 'chart_provide_pie') {
+                        let data = [];
+                        let userdata = [];
+                        let groupdata = [];
+                        vue_this.chart_obj.data.labels = [];
+                        vue_this.chart_obj.data.datasets[0].backgroundColor=[];
+                        vue_this.chart_obj.data.datasets[1].backgroundColor=[];
+
+                        vue_this.provide_statistics_list.user = vue_this.provide_statistics_list.user.sort(function (a, b) {
+                            return a.group_id < b.group_id ? 1 : -1;
+                        });
+                        vue_this.provide_statistics_list.group = vue_this.provide_statistics_list.group.sort(function (a, b) {
+                            return a.group_id < b.group_id ? 1 : -1;
+                        });
+                        
+                        Object.keys(vue_this.provide_statistics_list.user).forEach(key => {
+                            let money = vue_this.provide_statistics_list.user[key]['money'];
+                            let group_id = vue_this.provide_statistics_list.user[key]['group_id'];
+                            let color = vue_this.group_id_color[group_id];
+                            userdata.push(money);
+                            vue_this.chart_obj.data.datasets[0].backgroundColor.push(color);
+                            vue_this.chart_obj.data.datasets[1].backgroundColor.push(color);
+                            groupdata.push(0);
+                            vue_this.chart_obj.data.labels.push(key);
+                        });
+                        Object.keys(vue_this.provide_statistics_list.group).forEach(key => {
+                            let money = vue_this.provide_statistics_list.group[key]['money'];
+                            let group_id = vue_this.provide_statistics_list.group[key]['group_id'];
+                            let color = vue_this.group_id_color[group_id];
+                            userdata.push(0);
+                            groupdata.push(money);
+                            vue_this.chart_obj.data.labels.push(key);
+                            vue_this.chart_obj.data.datasets[0].backgroundColor.push(color);
+                            vue_this.chart_obj.data.datasets[1].backgroundColor.push(color);
+                        });
+                        
+                        data.push(userdata);
+                        data.push(groupdata);
+                       
+                        vue_this.chart_obj.data.datasets.map(function (dataset, key) {
+                            dataset.data = data[key];
+                        });
+                    }
                 } else if (vue_this.type == 'bar') {
-                    if(vue_this.table_id == 'chart_financial_bar_last_record'){
+                    if (vue_this.table_id == 'chart_financial_bar_last_record') {
                         let monthdata = [
                             vue_this.last_record_month_income,
                             vue_this.last_record_month_cost,
@@ -127,7 +186,22 @@
                             dataset.data = monthdata[key];
                         });
 
-                    }else{
+                    } else if (vue_this.table_id == 'chart_provide_bar') {
+                        let data = [];
+                        let newdata = [];
+                        vue_this.chart_obj.data.labels = [];
+                        Object.keys(vue_this.provide_statistics_list.user).forEach(key => {
+                            let money = vue_this.provide_statistics_list.user[key]['money'];
+                            newdata.push(money);
+                            vue_this.chart_obj.data.labels.push(key);
+                        });
+                        this.config.data.datasets[0].backgroundColor = vue_this.bar_color[2];
+                        data.push(newdata);
+
+                        vue_this.chart_obj.data.datasets.map(function (dataset, key) {
+                            dataset.data = data[key];
+                        });
+                    } else {
                         let monthdata = [
                             vue_this.month_income,
                             vue_this.month_cost,
@@ -139,13 +213,17 @@
                         });
                     }
                     /*update yAxes max 確保比對圖表兩邊比例一樣 */
-                    vue_this.config.options.scales.yAxes[0].ticks.max = vue_this.chart_bar_max_y;
+                    if ($.inArray(this.table_id, ['chart_financial_bar2', 'chart_financial_bar_last_record']) !== -1) {
+                        vue_this.config.options.scales.yAxes[0].ticks.max = vue_this.chart_bar_max_y;
+                    }
+
                     vue_this.chart_obj.options = vue_this.chart_obj.config.options;
-                    
+
                 }
                 vue_this.chart_obj.update({
                     duration: 700,
-                    easing: 'linear'});
+                    easing: 'linear'
+                });
             },
             ...mapActions({
                 saveName: 'saveName'
@@ -154,7 +232,7 @@
         watch: {
             money_status_bonus_paid: {
                 immediate: true,
-                    handler(val, oldVal) {
+                handler(val, oldVal) {
                     if (oldVal !== undefined) {
                         this.update(this);
                     }
@@ -162,7 +240,7 @@
             },
             money_status_bonus_unpaid: {
                 immediate: true,
-                    handler(val, oldVal) {
+                handler(val, oldVal) {
                     if (oldVal !== undefined) {
                         this.update(this);
                     }
@@ -170,7 +248,7 @@
             },
             money_status_unpaid: {
                 immediate: true,
-                    handler(val, oldVal) {
+                handler(val, oldVal) {
                     if (oldVal !== undefined) {
                         this.update(this);
                     }
@@ -193,6 +271,14 @@
                 }
             },
             month_cost: {
+                immediate: true,
+                handler(val, oldVal) {
+                    if (oldVal !== undefined) {
+                        this.update(this);
+                    }
+                }
+            },
+            provide_total_money: {
                 immediate: true,
                 handler(val, oldVal) {
                     if (oldVal !== undefined) {

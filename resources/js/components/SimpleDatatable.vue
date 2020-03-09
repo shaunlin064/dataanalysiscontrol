@@ -58,19 +58,14 @@
         data() {
             return {
                 now: 0,
+                rows_selected: this.$store.state.table_select,
             }
         },
         computed: {
             // ...mapGetters(['getTableSelect','getUserIds','getSaleGroupIds','getStartDate','getEndDate']),
-            ...mapState(['provide_money','loading','customer_profit_data','customer_groups_profit_data','medias_profit_data','media_companies_profit_data','group_progress_list','progress_list','bonus_list','provide_bonus_list','provide_groups_list','start_date','end_date','exchange_rates_list','currency']),
+            ...mapState(['provide_money', 'loading', 'customer_profit_data', 'customer_groups_profit_data', 'medias_profit_data', 'media_companies_profit_data', 'group_progress_list', 'progress_list', 'bonus_list', 'provide_bonus_list', 'provide_groups_list', 'start_date', 'end_date', 'exchange_rates_list', 'currency','table_select','provide_statistics_list']),
         },
         methods: {
-            change_render(item) {
-                return new Function('data', 'type', 'row', 'return `' + item + '`');
-            },
-            set_select(value) {
-                this.$store.commit('tableSelect', value);
-            },
             tableClear() {
                 if (this.dataTable !== undefined) {
                     this.dataTable.clear();
@@ -87,6 +82,75 @@
             },
             getExportFileName() {
                 return `${this.table_head}_${this.start_date.substr(0, 7)}-${this.end_date.substr(0, 7)}`;
+            },
+            selectToggle(dom,type){
+                let row = dom;
+                // Get row data
+                let data = this.dataTable.row(row).data();
+                let rowId = data.id;
+                // let rows_selected = this.$store.getters.getTableSelect;
+                let index = $.inArray(rowId,this.rows_selected[this.table_id]);
+                let thisSelectMoney = data.provide_money;
+                let groupName = data.sale_group_name ? data.sale_group_name : data.group_name;
+                let groupId = data.sale_groups_id ? data.sale_groups_id : data.sale_groups.sale_groups_id;
+                let userName = data.user_name ? data.user_name : '';
+                this.setStatistics(data);
+                switch(type){
+                    case 'select':
+                        if ( index === -1) {
+                            this.rows_selected[this.table_id].push(rowId);
+                            this.$store.state.provide_total_money += thisSelectMoney;
+                            this.provide_statistics_list['user'][userName]['money'] += thisSelectMoney;
+                            this.provide_statistics_list['user'][userName]['group_id'] = groupId;
+                            this.provide_statistics_list['group'][groupName]['money'] += thisSelectMoney;
+                            this.provide_statistics_list['group'][groupName]['group_id'] = groupId;
+                        }
+                        $(row).find('input[type="checkbox"]').prop('checked', true);
+                        $(row).addClass('selected');
+                        break;
+                    case 'unselect':
+                        if ( index !== -1) {
+                            this.rows_selected[this.table_id].splice(index, 1);
+                            this.$store.state.provide_total_money -= thisSelectMoney;
+                            this.provide_statistics_list['user'][userName]['money'] -= thisSelectMoney;
+                            this.provide_statistics_list['user'][userName]['group_id'] = groupId;
+                            this.provide_statistics_list['group'][groupName]['money'] -= thisSelectMoney;
+                            this.provide_statistics_list['group'][groupName]['group_id'] = groupId;
+                        }
+                        $(row).find('input[type="checkbox"]').prop('checked', false);
+                        $(row).removeClass('selected');
+                        break;
+                }
+                
+                if(this.provide_statistics_list['user'][userName]['money'] === 0){
+                    delete this.provide_statistics_list['user'][userName];
+                }
+                if(this.provide_statistics_list['group'][groupName]['money'] === 0 ){
+                    delete this.provide_statistics_list['group'][groupName];
+                }
+            },
+            setStatistics(data){
+                /*default*/
+                if(this.provide_statistics_list['user'] === undefined){
+                    this.provide_statistics_list['user'] = [];
+                }
+                if(this.provide_statistics_list['group'] === undefined){
+                    this.provide_statistics_list['group'] = [];
+                }
+                /*user*/
+                if( this.provide_statistics_list['user'][data.user_name] === undefined){
+                    this.provide_statistics_list['user'][data.user_name] = [];
+                    this.provide_statistics_list['user'][data.user_name]['money'] = 0;
+                    this.provide_statistics_list['user'][data.user_name]['group_id'] = 0;
+                }
+                /*sale group*/
+                let groupName = data.sale_group_name ? data.sale_group_name : data.group_name;
+                if( this.provide_statistics_list['group'][groupName] === undefined){
+                    this.provide_statistics_list['group'][groupName] = [];
+                    this.provide_statistics_list['group'][groupName]['money'] = 0;
+                    this.provide_statistics_list['group'][groupName]['group_id'] = 0;
+                }
+                
             }
         },
         beforeMount: function () {
@@ -102,6 +166,7 @@
             var ex_buttons = this.ex_buttons;
             var type = this.type;
             var vue = this;
+            vue.rows_selected[vue.table_id] = vue.select_id ? vue.select_id : [];
             $(document).ready(function () {
                 let domtable = $('#' + tableId + '');
 
@@ -139,7 +204,10 @@
                     };
 
                 if (type == 'select') {
-
+                    dataTableConfig.order = [1, 'asc'];
+                    
+                    vue.$store.state.provide_total_money = vue.total_money ? vue.total_money : 0;
+                    
                     dataTableConfig.columnDefs = [{
                         'targets': 0,
                         'searchable': false,
@@ -150,23 +218,65 @@
                             return `<input type='checkbox' value='${full.id}'>`;
                         }
                     }];
-                    dataTableConfig.order = [1, 'asc'];
+                    /*獎金發放使用  financial provide list*/
+                    if($.inArray(tableId, ['provide_sale_groups_bonus','provide_bonus']) !== -1){
+                        dataTableConfig.dom = 'Bfrtip';
+                        dataTableConfig.select = true;
+                        dataTableConfig.buttons = [{
+                            text: 'Select',
+                            className: 'btn btn-info',
+                            action: function () {
+                                let domtr = eval(`$('#${vue.table_id}').find('tbody tr')`);
 
-                    // Array holding selected row IDs
-                    var rows_selected = vue.$store.getters.getTableSelect;
-                    rows_selected[vue.table_id] = vue.select_id ? vue.select_id : [];
+                                domtr.each(function(e,v){
+                                    vue.selectToggle($(v),'select');
+                                });
 
-                    vue.$store.state.provide_total_money = vue.total_money ? vue.total_money : 0;
+                            }
+                        },
+                            {
+                                text: 'Unselect',
+                                className: 'btn btn-default',
+                                action: function () {
+                                    let domtr = eval(`$('#${vue.table_id}').find('tbody tr')`);
+
+                                    domtr.each(function(e,v){
+                                        vue.selectToggle($(v),'unselect');
+                                    });
+                                }
+                            }];
+
+                        // Handle click on checkbox
+                        domtable.find('tbody').on('click', 'input[type="checkbox"]', function (e) {
+                            
+                            let row = $(this).closest('tr');
+                            if (this.checked) {
+                                vue.selectToggle(row,'select');
+                            } else {
+                                vue.selectToggle(row,'unselect');
+                            }
+                            // Prevent click event from propagating to parent
+                            e.stopPropagation();
+                        });
+                    }
+                    
                     dataTableConfig.rowCallback = function (row, data, dataIndex) {
                         // Get row ID
                         var rowId = data['id'];
-
+                        
                         // If row ID is in the list of selected row IDs
-                        if ($.inArray(rowId, rows_selected[vue.table_id]) !== -1) {
+                        if ($.inArray(rowId, vue.rows_selected[vue.table_id]) !== -1) {
+                            
                             $(row).find('input[type="checkbox"]').prop('checked', true);
                             $(row).addClass('selected');
                         }
                     };
+
+                    // Handle click on table cells with checkboxes
+                    domtable.on('click', 'tbody td, thead th:first-child', function (e) {
+                        
+                        $(this).parent().find('input[type="checkbox"]').trigger('click');
+                    });
                 }
                 if (ex_buttons) {
                     dataTableConfig.dom = 'Bfrtip';
@@ -184,64 +294,12 @@
                         }];
                     });
                 }
+                
                 vue.dataTable = domtable.DataTable(dataTableConfig);
                 vue.dataTable.clear();
                 vue.dataTable.rows.add(rowData);
                 vue.dataTable.draw();
-                if (type == 'select') {
-
-                    // Handle click on checkbox
-                    domtable.find('tbody').on('click', 'input[type="checkbox"]', function (e) {
-                        var $row = $(this).closest('tr');
-
-                        // Get row data
-                        var data = vue.dataTable.row($row).data();
-
-                        // Get row ID
-                        var rowId = data['id'];
-                        // Determine whether row ID is in the list of selected row IDs
-                        var index = $.inArray(rowId, rows_selected[vue.table_id]);
-                        let thisSelectMoney = $row.find("div[data-money]").data('money');
-                        // If checkbox is checked and row ID is not in list of selected row IDs
-                        if (this.checked && index === -1) {
-                            eval(`rows_selected.${vue.table_id}`).push(rowId);
-                            vue.$store.state.provide_total_money += thisSelectMoney;
-                            // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
-                        } else if (!this.checked && index !== -1) {
-                            eval(`rows_selected.${vue.table_id}`).splice(index, 1);
-                            vue.$store.state.provide_total_money -= thisSelectMoney;
-                        }
-
-                        if (this.checked) {
-                            $row.addClass('selected');
-                        } else {
-                            $row.removeClass('selected');
-                        }
-                        // Prevent click event from propagating to parent
-                        e.stopPropagation();
-                    });
-
-                    // Handle click on table cells with checkboxes
-                    domtable.on('click', 'tbody td, thead th:first-child', function (e) {
-                        $(this).parent().find('input[type="checkbox"]').trigger('click');
-                    });
-                }
-                // });
-                // //chilren row
-                // $('#'+tableId+' tbody').on('click', 'td.details-control', function () {
-                //     var tr = $(this).closest('tr');
-                //     var row = dataTable.row( tr );
-                //
-                //     if ( row.child.isShown() ) {
-                //         // This row is already open - close it
-                //         row.child.hide();
-                //         tr.removeClass('shown');
-                //     }
-                //     else {
-                //         // Open this row
-                //         row.child( format(row.data()) ).show();
-                //         tr.addClass('shown');
-                //     }
+              
             });
         },
         mounted: function () {
@@ -253,16 +311,16 @@
                 immediate: true,    // 这句重要
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'customer_profit_data') {
-                        
+
                         this.updataTable(val);
                     }
                 }
             },
-            customer_groups_profit_data : {
+            customer_groups_profit_data: {
                 immediate: true,    // 这句重要
                 handler(val, oldVal) {
-                    if (oldVal !== undefined && val !== ''  && this.table_id == 'customer_groups_profit_data') {
-                        
+                    if (oldVal !== undefined && val !== '' && this.table_id == 'customer_groups_profit_data') {
+
                         this.updataTable(val);
                     }
                 }
@@ -270,44 +328,44 @@
             medias_profit_data: {
                 immediate: true,    // 这句重要
                 handler(val, oldVal) {
-                    if (oldVal !== undefined && val !== ''  && this.table_id == 'medias_profit_data') {
-                        
+                    if (oldVal !== undefined && val !== '' && this.table_id == 'medias_profit_data') {
+
                         this.updataTable(val);
                     }
                 }
             },
-            media_companies_profit_data : {
+            media_companies_profit_data: {
                 immediate: true,    // 这句重要
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'media_companies_profit_data') {
-                        
+
                         this.updataTable(val);
                     }
                 }
             },
-            group_progress_list:{
+            group_progress_list: {
                 immediate: true,    // 这句重要
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'group_progress_list') {
-                        
+
                         this.updataTable(val);
                     }
                 }
             },
-            progress_list:{
+            progress_list: {
                 immediate: true,    // 这句重要
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'progress_list') {
-                        
+
                         this.updataTable(val);
                     }
                 }
             },
-            bonus_list:{
+            bonus_list: {
                 immediate: true,    // 这句重要
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'bonus_list') {
-                        
+
                         this.updataTable(val);
                     }
                 }
@@ -321,7 +379,7 @@
                     }
                 }
             },
-            provide_groups_list:  {
+            provide_groups_list: {
                 immediate: true,    // 这句重要
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'provide_groups_list') {
@@ -330,7 +388,7 @@
                     }
                 }
             },
-            exchange_rates_list:{
+            exchange_rates_list: {
                 immediate: true,    // 这句重要
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'exchange_rates_list') {
@@ -338,39 +396,6 @@
                     }
                 }
             },
-            // start_date: {
-            //     immediate: true,    // 这句重要
-            //     handler(val, oldVal) {
-            //         if (oldVal !== undefined && val !== '') {
-            //             this.getData();
-            //         }
-            //     }
-            // },
-            // end_date: {
-            //     immediate: true,    // 这句重要
-            //     handler(val, oldVal) {
-            //         if (oldVal !== undefined && val !== '') {
-            //             this.getData();
-            //         }
-            //     }
-            // },
-            // user_ids: {
-            //     immediate: true,    // 这句重要
-            //     handler(val, oldVal) {
-            //         if (oldVal !== undefined && val !== '') {
-            //             this.getData();
-            //         }
-            //     }
-            // },
-            // sale_group_ids: {
-            //     immediate: true,// 这句重要
-            //     // lazy:true,
-            //     handler(val, oldVal) {
-            //         if (oldVal !== undefined && val !== '') {
-            //             this.getData();
-            //         }
-            //     }
-            // },
         }
     }
 </script>

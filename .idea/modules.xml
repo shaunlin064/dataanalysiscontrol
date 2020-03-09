@@ -3,6 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/dataAnalysisControl.iml" filepath="$PROJECT_DIR$/.idea/dataAnalysisControl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../database/.idea/database.iml" filepath="$PROJECT_DIR$/../../database/.idea/database.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../dockerFile/.idea/dockerFile.iml" filepath="$PROJECT_DIR$/../../dockerFile/.idea/dockerFile.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../js_customer/.idea/js_customer.iml" filepath="$PROJECT_DIR$/../js_customer/.idea/js_customer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../media_effect/.idea/media_effect.iml" filepath="$PROJECT_DIR$/../media_effect/.idea/media_effect.iml" />
     </modules>
   </component>
 </project>
