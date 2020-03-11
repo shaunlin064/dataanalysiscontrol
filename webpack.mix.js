@@ -29,3 +29,7 @@ mix.copyDirectory('node_modules/datatables.net-buttons', 'public/plugins/datatab
 mix.copyDirectory('node_modules/datatables.net-buttons-bs4', 'public/plugins/datatables.net-buttons-bs4');
 mix.copyDirectory('node_modules/datatables.net-select-bs4', 'public/plugins/datatables.net-select-bs4');
 mix.copyDirectory('node_modules/@fullcalendar', 'public/plugins/fullcalendar');
+
+
+// img
+mix.copy('storage/app/public/gototop.png', 'public/img/');
