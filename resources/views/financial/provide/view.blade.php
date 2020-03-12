@@ -83,6 +83,36 @@
                 </div>
             </div>
         </div>
+        <div class='row'><div class='col-md-12 col-sm-12 col-xs-12 border-right'>
+                <div class="box box-warning">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">發放統計</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='statistics_char'><i class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                        <!-- /.box-tools -->
+                    </div>
+                    <div class="box-body">
+                        <chart-component
+                            :table_id='"chart_provide_bar"'
+                            :type='"bar"'
+                            :title='"個人統計"'
+                            :labels='[]'
+                            :height='300'
+                            :chart_data='{{ json_encode([ ["data"=>0] ]) }}'
+                        ></chart-component>
+                        <chart-component
+                            :table_id='"chart_provide_pie"'
+                            :type='"pie"'
+                            :title='"團隊統計"'
+                            :labels='[]'
+                            :height='300'
+                            :chart_data='{{ json_encode([ ["data"=>[0]],["data"=>[0] ]  ]) }}'
+                        ></chart-component>
+                    </div>
+                </div>
+            </div></div>
         @if($saleGroups)
             <simple-data-table-componet
                     :table_id='"provide_groups_list"'
@@ -106,6 +136,7 @@
                 :ajax_url = '"/financial/provide/getAjaxProvideData"'
         ></simple-data-table-componet>
     </div>
+
     <!-- /.row -->
 @endsection
 
@@ -113,6 +144,25 @@
 
     <!-- page script -->
     <script>
+        $(document).ready(function () {
+            if(cookie.provide_view === undefined){
+                cookie.provide_view = {};
+            }
+            let boxToggleCookie = cookie.provide_view;
+            $('button[data-ui-contorl]').click(function(){
+                let field = $(this).data('ui-contorl');
+                eval(`boxToggleCookie.${field} = $(this).children('i').hasClass('fa-plus') ? 1 : 0;`);
+                setCookie('ui-contorl',JSON.stringify(cookie));
+            });
 
+            if(boxToggleCookie !== undefined){
+                Object.keys(boxToggleCookie).forEach(key=>{
+                    if(boxToggleCookie[key] === 0){
+                        $('*[data-ui-contorl="'+key+'"]').parents('.box-header.with-border').parent().addClass('collapsed-box');
+                        $('*[data-ui-contorl="'+key+'"]').children('i.fa').removeClass('fa-minus').addClass('fa-plus');
+                    }
+                });
+            }
+        });
     </script>
 @endsection

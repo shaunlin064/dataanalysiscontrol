@@ -57,5 +57,17 @@
         <property name="yearIsDateType" value="false" />
       </driver-properties>
     </data-source>
+    <data-source source="LOCAL" name="worklistDocker" uuid="b3267ed3-9455-4e03-94b8-aaf2c841d83f">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://172.16.1.132:3307</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="worklist" uuid="e040b1e7-89d1-44d8-9fd0-265a4e36568e">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://172.16.1.132:3306</jdbc-url>
+    </data-source>
   </component>
 </project>

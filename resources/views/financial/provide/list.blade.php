@@ -39,19 +39,6 @@
                         <p>總計發放金額</p>
                     </div>
                 </div>
-                {{--<div class="form-group col-xs-8 col-md-5 pull-left">--}}
-                {{--    <label>月份選擇</label>--}}
-                {{--    <date-picker-component :dom_id='"review-datepicker"'></date-picker-component>--}}
-                {{--    <!-- /.input group -->--}}
-                {{--</div>--}}
-                {{--<div class='col-xs-3 col-md-2 pull-right'>--}}
-                {{--    <label></label>--}}
-                {{--    <div class='input-group'>--}}
-                {{--        <a class="btn btn-app">--}}
-                {{--            <i class="fa fa-save"></i>excel匯出--}}
-                {{--        </a>--}}
-                {{--    </div>--}}
-                {{--</div>--}}
             </div>
         </div>
 
@@ -62,7 +49,7 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">發放統計</h3>
                     <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='sale_char'><i class="fa fa-minus"></i>
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='statistics_char'><i class="fa fa-minus"></i>
                         </button>
                     </div>
                     <!-- /.box-tools -->
@@ -71,7 +58,7 @@
                     <chart-component
                         :table_id='"chart_provide_bar"'
                         :type='"bar"'
-                        :title='"個人獎金"'
+                        :title='"個人統計"'
                         :labels='[]'
                         :height='300'
                         :chart_data='{{ json_encode([ ["data"=>0] ]) }}'
@@ -79,7 +66,7 @@
                     <chart-component
                         :table_id='"chart_provide_pie"'
                         :type='"pie"'
-                        :title='"團隊獎金發放統計"'
+                        :title='"團隊統計"'
                         :labels='[]'
                         :height='300'
                         :chart_data='{{ json_encode([ ["data"=>[0]],["data"=>[0] ]  ]) }}'
@@ -129,33 +116,6 @@
                     :domid='"provide_submit"'
                     :post_action_url='"post"'
                     data-step="4" data-intro="最後記得要送出" ></provide-submit>
-            {{--<provide-data-table-component :arg='{--}}
-            {{--"csrf_token" : "{{csrf_token()}}",--}}
-            {{--"paginate_count": {{$paginate->count()}},--}}
-            {{--"paginate" : {--}}
-            {{--    "hasPages" : "{{$paginate->hasPages()}}",--}}
-            {{--    "onFirstPage" : "{{$paginate->onFirstPage()}}",--}}
-            {{--    "previousPageUrl" : "{{$paginate->previousPageUrl()}}",--}}
-            {{--    "currentPage" : "{{$paginate->currentPage()}}",--}}
-            {{--    "hasMorePages" : "{{$paginate->hasMorePages()}}",--}}
-            {{--    "nextPageUrl" : "{{$paginate->nextPageUrl()}}",--}}
-            {{--    "element" : {{ json_encode($paginateElement) }}--}}
-            {{--},--}}
-            {{--"sort" : "{{$sort}}",--}}
-            {{--"sort_by" : "{{$sort_by}}",--}}
-            {{--"show_item" : "{{$paginate->perPage()}}",--}}
-            {{--"search_str" : "{{$search_str}}",--}}
-            {{--"first_item_num" : {{$paginate->firstItem() ?? 0}},--}}
-            {{--"last_item_num" : {{$paginate->lastItem() ?? 0 }},--}}
-            {{--"total_item_num" : {{$paginate->total() ?? 0}},--}}
-            {{--"row" : {{ json_encode($row)}},--}}
-            {{--"users" : {{ json_encode(session('users'))}},--}}
-            {{--"all_ids" : {!!  json_encode($allId)  !!},--}}
-            {{--"select_ids" : {!! json_encode($selectIds) !!},--}}
-            {{--"original_select_financial_id" : {!! json_encode($selectIds) !!},--}}
-            {{--"total_alreday_select_money" : {{ $totalAlredaySelectMoney }}--}}
-            {{--        }'></provide-data-table-component>--}}
-
         </div>
         <!-- Colored raised button -->
     </div>
@@ -167,6 +127,24 @@
     <!-- page script -->
     <script>
         $(document).ready(function () {
+            if(cookie.provide_list === undefined){
+                cookie.provide_list = {};
+            }
+            let boxToggleCookie = cookie.provide_list;
+            $('button[data-ui-contorl]').click(function(){
+                let field = $(this).data('ui-contorl');
+                eval(`boxToggleCookie.${field} = $(this).children('i').hasClass('fa-plus') ? 1 : 0;`);
+                setCookie('ui-contorl',JSON.stringify(cookie));
+            });
+
+            if(boxToggleCookie !== undefined){
+                Object.keys(boxToggleCookie).forEach(key=>{
+                    if(boxToggleCookie[key] === 0){
+                        $('*[data-ui-contorl="'+key+'"]').parents('.box-header.with-border').parent().addClass('collapsed-box');
+                        $('*[data-ui-contorl="'+key+'"]').children('i.fa').removeClass('fa-minus').addClass('fa-plus');
+                    }
+                });
+            }
         });
     </script>
 @endsection

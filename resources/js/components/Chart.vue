@@ -145,7 +145,7 @@
                         vue_this.provide_statistics_list.group = vue_this.provide_statistics_list.group.sort(function (a, b) {
                             return a.group_id < b.group_id ? 1 : -1;
                         });
-                        
+
                         Object.keys(vue_this.provide_statistics_list.user).forEach(key => {
                             let money = vue_this.provide_statistics_list.user[key]['money'];
                             let group_id = vue_this.provide_statistics_list.user[key]['group_id'];
@@ -166,10 +166,10 @@
                             vue_this.chart_obj.data.datasets[0].backgroundColor.push(color);
                             vue_this.chart_obj.data.datasets[1].backgroundColor.push(color);
                         });
-                        
+
                         data.push(userdata);
                         data.push(groupdata);
-                       
+
                         vue_this.chart_obj.data.datasets.map(function (dataset, key) {
                             dataset.data = data[key];
                         });
@@ -281,7 +281,7 @@
             provide_total_money: {
                 immediate: true,
                 handler(val, oldVal) {
-                    if (oldVal !== undefined) {
+                    if (oldVal !== undefined && val !== oldVal) {
                         this.update(this);
                     }
                 }

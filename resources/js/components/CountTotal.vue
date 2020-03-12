@@ -31,7 +31,7 @@
                     provide_total_money:{
                         immediate: true,    // 这句重要
                         handler (val, oldVal) {
-                            if(oldVal !== undefined && val !== oldVal) {
+                            if(oldVal !== undefined) {
                                 this.total = this.provide_total_money;
                             }
                         }

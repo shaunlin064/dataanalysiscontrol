@@ -4,7 +4,7 @@
 
 <script>
     import {mapState, mapMutations, mapActions, mapGetters} from 'vuex';
-    
+
     export default {
         name: "FinancialProvideAjaxCenter",
         props: {
@@ -44,10 +44,10 @@
                 axios.post(this.ajax_url, data).then(
                     response => {
                         this.$store.state.loading = false;
-                        
+
                         let bonus_total_money = parseInt(0);
                         let sale_group_total_money = parseInt(0);
-                        
+
                         if (response.data) {
 
                             response.data.provide_bonus_list.map(function (v) {
@@ -57,12 +57,12 @@
                             response.data.provide_groups_list.map(function (v) {
                                 sale_group_total_money += parseInt(v.provide_money);
                             });
-                            
+
                             this.$store.state.bonus_total_money = bonus_total_money;
                             this.$store.state.sale_group_total_money = sale_group_total_money;
                             this.$store.state.provide_bonus_list =  response.data.provide_bonus_list;
                             this.$store.state.provide_groups_list =  response.data.provide_groups_list;
-                            
+
                         }
                     },
                     err => {

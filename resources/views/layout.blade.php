@@ -69,7 +69,6 @@
 <script type="text/javascript">
 
     var cookie = JSON.parse(getCookie('ui-contorl') ? getCookie('ui-contorl') : '{}');
-
     $(document).on('click','.sidebar-toggle',function(){
         cookie.sidebar = $('body').hasClass('sidebar-collapse') ? 0 : 1;
         setCookie('ui-contorl',JSON.stringify(cookie));
