@@ -82,7 +82,7 @@
     <div class='row'>
         <div class='col-md-12'>
         <simple-data-table-componet
-                :table_id='"provide_sale_groups_bonus"'
+                :table_id='"provide_groups_list"'
                 :table_head='"招集人獎金"'
                 :table_title='["","月份","業務","團隊名稱","團隊毛利","比例","獎金"]'
                 :row = '{{ json_encode($saleGroupsReach) }}'
@@ -99,7 +99,7 @@
         <div class='col-md-12' >
             <p data-step="3" data-intro="個人獎金 每次系統都會自動勾選可發獎金人員,條件為目前所有該員獎金加總會正數,注意搜索並不會取消已勾選人員"></p>
             <simple-data-table-componet
-                    :table_id='"provide_bonus"'
+                    :table_id='"provide_bonus_list"'
                     :table_head='"個人獎金"'
                     :table_title='["","月份","業務","團隊名稱","案件名稱","媒體","類型","毛利","比例","獎金"]'
                     :row = '{{ json_encode($bonuslist) }}'

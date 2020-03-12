@@ -16,7 +16,7 @@
             }
         },
         computed: {
-            ...mapState(['start_date', 'end_date', 'user_ids', 'sale_group_ids', 'loading']),
+            ...mapState(['start_date', 'end_date', 'user_ids', 'sale_group_ids', 'loading','bonus_total_money','sale_group_total_money','provide_bonus_list','provide_groups_list','provide_total_money','provide_statistics_list']),
         },
         methods: {
             tableClear: function () {
@@ -58,11 +58,18 @@
                                 sale_group_total_money += parseInt(v.provide_money);
                             });
 
-                            this.$store.state.bonus_total_money = bonus_total_money;
-                            this.$store.state.sale_group_total_money = sale_group_total_money;
-                            this.$store.state.provide_bonus_list =  response.data.provide_bonus_list;
-                            this.$store.state.provide_groups_list =  response.data.provide_groups_list;
-
+                            if(this.$store.state.bonus_total_money !== bonus_total_money ||
+                            this.$store.state.sale_group_total_money !== sale_group_total_money ||
+                            this.$store.state.provide_bonus_list.length !==  response.data.provide_bonus_list.length ||
+                            this.$store.state.provide_groups_list.length !==  response.data.provide_groups_list.length){
+                                this.$store.state.provide_statistics_list['user'] = [];
+                                this.$store.state.provide_statistics_list['group'] = [];
+                                this.$store.state.provide_total_money = 0;
+                                this.$store.state.bonus_total_money = bonus_total_money;
+                                this.$store.state.sale_group_total_money = sale_group_total_money;
+                                this.$store.state.provide_bonus_list =  response.data.provide_bonus_list;
+                                this.$store.state.provide_groups_list =  response.data.provide_groups_list;
+                            }
                         }
                     },
                     err => {

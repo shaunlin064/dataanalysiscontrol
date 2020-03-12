@@ -84,9 +84,7 @@
                         // $(`#${vue.table_id} tbody`).find('tr').each(function (e, v) {
                         //     vue.selectToggle($(v), 'select');
                         // });
-                        vue.provide_statistics_list['user'] = [];
-                        vue.provide_statistics_list['group'] = [];
-                        vue.$store.state.provide_total_money = 0;
+
                         vue.dataTable.rows().data().each(function(v,e){
                             let thisSelectMoney = v.provide_money;
                             let groupName = v.sale_group_name ? v.sale_group_name : v.group_name;
@@ -99,13 +97,14 @@
                             vue.provide_statistics_list['user'][userName]['group_id'] = groupId;
                             vue.provide_statistics_list['group'][groupName]['money'] += thisSelectMoney;
                             vue.provide_statistics_list['group'][groupName]['group_id'] = groupId;
-                            vue.$store.state.provide_total_money += thisSelectMoney;
+
                             if (vue.provide_statistics_list['user'][userName]['money'] === 0) {
                                 delete vue.provide_statistics_list['user'][userName];
                             }
                             if (vue.provide_statistics_list['group'][groupName]['money'] === 0) {
                                 delete vue.provide_statistics_list['group'][groupName];
                             }
+                            vue.$store.state.provide_total_money += thisSelectMoney;
                         });
                     }
                 }
@@ -259,7 +258,7 @@
                         }
                     }];
                     /*獎金發放使用  financial provide list*/
-                    if ($.inArray(tableId, ['provide_sale_groups_bonus', 'provide_bonus']) !== -1) {
+                    if ($.inArray(tableId, ['provide_groups_list', 'provide_bonus_list']) !== -1) {
                         dataTableConfig.dom = 'Bfrtip';
                         dataTableConfig.select = true;
                         dataTableConfig.buttons = [{

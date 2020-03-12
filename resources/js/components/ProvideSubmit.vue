@@ -29,8 +29,8 @@
                 //添加参数
                 let paramters = {
                     '_token' : this.csrf,
-                    'provide_bonus' : this.$store.state.table_select.provide_bonus,
-                    'provide_sale_groups_bonus' : this.$store.state.table_select.provide_sale_groups_bonus,
+                    'provide_bonus' : this.$store.state.table_select.provide_bonus_list,
+                    'provide_sale_groups_bonus' : this.$store.state.table_select.provide_groups_list,
                 };
                 // paramters.map(function(v){
                 //     console.log(v);
@@ -41,17 +41,17 @@
                     opt.value = paramters[key];
                     temp_form.appendChild(opt);
                 });
-                
+
                 document.body.appendChild(temp_form);
                 // //提交数据
                 temp_form.submit();
             },
         },
         mounted: function(){
-        
+
         },
         watch:{
-        
+
         }
     }
 </script>
