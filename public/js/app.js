@@ -2638,6 +2638,37 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         });
 
         if (vue_this.table_id == 'chart_provide_pie') {
+          var getSort = function getSort(datas) {
+            var v1 = {};
+            var v2 = datas;
+            var useKey = 'group_id';
+            Object.keys(v2).forEach(function (key) {
+              var keyValue = v2[key][useKey];
+
+              if (v1[keyValue] === undefined) {
+                v1[keyValue] = [];
+              }
+
+              if (v1[keyValue][key] === undefined) {
+                v1[keyValue][key] = [];
+              }
+
+              v1[keyValue][key].push(v2[key]);
+            }, useKey);
+            var v3 = [];
+            Object.keys(v1).forEach(function (key) {
+              var items = v1[key];
+              Object.keys(items).forEach(function (key) {
+                if (v3[key] === undefined) {
+                  v3[key] = [];
+                }
+
+                v3[key] = items[key][0];
+              });
+            });
+            return v3;
+          };
+
           var data = [];
           var userdata = [];
           var groupdata = [];
@@ -2645,14 +2676,25 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           vue_this.chart_obj.data.datasets[0].backgroundColor = [];
           vue_this.chart_obj.data.datasets[1].backgroundColor = [];
           vue_this.provide_statistics_list.user = vue_this.provide_statistics_list.user.sort(function (a, b) {
-            return a.group_id < b.group_id ? 1 : -1;
+            if (a.group_id < b.group_id) {
+              return 1;
+            }
+
+            if (a.group_id > b.group_id) {
+              return -1;
+            }
+
+            return 0;
           });
           vue_this.provide_statistics_list.group = vue_this.provide_statistics_list.group.sort(function (a, b) {
             return a.group_id < b.group_id ? 1 : -1;
           });
+          vue_this.provide_statistics_list.user = getSort(vue_this.provide_statistics_list.user); // console.log( vue_this.provide_statistics_list.user);
+
           Object.keys(vue_this.provide_statistics_list.user).forEach(function (key) {
             var money = vue_this.provide_statistics_list.user[key]['money'];
-            var group_id = vue_this.provide_statistics_list.user[key]['group_id'];
+            var group_id = vue_this.provide_statistics_list.user[key]['group_id']; // let label = vue_this.provide_statistics_list.user[key]['name'];
+
             var color = vue_this.group_id_color[group_id];
             userdata.push(money);
             vue_this.chart_obj.data.datasets[0].backgroundColor.push(color);
@@ -2660,6 +2702,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             groupdata.push(0);
             vue_this.chart_obj.data.labels.push(key);
           });
+          vue_this.provide_statistics_list.group = getSort(vue_this.provide_statistics_list.group);
           Object.keys(vue_this.provide_statistics_list.group).forEach(function (key) {
             var money = vue_this.provide_statistics_list.group[key]['money'];
             var group_id = vue_this.provide_statistics_list.group[key]['group_id'];

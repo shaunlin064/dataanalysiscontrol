@@ -140,15 +140,53 @@
                         vue_this.chart_obj.data.datasets[1].backgroundColor=[];
 
                         vue_this.provide_statistics_list.user = vue_this.provide_statistics_list.user.sort(function (a, b) {
-                            return a.group_id < b.group_id ? 1 : -1;
+                            if(a.group_id < b.group_id){
+                                return 1;
+                            }
+                            if(a.group_id > b.group_id){
+                                return -1;
+                            }
+                            return 0;
                         });
                         vue_this.provide_statistics_list.group = vue_this.provide_statistics_list.group.sort(function (a, b) {
                             return a.group_id < b.group_id ? 1 : -1;
                         });
 
+                        function getSort(datas){
+                            let v1 = {};
+                            let v2 = datas;
+                            let useKey = 'group_id';
+                            Object.keys(v2).forEach( key => {
+                                let keyValue = v2[key][useKey];
+                                if(v1[keyValue] === undefined){
+                                    v1[keyValue] = [];
+                                }
+                                if(v1[keyValue][key] === undefined){
+                                    v1[keyValue][key] = [];
+                                }
+                                v1[keyValue][key].push(v2[key]);
+                            },useKey);
+
+                            let v3 = [];
+                            Object.keys(v1).forEach(key=>{
+                                let items = v1[key];
+                                Object.keys(items).forEach( key => {
+                                    if(v3[key] === undefined){
+                                        v3[key] = [];
+                                    }
+                                    v3[key] = items[key][0];
+                                });
+                            });
+                            return v3;
+                        }
+
+
+                        vue_this.provide_statistics_list.user = getSort(vue_this.provide_statistics_list.user);
+                        // console.log( vue_this.provide_statistics_list.user);
                         Object.keys(vue_this.provide_statistics_list.user).forEach(key => {
                             let money = vue_this.provide_statistics_list.user[key]['money'];
                             let group_id = vue_this.provide_statistics_list.user[key]['group_id'];
+                            // let label = vue_this.provide_statistics_list.user[key]['name'];
                             let color = vue_this.group_id_color[group_id];
                             userdata.push(money);
                             vue_this.chart_obj.data.datasets[0].backgroundColor.push(color);
@@ -156,6 +194,8 @@
                             groupdata.push(0);
                             vue_this.chart_obj.data.labels.push(key);
                         });
+
+                        vue_this.provide_statistics_list.group = getSort(vue_this.provide_statistics_list.group);
                         Object.keys(vue_this.provide_statistics_list.group).forEach(key => {
                             let money = vue_this.provide_statistics_list.group[key]['money'];
                             let group_id = vue_this.provide_statistics_list.group[key]['group_id'];
