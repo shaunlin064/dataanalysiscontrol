@@ -1,6 +1,6 @@
 /node_modules
 /public/css
-/public/js/app.js
+public/js/app.js
 /public/storage
 /public/js/helper.js
 /public/plugins/*
