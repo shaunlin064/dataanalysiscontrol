@@ -23,7 +23,8 @@
     "pda/pheanstalk": "~4.0",
     "phpoffice/phpexcel": "^1.8",
     "predis/predis": "~1.0",
-    "se/selenium-server-standalone": "^3.12"
+    "se/selenium-server-standalone": "^3.12",
+    "ext-json": "*"
   },
   "require-dev": {
     "beyondcode/laravel-dump-server": "^1.0",

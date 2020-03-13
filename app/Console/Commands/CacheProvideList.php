@@ -51,8 +51,7 @@ class CacheProvideList extends Command
         $request = new Request(['startDate' => $dateStart,'endDate'=>$dateEnd,'saleGroupIds' => $saleGroupsIds,'userIds'=>[]]);
         $provideObj = new ProvideController();
 
-
-        $provideObj->getAjaxProvideData($request);
+        $provideObj->getAjaxProvideData($request,'return');
 
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
