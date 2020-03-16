@@ -89,7 +89,7 @@
                         vue.dataTable.rows().data().each(function(v,e){
                             let thisSelectMoney = v.provide_money;
                             let groupName = v.sale_group_name ? v.sale_group_name : v.group_name;
-                            let groupId = v.sale_groups_id ? v.sale_groups_id : v.sale_groups.sale_groups_id;
+                            let groupId = v.sale_groups_id !== undefined ? v.sale_groups_id : v.sale_groups.sale_groups_id;
                             let userName = v.user_name ? v.user_name : '';
                             vue.setStatistics(v);
 
@@ -124,7 +124,7 @@
                     let index = $.inArray(rowId, this.rows_selected[this.table_id]);
                     let thisSelectMoney = data.provide_money;
                     let groupName = data.sale_group_name ? data.sale_group_name : data.group_name;
-                    let groupId = data.sale_groups_id ? data.sale_groups_id : data.sale_groups.sale_groups_id;
+                    let groupId = data.sale_groups_id !== undefined ? data.sale_groups_id : data.sale_groups.sale_groups_id;
                     let userName = data.user_name ? data.user_name : '';
                     this.setStatistics(data);
 
