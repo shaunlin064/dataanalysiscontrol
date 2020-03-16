@@ -86,9 +86,9 @@
         <div class='row'><div class='col-md-12 col-sm-12 col-xs-12 border-right'>
                 <div class="box box-warning">
                     <div class="box-header with-border">
-                        <h3 class="box-title">發放統計</h3>
+                        <h3 class="box-title">個人統計</h3>
                         <div class="box-tools pull-right">
-                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='statistics_char'><i class="fa fa-minus"></i>
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='statistics_char_person'><i class="fa fa-minus"></i>
                             </button>
                         </div>
                         <!-- /.box-tools -->
@@ -97,15 +97,48 @@
                         <chart-component
                             :table_id='"chart_provide_bar"'
                             :type='"bar"'
-                            :title='"個人統計"'
+                            :title='"個人"'
                             :labels='[]'
                             :height='300'
-                            :chart_data='{{ json_encode([ ["data"=>0] ]) }}'
+                            :chart_data='{{ json_encode([ ["data"=>[0,0]] ]) }}'
                         ></chart-component>
+                    </div>
+                </div>
+            </div></div>
+        <div class='row'><div class='col-md-12 col-sm-12 col-xs-12 border-right'>
+                <div class="box box-warning">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">月份統計</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='statistics_char_stack'><i class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                        <!-- /.box-tools -->
+                    </div>
+                    <div class="box-body">
+                        <provide-chart-stack
+                            :table_id='"chart_stack_bar"'
+                            :title='"月份"'
+                            :height='500'>
+                        </provide-chart-stack>
+                    </div>
+                </div>
+            </div></div>
+        <div class='row'><div class='col-md-12 col-sm-12 col-xs-12 border-right'>
+                <div class="box box-warning">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">團隊統計</h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='statistics_char_group'><i class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                        <!-- /.box-tools -->
+                    </div>
+                    <div class="box-body">
                         <chart-component
                             :table_id='"chart_provide_pie"'
                             :type='"pie"'
-                            :title='"團隊統計"'
+                            :title='"團隊"'
                             :labels='[]'
                             :height='300'
                             :chart_data='{{ json_encode([ ["data"=>[0]],["data"=>[0] ]  ]) }}'

@@ -53,7 +53,8 @@
             length_change: String,
             page_length: Number,
             select_id: Array,
-            total_money: Number
+            total_money: Number,
+            all_user_name : Object,
         },
         data() {
             return {
@@ -63,7 +64,7 @@
         },
         computed: {
             // ...mapGetters(['getTableSelect','getUserIds','getSaleGroupIds','getStartDate','getEndDate']),
-            ...mapState(['provide_money', 'loading', 'customer_profit_data', 'customer_groups_profit_data', 'medias_profit_data', 'media_companies_profit_data', 'group_progress_list', 'progress_list', 'bonus_list', 'provide_bonus_list', 'provide_groups_list', 'start_date', 'end_date', 'exchange_rates_list', 'currency', 'table_select', 'provide_statistics_list']),
+            ...mapState(['provide_money', 'loading', 'customer_profit_data', 'customer_groups_profit_data', 'medias_profit_data', 'media_companies_profit_data', 'group_progress_list', 'progress_list', 'bonus_list', 'provide_bonus_list', 'provide_groups_list', 'start_date', 'end_date', 'exchange_rates_list', 'currency', 'table_select', 'provide_statistics_list','provide_char_bar_stack']),
         },
         methods: {
             tableClear() {
@@ -90,7 +91,6 @@
                             let groupName = v.sale_group_name ? v.sale_group_name : v.group_name;
                             let groupId = v.sale_groups_id ? v.sale_groups_id : v.sale_groups.sale_groups_id;
                             let userName = v.user_name ? v.user_name : '';
-
                             vue.setStatistics(v);
 
                             vue.provide_statistics_list['user'][userName]['money'] += thisSelectMoney;
@@ -117,6 +117,7 @@
                 let vue = this;
                 // Get row data
                 let data = this.dataTable.row(row).data();
+
                 if (data !== undefined) {
                     let rowId = data.id;
                     // let rows_selected = this.$store.getters.getTableSelect;
@@ -136,6 +137,8 @@
                                 this.provide_statistics_list['user'][userName]['group_id'] = groupId;
                                 this.provide_statistics_list['group'][groupName]['money'] += thisSelectMoney;
                                 this.provide_statistics_list['group'][groupName]['group_id'] = groupId;
+                                this.provide_char_bar_stack[data.set_date][data.user_name]['provide_money'] += thisSelectMoney;
+                                // eval(`this.provide_char_bar_stack.${data.set_date}.${data.user_name} += ${thisSelectMoney}`);
                             }
                             if (vue.type === 'select') {
                                 $(row).find('input[type="checkbox"]').prop('checked', true);
@@ -151,6 +154,8 @@
                                 this.provide_statistics_list['user'][userName]['group_id'] = groupId;
                                 this.provide_statistics_list['group'][groupName]['money'] -= thisSelectMoney;
                                 this.provide_statistics_list['group'][groupName]['group_id'] = groupId;
+                                this.provide_char_bar_stack[data.set_date][data.user_name]['provide_money'] -= thisSelectMoney;
+                                // eval(`this.provide_char_bar_stack.${data.set_date}.${data.user_name} -= ${thisSelectMoney}`);
                             }
                             if (vue.type === 'select') {
                                 $(row).find('input[type="checkbox"]').prop('checked', false);
@@ -165,6 +170,11 @@
                     if (this.provide_statistics_list['group'][groupName]['money'] === 0) {
                         delete this.provide_statistics_list['group'][groupName];
                     }
+
+                    // if(this.$store.state.provide_char_bar_stack[data.set_date][data.user_name]['provide_money'] ===0){
+                    //     delete this.$store.state.provide_char_bar_stack[data.set_date][data.user_name];
+                    // }
+
                 }
 
             },
@@ -189,6 +199,35 @@
                     this.provide_statistics_list['group'][groupName]['money'] = 0;
                     this.provide_statistics_list['group'][groupName]['group_id'] = 0;
                 }
+
+
+                /*區分獎金檢視與獎金發放 */
+                let separateDate = data.provide_set_date !== undefined ? data.provide_set_date : data.set_date;
+                if(this.provide_char_bar_stack[separateDate] === undefined ){
+                    this.provide_char_bar_stack[separateDate] = {};
+                }
+                if(this.all_user_name !== undefined){
+                    let allName = this.all_user_name;
+                    let vue = this;
+                    Object.keys(allName).forEach( k =>{
+                        if(vue.provide_char_bar_stack[separateDate][k] === undefined){
+                            vue.provide_char_bar_stack[separateDate][k] = {};
+                            vue.provide_char_bar_stack[separateDate][k]['provide_money'] = 0;
+                            vue.provide_char_bar_stack[separateDate][k]['erp_user_id'] = allName[k];
+                        }
+                    },vue,separateDate);
+                }
+                if( this.provide_char_bar_stack[separateDate][data.user_name] === undefined){
+                    this.provide_char_bar_stack[separateDate][data.user_name] = {};
+                    this.provide_char_bar_stack[separateDate][data.user_name]['provide_money'] = 0;
+                }
+                this.provide_char_bar_stack[separateDate][data.user_name]['erp_user_id'] = data.user !== undefined ? data.user.erp_user_id : data.sale_user.erp_user_id;
+                // if(eval(`this.provide_char_bar_stack.${data.set_date} === undefined`) ){
+                //     eval(`this.provide_char_bar_stack.${data.set_date} = {}`);
+                //     if(eval(`this.provide_char_bar_stack.${data.set_date}.${data.user_name} === undefined`)){
+                //         eval(`this.provide_char_bar_stack.${data.set_date}.${data.user_name} = 0`);
+                //     }
+                // }
 
             }
         },

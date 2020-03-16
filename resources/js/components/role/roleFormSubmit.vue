@@ -36,7 +36,6 @@
                     'label':$('input[name="label"]').val()
                 };
                 // paramters.map(function(v){
-                //     console.log(v);
                 // });
                 Object.keys(paramters).forEach(function(key) {
                     var opt = document.createElement("textarea");
@@ -58,7 +57,6 @@
             //     handler (val, oldVal) {
             //         if(oldVal !== undefined) {
             //
-            //             console.log(val,oldVal);
             //         }
             //     }
             // }

@@ -119,6 +119,13 @@
             //		$autoSelectIds = $this->getProvideBalanceSelectedId($bonuslist);
             //		$total_mondey = $bonuslist->whereIn('id',$autoSelectIds)->sum('provide_money');
 
+            $allUserName = collect(array_merge($bonuslist->toArray(),$saleGroupsReach))->pluck('erp_user_id','user_name')->map(function($v,$k){
+                if(empty($v)){
+                    $v = User::where('name',$k)->first()->erp_user_id;
+                }
+                return $v;
+            });
+
             return view('financial.provide.list',
                 [
                     'data' => $this->resources,
@@ -126,6 +133,7 @@
                     'saleGroupsTableColumns' => $saleGroupsTableColumns,
                     'bonuslistColumns' => $bonuslistColumns,
                     'bonuslist' => $bonuslist,
+                    'allUserName' =>  $allUserName,
                     'autoSelectIds' => [],
                     'total_mondey' => 0,
                 ]);
@@ -146,12 +154,13 @@
             $date = new DateTime(date('Ym01'));
             $erpUserId = Auth::user()->erp_user_id;
             //
-            //		$provideStart = '2020-03-01';
-            //		$provideEnd = '2020-03-01';
-            //		$saleGroupIds =[1,2,3,4];
-            //		$userIds = [];
-            //		$request = new Request(['startDate'=>$provideStart,'endDate'=>$provideEnd,'saleGroupIds'=>$saleGroupIds,'userIds'=>$userIds]);
-            //		dd($this->getAjaxProvideData($request));
+//            $provideStart = '2020-03-01';
+//            $provideEnd = '2020-03-01';
+//            $saleGroupIds = [1, 2, 3, 4];
+//            $userIds = [];
+//            $request = new Request(['startDate' => $provideStart, 'endDate' => $provideEnd, 'saleGroupIds' => $saleGroupIds, 'userIds' => $userIds]);
+//            $datas = $this->getAjaxProvideData($request, 'return');
+//            dd($datas['provide_char_bar_stack']);
 
             list($saleGroups, $userList) = $this->getDataList($erpUserId, $date);
 
@@ -366,6 +375,7 @@
                     $cacheTime = 1;//hr
                     $dateDistance = ($dateNow->getTimestamp() - $date2->getTimestamp()) / (60 * 60 * 24) / 365;
 
+
                     if ($dateDistance > 0.1) { // over 1 month
                         Cache::store('memcached')->forever($this->cacheKeyFinancial . $date, ['saleGroupRowData' => $saleGroupRowData, 'bonusRowData' => $bonusRowData]);
                     } else { // close one month
@@ -382,9 +392,45 @@
                 $bonusRowData = $bonusRowData->concat($v['bonusRowData']);
             });
 
+            /*get provide Bar TrimData*/
+            $allName = Bonus::all()->pluck('erp_user_id')->unique()->values();
+
+//            $allName = $saleGroupRowData->groupBy('user_name')->map(function($v,$k){
+//                return ['provide_money' => 0,'erp_user_id'=> $v->max('sale_user.erp_user_id'),'groupId' => $v->max('sale_groups.sale_groups_id')?? 0];
+//            })->sortBy('erp_user_id');
+//            $allName = $bonusRowData->groupBy('user_name')->map(function($v,$k){
+//                return ['provide_money' => 0,'erp_user_id'=> $v->max('user.erp_user_id'),'groupId' => $v->max('sale_groups.sale_groups_id')?? 0];
+//            })->sortBy('erp_user_id')->merge($allName);
+
+
+            $provideCharBarStack = $bonusRowData->groupBy('provide_set_date')->map(function ($v, $k) {
+                $results = $v->groupBy('user_name')->map(function ($v, $k) {
+                    return ['provide_money' => $v->sum('provide_money'),'erp_user_id'=> $v->max('user.erp_user_id')];
+                });
+                return $results;
+            })->map(function($items,$k) use($allName){
+
+                $allName->each(function($v,$k) use(&$items){
+                    if(count($items->whereIn('erp_user_id',$v)) == 0){
+                        $name = ucfirst(User::where('erp_user_id',$v)->first()->name);
+                        $items[$name] = ['provide_money' => 0,'erp_user_id'=> $v];
+                    }
+                });
+                return $items->sortByDesc('erp_user_id');
+            })->toArray();
+
+            $saleGroupRowData->each(function($v,$k) use( &$provideCharBarStack ){
+                $provideCharBarStack[$v->provide_set_date][$v->user_name]['provide_money'] += $v->provide_money;
+            });
+
+            $provideCharBarStack = collect($provideCharBarStack)->map(function($v,$k) use($userIds){
+                return collect($v)->whereIn('erp_user_id', $userIds);
+            });
+
             $returnData = [
                 "provide_groups_list" => $saleGroupRowData->whereIn('erp_user_id', $userIds)->values()->toArray(),
-                "provide_bonus_list" => $bonusRowData->whereIn('erp_user_id', $userIds)->values()->toArray()
+                "provide_bonus_list" => $bonusRowData->whereIn('erp_user_id', $userIds)->values()->toArray(),
+                "provide_char_bar_stack" => $provideCharBarStack->toArray(),
             ];
 
             if ($outType == 'echo') {

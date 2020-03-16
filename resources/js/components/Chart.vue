@@ -1,5 +1,5 @@
 <template>
-    <div class="box box-info" id="canvas-holder" :style="{
+    <div class="box box-info" :id="'canvas-holder-'+table_id" :style="{
             'height': `${height ? height : 'auto'}px`
      }">
         <canvas :id=table_id></canvas>
@@ -83,7 +83,15 @@
                             text: this.title
                         },
                         scales: {
+                            xAxes: [{
+                                stacked: true,
+                                display: true,
+                                ticks: {
+                                    beginAtZero: true,
+                                }
+                            }],
                             yAxes: [{
+                                stacked: true,
                                 display: true,
                                 ticks: {
                                     beginAtZero: true,
@@ -212,7 +220,9 @@
 
                         vue_this.chart_obj.data.datasets.map(function (dataset, key) {
                             dataset.data = data[key];
+
                         });
+
                     }
                 } else if (vue_this.type == 'bar') {
                     if (vue_this.table_id == 'chart_financial_bar_last_record') {

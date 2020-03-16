@@ -76,7 +76,7 @@ Vue.component('chart-component', require('./components/Chart').default);
 Vue.component('chart-customer-precentage-profit', require('./components/CustomerPrecentagePie').default);
 Vue.component('chart-customer-profit-bar', require('./components/CustomerProfitBar').default);
 Vue.component('chart-all-year-profit-line', require('./components/AllYearProfit').default);
-
+Vue.component('provide-chart-stack', require('./components/ProvideChartStack').default);
 // exchangeRate
 Vue.component('exchange-ajax', require('./components/ExchangeAjax').default);
 Vue.component('exchange-chart-line', require('./components/ExchangeChartLine').default);

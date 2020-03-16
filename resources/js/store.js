@@ -53,6 +53,7 @@ export default {
         currency:'',
         exchange_rates_list:[],
         chart_exchange_line:[],
+        provide_char_bar_stack:{},
     },
     getters:{
         getTableSelect(state){

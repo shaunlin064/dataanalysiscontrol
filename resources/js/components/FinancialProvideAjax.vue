@@ -16,7 +16,7 @@
             }
         },
         computed: {
-            ...mapState(['start_date', 'end_date', 'user_ids', 'sale_group_ids', 'loading','bonus_total_money','sale_group_total_money','provide_bonus_list','provide_groups_list','provide_total_money','provide_statistics_list']),
+            ...mapState(['start_date', 'end_date', 'user_ids', 'sale_group_ids', 'loading','bonus_total_money','sale_group_total_money','provide_bonus_list','provide_groups_list','provide_total_money','provide_statistics_list','provide_char_bar_stack']),
         },
         methods: {
             tableClear: function () {
@@ -57,11 +57,10 @@
                             response.data.provide_groups_list.map(function (v) {
                                 sale_group_total_money += parseInt(v.provide_money);
                             });
-
-                            if(this.$store.state.bonus_total_money !== bonus_total_money ||
-                            this.$store.state.sale_group_total_money !== sale_group_total_money ||
-                            this.$store.state.provide_bonus_list.length !==  response.data.provide_bonus_list.length ||
-                            this.$store.state.provide_groups_list.length !==  response.data.provide_groups_list.length){
+                            // if(this.$store.state.bonus_total_money !== bonus_total_money ||
+                            // this.$store.state.sale_group_total_money !== sale_group_total_money ||
+                            // this.$store.state.provide_bonus_list.length !==  response.data.provide_bonus_list.length ||
+                            // this.$store.state.provide_groups_list.length !==  response.data.provide_groups_list.length){
                                 this.$store.state.provide_statistics_list['user'] = [];
                                 this.$store.state.provide_statistics_list['group'] = [];
                                 this.$store.state.provide_total_money = 0;
@@ -69,8 +68,9 @@
                                 this.$store.state.sale_group_total_money = sale_group_total_money;
                                 this.$store.state.provide_bonus_list =  response.data.provide_bonus_list;
                                 this.$store.state.provide_groups_list =  response.data.provide_groups_list;
+                                this.$store.state.provide_char_bar_stack = response.data.provide_char_bar_stack;
                             }
-                        }
+                        // }
                     },
                     err => {
 
@@ -85,7 +85,7 @@
             start_date: {
                 immediate: true,    // 这句重要
                 handler(val, oldVal) {
-                    if (oldVal !== undefined && val !== '') {
+                    if (oldVal !== undefined && val !== undefined) {
                         this.getData();
                     }
                 }
@@ -93,7 +93,7 @@
             end_date: {
                 immediate: true,    // 这句重要
                 handler(val, oldVal) {
-                    if (oldVal !== undefined && val !== '') {
+                    if (oldVal !== undefined && val !== undefined) {
                         this.getData();
                     }
                 }
@@ -101,7 +101,7 @@
             user_ids: {
                 immediate: true,    // 这句重要
                 handler(val, oldVal) {
-                    if (oldVal !== undefined && val !== '') {
+                    if (oldVal !== undefined && val !== undefined) {
                         this.getData();
                     }
                 }
@@ -110,7 +110,7 @@
                 immediate: true,// 这句重要
                 // lazy:true,
                 handler(val, oldVal) {
-                    if (oldVal !== undefined && val !== '') {
+                    if (oldVal !== undefined && val !== undefined) {
                         this.getData();
                     }
                 }

@@ -40,7 +40,7 @@
 
 <script>
     import {mapState, mapMutations, mapActions, mapGetters} from 'vuex';
-    
+
     export default {
         name: "permissionsClassDataTable",
         props: {
@@ -112,7 +112,6 @@
                     }
                 }).then(
                     (res)=>{
-                        console.log(res.data);
                         this.updateVuex(res);
                         this.renderDatatable();
                     }
