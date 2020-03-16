@@ -1,16 +1,17 @@
 <?php
-	/**
-	 * Created by PhpStorm.
-	 * User: shaun
-	 * Date: 2019-06-19
-	 * Time: 12:24
-	 */
+    /**
+     * Created by PhpStorm.
+     * User: shaun
+     * Date: 2019-06-19
+     * Time: 12:24
+     */
 
-//	width: 100px;
-//    display: inline-block;
-//    white-space: nowrap;
-//    overflow: hidden;
-//    text-overflow: ellipsis;
+
+    //	width: 100px;
+    //    display: inline-block;
+    //    white-space: nowrap;
+    //    overflow: hidden;
+    //    text-overflow: ellipsis;
 ?>
 
 @extends('layout')
@@ -39,11 +40,12 @@
                 <!-- small box -->
                 <div class="form-group col-md-6 col-sm-6 col-xs-12" data-step="1" data-intro="快速選擇月份區間">
                     <label>快速查詢:</label>
-                   <select-button-group></select-button-group>
+                    <select-button-group></select-button-group>
                     <load-item></load-item>
                 </div>
                 <div class="form-group col-md-6 col-sm-6 pull-left" data-step="2" data-intro="條件1:自訂時間">
-                    <date-range :dom_id='"review_date_ranger"' :input_start_date='"{{date('Y-m-01')}}"' :input_end_date='"{{date('Y-m-01')}}"'></date-range>
+                    <date-range :dom_id='"review_date_ranger"' :input_start_date='"{{date('Y-m-01')}}"'
+                                :input_end_date='"{{date('Y-m-01')}}"'></date-range>
                 </div>
             </div>
 
@@ -92,7 +94,8 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">資料篩選</h3>
                     <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='data_filter'><i
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"
+                                data-ui-contorl='data_filter'><i
                                 class="fa fa-minus"></i>
                         </button>
                     </div>
@@ -151,33 +154,39 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">比較圖表</h3>
                     <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='compare_char'><i
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"
+                                data-ui-contorl='compare_char'><i
                                 class="fa fa-minus"></i>
                         </button>
                     </div>
                     <!-- /.box-tools -->
                 </div>
                 <div class="box-body">
-                        <chart-component
-                            :table_id='"chart_financial_bar2"'
-                            :type='"bar"'
-                            :title='"選擇年度"'
-                            :ajax_url='"/bonus/review/getAjaxData"'
-                            :csrf='"{{csrf_token()}}"'
-                            :labels='[]'
-                            :height='300'
-                            :chart_data='{{ json_encode([ ["data"=>0],["data"=>0],["data"=>0,"type"=> 'line'] ]) }}'
-                        ></chart-component>
-                        <chart-component
-                            :table_id='"chart_financial_bar_last_record"'
-                            :type='"bar"'
-                            :title='"對比年度"'
-                            :ajax_url='"/bonus/review/getAjaxData"'
-                            :csrf='"{{csrf_token()}}"'
-                            :labels='[]'
-                            :height='300'
-                            :chart_data='{{ json_encode([ ["data"=>0],["data"=>0],["data"=>0,"type"=> 'line'] ]) }}'
-                        ></chart-component>
+                    <chart-component
+                        :table_id='"chart_financial_bar2"'
+                        :type='"bar"'
+                        :title='"選擇年度"'
+                        :ajax_url='"/bonus/review/getAjaxData"'
+                        :csrf='"{{csrf_token()}}"'
+                        :labels='[]'
+                        :height='300'
+                        :chart_data='{{ json_encode([ ["data"=>0],["data"=>0],["data"=>0,"type"=> 'line'] ]) }}'
+                    ></chart-component>
+                    <chart-component
+                        :table_id='"chart_financial_bar_last_record"'
+                        :type='"bar"'
+                        :title='"對比年度"'
+                        :ajax_url='"/bonus/review/getAjaxData"'
+                        :csrf='"{{csrf_token()}}"'
+                        :labels='[]'
+                        :height='300'
+                        :chart_data='{{ json_encode([ ["data"=>0],["data"=>0],["data"=>0,"type"=> 'line'] ]) }}'
+                    ></chart-component>
+                    <bonus-chart-stack
+                        :table_id='"chart_stack_bar"'
+                        :title='"月份"'
+                        :height='300'>
+                    </bonus-chart-stack>
                 </div>
             </div>
         </div>
@@ -186,7 +195,8 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">客戶圖表</h3>
                     <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='customer_char'><i
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"
+                                data-ui-contorl='customer_char'><i
                                 class="fa fa-minus"></i>
                         </button>
                     </div>
@@ -211,7 +221,8 @@
                 <div class="box-header with-border" data-step="6" data-intro="媒體經銷商列表 如有名稱為空白,代表後台案件媒體審核沒有設定媒體公司">
                     <h3 class="box-title">客戶列表</h3>
                     <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='customer_list' data-step="7" data-intro="區塊圖表可以關閉收起"><i
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"
+                                data-ui-contorl='customer_list' data-step="7" data-intro="區塊圖表可以關閉收起"><i
                                 class="fa fa-minus"></i>
                         </button>
                     </div>
@@ -280,7 +291,8 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">業績圖表</h3>
                     <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='sale_char'><i
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"
+                                data-ui-contorl='sale_char'><i
                                 class="fa fa-minus"></i>
                         </button>
                     </div>
@@ -313,7 +325,8 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">業績列表</h3>
                     <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='sale_list'><i
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"
+                                data-ui-contorl='sale_list'><i
                                 class="fa fa-minus"></i>
                         </button>
                     </div>
@@ -358,7 +371,8 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">業績列表</h3>
                     <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-ui-contorl='detail_list'><i
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"
+                                data-ui-contorl='detail_list'><i
                                 class="fa fa-minus"></i>
                         </button>
                     </div>
@@ -391,28 +405,28 @@
 
         $(document).ready(function () {
             /*紀錄 user 開關哪個box 存cookie 下次自動還原習用者習慣*/
-            if(cookie.bonus_review === undefined){
+            if (cookie.bonus_review === undefined) {
                 cookie.bonus_review = {};
             }
 
             let boxToggleCookie = cookie.bonus_review;
-            $('button[data-ui-contorl]').click(function(){
+            $('button[data-ui-contorl]').click(function () {
                 let field = $(this).data('ui-contorl');
                 eval(`boxToggleCookie.${field} = $(this).children('i').hasClass('fa-plus') ? 1 : 0;`);
-                setCookie('ui-contorl',JSON.stringify(cookie));
+                setCookie('ui-contorl', JSON.stringify(cookie));
             });
 
-            if(boxToggleCookie !== undefined){
-                Object.keys(boxToggleCookie).forEach(key=>{
-                    if(boxToggleCookie[key] === 0){
-                        $('*[data-ui-contorl="'+key+'"]').parents('.box-header.with-border').parent().addClass('collapsed-box');
-                        $('*[data-ui-contorl="'+key+'"]').children('i.fa').removeClass('fa-minus').addClass('fa-plus');
+            if (boxToggleCookie !== undefined) {
+                Object.keys(boxToggleCookie).forEach(key => {
+                    if (boxToggleCookie[key] === 0) {
+                        $('*[data-ui-contorl="' + key + '"]').parents('.box-header.with-border').parent().addClass('collapsed-box');
+                        $('*[data-ui-contorl="' + key + '"]').children('i.fa').removeClass('fa-minus').addClass('fa-plus');
                     }
                 });
             }
 
 
-           $('.owl-carousel').owlCarousel({
+            $('.owl-carousel').owlCarousel({
                 loop: false,
                 center: true,
                 items: 1,
@@ -424,18 +438,18 @@
                 }
             });
             /*cookie 紀錄使用者 習慣看哪個 owl item*/
-            if(cookie.bonus_review_owl === undefined){
+            if (cookie.bonus_review_owl === undefined) {
                 cookie.bonus_review_owl = {};
             }
             let owlShowItemCookie = cookie.bonus_review_owl;
-            $('.owl-carousel').on('changed.owl.carousel', function(event) {
+            $('.owl-carousel').on('changed.owl.carousel', function (event) {
                 eval(`owlShowItemCookie.${$(this).data('owlName')} = event.item.index;`);
-                setCookie('ui-contorl',JSON.stringify(cookie));
+                setCookie('ui-contorl', JSON.stringify(cookie));
             });
-            if(owlShowItemCookie !== undefined){
-                Object.keys(owlShowItemCookie).forEach(key=>{
-                    if(owlShowItemCookie[key] !== 0){
-                        $('.owl-carousel[data-owl-name="'+key+'"]').data('owl.carousel').to(owlShowItemCookie[key]);
+            if (owlShowItemCookie !== undefined) {
+                Object.keys(owlShowItemCookie).forEach(key => {
+                    if (owlShowItemCookie[key] !== 0) {
+                        $('.owl-carousel[data-owl-name="' + key + '"]').data('owl.carousel').to(owlShowItemCookie[key]);
                     }
                 });
             }

@@ -11,7 +11,7 @@
     | contains the "web" middleware group. Now create something great!
     |
     */
-    
+
     use App\ExchangeRate;
     use App\FinancialList;
     use App\Http\Controllers\FinancialController;
@@ -27,37 +27,37 @@
     use SebastianBergmann\Comparator\Factory;
     use SebastianBergmann\Comparator\ComparisonFailure;
     use App\Mail\CronTab;
-    
+
     /*
      * 登入系統
      */
     Route::get('/info', function () {
         phpinfo();
     });
-    
+
     Route::get('/cacheflush', function () {
         dd(Cache::store('memcached')->flush(),Cache::store('file')->flush());
     });
-    
+
     Route::group(['namespace' => '\App\Http\Controllers\Auth'], function () {
         Route::get('/login', 'AuthCustomerController@index')->name('auth.index');
         Route::post('/login', 'AuthCustomerController@login')->name('auth.login');
         Route::any('/logout', 'AuthCustomerController@logout')->name('auth.logout');
     });
-    
+
     Route::group(['middleware' => ['auth', 'GetMenuList']], function () {
         /*
          * index home
          */
-        
+
         Route::get('/', '\App\Http\Controllers\Bonus\ReviewController@view')->name('index');
-        
+
         //bonus start
         Route::group(['namespace' => '\App\Http\Controllers\Bonus'], function () {
             //setting
-            
+
             Route::prefix('bonus/setting')->group(function () {
-                
+
                 Route::get('/list', 'SettingController@list')->name('bonus.setting.list');
                 Route::get('/add', 'SettingController@add')->name('bonus.setting.add');
                 Route::get('/edit/{bonus?}', 'SettingController@edit')->name('bonus.setting.edit');
@@ -75,7 +75,7 @@
                 Route::any('/getAjaxData', 'ReviewController@getAjaxData')->name('bonus.review.getAjaxData');
             });
         });
-        
+
         // financial
         Route::group(['namespace' => '\App\Http\Controllers'], function () {
             Route::prefix('financial')->group(function () {
@@ -98,7 +98,7 @@
                 });
             });
         });
-        
+
         //sale groups setting
         Route::group(['namespace' => '\App\Http\Controllers'], function () {
             Route::prefix('saleGroup/setting')->group(function () {
@@ -111,16 +111,16 @@
                 });
             });
         });
-    
+
         //info
         Route::group(['namespace' => '\App\Http\Controllers'], function () {
             Route::prefix('info')->group(function () {
                 Route::group(['namespace' => '\App\Http\Controllers\Info'], function () {
                     Route::get('/scheduleList', 'InfoController@scheduleList')->name('info.scheduleList');
                     Route::get('/updateList', 'InfoController@updateList')->name('info.updateList');
-                    
+
                     Route::post('/articlesPost', 'InfoController@articlesPost')->name('info.articlesPost');
-                    
+
                 });
             });
         });
@@ -133,16 +133,16 @@
                 /*權限設定*/
                 Route::get('/permissionList', 'PermissionController@list')->name('system.permission.list');
                 Route::post('/permissionGetList', 'PermissionController@getList')->name('system.permission.getList');
-    
+
                 Route::post('/permissionAddAjaxPost', 'PermissionController@permissionAddAjaxPost')->name('system.permission.add.ajaxPost');
                 Route::post('/permissionEditAjaxPost/{permission}', 'PermissionController@permissionEditAjaxPost')->name('system.permission.edit.ajaxPost');
                 Route::post('/permissionDeleteAjaxPost/{permission}', 'PermissionController@permissionDeleteAjaxPost')->name('system.permission.ajaxPost');
-                
+
                 Route::post('/permissionClassAddAjaxPost', 'PermissionController@permissionClassAddAjaxPost')->name('system.permission.class.add.ajaxPost');
                 Route::any('/permissionClassDeleteAjaxPost/{permissionsClass}', 'PermissionController@permissionClassDeleteAjaxPost')->name('system.permission.class.delete.ajaxPost');
                 Route::any('/permissionClassEditAjaxPost/{permissionsClass}', 'PermissionController@permissionClassEditAjaxPost')->name('system.permission.class.edit.ajaxPost');
-                
-                
+
+
                 /*權限角色設定*/
                 Route::get('/roleList', 'RoleControl@roleList')->name('system.role.list');
                 Route::get('/roleAdd', 'RoleControl@roleAdd')->name('system.role.add');
@@ -153,18 +153,18 @@
                 Route::get('/roleUserList', 'RoleControl@roleUserList')->name('system.role.user.list');
                 Route::get('/roleUserEdit/{user?}', 'RoleControl@roleUserEdit')->name('system.role.user.edit');
                 Route::post('/roleUserPost', 'RoleControl@roleUserPost')->name('system.role.user.post');
-    
+
                 Route::prefix('menu')->group(function () {
                     Route::Get('/list', 'MenuController@list')->name('system.menu.list');
                     Route::Post('/menuPost', 'MenuController@menuPost')->name('system.menu.post');
                     Route::Post('/menuDelete', 'MenuController@menuDelete')->name('system.menu.delete');
                     Route::Post('/menuSubPost', 'MenuController@menuSubPost')->name('system.menuSub.post');
                     Route::Post('/menuSubDelete', 'MenuController@menuSubDelete')->name('system.menuSub.delete');
-        
+
                 });
             });
         });
-        
+
         /*
          * adminlte page
          */

@@ -1,23 +1,23 @@
 let date = new Date();
-date = `${date.getFullYear()}-${('0'+(date.getMonth()+1)).substring(0,2)}-01`;
+date = `${date.getFullYear()}-${('0' + (date.getMonth() + 1)).substring(0, 2)}-01`;
 export default {
     state: {
         change_date: '',
         start_date: '',
-        end_date:'',
+        end_date: '',
         table_select: [],
         user_ids: [],
-        sale_group_ids:[],
+        sale_group_ids: [],
         profit: 0,
         total_money: 0,
-        bonus_total_money : 0,
-        provide_total_money : 0,
+        bonus_total_money: 0,
+        provide_total_money: 0,
         sale_group_total_money: 0,
         bonus_list: [],
         bonus_rate: 0,
         bonus_next_amount: 0,
         bonus_next_percentage: 0,
-        bonus_direct:0,
+        bonus_direct: 0,
         money_status_paid: 0,
         money_status_unpaid: 0,
         money_status_bonus_paid: 0,
@@ -30,7 +30,7 @@ export default {
         last_record_month_cost: [],
         last_record_month_profit: [],
         last_record_month_label: [],
-        loading:false,
+        loading: false,
         agency_ids: [],
         client_ids: [],
         media_companies_ids: [],
@@ -46,41 +46,42 @@ export default {
         group_progress_list: [],
         provide_bonus_list: [],
         provide_groups_list: [],
-        provide_statistics_list:{},
+        provide_statistics_list: {},
         chart_bar_max_y: 0,
-        permission_data:[],
-        permission_class_data:[],
-        currency:'',
-        exchange_rates_list:[],
-        chart_exchange_line:[],
-        provide_char_bar_stack:{},
+        permission_data: [],
+        permission_class_data: [],
+        currency: '',
+        exchange_rates_list: [],
+        chart_exchange_line: [],
+        provide_char_bar_stack: {},
+        bonus_char_bar_stack: {},
     },
-    getters:{
-        getTableSelect(state){
+    getters: {
+        getTableSelect(state) {
             return state.table_select;
         }
     },
-    actions:{
+    actions: {
         saveName({commit}, msg) {
             commit('saveMsg', msg) // 提交到mutations中處理
         },
     },
     mutations: {
-        changeDate(state,value) {
+        changeDate(state, value) {
             state.change_date = value;
         },
-        changeDateRange(state,value){
+        changeDateRange(state, value) {
             state.start_date = value[0];
             state.end_date = value[1];
         },
-        tableSelect(state,value) {
+        tableSelect(state, value) {
             state.table_select = value;
         },
-        changeTotalMoney(state,value) {
+        changeTotalMoney(state, value) {
             state.total_money = value;
         },
-        changeBox(state,arg){
-            switch(arg.field){
+        changeBox(state, arg) {
+            switch (arg.field) {
                 case 'profit':
                     state.profit = arg.value;
                     break;
@@ -97,33 +98,33 @@ export default {
                     state.bonus_direct = arg.value;
             }
         },
-        changeMoneyStatus(state,arg){
+        changeMoneyStatus(state, arg) {
             state.money_status_paid = arg.paid;
             state.money_status_unpaid = arg.unpaid;
             state.money_status_bonus_paid = arg.bPaid;
             state.money_status_bonus_unpaid = arg.bUnPaid;
         },
-        changeMonthBalancen(state,arg){
+        changeMonthBalancen(state, arg) {
             state.month_income = arg.month_income;
             state.month_cost = arg.month_cost;
             state.month_profit = arg.month_profit;
         },
-        changeUserId(state,value){
+        changeUserId(state, value) {
             state.user_ids = value;
         },
-        changeSaleGroupId(state,value){
+        changeSaleGroupId(state, value) {
             state.sale_group_ids = value;
         },
-        changeAgencyIds(state,value){
+        changeAgencyIds(state, value) {
             state.agency_ids = value;
         },
-        changeClientIds(state,value){
+        changeClientIds(state, value) {
             state.client_ids = value;
         },
-        changeMediaCompaniesIds(state,value){
+        changeMediaCompaniesIds(state, value) {
             state.media_companies_ids = value;
         },
-        changeMediasNames(state,value){
+        changeMediasNames(state, value) {
             state.medias_names = value;
         },
     }
