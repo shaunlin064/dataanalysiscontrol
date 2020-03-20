@@ -38,6 +38,10 @@
             $this->policyModel = new FinancialList();
         }
 
+        /**
+         * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+         * @throws Exception
+         */
         public function view ()
         {
             $loginUserId = Auth::user()->erp_user_id;
@@ -121,12 +125,12 @@
             ];
 
             /*ajax check debug*/
-//                        $dateStart = $date->format('2020-01-01');
-//                        $dateEnd = $date->format('2020-03-01');
-//                        $userIds = collect($userList)->pluck('erp_user_id')->toArray();
-//                        $request = new Request([ 'startDate' => $dateStart, 'endDate' => $dateEnd, 'saleGroupIds' => [ 1, 2, 3, 4, 5 ], 'userIds' => [] ]);
-//                        $return = $this->getAjaxData($request, 'return');
-//                        dd($return);
+//                $dateStart = $date->format('2020-03-01');
+//                $dateEnd = $date->format('2020-03-01');
+//                $userIds = collect($userList)->pluck('erp_user_id')->toArray();
+//                $request = new Request([ 'startDate' => $dateStart, 'endDate' => $dateEnd, 'saleGroupIds' => [ 1, 2, 3, 4, 5 ], 'userIds' => [] ]);
+//                $return = $this->getAjaxData($request, 'return');
+//                dd($return);
             return view('bonus.review.view', [
                                                'data'                        => $this->resources,
                                                'bonusColumns'                => $bonusColumns,
@@ -163,7 +167,8 @@
 
             $saleGroupIds = SaleGroups::all()->pluck('id')->toArray();
             $date = new DateTime();
-            if ( !Cache::store('memcached')->has('yearProfit') )
+            $cacheKey = 'yearProfit';
+            if ( !Cache::store('memcached')->has($cacheKey) )
             {
                 /*取所有年度毛利統計資料*/
                 $dateStart = '2018-01-01';
@@ -181,10 +186,10 @@
                 array_pop($return);
                 array_pop($return);
 
-                Cache::store('memcached')->forever('yearProfit', $return);
+                Cache::store('memcached')->forever($cacheKey, $return);
             } else
             {
-                $cacheData = Cache::store('memcached')->get('yearProfit');
+                $cacheData = Cache::store('memcached')->get($cacheKey);
                 $thisMonth = $date->format('Y-m-01');
                 $lastMonth = $date->modify('-1Month')->format('Y-m-01');
                 $dateRange = date_range($lastMonth, $thisMonth);
@@ -199,10 +204,14 @@
             return $allYearProfit;
         }
 
+        /**
+         * @param Request $request
+         * @param string $outType
+         * @return array
+         * @throws \Psr\SimpleCache\InvalidArgumentException
+         */
         public function getAjaxData ( Request $request, $outType = 'echo' )
         {
-
-
             $dateStart = $request->startDate;
             $dateEnd = $request->endDate;
             $saleGroupIds = $request->saleGroupIds;
@@ -228,11 +237,12 @@
             }
 
             /*cache all user erp Id*/
-            $allUserErpIds = Cache::store('memcached')->remember('allUserErpId', ( 4 * 360 ), function () {
+            $cacheObj = Cache::store('memcached');
+            $allUserErpIds = $cacheObj->remember('allUserErpId', ( 4 * 360 ), function () {
                 return User::all()->pluck('erp_user_id')->toArray();
             });
             /*cache all groupId*/
-            $allGroupIds = Cache::store('memcached')->remember('allGroupId', ( 10 * 60 ), function () {
+            $allGroupIds = $cacheObj->remember('allGroupId', ( 10 * 60 ), function () {
                 return SaleGroups::all()->pluck('id')->toArray();
             });
 
@@ -272,14 +282,14 @@
                 $lastRecordDate->modify('-1Year');
                 $lastRecordDate = $lastRecordDate->format('Y-m-d');
 
-                if ( !Cache::store('memcached')->has($cahceKey . $date) )
+                if ( !$cacheObj->has($cahceKey . $date) )
                 {
                     //
                     [ $erpReturnData, $progressDatas, $groupProfitDatas ] = $this->getDataFromDataBase($allUserErpIds,
                                                                                                        $allGroupIds,
                                                                                                        $date, $date);
 
-                    Cache::store('memcached')
+                    $cacheObj
                         ->put($cahceKey . $date,
                               [ "bonus_list" => $erpReturnData, 'progress_list' => $progressDatas, 'group_progress_list' => $groupProfitDatas ],
                             ( $cacheTime * 3600 ));
@@ -288,24 +298,24 @@
 
                 } else
                 {
-                    $cacheData[] = Cache::store('memcached')->get($cahceKey . $date);
+                    $cacheData[] = $cacheObj->get($cahceKey . $date);
 
                 }
                 /*抓取比對資料*/
-                if ( !Cache::store('memcached')->has($cahceKey . $lastRecordDate) )
+                if ( !$cacheObj->has($cahceKey . $lastRecordDate) )
                 {
                     [ $erpReturnData, $progressDatas, $groupProfitDatas ] = $this->getDataFromDataBase($allUserErpIds,
                                                                                                        $allGroupIds,
                                                                                                        $lastRecordDate,
                                                                                                        $lastRecordDate);
-                    Cache::store('memcached')
+                    $cacheObj
                         ->put($cahceKey . $lastRecordDate,
                               [ "bonus_list" => $erpReturnData, 'progress_list' => $progressDatas, 'group_progress_list' => $groupProfitDatas ],
                             ( $cacheTime * 3600 ));
                     $cacheDataLastRecord[] = [ "bonus_list" => $erpReturnData, 'progress_list' => $progressDatas, 'group_progress_list' => $groupProfitDatas ];
                 } else
                 {
-                    $cacheDataLastRecord[] = Cache::store('memcached')->get($cahceKey . $lastRecordDate);
+                    $cacheDataLastRecord[] = $cacheObj->get($cahceKey . $lastRecordDate);
                 }
             }
 
@@ -553,7 +563,7 @@
             $erpReturnData = collect($this->getFinancialData($userIds, $dateStart, $dateEnd));
 
             /*progressDatas*/
-            $progressDatas = $this->getProgressDatas($erpReturnData);
+            $progressDatas = $this->getProgressDates($erpReturnData);
 
             //			/*補齊該月沒有 金額的user 資料*/
             foreach ( date_range($dateStart, $dateEnd) as $dateRange )
@@ -566,7 +576,8 @@
                 {
 
                     $thisResignUser = $resignUsers->whereIn('id', $item->erp_user_id)->first();
-                    if ( $thisResignUser['user_resign_date'] )
+
+                    if ( isset($thisResignUser['user_resign_date']) )
                     {
                         if ( $thisResignUser['user_resign_date'] <= $dateRange )
                         {
@@ -597,7 +608,7 @@
                 $groupDateStart->modify('+1Month');
             }
             /*calculation profit percentage*/
-            $groupProfitDatas = $this->getGroupProfitDatas($tmpGroups, $erpReturnData);
+            $groupProfitDatas = $this->getGroupProfitDates($tmpGroups, $erpReturnData);
 
             $erpReturnData = $erpReturnData->map(function ( $v, $k ) {
                 $v['set_date'] = substr($v['set_date'], 0, 7);
@@ -622,7 +633,7 @@
          * @param Collection $erpReturnData
          * @return Collection
          */
-        private function getProgressDatas ( Collection $erpReturnData ): Collection
+        private function getProgressDates( Collection $erpReturnData ): Collection
         {
             $progressDatas = collect([]);
             $erpReturnData->groupBy([ 'set_date', 'erp_user_id' ])
@@ -671,7 +682,7 @@
          * @param Collection $erpReturnData
          * @return Collection
          */
-        private function getGroupProfitDatas ( array $tmpGroups, Collection $erpReturnData ): Collection
+        private function getGroupProfitDates ( array $tmpGroups, Collection $erpReturnData ): Collection
         {
             $groupProfitDatas = collect([]);
 
@@ -691,6 +702,14 @@
             return $groupProfitDatas;
         }
 
+        /**
+         * @param $financialDataArrays
+         * @param $agencyIdArrays
+         * @param $clientIdArrays
+         * @param $mediaCompaniesIdArrays
+         * @param $mediasNameArrays
+         * @return Collection
+         */
         public function getFilterData ( $financialDataArrays, $agencyIdArrays, $clientIdArrays, $mediaCompaniesIdArrays, $mediasNameArrays )
         {
 
@@ -846,6 +865,11 @@
             return $customerProfitData;
         }
 
+        /**
+         * @param $dateRangerArray
+         * @return array
+         * @throws \Psr\SimpleCache\InvalidArgumentException
+         */
         public function getreceiptTimes ( $dateRangerArray )
         {
             $erpFin = new FinancialController();

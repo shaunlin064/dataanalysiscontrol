@@ -105,7 +105,7 @@
                     duration: 0,
                     easing: 'linear'
                 });
-                console.log('in');
+
             },
             trimData() {
                 /*stack*/
