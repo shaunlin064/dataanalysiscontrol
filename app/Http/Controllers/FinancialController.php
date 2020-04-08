@@ -5,9 +5,9 @@
 	 * Date: 2019-07-01
 	 * Time: 15:53
 	 */
-	
+
 	namespace App\Http\Controllers;
-	
+
 	class FinancialController extends BaseController
 	{
 		const CUSTOMER_FIELDS_LOCAL_API_DIFFERENCE = [
@@ -20,9 +20,9 @@
 		];
 		public function getBalancePayMentData (String $tpye = 'select')
 		{
-			
+
 			$apiObj = new ApiController();
-			
+
 			$data = [
 			 'token' => env('API_TOKEN'),
 			 'action' => 'balancePayMent',
@@ -31,22 +31,55 @@
 			 ]
 			];
 			$url = env('API_GET_BALANCE_PAYMENT_IDS_URL');
-			
+
 			$returnData = $apiObj->curlPost(json_encode($data),$url,'json');
-			
+
 			return $returnData;
 		}
-		
+        public function getErpMemberCancelFinancial (Array $userIds,String $dateYearMonth = null ,String  $organizationStr = 'all',$outgroup = null)
+        {
+
+            if(empty($dateYearMonth)){
+                $dateYearMonth = new \DateTime();
+                $dateYearMonth = $dateYearMonth->format('Ym');
+            }
+
+            $apiObj = new ApiController();
+
+            $data = [
+                'token' => env('API_TOKEN'),
+                'action' => 'getUserCancelProfitByCamCue',
+                'data' => [
+                    'userIds' => implode(',',$userIds),
+                    'yearMonthStr' => $dateYearMonth,
+                    'organizationStr' => $organizationStr,
+                    'outgroup' => $outgroup
+                ]
+            ];
+
+            $url = env('API_GET_MEMBER_FINANCIAL_URL');
+
+            $returnData = $apiObj->curlPost(json_encode($data),$url,'json');
+//            dd($returnData,$url);
+            foreach($returnData as $key => $items){
+
+                $items = $this->apiKeyFieldNameChange($items);
+
+                //				$returnData[$key] = $this->exchangeMoney($items);
+                $returnData[$key] = $items;
+            }
+            return $returnData;
+        }
 		public function getErpMemberFinancial (Array $userIds,String $dateYearMonth = null ,String  $organizationStr = 'all',$outgroup = null)
 		{
-			
+
 			if(empty($dateYearMonth)){
 				$dateYearMonth = new \DateTime();
 				$dateYearMonth = $dateYearMonth->format('Ym');
 			}
-			
+
 			$apiObj = new ApiController();
-			
+
 			$data = [
 			 'token' => env('API_TOKEN'),
 			 'action' => 'getUserProfitByCamCue',
@@ -57,13 +90,12 @@
 			  'outgroup' => $outgroup
 			 ]
 			];
-			
 			$url = env('API_GET_MEMBER_FINANCIAL_URL');
-			
+
 			$returnData = $apiObj->curlPost(json_encode($data),$url,'json');
-			
+
 			foreach($returnData as $key => $items){
-				
+
 				$items = $this->apiKeyFieldNameChange($items);
 
 //				$returnData[$key] = $this->exchangeMoney($items);
@@ -71,11 +103,11 @@
 			}
 			return $returnData;
 		}
-        
+
         public function getReciptTimes ($dateMonth = null)
         {
             $apiObj = new ApiController();
-    
+
             $data = [
                 'token' => env('API_TOKEN'),
                 'action' => 'receiptTimes',
@@ -83,12 +115,12 @@
                     'yearMonthStr' => $dateMonth,
                 ]
             ];
-            
+
             $url = env('API_GET_RECEIPT_TIMES_URL');
             return $apiObj->curlPost(json_encode($data),$url,'json');
-            
+
 		}
-		
+
 		public function apiKeyFieldNameChange ($items)
 		{
 			foreach(self::CUSTOMER_FIELDS_LOCAL_API_DIFFERENCE as $localKey => $apikey){
@@ -99,5 +131,5 @@
 			}
 			return $items;
 		}
-		
+
 	}
