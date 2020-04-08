@@ -11,7 +11,7 @@ class FinancialList extends Model
 {
     //
 
-	protected $guarded = ['med_group','dep_name','dep_id','username','priority'];
+	protected $guarded = ['med_group','dep_name','dep_id','username','priority','accounting_id'];
 
 	protected $attributes = [
 	 'status' => 0,
