@@ -6,13 +6,14 @@
 
 <script>
     import {mapState, mapMutations, mapActions} from 'vuex';
-    
+
     export default {
         name: "AllYearProfit",
         props: {
             table_id: String,
             title: String,
             datas: Object,
+
         },
         data: function () {
             return {
@@ -49,10 +50,10 @@
         created: function () {
             const entries = Object.entries(this.datas.data);
             let colorNumber = 0;
-            
+
             for (const [label, value] of entries) {
                 const color = this.default_color[colorNumber++];
-                
+
                 this.config.data.datasets.push({
                     'backgroundColor': color,
                     'borderColor':  color,
