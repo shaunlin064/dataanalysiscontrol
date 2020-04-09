@@ -13,6 +13,7 @@
             table_id: String,
             title: String,
             datas: Object,
+
         },
         data: function () {
             return {
