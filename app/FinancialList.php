@@ -196,7 +196,7 @@ class FinancialList extends Model
 	public function saveUntilNowAllData ()
 	{
 		$financial = new FinancialController();
-		$erpReturnData = collect($financial->getErpMemberFinancial(['all'],'all'));
+		$erpReturnData = collect($financial->getErpMemberFinancial(['all'],'all'))->whereIn('organization',['js','ff']);
 
 		DB::beginTransaction();
 		try{
@@ -225,7 +225,7 @@ class FinancialList extends Model
             $date = new DateTime($yearMonthDayStr);
         }
 
-		$erpReturnData = collect($financial->getErpMemberFinancial(['all'],$date->format('Ym')));
+		$erpReturnData = collect($financial->getErpMemberFinancial(['all'],$date->format('Ym')))->whereIn('organization',['js','ff']);
 
         $erpReturnData = $erpReturnData->filter(function($v,$k) {
             $tmpDate = new DateTime($v['year_month'].'01');
