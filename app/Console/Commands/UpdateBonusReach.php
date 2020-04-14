@@ -43,27 +43,27 @@ class UpdateBonusReach extends Command
     {
         //
         $startTime = microtime(true);
-        
+
 	    $bonusReach = new BonusReachController();
 	    $date_now =  new \DateTime();
 	    $date_now->modify('-1Month');
-    
+
         if(!ExchangeRate::checkDataExsist(now()->setDays(1)->subMonth()->format('Y-m-d'),"USD")){
             /*mail notice Job*/
-            SentMail::dispatch('crontab',['name'=>'admin', 'title' => 'update_bonus_reach 更新失敗沒有該月匯率資料']);
+            SentMail::dispatch('crontab',['mail'=>'shaun@js-adways.com.tw','name'=>'admin', 'title' => 'update_bonus_reach 更新失敗沒有該月匯率資料']);
             //加入隊列
             /*重新更新匯率 重新更資資料*/
             UpdateExchange::dispatch()->delay(now()->addHour(10));
             \App\Jobs\UpdateBonusReach::dispatch()->delay(now()->addHour(10)->addMinute(10));
             die;
         }
-        
+
 	    $bonusReach->update($date_now->format('Y-m-01'));
-    
+
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
-    
+
         /*mail notice Job*/
-        \App\Jobs\SentMail::dispatch('crontab',['name'=>'admin', 'title' => 'update_bonus_reach schedule down']);
+        \App\Jobs\SentMail::dispatch('crontab',['mail'=>'shaun@js-adways.com.tw','name'=>'admin', 'title' => 'update_bonus_reach schedule down']);
     }
 }

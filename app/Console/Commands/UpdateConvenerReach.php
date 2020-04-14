@@ -43,27 +43,27 @@ class UpdateConvenerReach extends Command
     {
     	//
         $startTime = microtime(true);
-        
+
 	    $date = new DateTime(date('Ym01'));
 	    $setDate = $date->modify('-1Month')->format('Y-m-d');
-	    
+
         if(!ExchangeRate::checkDataExsist($setDate,"USD")){
             /*mail notice Job*/
-            SentMail::dispatch('crontab',['name'=>'admin', 'title' => 'update_convener_reach 更新失敗沒有該月匯率資料']);
+            SentMail::dispatch('crontab',['mail'=>'shaun@js-adways.com.tw','name'=>'admin', 'title' => 'update_convener_reach 更新失敗沒有該月匯率資料']);
             //加入隊列
             /*重新更新匯率 重新更資資料*/
             UpdateExchange::dispatch()->delay(now()->addHour(10));
             UpdateConvenerReach::dispatch()->delay(now()->addHour(10)->addMinute(10));
             die;
         }
-        
+
 	    $saleGroupsReach = new SaleGroupsReach();
 	    $saleGroupsReach->setAllConvenerReach($setDate);
-	    
+
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
-        
+
         /*mail notice Job*/
-        SentMail::dispatch('crontab',['name'=>'admin', 'title' => 'update_convener_reach schedule down']);
+        SentMail::dispatch('crontab',['mail'=>'shaun@js-adways.com.tw','name'=>'admin', 'title' => 'update_convener_reach schedule down']);
     }
 }

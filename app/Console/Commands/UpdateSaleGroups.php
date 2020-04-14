@@ -42,22 +42,22 @@ class UpdateSaleGroups extends Command
     {
         //
         $startTime = microtime(true);
-        
+
 	    $thisMonth = date('Y-m-01');
 	    $allSale = SaleGroups::where('id','!=',0)->with(['groupsUsersLastMonth'])->with(['groupsBonusLastMonth'])->get();
 	    SaleGroupsBonusLevels::where('set_Date',$thisMonth)->delete();
 	    SaleGroupsUsers::where('set_Date',$thisMonth)->delete();
 	    foreach($allSale as $sale){
 		    foreach (['groupsUsersLastMonth','groupsBonusLastMonth'] as $keyfiled){
-			
+
 			    if(isset($sale[$keyfiled])){
 				    $tmp = [];
-				
+
 				    $sale[$keyfiled]->flatMap(function ($values,$key) use($thisMonth,&$tmp) {
-					
+
 					    $values = $values->toArray();
 					    $unsetArr = ['id','created_at','updated_at'];
-					
+
 					    foreach($unsetArr as $filed){
 						    unset($values[$filed]);
 					    };
@@ -69,11 +69,11 @@ class UpdateSaleGroups extends Command
 		    }
 		    $sale->push();
 	    };
-	    
+
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
-    
+
         /*mail notice Job*/
-        \App\Jobs\SentMail::dispatch('crontab',['name'=>'admin', 'title' => 'update_sale_groups schedule down']);
+        \App\Jobs\SentMail::dispatch('crontab',['mail'=>'shaun@js-adways.com.tw','name'=>'admin', 'title' => 'update_sale_groups schedule down']);
     }
 }
