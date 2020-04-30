@@ -26,6 +26,7 @@ window.DataTable = DataTable;
 
 //chart.js
 import Chart from 'chart.js';
+import ChartPlugin from 'chartjs-plugin-labels';
 
 import moment from 'moment'
 window.moment = moment;

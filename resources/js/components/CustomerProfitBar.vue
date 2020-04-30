@@ -6,7 +6,7 @@
 
 <script>
     import {mapState, mapMutations, mapActions} from 'vuex';
-    
+
     export default {
         name: "CustomerProfitBar",
         props: {
@@ -51,6 +51,14 @@
                             display: true,
                             text: this.title
                         },
+                        plugins: {
+                            labels:
+                                {
+                                    render: function (args) {
+                                        return new Intl.NumberFormat().format(args.value);
+                                    },
+                                }
+                        }
                     }
                 },
                 chart_obj: {},
@@ -72,11 +80,11 @@
         methods: {
             update(vue_this) {
                     let totalProfit = [];
-                    
+
                     for (var i = 0; i < vue_this.agency_profit.length; i++) {
                         totalProfit[i] = vue_this.agency_profit[i]+vue_this.client_profit[i];
                     };
-                    
+
                     let monthdata = [
                         vue_this.agency_profit,
                         vue_this.client_profit,

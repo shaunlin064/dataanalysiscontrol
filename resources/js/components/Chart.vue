@@ -98,6 +98,7 @@
                                 }
                             }]
                         },
+
                     }
                 },
                 chart_obj: {},
@@ -125,6 +126,16 @@
         },
         mounted: function () {
             var ctx = document.getElementById(this.table_id).getContext('2d');
+            if(this.type == 'bar'){
+                this.config.options.plugins = {
+                    labels:
+                    {
+                        render: function (args) {
+                            return new Intl.NumberFormat().format(args.value);
+                        },
+                    }
+                };
+            }
             this.chart_obj = new Chart(ctx, this.config);
         },
         methods: {

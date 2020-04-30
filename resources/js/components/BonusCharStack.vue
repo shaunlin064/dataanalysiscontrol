@@ -76,19 +76,30 @@
                         },
                         responsive: true,
                         scales: {
-                            xAxes: [{
+                            xAxes:  [{
                                 stacked: true,
+                                scaleLabel : {
+                                    display : true,
+                                    labelString : '',
+                                    padding: 2,
+                                }
                             }],
                             yAxes: [{
                                 stacked: true,
                             }]
                         },
+                        plugins: {
+                            labels:
+                                {
+                                    fontSize: 0
+                                }
+                        }
                     }
-                }
+                },
             }
         },
         computed: {
-            ...mapState(['bonus_char_bar_stack']),
+            ...mapState(['bonus_char_bar_stack','start_date','end_date']),
         },
         created: function () {
         },
@@ -100,7 +111,12 @@
             update() {
                 /*資料整理*/
                 let barChartData = this.trimData();
+                console.log(barChartData);
                 this.chart_obj.data = barChartData;
+
+                this.chart_obj.options.scales.xAxes[0].scaleLabel.labelString = `${this.start_date.substr(0, 7)}  至  ${this.end_date.substr(0, 7)}`;
+
+                this.chart_obj.options.scales.xAxes[0].scaleLabel.padding= 2;
                 this.chart_obj.update({
                     duration: 0,
                     easing: 'linear'

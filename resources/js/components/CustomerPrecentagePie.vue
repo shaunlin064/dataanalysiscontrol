@@ -47,6 +47,14 @@
                             display: true,
                             text: this.title
                         },
+                        plugins: {
+                            labels:
+                                {
+                                render: 'percentage',
+                                fontColor: ['black'],
+                                precision: 1
+                            }
+                        }
                     }
                 },
                 chart_obj: {},
