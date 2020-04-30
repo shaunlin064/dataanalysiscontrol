@@ -350,6 +350,20 @@
                         </div>
                         <div class="col-xs-12">
                             <simple-data-table-componet
+                                :table_id='"progress_list_total"'
+                                :table_head='"成員總計績效表"'
+                                :table_title='["業務","團隊","毛利","達成率","責任額"]'
+                                :row='[]'
+                                {{--:ex_buttons= '["excel"]'--}}
+                                :csrf='"{{csrf_token()}}"'
+                                :columns='{!!json_encode($progressTotalColumns)!!}'
+                                :ajax_url='"/bonus/review/getAjaxData"'
+                                :page_length='15'
+                                :length_change='"hide"'
+                            ></simple-data-table-componet>
+                        </div>
+                        <div class="col-xs-12">
+                            <simple-data-table-componet
                                 :table_id='"group_progress_list"'
                                 :table_head='"團隊績效表"'
                                 :table_title='["月份","團隊","毛利","達成率"]'
@@ -357,6 +371,20 @@
                                 {{--:ex_buttons= '["excel"]'--}}
                                 :csrf='"{{csrf_token()}}"'
                                 :columns='{!!json_encode($groupProgressColumns)!!}'
+                                :ajax_url='"/bonus/review/getAjaxData"'
+                                :page_length='15'
+                                :length_change='"hide"'
+                            ></simple-data-table-componet>
+                        </div>
+                        <div class="col-xs-12">
+                            <simple-data-table-componet
+                                :table_id='"group_progress_list_total"'
+                                :table_head='"團隊總計績效表"'
+                                :table_title='["團隊","毛利","達成率","責任額"]'
+                                :row='[]'
+                                {{--:ex_buttons= '["excel"]'--}}
+                                :csrf='"{{csrf_token()}}"'
+                                :columns='{!!json_encode($groupProgressTotalColumns)!!}'
                                 :ajax_url='"/bonus/review/getAjaxData"'
                                 :page_length='15'
                                 :length_change='"hide"'

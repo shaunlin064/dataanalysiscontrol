@@ -14,8 +14,8 @@ import Vuex from 'vuex';
 
 Vue.use(Vuex);
 
-import test from './store';
-let store1 =  new Vuex.Store(test);
+import storeData from './store';
+let customerStore =  new Vuex.Store(storeData);
 
 
 // jquery
@@ -133,5 +133,5 @@ Vue.component('menu-form', require('./components/menu/menuForm').default);
 Vue.component('menu-sub-form', require('./components/menu/menuSubForm').default);
 const app = new Vue({
     el: '#app',
-    store:store1
+    store: customerStore
 });

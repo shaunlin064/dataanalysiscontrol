@@ -68,8 +68,9 @@
                             this.$store.state.chart_bar_max_y =  response.data.chart_bar_max_y;
                             /*sales list*/
                             this.$store.state.group_progress_list = response.data.group_progress_list;
+                            this.$store.state.group_progress_list_total = response.data.group_progress_list_total;
                             this.$store.state.progress_list = response.data.progress_list;
-
+                            this.$store.state.progress_list_total = response.data.progress_list_total;
                             /*customer char*/
                             this.$store.state.agency_profit  = response.data.customer_precentage_profit['agency_profit'];
                             this.$store.state.client_profit  = response.data.customer_precentage_profit['client_profit'];

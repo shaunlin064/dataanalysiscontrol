@@ -36,7 +36,7 @@
 </template>
 
 <script>
-    import {mapState, mapMutations, mapActions, mapGetters} from 'vuex';
+    import {mapState} from 'vuex';
 
     export default {
         name: "SimpleDatatable",
@@ -54,7 +54,7 @@
             page_length: Number,
             select_id: Array,
             total_money: Number,
-            all_user_name : Object,
+            all_user_name: Object,
         },
         data() {
             return {
@@ -64,7 +64,7 @@
         },
         computed: {
             // ...mapGetters(['getTableSelect','getUserIds','getSaleGroupIds','getStartDate','getEndDate']),
-            ...mapState(['provide_money', 'loading', 'customer_profit_data', 'customer_groups_profit_data', 'medias_profit_data', 'media_companies_profit_data', 'group_progress_list', 'progress_list', 'bonus_list', 'provide_bonus_list', 'provide_groups_list', 'start_date', 'end_date', 'exchange_rates_list', 'currency', 'table_select', 'provide_statistics_list','provide_char_bar_stack']),
+            ...mapState(['provide_money', 'loading', 'customer_profit_data', 'customer_groups_profit_data', 'medias_profit_data', 'media_companies_profit_data', 'group_progress_list', 'group_progress_list_total', 'progress_list', 'progress_list_total', 'bonus_list', 'provide_bonus_list', 'provide_groups_list', 'start_date', 'end_date', 'exchange_rates_list', 'currency', 'table_select', 'provide_statistics_list', 'provide_char_bar_stack']),
         },
         methods: {
             tableClear() {
@@ -86,7 +86,7 @@
                         //     vue.selectToggle($(v), 'select');
                         // });
 
-                        vue.dataTable.rows().data().each(function(v,e){
+                        vue.dataTable.rows().data().each(function (v, e) {
                             let thisSelectMoney = v.provide_money;
                             let groupName = v.sale_group_name ? v.sale_group_name : v.group_name;
                             let groupId = v.sale_groups_id !== undefined ? v.sale_groups_id : v.sale_groups.sale_groups_id;
@@ -203,21 +203,21 @@
 
                 /*區分獎金檢視與獎金發放 */
                 let separateDate = data.provide_set_date !== undefined ? data.provide_set_date : data.set_date;
-                if(this.provide_char_bar_stack[separateDate] === undefined ){
+                if (this.provide_char_bar_stack[separateDate] === undefined) {
                     this.provide_char_bar_stack[separateDate] = {};
                 }
-                if(this.all_user_name !== undefined){
+                if (this.all_user_name !== undefined) {
                     let allName = this.all_user_name;
                     let vue = this;
-                    Object.keys(allName).forEach( k =>{
-                        if(vue.provide_char_bar_stack[separateDate][k] === undefined){
+                    Object.keys(allName).forEach(k => {
+                        if (vue.provide_char_bar_stack[separateDate][k] === undefined) {
                             vue.provide_char_bar_stack[separateDate][k] = {};
                             vue.provide_char_bar_stack[separateDate][k]['provide_money'] = 0;
                             vue.provide_char_bar_stack[separateDate][k]['erp_user_id'] = allName[k];
                         }
-                    },vue,separateDate);
+                    }, vue, separateDate);
                 }
-                if( this.provide_char_bar_stack[separateDate][data.user_name] === undefined){
+                if (this.provide_char_bar_stack[separateDate][data.user_name] === undefined) {
                     this.provide_char_bar_stack[separateDate][data.user_name] = {};
                     this.provide_char_bar_stack[separateDate][data.user_name]['provide_money'] = 0;
                 }
@@ -430,10 +430,28 @@
                     }
                 }
             },
+            group_progress_list_total: {
+                immediate: true,    // 这句重要
+                handler(val, oldVal) {
+                    if (oldVal !== undefined && val !== '' && this.table_id == 'group_progress_list_total') {
+
+                        this.updataTable(val);
+                    }
+                }
+            },
             progress_list: {
                 immediate: true,    // 这句重要
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'progress_list') {
+
+                        this.updataTable(val);
+                    }
+                }
+            },
+            progress_list_total: {
+                immediate: true,    // 这句重要
+                handler(val, oldVal) {
+                    if (oldVal !== undefined && val !== '' && this.table_id == 'progress_list_total') {
 
                         this.updataTable(val);
                     }

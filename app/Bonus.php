@@ -114,7 +114,7 @@
             $bonusDirect = isset($reachLevle['bonus_direct']) ? $reachLevle['bonus_direct'] : 0;
 
 
-            $returnData = [ 'estimateBonus' => $estimateBonus, 'reachLevle' => $reachLevle, 'nextLevel' => $nextLevel, 'bonusDirect' => $bonusDirect ];
+            $returnData = [ 'estimateBonus' => $estimateBonus, 'reachLevle' => $reachLevle, 'nextLevel' => $nextLevel, 'bonusDirect' => $bonusDirect,'boundary' => $userbonus['boundary'] ];
 
             return $returnData;
         }
