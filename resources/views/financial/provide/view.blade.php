@@ -39,7 +39,7 @@
                         <p>總計發放金額</p>
                     </div>
                 </div>
-                <div class="form-group col-xs-8 col-md-6 pull-left">
+                <div class="form-group col-xs-12 col-md-6 pull-left">
                     <date-range :dom_id='"provide_date_ranger"' :input_start_date='"{{date("Y-m-01")}}"' :input_end_date='"{{date("Y-m-01")}}"'
                                 data-step="1" data-intro="選擇要檢視的月份區間"></date-range>
                 </div>

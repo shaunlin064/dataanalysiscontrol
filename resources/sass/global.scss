@@ -306,12 +306,10 @@ $phones-media: 479px;
         @include small-pad-width {
             overflow: hidden;
             height: auto;
-            height: 180px;
         }
         @include phone-width {
             overflow: hidden;
             height: auto;
-            height: 180px;
         }
     }
 }
