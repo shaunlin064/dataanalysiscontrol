@@ -290,7 +290,7 @@
         private function save ( array $selectFincialIds ): void
         {
             $createdTime = new DateTime();
-            if ( $createdTime->format('d') >= 5 )
+            if ( $createdTime->format('d') >= 6 )
             {
                 $createdTime->modify('+1Month');
             }

@@ -121,7 +121,7 @@
                 :columns = '{!!json_encode($saleGroupsTableColumns)!!}'
                 :type = '"select"'
                 :all_user_name='{{json_encode($allUserName)}}'
-                data-step="2" data-intro="召集人獎金須自行手動勾選,每月16號後計算上月獎金..<a href='/info/scheduleList'>可參考系統排程表</a>"
+                data-step="2" data-intro="召集人獎金 每月16號後計算上月獎金..<a href='/info/scheduleList'>可參考系統排程表</a>"
         ></simple-data-table-componet>
         </div>
     </div>
@@ -130,7 +130,7 @@
     {{--list --}}
     <div class='row'>
         <div class='col-md-12' >
-            <p data-step="3" data-intro="個人獎金 每次系統都會自動勾選可發獎金人員,條件為目前所有該員獎金加總會正數,注意搜索並不會取消已勾選人員"></p>
+            <p data-step="3" data-intro="個人獎金 須留意獎金加總需要為正數才能發放"></p>
             <simple-data-table-componet
                     :table_id='"provide_bonus_list"'
                     :table_head='"個人獎金"'

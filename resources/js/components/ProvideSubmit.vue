@@ -3,13 +3,14 @@
 </template>
 
 <script>
-    import {mapState,mapMutations,mapActions,mapGetters} from 'vuex';
+    import {mapState} from 'vuex';
+
     export default {
         name: "ProvideSubmit",
         props: {
-          domid:String,
+            domid: String,
             csrf: String,
-          post_action_url:String,
+            post_action_url: String,
         },
         data() {
             return {}
