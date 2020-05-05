@@ -655,10 +655,10 @@
         {
             $date = new DateTime();
             Cache::store('memcached')->forget($this->cacheKeyFinancial . $date->format('Y-m-01'));
-            Cache::store('memcached')->forget($this->cacheKeyProvide . $date->format('Y-m-01'));
+            Cache::store('memcached')->forget($this->cacheKeyProvide);
             $date->modify('-1Month');
             Cache::store('memcached')->forget($this->cacheKeyFinancial . $date->format('Y-m-01'));
-            Cache::store('memcached')->forget($this->cacheKeyProvide . $date->format('Y-m-01'));
+            Cache::store('memcached')->forget($this->cacheKeyProvide);
         }
     }
 
