@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\FinancialList;
 use DateTime;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
 
 class UpdateFinancialData extends Command
 {
@@ -31,7 +32,7 @@ class UpdateFinancialData extends Command
     {
         parent::__construct();
     }
-    
+
     /**
      * Execute the console command.
      *
@@ -42,9 +43,9 @@ class UpdateFinancialData extends Command
     {
         //
         $startTime = microtime(true);
-        
+
 	    $finanicalList = new FinancialList();
-        
+
         $datetime = new DateTime(date('Ym01'));
         $nowdate = new DateTime();
         /*last month*/
@@ -54,15 +55,17 @@ class UpdateFinancialData extends Command
         }
         /*this month*/
 	    $finanicalList->saveCloseData($nowdate->format('Ym01'));
-    
+
 	    /*next month*/
         $dateNextMonth = new DateTime(date('Ym01'));
         $dateNextMonth->modify('+1Month');
         $finanicalList->saveCloseData($dateNextMonth->format('Ym01'));
-        
+
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
-    
+
+        Artisan::call('cache_all');
+
         /*mail notice Job*/
         \App\Jobs\SentMail::dispatch('crontab',['mail'=>'shaun@js-adways.com.tw','name'=>'admin', 'title' => 'update_financial_data schedule down']);
     }
