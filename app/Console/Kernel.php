@@ -43,9 +43,9 @@
         protected function schedule (Schedule $schedule)
         {
             if(env('APP_ENV') != 'local'){
-                $schedule->command('update_financial_data')->twiceDaily(10, 15);
-                $schedule->command('update_financial_data')->dailyAt('19:00');
-                $schedule->command('update_financial_money_receipt')->dailyAt('00:20');
+                $schedule->command('update_financial_data')->twiceDaily(12, 18);
+                $schedule->command('update_financial_data')->daily();
+
                 $schedule->command('update_user_bonus')->monthlyOn('1', '00:00');
                 $schedule->command('update_sale_groups')->monthlyOn('1', '00:10');
                 $schedule->command('update_exchange_rate')->monthlyOn('1', '00:30');

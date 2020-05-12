@@ -37,16 +37,16 @@ class InfoController extends BaseController
 
         $timeLine =[
             'resource' => [
-                ["id"=>'',"title"=>"更新收款資料","eventColor"=>"green"],
                 ["id"=>'',"title"=>"更新財報資料","eventColor"=>"orange"],
                 ["id"=>'',"title"=>"更新財報資料","eventColor"=>"orange"],
                 ["id"=>'',"title"=>"更新財報資料","eventColor"=>"orange"],
             ],
             'events' => [
-                ['id' => '',  'resourceId' => '','title' => '收款更新','start' => $dateTime->format('Y-m-d 00:00:00') , 'end' => $dateTime->format('Y-m-d 01:00:00')],
-                ['id' => '',  'resourceId' => '','title' => '財報更新','start' => $dateTime->format('Y-m-d 10:00:00') , 'end' => $dateTime->format('Y-m-d 11:00:00')],
-                ['id' => '',  'resourceId' => '','title' => '財報更新','start' => $dateTime->format('Y-m-d 15:00:00') , 'end' => $dateTime->format('Y-m-d 16:00:00')],
-//                ['id' => '',  'resourceId' => '','title' => '財報更新','start' => $dateTime->format('Y-m-d 19:00:00') , 'end' => $dateTime->format('Y-m-d 19:00:00')],
+
+                    ['id' => '',  'resourceId' => '','title' => '財報更新','start' => $dateTime->format('Y-m-d 12:00:00') , 'end' => $dateTime->format('Y-m-d 12:00:00')],
+                ['id' => '',  'resourceId' => '','title' => '財報更新','start' => $dateTime->format('Y-m-d 18:00:00') , 'end' => $dateTime->format('Y-m-d 18:00:00')],
+                ['id' => '',  'resourceId' => '','title' => '財報更新','start' => $dateTime->format('Y-m-d 00:00:00') , 'end' => $dateTime->format('Y-m-d 00:00:00')]
+                ,
             ]
         ];
         $rid = 1;

@@ -64,6 +64,7 @@ class UpdateFinancialData extends Command
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
 
+        Artisan::call('update_financial_money_receipt');
         Artisan::call('cache_all');
 
         /*mail notice Job*/

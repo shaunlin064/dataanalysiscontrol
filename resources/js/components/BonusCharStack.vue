@@ -111,7 +111,6 @@
             update() {
                 /*資料整理*/
                 let barChartData = this.trimData();
-                console.log(barChartData);
                 this.chart_obj.data = barChartData;
 
                 this.chart_obj.options.scales.xAxes[0].scaleLabel.labelString = `${this.start_date.substr(0, 7)}  至  ${this.end_date.substr(0, 7)}`;
