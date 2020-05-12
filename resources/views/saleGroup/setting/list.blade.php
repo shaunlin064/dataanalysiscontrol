@@ -108,7 +108,6 @@
                     ],
                 });
             let listdata = {!! json_encode($row)  !!};
-            console.log($('#saleGroupSetting'));
             dataTable.clear();
             dataTable.rows.add( listdata );
             dataTable.draw();

@@ -74,7 +74,7 @@ class SaleGroupController extends BaseController
 		})->toArray();
 		$saleGroups->groupsUsers->map(function($v,$k) use(&$groupsBonusHistory){
 			$v['boundary'] = $v->getUserBonusBoundary->boundary ?? 0;
-			$v['name'] =  ucfirst($v->user->name);
+			$v['name'] =  $v->user ? ucfirst($v->user->name) : '';
 
 			if(isset($groupsBonusHistory[$v->set_date])){
                 $groupsBonusHistory[$v->set_date]['totalBoundary'] += $v['boundary'];
