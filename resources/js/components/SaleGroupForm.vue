@@ -3,7 +3,7 @@
 			<form class="form-horizontal" :action='this.arg.form_action' method='post' id='bonusSettingForm'>
 				<input type='hidden'  id='user_now_select' name='user_now_select' v-model='user_now_select'>
 				<input type='hidden'  id='user_now_select_is_convener' name='user_now_select_is_convener' v-model='user_now_select_is_convener'>
-				
+
 				<div class="box-body">
 					<div class="form-group">
 						<input type='hidden' name="_token" :value=csrf_token>
@@ -90,11 +90,11 @@
 								</tr>
 								</tbody>
 							</table>
-							
+
 							<div class="col-3 offset-9 text-right my-3">
 								<button type='button' @click="add" class="btn btn-success">新增</button>
 							</div>
-						
+
 						</div>
 					</div>
 					<simple-data-table-componet
@@ -107,7 +107,7 @@
 						<button type="button" @click='submit' class="btn btn-info pull-right" data-step="8" data-intro="最後送出才會完成修改">送出</button>
 				</div>
 				<!-- /.box-body -->
-				
+
 				<!-- /.box-footer -->
 			</form>
 	</div>
@@ -185,7 +185,7 @@
                 this.has_error = true;
                 this.has_error = false;
                 this.detail_check();
-               
+
                 if(!this.detail_error_check){
                     this.originalData = null;
                     this.editIndex = null;
@@ -198,7 +198,7 @@
                 }else{
                     this.has_error = false;
                 }
-		            
+
                 this.detail_check();
                 if( !(this.has_error) && !(this.detail_error_check) ){
                     $('#bonusSettingForm').submit();
@@ -209,16 +209,18 @@
                     $('#groupName').focus();
                     return;
                 }
-                if(this.user_now_select.length == 0){
-                    alert('請選擇團隊成員');
-                    return;
-                }
-                
+                // if(this.user_now_select.length == 0){
+                //     this.has_error = true;
+                //     alert('請選擇團隊成員');
+                //     return;
+                // }
+
                 if(this.user_now_select_is_convener.length > 1){
+                    this.has_error = true;
                     alert('招集人不能超過一位');
                     return;
                 }
-                
+
                 let detail_has_error = this.detail_has_error;
                 const values = Object.values(this.items);
                 let detail_error_check = false;
@@ -251,18 +253,18 @@
                 });
                 vue.bonus_rate -=  vue.count_rate * 0.25;
             });
-            
-            
+
+
 		        $('.row').on('click','input[type="checkbox"]',function(v,k){
                 var now = +new Date();
                 if (now - evTimeStamp < 100) {
                     return;
                 }
                 evTimeStamp = now;
-                
+
                 let checkStatus = $(this).prop("checked");
                 let thisValue = parseInt($(this).val());
-                
+
 				        if($(this).hasClass('is_convener')){
                     if(checkStatus){
                         vue.user_now_select_is_convener.push(thisValue);
@@ -274,7 +276,7 @@
                     if(checkStatus){
                         vue.total_boundary += $(this).parent().parent().find('[data-boundary]').data('boundary');
                         vue.user_now_select.push(thisValue);
-		                    
+
                         if(boundary !== undefined && boundary !== 0  ){
                             vue.count_rate++;
                         }
