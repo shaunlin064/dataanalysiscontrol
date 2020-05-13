@@ -144,6 +144,40 @@ window.sleep = function (time) {
   });
 };
 
+window.sumDataMapReduce = function (arr, key) {
+  return eval("arr.map(el=>el.".concat(key, ").reduce((a,b)=>a+b)"));
+};
+
+window.getSort = function (datas, useKey) {
+  var v1 = {};
+  var v2 = datas;
+  Object.keys(v2).forEach(function (key) {
+    var keyValue = v2[key][useKey];
+
+    if (v1[keyValue] === undefined) {
+      v1[keyValue] = [];
+    }
+
+    if (v1[keyValue][key] === undefined) {
+      v1[keyValue][key] = [];
+    }
+
+    v1[keyValue][key].push(v2[key]);
+  }, useKey);
+  var v3 = [];
+  Object.keys(v1).forEach(function (key) {
+    var items = v1[key];
+    Object.keys(items).forEach(function (key) {
+      if (v3[key] === undefined) {
+        v3[key] = [];
+      }
+
+      v3[key] = items[key][0];
+    });
+  });
+  return v3;
+};
+
 window.urlPost = function (URL, PARAMTERS) {
   var TARGET = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '_blank';
   //创建form表单

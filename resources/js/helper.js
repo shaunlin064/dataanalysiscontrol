@@ -15,7 +15,35 @@ window.changeUrlParmas = function(data) {
 window.sleep = function(time) {
     return new Promise((resolve) => setTimeout(resolve, time));
 };
+window.sumDataMapReduce = function(arr,key){
+    return eval(`arr.map(el=>el.${key}).reduce((a,b)=>a+b)`);
+};
+window.getSort = function(datas,useKey){
+    let v1 = {};
+    let v2 = datas;
+    Object.keys(v2).forEach( key => {
+        let keyValue = v2[key][useKey];
+        if(v1[keyValue] === undefined){
+            v1[keyValue] = [];
+        }
+        if(v1[keyValue][key] === undefined){
+            v1[keyValue][key] = [];
+        }
+        v1[keyValue][key].push(v2[key]);
+    },useKey);
 
+    let v3 = [];
+    Object.keys(v1).forEach(key=>{
+        let items = v1[key];
+        Object.keys(items).forEach( key => {
+            if(v3[key] === undefined){
+                v3[key] = [];
+            }
+            v3[key] = items[key][0];
+        });
+    });
+    return v3;
+}
 window.urlPost = function(URL, PARAMTERS,TARGET = '_blank') {
 
     //创建form表单

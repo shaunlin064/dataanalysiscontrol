@@ -170,7 +170,7 @@
                         :csrf='"{{csrf_token()}}"'
                         :labels='[]'
                         :height='300'
-                        :chart_data='{{ json_encode([ ["data"=>0],["data"=>0],["data"=>0,"type"=> 'line'] ]) }}'
+                        :chart_data='{{ json_encode([ ["data"=>0],["data"=>0],["data"=>0,"type"=> 'bar'] ]) }}'
                     ></chart-component>
                     <chart-component
                         :table_id='"chart_financial_bar_last_record"'
@@ -180,13 +180,36 @@
                         :csrf='"{{csrf_token()}}"'
                         :labels='[]'
                         :height='300'
-                        :chart_data='{{ json_encode([ ["data"=>0],["data"=>0],["data"=>0,"type"=> 'line'] ]) }}'
+                        :chart_data='{{ json_encode([ ["data"=>0],["data"=>0],["data"=>0,"type"=> 'bar'] ]) }}'
                     ></chart-component>
                     <bonus-chart-stack
                         :table_id='"chart_stack_bar"'
                         :title='"月份"'
                         :height='300'>
                     </bonus-chart-stack>
+                </div>
+            </div>
+        </div>
+        <div class='col-md-12'>
+            <div class="box box-warning">
+                <div class="box-header with-border">
+                    <h3 class="box-title">媒體圖表</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"
+                                data-ui-contorl='customer_char'><i
+                                class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                    <!-- /.box-tools -->
+                </div>
+                <div class="box-body" data-step="5" data-intro="圓餅圖表可點擊查看細節">
+                    <div class='owl-carousel owl-theme' data-owl-name='customer_char'>
+                        <chart-media-precentage-profit
+                            :table_id='"media_precentage_profit"'
+                            :title='"媒體毛利佔比"'
+                            :labels='[]'
+                        ></chart-media-precentage-profit>
+                    </div>
                 </div>
             </div>
         </div>
@@ -398,6 +421,7 @@
                 </div>
             </div>
         </div>
+
         <div class="col-xs-12">
             <div class="box box-warning">
                 <div class="box-header with-border">

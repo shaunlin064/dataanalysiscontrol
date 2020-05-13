@@ -11,6 +11,7 @@
         },
         data() {
             return {
+                time : [],
                 ajax_url : '/bonus/review/getAjaxData',
             }
         },
@@ -111,6 +112,7 @@
             },
             end_date: {
                 immediate: true,    // 这句重要
+                // lazy:true,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && val !== oldVal) {
                         this.getData();
@@ -119,6 +121,7 @@
             },
             user_ids: {
                 immediate: true,    // 这句重要
+                // lazy:true,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && val !== oldVal) {
                         this.getData();

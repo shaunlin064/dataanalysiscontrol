@@ -48,11 +48,34 @@
                             text: this.title
                         },
                         plugins: {
-                            labels:
-                                {
-                                render: 'percentage',
-                                fontColor: ['black'],
-                                precision: 1
+                            // labels:
+                            //     {
+                            //     render: 'percentage',
+                            //     fontColor: ['black'],
+                            //     precision: 1
+                            // }
+                            datalabels: {
+                                align: 'bottom',
+                                formatter: (value, ctx) => {
+                                    let sum = 0;
+                                    let index = ctx.datasetIndex;
+                                    let dataArr = ctx.chart.data.datasets[index].data;
+
+                                    dataArr.map(data => {
+                                        if(data < 0){
+                                            data = 0;
+                                        }
+                                        sum += data;
+                                    });
+
+                                    let percentage = (value*100 / sum).toFixed(1);
+                                    if(percentage != '0.0'){
+                                        return percentage+"%";
+                                    }
+                                    return null;
+
+                                },
+                                color: '#0c0b0b',
                             }
                         }
                     }

@@ -28,6 +28,47 @@
     use SebastianBergmann\Comparator\ComparisonFailure;
     use App\Mail\CronTab;
 
+    Route::get('/test1', function (\Illuminate\Http\Request $request){
+       $query = http_build_query(
+           [
+               'client_id' => 3,
+               'redirect_uri' => 'http://dac/callback',
+               'response_type' => 'code',
+               'scope' => '',
+           ]);
+        return redirect('http://signing/oauth/authorize?'.$query);
+    });
+
+    Route::get('/callback', function (\Illuminate\Http\Request $request) {
+
+        $http = new GuzzleHttp\Client;
+
+//        $response = $http->post('http://signing/oauth/token', [
+//            'form_params' => [
+//                'grant_type' => 'authorization_code',
+//                'client_id' => '3',
+//                'client_secret' => 'IBO4XfNr4u7BXNtyLIfU9YXxURXElB1p2DJ9SvdG',
+//                'redirect_uri' => 'http://dac/callback',
+//                'code' => $request->code,
+//            ],
+//        ]);
+
+        $http = new GuzzleHttp\Client;
+
+        $response = $http->post('http://127.0.0.5/oauth/token', [
+            'form_params' => [
+                'grant_type' => 'password',
+                'client_id' => '3',
+                'client_secret' => 'IBO4XfNr4u7BXNtyLIfU9YXxURXElB1p2DJ9SvdG',
+                'username' => 'shaun@js-adways.com.tw',
+                'password' => '9876qwer',
+                'scope' => '',
+            ],
+        ]);
+
+        return json_decode((string) $response->getBody(), true);
+    });
+
     /*
      * 登入系統
      */

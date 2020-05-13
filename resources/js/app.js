@@ -26,8 +26,8 @@ window.DataTable = DataTable;
 
 //chart.js
 import Chart from 'chart.js';
-import ChartPlugin from 'chartjs-plugin-labels';
-
+// import ChartPlugin from 'chartjs-plugin-labels';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import moment from 'moment'
 window.moment = moment;
 //datepicker
@@ -75,6 +75,7 @@ Vue.component('box-progress-component', require('./components/BoxProgress').defa
 //chart
 Vue.component('chart-component', require('./components/Chart').default);
 Vue.component('chart-customer-precentage-profit', require('./components/CustomerPrecentagePie').default);
+Vue.component('chart-media-precentage-profit', require('./components/MediaPrecentagePie').default);
 Vue.component('chart-customer-profit-bar', require('./components/CustomerProfitBar').default);
 Vue.component('chart-all-year-profit-line', require('./components/AllYearProfit').default);
 Vue.component('provide-chart-stack', require('./components/ProvideChartStack').default);

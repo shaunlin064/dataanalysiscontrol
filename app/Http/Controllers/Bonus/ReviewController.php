@@ -192,25 +192,28 @@
             ];
 
             /*ajax check debug*/ //
-//            $dateStart = $date->format('2020-04-01');
-//            $dateEnd   = $date->format('2020-04-01');
-//            $userIds   = collect($userList)->pluck('erp_user_id')->toArray();
-//            $request   = new Request(
-//                [
-//                    'startDate'    => $dateStart,
-//                    'endDate'      => $dateEnd,
-//                    'saleGroupIds' => [
-//                        1,
-//                        2,
-//                        3,
-//                        4,
-//                        5
-//                    ],
-//                    'userIds'      => []
-//                ]
-//            );
-//            $return    = $this->getAjaxData($request, 'return');
-//            dd($return['progress_list_total'], $return['group_progress_list_total']);
+            //            $dateStart = $date->format('2020-05-01');
+            //            $dateEnd   = $date->format('2020-05-01');
+            //            $userIds   = collect($userList)->pluck('erp_user_id')->toArray();
+            //            $request   = new Request(
+            //                [
+            //                    'startDate'    => $dateStart,
+            //                    'endDate'      => $dateEnd,
+            //                    'saleGroupIds' => [
+            //                        1,
+            //                        2,
+            //                        3,
+            //                        4,
+            //                        5,
+            //                        6,
+            //                        7,
+            //                        8
+            //                    ],
+            //                    'userIds'      => []
+            //                ]
+            //            );
+            //            $return    = $this->getAjaxData($request, 'return');
+            //            dd($return);
             return view(
                 'bonus.review.view', [
                                        'data'                        => $this->resources,
@@ -571,7 +574,6 @@
                     array_merge($chartFinancialBar['totalIncome'], $chartFinancialBarLastRecord['totalIncome'])
                 )->max();
 
-
                 Cache::store('file')->put(
                     $cahceKey . 'filterData' . $hash, [
                     $customerPrecentageProfit,
@@ -653,19 +655,24 @@
                 }
             );
 
-            $bonus_list = $bonus_list->values()->toArray();
-            $progress_list = $progress_list->map(function($v,$k){
-                $v['profit'] = number_format($v['profit']);
-                $v['totalProfit'] = number_format($v['totalProfit']);
-                return $v;
-            });
-            $progress_list_total = $progress_list_total->map(function($v,$k){
-                $v['total_boundary'] = number_format($v['total_boundary']);
-                $v['total_profit'] = number_format($v['total_profit']);
-                return $v;
-            });
+            $bonus_list                = $bonus_list->values()->toArray();
+            $progress_list             = $progress_list->map(
+                function ( $v, $k ) {
+                    $v['profit']      = number_format($v['profit']);
+                    $v['totalProfit'] = number_format($v['totalProfit']);
+                    return $v;
+                }
+            );
+            $progress_list_total       = $progress_list_total->map(
+                function ( $v, $k ) {
+                    $v['total_boundary'] = number_format($v['total_boundary']);
+                    $v['total_profit']   = number_format($v['total_profit']);
+                    return $v;
+                }
+            );
             $group_progress_list       = $group_progress_list->whereIn('id', $saleGroupIds)->values();
-            $group_progress_list_total = $group_progress_list->groupBy('id')->map(function ( $v, $k ) {
+            $group_progress_list_total = $group_progress_list->groupBy('id')->map(
+                function ( $v, $k ) {
                     return [
                         'id'                 => $v->max('id'),
                         'name'               => $v->max('name'),
@@ -675,10 +682,12 @@
                     ];
                 }
             )->values();
-            $group_progress_list = $group_progress_list->map(function($v,$k){
-                $v['profit'] = number_format($v['profit']);
-                return $v;
-            });
+            $group_progress_list       = $group_progress_list->map(
+                function ( $v, $k ) {
+                    $v['profit'] = number_format($v['profit']);
+                    return $v;
+                }
+            );
 
             $returnData = [
                 "bonus_list"                      => $bonus_list,
@@ -928,17 +937,23 @@
                             continue;
                         }
                     }
-                    $tmpData                    = $this->getUserBonus($item->erp_user_id, 0, $dateRange);
-                    $tmpData['totalProfit']     = number_format(0);
-                    $tmpData['sale_group_name'] = $item->user->getUserGroupsName();
-                    $tmpData['user_name']       = $item->user->name;
-                    $tmpData['set_date']        = $setDate;
-                    $tmpData['erp_user_id']     = $item->erp_user_id;
-                    $tmpData['boundary']        = $item->boundary;
-                    $progressDatas[]            = $tmpData;
+                    $tmpData                = $this->getUserBonus($item->erp_user_id, 0, $dateRange);
+                    $tmpData['totalProfit'] = number_format(0);
+
+                    $tmpData['sale_group_name'] = $item->user->userGroups->where('set_date', $dateRange)->map(
+                        function ( $v ) {
+                            return $v->saleGroups->name;
+                        }
+                    )->implode(',');
+
+                    //                    $tmpData['sale_group_name'] = $item->user->getUserGroupsName();
+                    $tmpData['user_name']   = $item->user->name;
+                    $tmpData['set_date']    = $setDate;
+                    $tmpData['erp_user_id'] = $item->erp_user_id;
+                    $tmpData['boundary']    = $item->boundary;
+                    $progressDatas[]        = $tmpData;
                 }
             };
-
             ///*get group Profit */
             $groupDateStart = new DateTime($dateStart);
             $tmpGroups      = [];
@@ -1285,6 +1300,7 @@
                     $saleChannelProfitData[ $v->max('sales_channel') ] = $v->sum('profit');
                 }
             );
+            $saleChannelProfitData = collect($saleChannelProfitData)->sortKeys();
 
             $mediaCompaniesProfitData = $bonus_list->groupBy('companies_id')->map(
                 function ( $v, $k ) {
@@ -1328,16 +1344,14 @@
                         'sales_channel'    => $v->max(
                             'sales_channel'
                         ),
-                        'income'           => number_format($income),
-                        'cost'             => number_format(
-                            $cost
-                        ),
-                        'profit'           => number_format($profit),
+                        'income'           => $income,
+                        'cost'             => $cost,
+                        'profit'           => $profit,
                         'profit_percenter' => $profitPercenter
                     ];
                     return $data;
                 }
-            )->values();
+            )->sortBy('sales_channel')->values();
 
             return [
                 $mediaCompaniesProfitData,

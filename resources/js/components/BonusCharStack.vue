@@ -89,10 +89,9 @@
                             }]
                         },
                         plugins: {
-                            labels:
-                                {
-                                    fontSize: 0
-                                }
+                            datalabels: {
+                                display: false,
+                            }
                         }
                     }
                 },

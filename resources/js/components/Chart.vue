@@ -76,6 +76,30 @@
                         'labels': this.labels,
                     },
                     options: {
+                        plugins: {
+                            datalabels: {
+                                formatter: (value, ctx) => {
+                                    let sum = 0;
+                                    let index = ctx.datasetIndex;
+                                    let dataArr = ctx.chart.data.datasets[index].data;
+
+                                    dataArr.map(data => {
+                                        if(data < 0){
+                                            data = 0;
+                                        }
+                                        sum += data;
+                                    });
+
+                                    let percentage = (value*100 / sum).toFixed(1);
+                                    if(percentage != '0.0'){
+                                        return percentage+"%";
+                                    }
+                                    return null;
+
+                                },
+                                color: '#0c0b0b',
+                            }
+                        },
                         responsive: true,
                         maintainAspectRatio: this.height ? false : true,
                         title: {
@@ -99,7 +123,7 @@
                             }]
                         },
 
-                    }
+                    },
                 },
                 chart_obj: {},
                 chart_labels: [],
@@ -171,36 +195,7 @@
                             return a.group_id < b.group_id ? 1 : -1;
                         });
 
-                        function getSort(datas){
-                            let v1 = {};
-                            let v2 = datas;
-                            let useKey = 'group_id';
-                            Object.keys(v2).forEach( key => {
-                                let keyValue = v2[key][useKey];
-                                if(v1[keyValue] === undefined){
-                                    v1[keyValue] = [];
-                                }
-                                if(v1[keyValue][key] === undefined){
-                                    v1[keyValue][key] = [];
-                                }
-                                v1[keyValue][key].push(v2[key]);
-                            },useKey);
-
-                            let v3 = [];
-                            Object.keys(v1).forEach(key=>{
-                                let items = v1[key];
-                                Object.keys(items).forEach( key => {
-                                    if(v3[key] === undefined){
-                                        v3[key] = [];
-                                    }
-                                    v3[key] = items[key][0];
-                                });
-                            });
-                            return v3;
-                        }
-
-
-                        vue_this.provide_statistics_list.user = getSort(vue_this.provide_statistics_list.user);
+                        vue_this.provide_statistics_list.user = getSort(vue_this.provide_statistics_list.user,'group_id');
                         // console.log( vue_this.provide_statistics_list.user);
                         Object.keys(vue_this.provide_statistics_list.user).forEach(key => {
                             let money = vue_this.provide_statistics_list.user[key]['money'];
@@ -214,7 +209,7 @@
                             vue_this.chart_obj.data.labels.push(key);
                         });
 
-                        vue_this.provide_statistics_list.group = getSort(vue_this.provide_statistics_list.group);
+                        vue_this.provide_statistics_list.group = getSort(vue_this.provide_statistics_list.group,'group_id');
                         Object.keys(vue_this.provide_statistics_list.group).forEach(key => {
                             let money = vue_this.provide_statistics_list.group[key]['money'];
                             let group_id = vue_this.provide_statistics_list.group[key]['group_id'];
@@ -231,9 +226,7 @@
 
                         vue_this.chart_obj.data.datasets.map(function (dataset, key) {
                             dataset.data = data[key];
-
                         });
-
                     }
                 } else if (vue_this.type == 'bar') {
                     if (vue_this.table_id == 'chart_financial_bar_last_record') {

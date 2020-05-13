@@ -41,23 +41,23 @@ class User extends Authenticatable
 	{
 		$this->api_token = str_random(60);
 		$this->save();
-		
+
 		return $this->api_token;
 	}
-	
+
 	public function financialList(){
 		return $this->hasMany(FinancialList::CLASS,'erp_user_id','erp_user_id');
 	}
-	
+
 	public function userGroups(){
-		return $this->hasMany(SaleGroupsUsers::CLASS,'erp_user_id','erp_user_id')->orderBy('set_date','desc')->groupBy('sale_groups_id');
+		return $this->hasMany(SaleGroupsUsers::CLASS,'erp_user_id','erp_user_id')->orderBy('set_date','desc');
 		//return $this->hasMany(SaleGroupsUsers::CLASS,'erp_user_id','erp_user_id')->groupBy('sale_groups_id');
 	}
-	
+
 	public function isAdmin(){
 		return $this->hasRole('admin');
 	}
-    
+
     public function isBusinessDirector ()
     {
         return $this->hasRole('business_director');
@@ -75,31 +75,31 @@ class User extends Authenticatable
         if(auth()->user()->isAdmin()){
             return true;
         }
-        
+
         $this->roles->each(function($role) use($permission,&$check){
             if($role->permissions->contains('name',$permission)){
                 $check = true;
                 return false;
             };
         });
-        
+
         return $check;
     }
-    
+
     public function menuCheck (Menu $menus)
     {
         $check = false;
-        
+
         $menus->subMenu->each(function($v,$k) use(&$check){
             if($check == false){
                 $check = $this->hasPermission($v->url);
             }
         });
-    
+
         if(auth()->user()->isAdmin()){
             $check=true;
         }
-        
+
         return $check;
     }
 }
