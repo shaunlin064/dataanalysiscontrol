@@ -313,7 +313,10 @@
             },
             getOtherData(data) {
                 let vue = this;
-                let profit = sumDataMapReduce(data, 'profit');
+                let profit = 0;
+                if(data.length > 0){
+                     profit = sumDataMapReduce(data, 'profit');
+                }
                 let profit_average = profit / data.length;
                 let trimData = [];
                 let tmp_other = vue.getDataDefault('other', 'other');
@@ -336,9 +339,12 @@
                 let vue = this;
                 let trimData = vue.getDataDefault(name, sales_channel);
                 let tmp_other = vue.getDataDefault('其他', sales_channel);
-                trimData.profit = sumDataMapReduce(data, 'profit');
-                trimData.cost = sumDataMapReduce(data, 'cost');
-                trimData.income = sumDataMapReduce(data, 'income');
+                if(data.length > 0){
+                    trimData.profit = sumDataMapReduce(data, 'profit');
+                    trimData.cost = sumDataMapReduce(data, 'cost');
+                    trimData.income = sumDataMapReduce(data, 'income');
+                }
+
                 let profit_average = trimData.profit / data.length;
 
                 data.map((v, key) => {
