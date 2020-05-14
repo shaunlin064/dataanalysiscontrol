@@ -97,12 +97,12 @@
                                     }else{
                                         let strNumber = value;
                                         if(value/1000000000 > 1){
-                                            strNumber = (value / 1000000000).toFixed(1) + 'B'
+                                            strNumber = (value / 1000000000).toFixed(1) + 'G'
                                         }
                                         else if(value/1000000 > 1){
                                             strNumber = (value / 1000000).toFixed(1) + 'M'
                                         }else if(value/1000 > 1){
-                                            strNumber = Math.round(value / 1000) + 'K'
+                                            strNumber = Math.round(value / 1000) + 'k'
                                         }else{
                                             strNumber = Math.round(value * 1000) / 1000;
                                         }
