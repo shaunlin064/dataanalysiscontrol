@@ -386,7 +386,7 @@
         },
         watch: {
             customer_profit_data: {
-                immediate: true,    // 这句重要
+                immediate: false,    // 这句重要
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'customer_profit_data') {
 
@@ -395,7 +395,7 @@
                 }
             },
             customer_groups_profit_data: {
-                immediate: true,    // 这句重要
+                immediate: false,    // 这句重要
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'customer_groups_profit_data') {
 
@@ -404,7 +404,7 @@
                 }
             },
             medias_profit_data: {
-                immediate: true,    // 这句重要
+                immediate: false,    // 这句重要
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'medias_profit_data') {
 
@@ -413,7 +413,7 @@
                 }
             },
             media_companies_profit_data: {
-                immediate: true,    // 这句重要
+                immediate: false,    // 这句重要
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'media_companies_profit_data') {
 
@@ -422,7 +422,7 @@
                 }
             },
             group_progress_list: {
-                immediate: true,    // 这句重要
+                immediate: false,    // 这句重要
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'group_progress_list') {
 
@@ -431,7 +431,7 @@
                 }
             },
             group_progress_list_total: {
-                immediate: true,    // 这句重要
+                immediate: false,    // 这句重要
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'group_progress_list_total') {
 
@@ -440,7 +440,7 @@
                 }
             },
             progress_list: {
-                immediate: true,    // 这句重要
+                immediate: false,    // 这句重要
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'progress_list') {
 
@@ -449,7 +449,7 @@
                 }
             },
             progress_list_total: {
-                immediate: true,    // 这句重要
+                immediate: false,    // 这句重要
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'progress_list_total') {
 
@@ -458,7 +458,7 @@
                 }
             },
             bonus_list: {
-                immediate: true,    // 这句重要
+                immediate: false,    // 这句重要
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'bonus_list') {
 
@@ -467,7 +467,7 @@
                 }
             },
             provide_bonus_list: {
-                immediate: true,    // 这句重要
+                immediate: false,    // 这句重要
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'provide_bonus_list') {
 
@@ -476,7 +476,7 @@
                 }
             },
             provide_groups_list: {
-                immediate: true,    // 这句重要
+                immediate: false,    // 这句重要
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'provide_groups_list') {
 
@@ -485,7 +485,7 @@
                 }
             },
             exchange_rates_list: {
-                immediate: true,    // 这句重要
+                immediate: false,    // 这句重要
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'exchange_rates_list') {
                         this.updataTable(val);

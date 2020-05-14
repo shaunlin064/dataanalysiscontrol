@@ -89,13 +89,28 @@
                                         }
                                         sum += data;
                                     });
-
-                                    let percentage = (value*100 / sum).toFixed(1);
-                                    if(percentage != '0.0'){
-                                        return percentage+"%";
+                                    if(this.type == 'pie'){
+                                        let percentage = (value*100 / sum).toFixed(1);
+                                        if(percentage != '0.0'){
+                                            return percentage+"%";
+                                        }
+                                    }else{
+                                        let strNumber = value;
+                                        if(value/1000000000 > 1){
+                                            strNumber = (value / 1000000000).toFixed(1) + 'B'
+                                        }
+                                        else if(value/1000000 > 1){
+                                            strNumber = (value / 1000000).toFixed(1) + 'M'
+                                        }else if(value/1000 > 1){
+                                            strNumber = Math.round(value / 1000) + 'K'
+                                        }else{
+                                            strNumber = Math.round(value * 1000) / 1000;
+                                        }
+                                        // strNumber = currencyFilters(parseInt(Math.round(value * 1000) / 1000));
+                                        return strNumber;
                                     }
-                                    return null;
 
+                                    return null;
                                 },
                                 color: '#0c0b0b',
                             }
@@ -150,16 +165,16 @@
         },
         mounted: function () {
             var ctx = document.getElementById(this.table_id).getContext('2d');
-            if(this.type == 'bar'){
-                this.config.options.plugins = {
-                    labels:
-                    {
-                        render: function (args) {
-                            return new Intl.NumberFormat().format(args.value);
-                        },
-                    }
-                };
-            }
+            // if(this.type == 'bar'){
+            //     this.config.options.plugins = {
+            //         labels:
+            //         {
+            //             render: function (args) {
+            //                 return new Intl.NumberFormat().format(args.value);
+            //             },
+            //         }
+            //     };
+            // }
             this.chart_obj = new Chart(ctx, this.config);
         },
         methods: {
@@ -339,7 +354,7 @@
                         this.update(this);
                     }
                 }
-            }
+            },
         }
     }
 </script>

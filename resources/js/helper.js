@@ -18,6 +18,17 @@ window.sleep = function(time) {
 window.sumDataMapReduce = function(arr,key){
     return eval(`arr.map(el=>el.${key}).reduce((a,b)=>a+b)`);
 };
+window.checkUndefined = function(data,key,def){
+    if(data[key] === undefined){
+        return def;
+    }else{
+        return data[key];
+    }
+};
+window.currencyFilters = function(price){
+    // return price.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
+    return price.toLocaleString('en-US');  /*寫法二：轉為千分號*/
+},
 window.getSort = function(datas,useKey){
     let v1 = {};
     let v2 = datas;

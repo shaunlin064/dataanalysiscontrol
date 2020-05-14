@@ -88,9 +88,12 @@
                     'render' => '<span class="badge bg-${style}">${data}</span>',
                     'parmas' => 'let style ="yellow"; if(data == "BR"){ style = "green"}else if(data == "EC"){ style = "purple"}'
                 ],
-                [ 'data' => 'income' ],
-                [ 'data' => 'cost' ],
-                [ 'data' => 'profit' ],
+                [ 'data' => 'income',
+                  'render' => '${Math.round(data).toLocaleString("en-US")}',],
+                [ 'data' => 'cost',
+                  'render' => '${Math.round(data).toLocaleString("en-US")}',],
+                [ 'data' => 'profit',
+                  'render' => '${Math.round(data).toLocaleString("en-US")}',],
                 [ 'data' => 'profit_percenter' ]
             ];
             $mediaCompaniesProfitColumns = [
@@ -1297,7 +1300,7 @@
             ];
             $bonus_list->groupBy('sales_channel')->each(
                 function ( $v, $k ) use ( &$saleChannelProfitData ) {
-                    $saleChannelProfitData[ $v->max('sales_channel') ] = $v->sum('profit');
+                    $saleChannelProfitData[ $v->max('sales_channel') ] = round($v->sum('profit'));
                 }
             );
             $saleChannelProfitData = collect($saleChannelProfitData)->sortKeys();

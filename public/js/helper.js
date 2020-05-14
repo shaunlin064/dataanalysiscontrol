@@ -148,7 +148,19 @@ window.sumDataMapReduce = function (arr, key) {
   return eval("arr.map(el=>el.".concat(key, ").reduce((a,b)=>a+b)"));
 };
 
-window.getSort = function (datas, useKey) {
+window.checkUndefined = function (data, key, def) {
+  if (data[key] === undefined) {
+    return def;
+  } else {
+    return data[key];
+  }
+};
+
+window.currencyFilters = function (price) {
+  // return price.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
+  return price.toLocaleString('en-US');
+  /*寫法二：轉為千分號*/
+}, window.getSort = function (datas, useKey) {
   var v1 = {};
   var v2 = datas;
   Object.keys(v2).forEach(function (key) {

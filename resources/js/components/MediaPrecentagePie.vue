@@ -17,12 +17,12 @@
         computed: {...mapState(['medias_profit_data', 'sale_channel_profitData'])},
         data: function () {
             return {
-                evTimeStamp : 0,
-                drill_down_data:{
-
-                },
+                topNumber: 5,
+                topProfitLimit: 10000,
+                evTimeStamp: 0,
+                chart_drill_down_data: {},
                 drill_position: '',
-                chart_data : [],
+                chart_outside_data: [],
                 default_color: {
                     red: 'rgba(255, 99, 132,0.5)',
                     orange: 'rgba(255, 159, 64,0.5)',
@@ -124,10 +124,21 @@
                                                     }
                                                     sum += data;
                                                 });
-
                                                 let percentage = (value * 100 / sum).toFixed(1);
+                                                let strNumber = value;
+                                                // if(value/1000000000 > 1){
+                                                //     strNumber = (value / 1000000000).toFixed(1) + 'B'
+                                                // }
+                                                // else if(value/1000000 > 1){
+                                                //     strNumber = (value / 1000000).toFixed(1) + 'M'
+                                                // }else if(value/1000 > 1){
+                                                //     strNumber = Math.round(value / 1000) + 'K'
+                                                // }else{
+                                                //     strNumber = Math.round(value * 1000) / 1000;
+                                                // }
+                                                strNumber = currencyFilters(parseInt(Math.round(value * 1000) / 1000));
                                                 return ctx.active
-                                                    ? Math.round(value * 1000) / 1000
+                                                    ? strNumber
                                                     : percentage + "%";
 
                                             } else {
@@ -193,10 +204,24 @@
             };
         },
         methods: {
+            getMediaCopyData() {
+                return Object.assign([], this.medias_profit_data);
+            },
+            getDataDefault(name, sales_channel) {
+                return {
+                    'name': name,
+                    'cost': 0,
+                    'income': 0,
+                    'profit': 0,
+                    'profit_percenter': 0,
+                    'sales_channel': sales_channel,
+                    'child': []
+                }
+            },
             drilldown(label) {
                 let vue = this;
 
-                if(vue.drill_down_data[label] === undefined){
+                if (vue.chart_drill_down_data[label] === undefined) {
                     return false;
                 }
                 vue.chart_obj.data.labels = [];
@@ -204,51 +229,52 @@
                 vue.chart_obj.data.datasets[1].backgroundColor = [];
                 let data = [];
                 let mediaData = [];
-                let channelData = [];
+                let inSiteData = [];
 
-                if(this.drill_position === label){
+                if (this.drill_position === label) {
+
                     Object.keys(vue.sale_channel_profitData).forEach(key => {
                         let label = key;
                         let color = vue.channel_color[key];
                         let money = vue.sale_channel_profitData[key];
-                        channelData.push(money);
+                        inSiteData.push(money);
                         vue.chart_obj.data.datasets[0].backgroundColor.push(color);
                         vue.chart_obj.data.datasets[1].backgroundColor.push(color);
                         mediaData.push(0);
                         vue.chart_obj.data.labels.push(label);
                     });
-                    vue.chart_data = vue.chart_data.sort(function (a, b) {
+                    vue.chart_outside_data = vue.chart_outside_data.sort(function (a, b) {
                         return a.sales_channel < b.sales_channel ? 1 : -1;
                     });
-                    vue.chart_data.map((v, key) => {
+                    vue.chart_outside_data.map((v, key) => {
                         let label = v.name;
                         let color = vue.channel_color[v.sales_channel];
                         let money = parseInt(v.profit);
-                        channelData.push(0);
+                        inSiteData.push(0);
                         vue.chart_obj.data.datasets[0].backgroundColor.push(color);
                         vue.chart_obj.data.datasets[1].backgroundColor.push(color);
                         mediaData.push(money);
                         vue.chart_obj.data.labels.push(label);
                     });
                     this.drill_position = 'all';
-                }else{
+                } else {
                     /*內圈*/
                     let color = vue.channel_color[label];
                     let money = vue.sale_channel_profitData[label];
-                    if( label == 'other'){
-                        money = vue.drill_down_data[label]['profit'];
+                    if (label == 'other') {
+                        money = vue.chart_drill_down_data[label]['profit'];
                     }
-                    channelData.push(money);
+                    inSiteData.push(money);
                     vue.chart_obj.data.datasets[0].backgroundColor.push(color);
                     vue.chart_obj.data.datasets[1].backgroundColor.push(color);
                     mediaData.push(0);
                     vue.chart_obj.data.labels.push(label);
                     /*外圈*/
-                    vue.drill_down_data[label]['child'].map((v, key) => {
+                    vue.chart_drill_down_data[label]['child'].map((v, key) => {
                         let label = v.name;
                         let color = vue.channel_color[v.sales_channel];
                         let money = parseInt(v.profit);
-                        channelData.push(0);
+                        inSiteData.push(0);
                         vue.chart_obj.data.datasets[0].backgroundColor.push(color);
                         vue.chart_obj.data.datasets[1].backgroundColor.push(color);
                         mediaData.push(money);
@@ -258,7 +284,7 @@
                 }
 
                 data.push(mediaData);
-                data.push(channelData);
+                data.push(inSiteData);
                 this.chart_obj.data.datasets.map(function (dataset, key) {
                     dataset.data = data[key];
                 });
@@ -268,164 +294,123 @@
                 });
 
             },
-            sumDataReduce(arr) {
-                return arr.reduce((a, b) => a + b);
+            getOtherData(data) {
+                let vue = this;
+                let profit = sumDataMapReduce(data, 'profit');
+                let profit_average = profit / data.length;
+                let trimData = [];
+                let tmp_other = vue.getDataDefault('other', 'other');
+                data.map((v, key) => {
+                    let inTop = false;
+                    inTop = v.profit >= profit_average && v.profit > vue.topProfitLimit && v.profit > 0 && key < vue.topNumber;
+                    if (inTop) {
+                        trimData.push(v);
+                    } else {
+                        tmp_other['child'].push(v);
+                    }
+                });
+                tmp_other = vue.getTrimMediaChildData(tmp_other['child'], 'other', '其他');
+                vue.chart_drill_down_data['other'] = tmp_other;
+                trimData.push(tmp_other)
+
+                return trimData;
+            },
+            getTrimMediaChildData(data, name, sales_channel) {
+                let vue = this;
+                let trimData = vue.getDataDefault(name, sales_channel);
+                let tmp_other = vue.getDataDefault('其他', sales_channel);
+                trimData.profit = sumDataMapReduce(data, 'profit');
+                trimData.cost = sumDataMapReduce(data, 'cost');
+                trimData.income = sumDataMapReduce(data, 'income');
+                let profit_average = trimData.profit / data.length;
+
+                data.map((v, key) => {
+                    let inTop = false;
+                    inTop = v.profit >= profit_average && v.profit > vue.topProfitLimit && v.profit > 0 && key < vue.topNumber;
+                    if (inTop) {
+                        trimData['child'].push(v)
+                    } else {
+                        tmp_other['cost'] += v.cost;
+                        tmp_other['income'] += v.income;
+                        tmp_other['profit'] += v.profit;
+                        tmp_other['child'].push(v);
+                    }
+                });
+                trimData['child'].push(tmp_other)
+
+                return trimData;
+            },
+            setRenderChart(data, type) {
+                let vue = this;
+                let [inSiteData, outSiteData] = [[], []]
+                Object.keys(data).forEach(key => {
+                    let label = '';
+                    let color = '';
+                    let money = '';
+                    if (type === 'in') {
+                        label = key;
+                        color = vue.channel_color[key];
+                        money = vue.sale_channel_profitData[key];
+                        inSiteData.push(money);
+                        outSiteData.push(0);
+                    } else {
+                        label = data[key].name;
+                        color = vue.channel_color[data[key].sales_channel];
+                        money = parseInt(data[key].profit);
+                        inSiteData.push(0);
+                        outSiteData.push(money);
+                    }
+                    vue.chart_obj.data.datasets[0].backgroundColor.push(color);
+                    vue.chart_obj.data.datasets[1].backgroundColor.push(color);
+
+                    vue.chart_obj.data.labels.push(label);
+                });
+                vue.chart_obj.data.datasets[0].data= vue.chart_obj.data.datasets[0].data.concat(outSiteData);
+                vue.chart_obj.data.datasets[1].data = vue.chart_obj.data.datasets[1].data.concat(inSiteData);
+
+            },
+            chartRestDefault(){
+                this.chart_obj.data.labels = [];
+                this.chart_obj.data.datasets[0].data = [];
+                this.chart_obj.data.datasets[1].data = [];
+                this.chart_obj.data.datasets[0].backgroundColor = [];
+                this.chart_obj.data.datasets[1].backgroundColor = [];
             },
             update() {
                 let vue = this;
-                vue.chart_obj.data.labels = [];
-                vue.chart_obj.data.datasets[0].backgroundColor = [];
-                vue.chart_obj.data.datasets[1].backgroundColor = [];
-                vue.drill_down_data = {
-                };
-                vue.chart_data = [];
-                let data = [];
-                let mediaData = [];
-                let channelData = [];
+                let media_total_profit = 0;
+                let profit_average = 0;
+                let sortSalesChannelData = {};
+
+                vue.chart_drill_down_data = {};
+                vue.chart_outside_data = [];
+                vue.chartRestDefault();
 
                 /*計算媒體利潤平均值*/
-                let media_total_profit = 0;
-                let trimData = Object.assign([],this.medias_profit_data)
-                trimData.map((v) => {
-                    let money = parseInt(v.profit);
-                    media_total_profit += money;
-                });
-                let media_length = trimData.length;
-                let profit_average = Math.round(media_total_profit/media_length);
-                /*取前10 且 profit 大於平均*/
-                let topNumber = 5;
+                let trimData = vue.getMediaCopyData();
 
-                /*依利潤排序*/
-                let tmp_data = trimData;
-                tmp_data = tmp_data.sort(function (a, b) {
-                    return a.profit < b.profit ? 1 : -1;
-                });
-                /*分出大於平均值資料 與 其他*/
-                let other_data = [];
-                tmp_data.map((v,key)=>{
-                    /*取前10 且 profit 大於平均*/
-                    if(v.profit >=  profit_average && key < topNumber){
-                        vue.chart_data.push(v);
-                    }else{
-                        other_data.push(v);
-                    }
-                    if(vue.drill_down_data[v.sales_channel] === undefined){
-                        vue.drill_down_data[v.sales_channel] = {
-                            'name' : v.sales_channel,
-                            'cost' : 0,
-                            'income' : 0,
-                            'profit' : 0,
-                            'profit_percenter' : 0,
-                            'sales_channel' : v.sales_channel,
-                            'child' : []
-                        };
-                    }
-                    vue.drill_down_data[v.sales_channel]['cost'] += v.cost;
-                    vue.drill_down_data[v.sales_channel]['income'] += v.income;
-                    vue.drill_down_data[v.sales_channel]['profit'] += v.profit;
-                    vue.drill_down_data[v.sales_channel]['child'].push(v);
-                });
-
-                ['AP','BR','EC'].map(k=>{
-                    let tmpChild = [];
-                    let tmp_other = {
-                        'name' : '其他',
-                        'cost' : 0,
-                        'income' : 0,
-                        'profit' : 0,
-                        'profit_percenter' : 0,
-                        'sales_channel' : k,
-                        'child' : []
-                    };
-                    let average = vue.drill_down_data[k]['profit'] / vue.drill_down_data[k]['child'].length;
-
-                    vue.drill_down_data[k]['child'].map((v,key)=>{
-                        if(key <= 4 && v.profit >= average && v.profit > 0 && v.profit > 10000){
-                            tmpChild.push(v)
-                        }else{
-                            tmp_other['cost'] += v.cost;
-                            tmp_other['income'] += v.income;
-                            tmp_other['profit'] += v.profit;
-                            tmp_other.child.push(v);
-                        }
+                if (trimData.length > 0) {
+                    /*依利潤排序*/
+                    trimData = trimData.sort((a, b) => a.profit < b.profit ? 1 : -1);
+                    media_total_profit = sumDataMapReduce(trimData, 'profit');
+                    profit_average = Math.round(media_total_profit / trimData.length);
+                    /*sort data*/
+                    trimData.map((v, key) => {
+                        sortSalesChannelData[v.sales_channel] = checkUndefined(sortSalesChannelData, v.sales_channel, []);
+                        sortSalesChannelData[v.sales_channel].push(v);
                     });
-                    tmpChild.push(tmp_other);
-                    vue.drill_down_data[k]['child'] = tmpChild;
-                })
+                    /*trim 鉗套下層資料*/
+                    Object.keys(sortSalesChannelData).forEach(sales_channel => {
+                        vue.chart_drill_down_data[sales_channel] = vue.getTrimMediaChildData(sortSalesChannelData[sales_channel], sales_channel, sales_channel);
+                    });
+                    /*最上層層資料*/
+                    vue.chart_outside_data = vue.getOtherData(trimData).sort((a, b) => a.sales_channel > b.sales_channel ? 1 : -1);
 
+                    /*render chart*/
+                    vue.setRenderChart(vue.sale_channel_profitData, 'in');
+                    vue.setRenderChart(vue.chart_outside_data, 'out');
+                }
 
-                /*trim data 整合*/
-                vue.drill_down_data['other'] = {
-                    'name' : 'other',
-                    'cost' : 0,
-                    'income' : 0,
-                    'profit' : 0,
-                    'profit_percenter' : 0,
-                    'sales_channel' : 'other',
-                    'child' : []
-                };
-
-                vue.drill_down_data['other']['cost'] = sumDataMapReduce(other_data,'cost');
-                vue.drill_down_data['other']['income'] =  sumDataMapReduce(other_data,'income');
-                vue.drill_down_data['other']['profit'] = sumDataMapReduce(other_data,'profit');
-
-                let tmp_insite_other = {
-                    'name' : '其他',
-                    'cost' : 0,
-                    'income' : 0,
-                    'profit' : 0,
-                    'profit_percenter' : 0,
-                    'sales_channel' : 'other',
-                    'child' : []
-                };
-                let average = vue.drill_down_data['other']['profit'] / other_data.length;
-                other_data.map((v,key)=>{
-                    if(key <= 4 && v.profit > average && v.profit > 10000){
-                        vue.drill_down_data['other']['child'].push(v)
-                    }else{
-                        tmp_insite_other['cost'] += v.cost;
-                        tmp_insite_other['income'] += v.income;
-                        tmp_insite_other['profit'] += v.profit;
-                        tmp_insite_other.child.push(v);
-                    }
-                });
-                vue.drill_down_data['other']['child'].push(tmp_insite_other);
-
-
-
-                vue.chart_data.push(vue.drill_down_data['other']);
-                Object.keys(vue.sale_channel_profitData).forEach(key => {
-                    let label = key;
-                    let color = vue.channel_color[key];
-                    let money = vue.sale_channel_profitData[key];
-                    channelData.push(money);
-                    vue.chart_obj.data.datasets[0].backgroundColor.push(color);
-                    vue.chart_obj.data.datasets[1].backgroundColor.push(color);
-                    mediaData.push(0);
-                    vue.chart_obj.data.labels.push(label);
-                });
-                vue.chart_data = vue.chart_data.sort(function (a, b) {
-                    return a.sales_channel > b.sales_channel ? 1 : -1;
-                });
-
-
-                vue.chart_data.map((v, key) => {
-                    let label = v.name;
-                    let color = vue.channel_color[v.sales_channel];
-                    let money = parseInt(v.profit);
-                    channelData.push(0);
-                    vue.chart_obj.data.datasets[0].backgroundColor.push(color);
-                    vue.chart_obj.data.datasets[1].backgroundColor.push(color);
-                    mediaData.push(money);
-                    vue.chart_obj.data.labels.push(label);
-                });
-
-
-                data.push(mediaData);
-                data.push(channelData);
-                vue.chart_obj.data.datasets.map(function (dataset, key) {
-                    dataset.data = data[key];
-                });
                 vue.chart_obj.update({
                     duration: 700,
                     easing: 'linear'
@@ -443,9 +428,8 @@
 
                         let now = +new Date();
                         if (now - this.evTimeStamp < 2000) {
-                           return;
+                            return;
                         }
-                        console.log('1');
                         this.evTimeStamp = now;
                         this.update();
                     }
