@@ -500,7 +500,7 @@
             }
 
             async function run() {
-                await sleep(500);
+                await sleep(1500);
                 $owl.trigger('refresh.owl.carousel');
             }
 
