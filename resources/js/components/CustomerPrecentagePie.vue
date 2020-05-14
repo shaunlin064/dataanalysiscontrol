@@ -95,13 +95,10 @@
             this.chart_obj = new Chart(ctx, this.config);
         },
         methods: {
-            sumDataReduce(arr){
-                return arr.reduce((a,b)=>a+b);
-            },
             update(vue_this) {
                 vue_this.chart_obj.data.datasets[0].data = [
-                    vue_this.sumDataReduce(vue_this.$store.state.agency_profit),
-                    vue_this.sumDataReduce(vue_this.$store.state.client_profit),
+                    vue_this.agency_profit.reduce((a,b)=>a+b),
+                    vue_this.client_profit.reduce((a,b)=>a+b),
                     0,
                     0,
                     0

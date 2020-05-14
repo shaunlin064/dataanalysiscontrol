@@ -315,7 +315,7 @@
                 let vue = this;
                 let profit = 0;
                 if(data.length > 0){
-                     profit = sumDataMapReduce(data, 'profit');
+                    profit = data.map(e=>e.profit).reduce((a,b)=>a+b);
                 }
                 let profit_average = profit / data.length;
                 let trimData = [];
@@ -340,9 +340,9 @@
                 let trimData = vue.getDataDefault(name, sales_channel);
                 let tmp_other = vue.getDataDefault('其他', sales_channel);
                 if(data.length > 0){
-                    trimData.profit = sumDataMapReduce(data, 'profit');
-                    trimData.cost = sumDataMapReduce(data, 'cost');
-                    trimData.income = sumDataMapReduce(data, 'income');
+                    trimData.profit = data.map(e=>e.profit).reduce((a,b)=>a+b);
+                    trimData.cost = data.map(e=>e.cost).reduce((a,b)=>a+b);
+                    trimData.income = data.map(e=>e.income).reduce((a,b)=>a+b);
                 }
 
                 let profit_average = trimData.profit / data.length;
@@ -415,7 +415,7 @@
                 if (trimData.length > 0) {
                     /*依利潤排序*/
                     trimData = trimData.sort((a, b) => a.profit < b.profit ? 1 : -1);
-                    media_total_profit = sumDataMapReduce(trimData, 'profit');
+                    media_total_profit = trimData.map(e=>e.profit).reduce((a,b)=>a+b);
                     profit_average = Math.round(media_total_profit / trimData.length);
                     /*sort data*/
                     trimData.map((v, key) => {

@@ -15,9 +15,6 @@ window.changeUrlParmas = function(data) {
 window.sleep = function(time) {
     return new Promise((resolve) => setTimeout(resolve, time));
 };
-window.sumDataMapReduce = function(arr,key){
-    return eval(`arr.map(el=>el.${key}).reduce((a,b)=>a+b)`);
-};
 window.checkUndefined = function(data,key,def){
     if(data[key] === undefined){
         return def;
