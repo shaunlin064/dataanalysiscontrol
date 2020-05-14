@@ -482,17 +482,29 @@
             }
 
 
-            $('.owl-carousel').owlCarousel({
+            var $owl = $('.owl-carousel').owlCarousel({
                 loop: false,
                 center: true,
                 items: 1,
                 margin: 10,
+                autoHeight:true,
                 responsive: {
                     800: {
                         items: 1
                     }
                 }
             });
+
+            async function sleep(ms = 0) {
+                return new Promise(r => setTimeout(r, ms));
+            }
+
+            async function run() {
+                await sleep(500);
+                $owl.trigger('refresh.owl.carousel');
+            }
+
+            run();
             /*cookie 紀錄使用者 習慣看哪個 owl item*/
             if (cookie.bonus_review_owl === undefined) {
                 cookie.bonus_review_owl = {};

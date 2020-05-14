@@ -14,7 +14,7 @@
             title: String,
             labels: Array,
         },
-        computed: {...mapState(['medias_profit_data', 'sale_channel_profitData'])},
+        computed: {...mapState(['medias_profit_data', 'sale_channel_profitData','start_date','end_date'])},
         data: function () {
             return {
                 topNumber: 5,
@@ -59,6 +59,22 @@
                         title: {
                             display: true,
                             text: this.title
+                        },
+                        scales: {
+                            xAxes:  [{
+                                stacked: false,
+                                scaleLabel : {
+                                    display : true,
+                                    labelString : '',
+                                    padding: 2,
+                                }
+                            }],
+                            yAxes: [{
+                                stacked: false,
+                                scaleLabel : {
+                                    display : false,
+                                }
+                            }]
                         },
                         plugins: {
                             datalabels: {
@@ -202,6 +218,7 @@
                     vue.drilldown(label);
                 }
             };
+
         },
         methods: {
             getMediaCopyData() {
@@ -410,7 +427,7 @@
                     vue.setRenderChart(vue.sale_channel_profitData, 'in');
                     vue.setRenderChart(vue.chart_outside_data, 'out');
                 }
-
+                this.chart_obj.options.scales.xAxes[0].scaleLabel.labelString = `${this.start_date.substr(0, 7)}  至  ${this.end_date.substr(0, 7)}`;
                 vue.chart_obj.update({
                     duration: 700,
                     easing: 'linear'
