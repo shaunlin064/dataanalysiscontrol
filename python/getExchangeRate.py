@@ -5,15 +5,15 @@ import datetime
 
 class Exchange:
     def __init__(self):
-        self.currencies = ('JPY','USD','CNY')
-        self.currencyData = {'JPY':{},'USD':{},'CNY':{}}
+        self.currencies = ('JPY','USD','CNY','HKD','KRW','SGD','USD','GBP','IDR')
+        self.currencyData = {'JPY':{},'USD':{},'CNY':{},'HKD':{},'KRW':{},'SGD':{},'GBP':{},'IDR':{}}
         self.filePath = 'storage/app/public/exchangeRate.txt'
         today = datetime.date.today()
-        first = today.replace(day=1)
-        lastMonthLastDay = first - datetime.timedelta(days=1)
+#         first = today.replace(day=1)
+#         lastMonthLastDay = first - datetime.timedelta(days=1)
 
-        self.getYear= int(lastMonthLastDay.strftime("%Y"))
-        self.getMonth= int(lastMonthLastDay.strftime("%m"))
+        self.getYear= int(today.strftime("%Y"))
+        self.getMonth= int(today.strftime("%m"))
 
     def getExchangeLastMonth(self):
 
@@ -24,7 +24,6 @@ class Exchange:
         with open(self.filePath,"w") as f:
             f.write(json.dumps(self.currencyData))
     def getExchangeByRange(self,startYear,startMonth):
-
         for currency in self.currencies:
             tmpYear = int(startYear)
             tmpMonth = int(startMonth)

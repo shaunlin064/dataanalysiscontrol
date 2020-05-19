@@ -202,7 +202,7 @@
                     </div>
                     <!-- /.box-tools -->
                 </div>
-                <div class="box-body" data-step="5" data-intro="圓餅圖表可點擊查看細節">
+                <div class="box-body" data-step="8" data-intro="圓餅圖表可點擊查看細節">
                     <div class='owl-carousel owl-theme' data-owl-name='customer_char'>
                         <chart-media-precentage-profit
                             :table_id='"media_precentage_profit"'

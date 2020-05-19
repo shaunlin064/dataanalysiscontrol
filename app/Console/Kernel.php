@@ -48,7 +48,7 @@
 
                 $schedule->command('update_user_bonus')->monthlyOn('1', '00:00');
                 $schedule->command('update_sale_groups')->monthlyOn('1', '00:10');
-                $schedule->command('update_exchange_rate')->monthlyOn('1', '00:30');
+                $schedule->command('update_exchange_rate')->daily();
                 $schedule->command('update_bonus_reach')->monthlyOn('16', '00:10');
                 $schedule->command('update_convener_reach')->monthlyOn('16', '00:20');
 
