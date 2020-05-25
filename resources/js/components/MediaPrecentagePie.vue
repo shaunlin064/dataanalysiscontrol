@@ -201,9 +201,9 @@
             });
         },
         mounted: function () {
-            var ctx = document.getElementById(this.table_id).getContext('2d');
+            let ctx = document.getElementById(this.table_id).getContext('2d');
             this.chart_obj = new Chart(ctx, this.config);
-            var canvas = document.getElementById(this.table_id);
+            let canvas = document.getElementById(this.table_id);
             let vue = this;
             canvas.onclick = function (evt) {
                 var activePoints = vue.chart_obj.getElementsAtEvent(evt);

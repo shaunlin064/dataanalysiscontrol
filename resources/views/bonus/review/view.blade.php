@@ -190,7 +190,7 @@
                 </div>
             </div>
         </div>
-        <div class='col-md-12'>
+        <div class='col-sm-12 col-xs-12 border-right'>
             <div class="box box-warning">
                 <div class="box-header with-border">
                     <h3 class="box-title">媒體圖表</h3>
@@ -203,13 +203,11 @@
                     <!-- /.box-tools -->
                 </div>
                 <div class="box-body" data-step="8" data-intro="圓餅圖表可點擊查看細節">
-                    <div class='owl-carousel owl-theme' data-owl-name='customer_char'>
                         <chart-media-precentage-profit
                             :table_id='"media_precentage_profit"'
                             :title='"媒體毛利佔比"'
                             :labels='[]'
                         ></chart-media-precentage-profit>
-                    </div>
                 </div>
             </div>
         </div>
