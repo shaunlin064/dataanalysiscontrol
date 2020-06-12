@@ -419,7 +419,7 @@
                     profit_average = Math.round(media_total_profit / trimData.length);
                     /*sort data*/
                     trimData.map((v, key) => {
-                        sortSalesChannelData[v.sales_channel] = checkUndefined(sortSalesChannelData, v.sales_channel, []);
+                        sortSalesChannelData[v.sales_channel] = sortSalesChannelData[v.sales_channel] !== undefined ? sortSalesChannelData[v.sales_channel] : [];
                         sortSalesChannelData[v.sales_channel].push(v);
                     });
                     /*trim 鉗套下層資料*/

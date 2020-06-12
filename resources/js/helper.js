@@ -15,13 +15,6 @@ window.changeUrlParmas = function(data) {
 window.sleep = function(time) {
     return new Promise((resolve) => setTimeout(resolve, time));
 };
-window.checkUndefined = function(data,key,def){
-    if(data[key] === undefined){
-        return def;
-    }else{
-        return data[key];
-    }
-};
 window.currencyFilters = function(price){
     // return price.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
     return price.toLocaleString('en-US');  /*寫法二：轉為千分號*/
