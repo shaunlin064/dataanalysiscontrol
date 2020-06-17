@@ -8,7 +8,7 @@
 
 <script>
     import {mapState, mapMutations, mapActions, mapGetters} from 'vuex';
-    
+
     export default {
         name: "ExchangeChartLine",
         props: {
@@ -83,7 +83,7 @@
             }
         },
         computed: {
-                ...mapState(['chart_exchange_line']),
+                ...mapState('exchangeRate',['chart_exchange_line']),
         },
         methods: {
             update(vue_this) {
@@ -110,10 +110,10 @@
                                 });
                                 break;
                         }
-                       
+
                         vue_this.chart_obj.data.labels = vue_this.chart_exchange_line.labels;
                     }
-                    
+
                 });
                 vue_this.chart_obj.update({
                     duration: 700,

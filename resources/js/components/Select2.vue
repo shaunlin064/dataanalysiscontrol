@@ -31,25 +31,31 @@
                     this.changeSaleGroupId($('#'+domId+'').val());
                     break;
               case 'select_currency':
-                      this.$store.state.currency = $('#'+domId+'').val();
+                      this.$store.dispatch('exchangeRate/changeCurrency',$('#'+domId+'').val());
                   break;
               }
             },
             changeUserId(ids) {
-                this.$store.commit('changeUserId', ids);
+                // this.$store.commit('changeUserId', ids);
+                this.$store.dispatch('select/changeUserId', ids);
             },
             changeSaleGroupId(ids) {
-                this.$store.commit('changeSaleGroupId', ids);
+                // this.$store.commit('changeSaleGroupId', ids);
+                this.$store.dispatch('select/changeSaleGroupId', ids);
             },
         },
-        computed: mapState(['user_ids','sale_group_ids']),
+        computed: {
+            ...mapState('select',['user_ids','sale_group_ids']),
+            ...mapState('exchangeRate',['currency']),
+        },
+        // computed: mapState(['user_ids','sale_group_ids']),
         mounted: function(){
-            
+
             $('#'+this.id+'').select2();
-		        
+
             var domId = this.id;
             var thisVue = this;
-            
+
             thisVue.updateSelectToVux(domId);
             $('#'+this.id+'').on('change', function (e) {
                 thisVue.updateSelectToVux(domId);
@@ -57,13 +63,13 @@
             var evTimeStamp = 0;
             $('.row').on('click','input[name="selectType"]',function(v,k){
                 let now = new Date();
-                
+
                 if (now - evTimeStamp < 100) {
                     return;
                 }
-                
+
                 evTimeStamp = now;
-                
+
                 let select_user = $('#select_user');
                 let select_groups = $('#select_groups');
                 let type = $(this).data('type');
@@ -95,7 +101,7 @@
         },
         watch:{
             // change_date: {
-            //     immediate: true,    // 这句重要
+            //     immediate: true,
             //     handler (val, oldVal) {
             //         if(oldVal !== undefined) {
             //

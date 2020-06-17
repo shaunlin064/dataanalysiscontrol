@@ -448,8 +448,6 @@
         </div>
         <!-- /.box -->
     </div>
-
-    </div>
     <!-- /.row -->
 @endsection
 

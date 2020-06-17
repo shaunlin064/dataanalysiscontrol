@@ -98,7 +98,8 @@
             }
         },
         computed: {
-            ...mapState(['bonus_char_bar_stack','start_date','end_date']),
+            ...mapState('chart',['bonus_char_bar_stack']),
+            ...mapState('dateRange',['start_date','end_date'])
         },
         created: function () {
         },
@@ -122,60 +123,6 @@
 
             },
             trimData() {
-                /*stack*/
-                // let barChartData = {};
-                // let trimDatas = [];
-                // let originalData = this.bonus_char_bar_stack;
-                // let stackLabel = [];
-                // let columnLabel = [];
-                // var vue = this;
-                // let i = 0;
-                //
-                // Object.keys(originalData).forEach(date=>{
-                //     // trimDatas[key] = [];
-                //     let items = [];
-                //     let items2 = [];
-                //     let items3 = [];
-                //     let datas = originalData[date];
-                //
-                //     stackLabel.push(date);
-                //     Object.keys(datas).forEach(userName =>{
-                //         if(i == 0){
-                //             columnLabel.push(userName);
-                //         }
-                //         items.push(datas[userName]['income']);
-                //         items2.push(datas[userName]['cost']);
-                //         items3.push(datas[userName]['profit']);
-                //     },columnLabel,i);
-                //
-                //     let colorNumber = parseInt(date.substr(5,6))%12;
-                //     trimDatas.push({
-                //         label:`${date}-收入`,
-                //         data:items,
-                //         stack:'0',
-                //         backgroundColor:vue.color[colorNumber]
-                //     });
-                //
-                //     trimDatas.push({
-                //         label:`${date}-成本`,
-                //         data:items2,
-                //         stack:'1',
-                //         backgroundColor:vue.color[colorNumber]
-                //     });
-                //     trimDatas.push({
-                //         label:`${date}-毛利`,
-                //         data:items3,
-                //         stack:'2',
-                //         backgroundColor:vue.color[colorNumber]
-                //     });
-                //
-                //     i++;
-                //
-                // },trimDatas,stackLabel,columnLabel,i);
-                // barChartData.labels = columnLabel;
-                // barChartData.datasets = trimDatas;
-                //
-                // return barChartData;
                 /*full month*/
                 let barChartData = {};
                 let trimDatas = [];

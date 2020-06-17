@@ -118,7 +118,7 @@
         },
         watch: {
             agency_profit: {
-                immediate: true,    // 这句重要
+                immediate: true,
                 handler(val, oldVal) {
                     if (oldVal !== undefined) {
                         this.update(this);
@@ -126,7 +126,7 @@
                 }
             },
             client_profit: {
-                immediate: true,    // 这句重要
+                immediate: true,
                 handler(val, oldVal) {
                     if (oldVal !== undefined ) {
                         this.update(this);

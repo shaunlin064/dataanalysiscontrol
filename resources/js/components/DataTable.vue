@@ -50,7 +50,7 @@
                         let chartMoneyStatus = response.data.chartMoneyStatus;
                         this.updataTable(response.data.erpReturnData);
 
-                        this.$store.commit('changeMonthBalancen', {
+                        this.$store.commit('changeMonthBalance', {
                             'month_income': chartDataBar.totalIncome,
                             'month_cost': chartDataBar.totalCost
                         });
@@ -133,7 +133,7 @@
         },
         watch: {
             change_date: {
-                immediate: true,    // 这句重要
+                immediate: true,
                 handler(val, oldVal) {
                     if (oldVal !== undefined) {
                         this.getCampaignData(this.user_ids, val);

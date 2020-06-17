@@ -50,17 +50,17 @@
             input_start_date : String,
             input_end_date : String,
         },
-        computed: {...mapState(['start_date','end_date'])},
+        computed: {...mapState('dateRange',['start_date','end_date'])},
         data() {
             return {
             }
         },
         mounted: function(){
-        
+
         },
         methods: {
             update(){
-            
+
             },
             click(dataSelectType) {
                 let d = new Date();
@@ -68,7 +68,7 @@
                 let dateStrEnd;
                 let year = d.getFullYear();
                 let month = d.getMonth();
-                
+
                 switch (dataSelectType) {
                     case 'lY':
                         dateStrStart = `${d.getFullYear() - 1}-01-01`;
@@ -98,7 +98,7 @@
                         }
                         dateStrStart = `${year}-${month}-01`;
                         dateStrEnd = `${year}-${month}-01`;
-                        
+
                         break;
                     case 'q1':
                         dateStrStart = `${year}-01-01`;
@@ -117,8 +117,8 @@
                         dateStrEnd = `${year}-12-01`;
                         break;
                 }
-                
-                this.$store.commit('changeDateRange', [dateStrStart,dateStrEnd]);
+
+                this.$store.dispatch('dateRange/changeDateRange', [dateStrStart,dateStrEnd]);
             }
         },
     }

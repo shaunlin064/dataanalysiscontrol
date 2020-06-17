@@ -27,7 +27,6 @@
 
 @extends('headerbar')
 
-
 <!-- Content Wrapper. Contains page content -->
 @section('content')
     <div class="row">

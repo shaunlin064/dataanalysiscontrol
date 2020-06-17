@@ -28,7 +28,7 @@
 @section('content')
     <div class="row">
         <div class="col-md-4">
-            <profile-component :user_data='{!! json_encode($userData) !!}'></profile-component>
+            <person-profile-component :user_data='{!! json_encode($userData) !!}'></person-profile-component>
         </div>
         <!-- /.col -->
         <div class="col-md-8">

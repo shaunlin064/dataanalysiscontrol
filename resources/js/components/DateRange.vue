@@ -2,7 +2,7 @@
 	<!-- Date range -->
 	<div class="form-group">
 		<label>Date range:</label>
-		
+
 		<div class="input-group">
 			<div class="input-group-addon">
 				<i class="fa fa-calendar"></i>
@@ -15,7 +15,7 @@
 
 <script>
     import {mapState, mapMutations, mapActions} from 'vuex';
-    
+
     export default {
         name: "date-range",
         props: {
@@ -23,7 +23,9 @@
             input_end_date : String,
             dom_id : String,
         },
-        computed: {...mapState(['start_date','end_date'])},
+        computed: {
+            ...mapState('dateRange',['start_date','end_date']),
+        },
         data() {
             return {
                 starDate : this.input_start_date,
@@ -52,15 +54,17 @@
         },
         methods: {
             changeDate() {
-                this.$store.commit('changeDateRange', [this.starDate,this.endDate]);
+                this.$store.dispatch('dateRange/changeDateRange',[this.starDate,this.endDate])
+                // this.$store.commit('changeDateRange', [this.starDate,this.endDate]);
             },
             update(){
-                $('#' + this.dom_id + '').val(`${this.$store.state.start_date.replace("-01", "")} - ${this.$store.state.end_date.replace("-01", "")}`);
+                // $('#' + this.dom_id + '').val(`${this.$store.state.start_date.replace("-01", "")} - ${this.$store.state.end_date.replace("-01", "")}`);
+                $('#' + this.dom_id + '').val(`${this.start_date.replace("-01", "")} - ${this.end_date.replace("-01", "")}`);
             },
         },
         watch: {
             start_date: {
-                immediate: true,    // 这句重要
+                immediate: true,
                 handler(val, oldVal) {
                     if (oldVal !== undefined) {
                         this.update();
@@ -68,7 +72,7 @@
                 }
             },
             end_date: {
-                immediate: true,    // 这句重要
+                immediate: true,
                 handler(val, oldVal) {
                     if (oldVal !== undefined ) {
                         this.update();

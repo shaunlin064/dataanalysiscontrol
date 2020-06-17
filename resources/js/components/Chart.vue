@@ -21,7 +21,10 @@
             csrf: String,
             height: Number,
         },
-        computed: {...mapState(['month_income', 'month_cost', 'month_profit', 'money_status_paid', 'money_status_unpaid', 'money_status_bonus_paid', 'money_status_bonus_unpaid', 'month_label', 'last_record_month_income', 'last_record_month_cost', 'last_record_month_profit', 'last_record_month_label', 'chart_bar_max_y', 'provide_statistics_list', 'provide_total_money'])},
+        computed: {
+            ...mapState('chart',['month_income', 'month_cost', 'month_profit', 'money_status_paid', 'money_status_unpaid', 'money_status_bonus_paid', 'money_status_bonus_unpaid', 'month_label', 'last_record_month_income', 'last_record_month_cost', 'last_record_month_profit', 'last_record_month_label', 'chart_bar_max_y',]),
+            ...mapState('financial',['provide_statistics_list','provide_total_money'])
+        },
         data: function () {
             return {
                 color:[
@@ -145,41 +148,36 @@
             }
         },
         created: function () {
+            bus.$on('chartClear',this.chartClear);
             let vue_this = this;
-            // var default_color = vue_this.default_color;
             this.config.data.datasets.map(function (v, k, i) {
-
                 if (vue_this.type == 'pie') {
                     v.backgroundColor = vue_this.pie_color;
                 } else if (vue_this.type == 'bar') {
                     v.label = vue_this.bar_label[k];
                     v.backgroundColor = vue_this.bar_color[k];
-                    // if(k <= 1){
-                    //     v.stack = '0';
-                    // }else{
-                    //     v.stack = '1';
-                    // }
                     v.stack = `${k}`;
                 }
             });
+
         },
         mounted: function () {
             var ctx = document.getElementById(this.table_id).getContext('2d');
-            // if(this.type == 'bar'){
-            //     this.config.options.plugins = {
-            //         labels:
-            //         {
-            //             render: function (args) {
-            //                 return new Intl.NumberFormat().format(args.value);
-            //             },
-            //         }
-            //     };
-            // }
             this.chart_obj = new Chart(ctx, this.config);
+
         },
         methods: {
             getRandom(min, max) {
                 return Math.floor(Math.random() * (max - min + 1)) + min;
+            },
+            chartClear(){
+                let vue = this;
+                this.chart_obj.data.labels = [];
+                this.chart_obj.data.datasets.map( (v,k) =>{
+                    vue.chart_obj.data.datasets[k]['data'] = [];
+                    vue.chart_obj.data.datasets[k]['backgroundColo']=[];
+                });
+                this.chart_obj.update();
             },
             update(vue_this) {
                 if (vue_this.type == 'pie') {
@@ -197,25 +195,10 @@
                         vue_this.chart_obj.data.datasets[0].backgroundColor=[];
                         vue_this.chart_obj.data.datasets[1].backgroundColor=[];
 
-                        vue_this.provide_statistics_list.user = vue_this.provide_statistics_list.user.sort(function (a, b) {
-                            if(a.group_id < b.group_id){
-                                return 1;
-                            }
-                            if(a.group_id > b.group_id){
-                                return -1;
-                            }
-                            return 0;
-                        });
-                        vue_this.provide_statistics_list.group = vue_this.provide_statistics_list.group.sort(function (a, b) {
-                            return a.group_id < b.group_id ? 1 : -1;
-                        });
-
-                        vue_this.provide_statistics_list.user = getSort(vue_this.provide_statistics_list.user,'group_id');
-                        // console.log( vue_this.provide_statistics_list.user);
                         Object.keys(vue_this.provide_statistics_list.user).forEach(key => {
                             let money = vue_this.provide_statistics_list.user[key]['money'];
                             let group_id = vue_this.provide_statistics_list.user[key]['group_id'];
-                            // let label = vue_this.provide_statistics_list.user[key]['name'];
+
                             let color = vue_this.group_id_color[group_id];
                             userdata.push(money);
                             vue_this.chart_obj.data.datasets[0].backgroundColor.push(color);
@@ -224,7 +207,6 @@
                             vue_this.chart_obj.data.labels.push(key);
                         });
 
-                        vue_this.provide_statistics_list.group = getSort(vue_this.provide_statistics_list.group,'group_id');
                         Object.keys(vue_this.provide_statistics_list.group).forEach(key => {
                             let money = vue_this.provide_statistics_list.group[key]['money'];
                             let group_id = vue_this.provide_statistics_list.group[key]['group_id'];

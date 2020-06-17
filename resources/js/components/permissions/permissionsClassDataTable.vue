@@ -53,17 +53,16 @@
             return {}
         },
         computed: {
-            ...mapState(['permission_data','permission_class_data']),
+            ...mapState('permission', ['permission_data', 'permission_class_data']),
         },
         methods: {
             renderDatatable(){
                 this.dataTable.clear();
-                this.dataTable.rows.add(this.$store.state.permission_class_data);
+                this.dataTable.rows.add(this.permission_class_data);
                 this.dataTable.draw();
             },
             updateVuex: function (res) {
-                this.$store.state.permission_data = res.data.row;
-                this.$store.state.permission_class_data = res.data.permissionClassData;
+                this.$store.dispatch('permission/changePermissionClassData',res.data.permissionClassData);
             },
             axioPost(params, id){
                 params['_token'] = this.csrf;
@@ -120,9 +119,11 @@
         },
         beforeMount: function () {
             var vue = this;
-
-            this.$store.state.permission_class_data = vue.row;
-
+            this.updateVuex({
+                data: {
+                    permissionClassData: vue.row
+                }
+            })
             $(document).ready(function () {
                 let domtable = $('#' + vue.table_id);
                 let dataTableConfig =

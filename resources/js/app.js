@@ -1,4 +1,4 @@
-import store from "./store";
+// import store from "./store";
 
 /**
  * First we will load all of this project's JavaScript dependencies which
@@ -14,8 +14,10 @@ import Vuex from 'vuex';
 
 Vue.use(Vuex);
 
-import storeData from './store';
-let customerStore =  new Vuex.Store(storeData);
+// Vuex Store
+import store from './store/store'
+// import store from './store';
+// let customerStore =  new Vuex.Store(store);
 
 
 // jquery
@@ -62,7 +64,7 @@ Vue.component('bonus-setting-history', require('./components/BonusSettingHistory
 Vue.component('bonus-review-ajax', require('./components/BonusReviewAjax.vue').default);
 Vue.component('financial-provide-ajax-component', require('./components/FinancialProvideAjax.vue').default);
 
-Vue.component('profile-component', require('./components/PersonProfile.vue').default);
+Vue.component('person-profile-component', require('./components/PersonProfile.vue').default);
 
 Vue.component('data-table-component', require('./components/DataTable.vue').default);
 Vue.component('date-picker-component', require('./components/Datepicker.vue').default);
@@ -133,7 +135,10 @@ Vue.component('permission-class-data-table', require('./components/permissions/p
 Vue.component('menu-list', require('./components/menu/menuList').default);
 Vue.component('menu-form', require('./components/menu/menuForm').default);
 Vue.component('menu-sub-form', require('./components/menu/menuSubForm').default);
+
+window.bus = new Vue();
 const app = new Vue({
     el: '#app',
-    store: customerStore
+    store
 });
+

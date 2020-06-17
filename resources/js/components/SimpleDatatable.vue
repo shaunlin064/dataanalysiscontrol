@@ -59,12 +59,14 @@
         data() {
             return {
                 now: 0,
-                rows_selected: this.$store.state.table_select,
             }
         },
         computed: {
-            // ...mapGetters(['getTableSelect','getUserIds','getSaleGroupIds','getStartDate','getEndDate']),
-            ...mapState(['provide_money', 'loading', 'customer_profit_data', 'customer_groups_profit_data', 'medias_profit_data', 'media_companies_profit_data', 'group_progress_list', 'group_progress_list_total', 'progress_list', 'progress_list_total', 'bonus_list', 'provide_bonus_list', 'provide_groups_list', 'start_date', 'end_date', 'exchange_rates_list', 'currency', 'table_select', 'provide_statistics_list', 'provide_char_bar_stack']),
+            ...mapState('financial',['provide_money', 'loading', 'provide_bonus_list', 'provide_groups_list', 'start_date', 'end_date',  'provide_statistics_list', 'provide_char_bar_stack','provide_total_money']),
+            ...mapState('chart',['bonus_list','customer_profit_data', 'customer_groups_profit_data', 'medias_profit_data', 'media_companies_profit_data', 'group_progress_list', 'group_progress_list_total', 'progress_list', 'progress_list_total','exchange_rates_list']),
+            ...mapState('exchangeRate',['exchange_rates_list']),
+            ...mapState('dataTable',['table_select']),
+            ...mapState(['loading']),
         },
         methods: {
             tableClear() {
@@ -74,39 +76,12 @@
                 }
             },
             updataTable(row) {
-
                 let vue = this;
                 if (vue.dataTable !== undefined) {
                     vue.dataTable.clear();
                     vue.dataTable.rows.add(row);
                     vue.dataTable.draw();
-                    vue.$store.state.loading = false;
-                    if ($.inArray(vue.table_id, ['provide_groups_list', 'provide_bonus_list']) !== -1) {
-                        // $(`#${vue.table_id} tbody`).find('tr').each(function (e, v) {
-                        //     vue.selectToggle($(v), 'select');
-                        // });
-
-                        vue.dataTable.rows().data().each(function (v, e) {
-                            let thisSelectMoney = v.provide_money;
-                            let groupName = v.sale_group_name ? v.sale_group_name : v.group_name;
-                            let groupId = v.sale_groups_id !== undefined ? v.sale_groups_id : v.sale_groups.sale_groups_id;
-                            let userName = v.user_name ? v.user_name : '';
-                            vue.setStatistics(v);
-
-                            vue.provide_statistics_list['user'][userName]['money'] += thisSelectMoney;
-                            vue.provide_statistics_list['user'][userName]['group_id'] = groupId;
-                            vue.provide_statistics_list['group'][groupName]['money'] += thisSelectMoney;
-                            vue.provide_statistics_list['group'][groupName]['group_id'] = groupId;
-
-                            if (vue.provide_statistics_list['user'][userName]['money'] === 0) {
-                                delete vue.provide_statistics_list['user'][userName];
-                            }
-                            if (vue.provide_statistics_list['group'][groupName]['money'] === 0) {
-                                delete vue.provide_statistics_list['group'][groupName];
-                            }
-                            vue.$store.state.provide_total_money += thisSelectMoney;
-                        });
-                    }
+                    // vue.$store.state.loading = false;
                 }
             },
             getExportFileName() {
@@ -120,43 +95,28 @@
 
                 if (data !== undefined) {
                     let rowId = data.id;
-                    // let rows_selected = this.$store.getters.getTableSelect;
-                    let index = $.inArray(rowId, this.rows_selected[this.table_id]);
-                    let thisSelectMoney = data.provide_money;
-                    let groupName = data.sale_group_name ? data.sale_group_name : data.group_name;
-                    let groupId = data.sale_groups_id !== undefined ? data.sale_groups_id : data.sale_groups.sale_groups_id;
-                    let userName = data.user_name ? data.user_name : '';
-                    this.setStatistics(data);
+                    let index = $.inArray(rowId, this.table_select[this.table_id]);
+                    let table_id = this.table_id;
+                    this.$store.dispatch('financial/setStatistics',data);
 
                     switch (type) {
                         case 'select':
                             if (index === -1) {
-                                this.rows_selected[this.table_id].push(rowId);
-                                this.$store.state.provide_total_money += thisSelectMoney;
-                                this.provide_statistics_list['user'][userName]['money'] += thisSelectMoney;
-                                this.provide_statistics_list['user'][userName]['group_id'] = groupId;
-                                this.provide_statistics_list['group'][groupName]['money'] += thisSelectMoney;
-                                this.provide_statistics_list['group'][groupName]['group_id'] = groupId;
-                                this.provide_char_bar_stack[data.set_date][data.user_name]['provide_money'] += thisSelectMoney;
-                                // eval(`this.provide_char_bar_stack.${data.set_date}.${data.user_name} += ${thisSelectMoney}`);
+                                this.$store.dispatch('financial/selectData',{table_id,data,index,type:'select'})
+                                this.$store.dispatch('dataTable/pushTableSelect',{select_id:rowId,dom_id:table_id});
+
                             }
                             if (vue.type === 'select') {
                                 $(row).find('input[type="checkbox"]').prop('checked', true);
                                 $(row).addClass('selected');
                             }
-
-                            break;
+                           break;
                         case 'unselect':
                             if (index !== -1) {
-                                this.rows_selected[this.table_id].splice(index, 1);
-                                this.$store.state.provide_total_money -= thisSelectMoney;
-                                this.provide_statistics_list['user'][userName]['money'] -= thisSelectMoney;
-                                this.provide_statistics_list['user'][userName]['group_id'] = groupId;
-                                this.provide_statistics_list['group'][groupName]['money'] -= thisSelectMoney;
-                                this.provide_statistics_list['group'][groupName]['group_id'] = groupId;
-                                this.provide_char_bar_stack[data.set_date][data.user_name]['provide_money'] -= thisSelectMoney;
-                                // eval(`this.provide_char_bar_stack.${data.set_date}.${data.user_name} -= ${thisSelectMoney}`);
+                                this.$store.dispatch('financial/selectData',{table_id,data,index,type:'unselect'})
+                                this.$store.dispatch('dataTable/spliceTableSelect',{select_id:rowId,dom_id:table_id});
                             }
+
                             if (vue.type === 'select') {
                                 $(row).find('input[type="checkbox"]').prop('checked', false);
                                 $(row).removeClass('selected');
@@ -164,72 +124,10 @@
                             break;
                     }
 
-                    if (this.provide_statistics_list['user'][userName]['money'] === 0) {
-                        delete this.provide_statistics_list['user'][userName];
-                    }
-                    if (this.provide_statistics_list['group'][groupName]['money'] === 0) {
-                        delete this.provide_statistics_list['group'][groupName];
-                    }
-
-                    // if(this.$store.state.provide_char_bar_stack[data.set_date][data.user_name]['provide_money'] ===0){
-                    //     delete this.$store.state.provide_char_bar_stack[data.set_date][data.user_name];
-                    // }
-
+                    this.$store.dispatch('financial/sortProvideStatisticsList');
                 }
 
             },
-            setStatistics(data) {
-                /*default*/
-                if (this.provide_statistics_list['user'] === undefined) {
-                    this.provide_statistics_list['user'] = [];
-                }
-                if (this.provide_statistics_list['group'] === undefined) {
-                    this.provide_statistics_list['group'] = [];
-                }
-                /*user*/
-                if (this.provide_statistics_list['user'][data.user_name] === undefined) {
-                    this.provide_statistics_list['user'][data.user_name] = [];
-                    this.provide_statistics_list['user'][data.user_name]['money'] = 0;
-                    this.provide_statistics_list['user'][data.user_name]['group_id'] = 0;
-                }
-                /*sale group*/
-                let groupName = data.sale_group_name ? data.sale_group_name : data.group_name;
-                if (this.provide_statistics_list['group'][groupName] === undefined) {
-                    this.provide_statistics_list['group'][groupName] = [];
-                    this.provide_statistics_list['group'][groupName]['money'] = 0;
-                    this.provide_statistics_list['group'][groupName]['group_id'] = 0;
-                }
-
-
-                /*區分獎金檢視與獎金發放 */
-                let separateDate = data.provide_set_date !== undefined ? data.provide_set_date : data.set_date;
-                if (this.provide_char_bar_stack[separateDate] === undefined) {
-                    this.provide_char_bar_stack[separateDate] = {};
-                }
-                if (this.all_user_name !== undefined) {
-                    let allName = this.all_user_name;
-                    let vue = this;
-                    Object.keys(allName).forEach(k => {
-                        if (vue.provide_char_bar_stack[separateDate][k] === undefined) {
-                            vue.provide_char_bar_stack[separateDate][k] = {};
-                            vue.provide_char_bar_stack[separateDate][k]['provide_money'] = 0;
-                            vue.provide_char_bar_stack[separateDate][k]['erp_user_id'] = allName[k];
-                        }
-                    }, vue, separateDate);
-                }
-                if (this.provide_char_bar_stack[separateDate][data.user_name] === undefined) {
-                    this.provide_char_bar_stack[separateDate][data.user_name] = {};
-                    this.provide_char_bar_stack[separateDate][data.user_name]['provide_money'] = 0;
-                }
-                this.provide_char_bar_stack[separateDate][data.user_name]['erp_user_id'] = data.user !== undefined ? data.user.erp_user_id : data.sale_user.erp_user_id;
-                // if(eval(`this.provide_char_bar_stack.${data.set_date} === undefined`) ){
-                //     eval(`this.provide_char_bar_stack.${data.set_date} = {}`);
-                //     if(eval(`this.provide_char_bar_stack.${data.set_date}.${data.user_name} === undefined`)){
-                //         eval(`this.provide_char_bar_stack.${data.set_date}.${data.user_name} = 0`);
-                //     }
-                // }
-
-            }
         },
         beforeMount: function () {
             this.columns.map(function (v) {
@@ -237,14 +135,14 @@
                     v.render = new Function('data', 'type', 'row', '' + v.parmas + '; return  `' + v.render + '`');
                 }
             });
-
+            //
             var columns = this.columns;
             var rowData = this.row;
             var tableId = this.table_id;
             var ex_buttons = this.ex_buttons;
             var type = this.type;
             var vue = this;
-            vue.rows_selected[vue.table_id] = vue.select_id ? vue.select_id : [];
+            vue.table_select[vue.table_id] = vue.select_id ? vue.select_id : [];
             $(document).ready(function () {
                 let domtable = $('#' + tableId + '');
 
@@ -343,7 +241,7 @@
                         var rowId = data['id'];
 
                         // If row ID is in the list of selected row IDs
-                        if ($.inArray(rowId, vue.rows_selected[vue.table_id]) !== -1) {
+                        if ($.inArray(rowId, vue.table_select[vue.table_id]) !== -1) {
 
                             $(row).find('input[type="checkbox"]').prop('checked', true);
                             $(row).addClass('selected');
@@ -377,7 +275,6 @@
                 vue.dataTable.clear();
                 vue.dataTable.rows.add(rowData);
                 vue.dataTable.draw();
-
             });
         },
         mounted: function () {
@@ -386,7 +283,7 @@
         },
         watch: {
             customer_profit_data: {
-                immediate: false,    // 这句重要
+                immediate: false,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'customer_profit_data') {
 
@@ -395,7 +292,7 @@
                 }
             },
             customer_groups_profit_data: {
-                immediate: false,    // 这句重要
+                immediate: false,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'customer_groups_profit_data') {
 
@@ -404,7 +301,7 @@
                 }
             },
             medias_profit_data: {
-                immediate: false,    // 这句重要
+                immediate: false,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'medias_profit_data') {
 
@@ -413,7 +310,7 @@
                 }
             },
             media_companies_profit_data: {
-                immediate: false,    // 这句重要
+                immediate: false,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'media_companies_profit_data') {
 
@@ -422,7 +319,7 @@
                 }
             },
             group_progress_list: {
-                immediate: false,    // 这句重要
+                immediate: false,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'group_progress_list') {
 
@@ -431,7 +328,7 @@
                 }
             },
             group_progress_list_total: {
-                immediate: false,    // 这句重要
+                immediate: false,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'group_progress_list_total') {
 
@@ -440,7 +337,7 @@
                 }
             },
             progress_list: {
-                immediate: false,    // 这句重要
+                immediate: false,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'progress_list') {
 
@@ -449,7 +346,7 @@
                 }
             },
             progress_list_total: {
-                immediate: false,    // 这句重要
+                immediate: false,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'progress_list_total') {
 
@@ -458,7 +355,7 @@
                 }
             },
             bonus_list: {
-                immediate: false,    // 这句重要
+                immediate: false,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'bonus_list') {
 
@@ -467,7 +364,7 @@
                 }
             },
             provide_bonus_list: {
-                immediate: false,    // 这句重要
+                immediate: false,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'provide_bonus_list') {
 
@@ -476,7 +373,7 @@
                 }
             },
             provide_groups_list: {
-                immediate: false,    // 这句重要
+                immediate: false,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'provide_groups_list') {
 
@@ -485,7 +382,7 @@
                 }
             },
             exchange_rates_list: {
-                immediate: false,    // 这句重要
+                immediate: false,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'exchange_rates_list') {
                         this.updataTable(val);

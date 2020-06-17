@@ -4,7 +4,7 @@
 		<!-- Date range -->
 		<div class="form-group">
 			<label>Date range:</label>
-			
+
 			<div class="input-group">
 				<div class="input-group-addon">
 					<i class="fa fa-calendar"></i>
@@ -17,7 +17,7 @@
 			<div class="box box-warning" :class="{'collapsed-box' : key > 0}" v-for='(item,key) in items' :data-history-range=formate(item.set_date)>
 				<div class="box-header with-border">
 					<h3 class="box-title">{{item.set_date}}</h3>
-					
+
 					<div class="box-tools pull-right">
 						<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa" :class="{'fa-minus' : key == 0 , 'fa-plus' : key > 0}"></i>
 						</button>
@@ -61,7 +61,6 @@
 	<!-- /.tab-pane -->
 </template>
 <script>
-
     require('../../../public/adminLte_componets/bootstrap-daterangepicker/daterangepicker');
     export default {
         props: { items: Array ,active: Boolean},
@@ -78,18 +77,18 @@
                 locale: { format: 'YYYY/MM' },
                 startDate: "2018-12",
             });
-						
+
             var rangeStart = '';
             var rangeEnd = '';
 
             dateRoot.on('apply.daterangepicker', function(ev, picker) {
                 rangeStart = picker.startDate.format('YYYYMM');
                 rangeEnd = picker.endDate.format('YYYYMM');
-                
+
                 historyDom.hide();
                 historyDom.map(function(){
                     let date = $(this).data('history-range');
-                    
+
                     if((date > rangeStart && date < rangeEnd) || date == rangeStart || date == rangeEnd){
                         $(this).show();
                     }
@@ -97,19 +96,19 @@
             });
         },
         created() {
-        
+
 			  },
 		    methods:{
             formate(v){
-                
+
                 v = v.replace('-','');
                 v = v.replace('-01','');
-                
+
                 return v;
             }
 		    }
     }
-    
+
 </script>
 
 <style scoped>

@@ -14,7 +14,11 @@
             title: String,
             labels: Array,
         },
-        computed: {...mapState(['medias_profit_data', 'sale_channel_profitData','start_date','end_date'])},
+        computed: {
+            ...mapState('chart',['medias_profit_data', 'sale_channel_profitData']),
+            ...mapState('dateRange',['start_date','end_date'])
+        },
+
         data: function () {
             return {
                 topNumber: 5,
@@ -33,8 +37,6 @@
                     grey: 'rgba(201, 203, 207,0.5)'
                 },
                 color: [
-                    // 'rgba(255, 99, 132,0.5)',
-                    // 'rgba(54, 162, 235,0.5)',
                     'rgba(255, 205, 86,0.5)',
                     'rgba(75, 192, 192,0.5)',
                     'rgba(153, 102, 255,0.5)',
@@ -79,27 +81,6 @@
                         plugins: {
                             datalabels: {
                                 labels: {
-                                    // index: {
-                                    //     align: 'end',
-                                    //     anchor: 'end',
-                                    //     color: function(ctx) {
-                                    //         return ctx.dataset.backgroundColor;
-                                    //     },
-                                    //     font: {size: 18},
-                                    //     formatter: function(value, ctx) {
-                                    //         if(value !== 0){
-                                    //             return ctx.active
-                                    //                 ? 'index'
-                                    //                 : '#' + (ctx.dataIndex + 1);
-                                    //         }else{
-                                    //             return null;
-                                    //         }
-                                    //     },
-                                    //     offset: 8,
-                                    //     opacity: function(ctx) {
-                                    //         return ctx.active ? 1 : 0.5;
-                                    //     }
-                                    // },
                                     name: {
                                         align: 'top',
                                         font: {size: 16},
@@ -142,16 +123,6 @@
                                                 });
                                                 let percentage = (value * 100 / sum).toFixed(1);
                                                 let strNumber = value;
-                                                // if(value/1000000000 > 1){
-                                                //     strNumber = (value / 1000000000).toFixed(1) + 'G'
-                                                // }
-                                                // else if(value/1000000 > 1){
-                                                //     strNumber = (value / 1000000).toFixed(1) + 'M'
-                                                // }else if(value/1000 > 1){
-                                                //     strNumber = Math.round(value / 1000) + 'k'
-                                                // }else{
-                                                //     strNumber = Math.round(value * 1000) / 1000;
-                                                // }
                                                 strNumber = currencyFilters(parseInt(Math.round(value * 1000) / 1000));
                                                 return ctx.active
                                                     ? strNumber
@@ -166,26 +137,6 @@
                                         padding: 4,
                                     }
                                 },
-                                // formatter: (value, ctx) => {
-                                //     let sum = 0;
-                                //     let index = ctx.datasetIndex;
-                                //     let dataArr = ctx.chart.data.datasets[index].data;
-                                //
-                                //     dataArr.map(data => {
-                                //         if(data < 0){
-                                //             data = 0;
-                                //         }
-                                //         sum += data;
-                                //     });
-                                //
-                                //     let percentage = (value*100 / sum).toFixed(1);
-                                //     if(percentage != '0.0'){
-                                //         return percentage+"%";
-                                //     }
-                                //     return null;
-                                //
-                                // },
-                                // color: '#0c0b0b',
                             }
                         }
                     }
@@ -459,7 +410,7 @@
                 }
             },
             // client_profit: {
-            //     immediate: true,    // 这句重要
+            //     immediate: true,
             //     handler(val, oldVal) {
             //         if (oldVal !== undefined ) {
             //             this.update(this);

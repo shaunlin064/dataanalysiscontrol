@@ -88,9 +88,11 @@
             }
         },
         computed: {
-            ...mapState(['provide_total_money','provide_groups_list', 'provide_bonus_list','provide_char_bar_stack']),
+            ...mapState('financial',['provide_total_money','provide_groups_list', 'provide_bonus_list','provide_char_bar_stack']),
         },
-        created: function () {},
+        created: function () {
+            bus.$on('chartStackClear',this.chartStackClear);
+        },
         mounted: function () {
             var ctx = document.getElementById(this.table_id).getContext('2d');
             this.chart_obj = new Chart(ctx, this.config);
@@ -105,28 +107,53 @@
                     easing: 'linear'
                 });
             },
+            chartStackClear(){
+                let vue = this;
+                this.chart_obj.data.labels = [];
+                this.chart_obj.data.datasets.map( (v,k) =>{
+                    vue.chart_obj.data.datasets[k]['data'] = [];
+                    vue.chart_obj.data.datasets[k]['backgroundColo']=[];
+                });
+                this.chart_obj.update();
+            },
             trimData(){
-
+                var vue = this;
                 let barChartData = {};
                 let trimDatas = [];
                 let originalData = this.provide_char_bar_stack;
-                let stackLabel = [];
-                let columnLabel = [];
-                var vue = this;
-                let i = 0;
+                let stackDateLabel = [];
+                let columnUserNameLabel = [];
+                let newSortDatas = {};
+                let dateSortArray = Object.entries(originalData); //把 obj 拆成 array
+                dateSortArray = dateSortArray.map( (a) => a[0]).sort();
 
-                Object.keys(originalData).forEach(date=>{
-                    // trimDatas[key] = [];
+                 dateSortArray.map((date) => {
+                     newSortDatas[date] = originalData[date];
+                },originalData,newSortDatas)
+                /*get All User name include datas*/
+                Object.keys(newSortDatas).forEach(date=>{
+                    Object.keys(newSortDatas[date]).forEach(userName =>{
+                        if($.inArray(userName,columnUserNameLabel) === -1){
+                            columnUserNameLabel.push(userName);
+                        }
+                    },columnUserNameLabel);
+                },columnUserNameLabel);
+                Object.keys(newSortDatas).forEach(date=>{
+
                     let items = [];
-                    let datas = originalData[date];
-                    stackLabel.push(date);
+                    let datas = newSortDatas[date];
+                    stackDateLabel.push(date);
 
                     Object.keys(datas).forEach(userName =>{
-                        if(i == 0){
-                            columnLabel.push(userName);
+                        if(items.length === 0){
+                            columnUserNameLabel.map(()=>{
+                                items.push(0);
+                            },items);
                         }
-                        items.push(datas[userName]['provide_money']);
-                    },columnLabel,i);
+                        let index = $.inArray(userName,columnUserNameLabel);
+                        items[index] = datas[userName]['provide_money'];
+                    },columnUserNameLabel);
+
                     let colorNumber = parseInt(date.substr(5,6))%12;
                     trimDatas.push({
                         label:date,
@@ -134,10 +161,9 @@
                         stack:'0',
                         backgroundColor:vue.color[colorNumber]
                     });
-                    i++;
+                },trimDatas,stackDateLabel,columnUserNameLabel);
 
-                },trimDatas,stackLabel,columnLabel,i);
-                barChartData.labels = columnLabel;
+                barChartData.labels = columnUserNameLabel;
                 barChartData.datasets = trimDatas;
 
                 return barChartData;

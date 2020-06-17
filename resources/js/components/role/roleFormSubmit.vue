@@ -16,7 +16,7 @@
             return {}
         },
         computed: {
-            ...mapState(['table_select']),
+            ...mapGetters('dataTable',['getPermissionTableSelect'])
         },
         methods:{
             post(){
@@ -30,11 +30,12 @@
                 //添加参数
                 let paramters = {
                     '_token' : this.csrf,
-                    'permission_ids' : eval(`this.$store.state.table_select.${this.domid}`),
+                    'permission_ids' : this.getPermissionTableSelect,
                     'id': this.role_id,
                     'name':$('input[name="name"]').val(),
                     'label':$('input[name="label"]').val()
                 };
+
                 // paramters.map(function(v){
                 // });
                 Object.keys(paramters).forEach(function(key) {
@@ -49,11 +50,10 @@
             },
         },
         mounted: function(){
-
         },
         watch:{
             // change_date: {
-            //     immediate: true,    // 这句重要
+            //     immediate: true,
             //     handler (val, oldVal) {
             //         if(oldVal !== undefined) {
             //

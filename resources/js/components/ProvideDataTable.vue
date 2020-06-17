@@ -130,7 +130,7 @@
 				<pagination-component :arg='
 				arg.paginate
 				'></pagination-component>
-				
+
 			</div>
 			<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored pull-right" @click='post'>
 				送出
@@ -196,11 +196,11 @@
         methods: {
             sorting() {
                 let target = $(event.target);
-                
+
                 let sorting = target.hasClass('sorting');
                 let sorting_asc = target.hasClass('sorting_asc');
                 let sorting_desc = target.hasClass('sorting_desc');
-                
+
                 let sort_name = target.data('sort');
                 this.sortingReset(sort_name);
                 // console.log(sorting,sorting_asc,sorting_desc);
@@ -223,10 +223,10 @@
                         this.sort_campaign_name.sorting  = true;
                     }
                 }
-                
+
                     //get url Parmas
                     let urlParmas = getUrlParmas();
-                
+
                     urlParmas['sort_by'] = sort_name;
                     if(sorting){
                         //change parmas data
@@ -241,7 +241,7 @@
                         delete urlParmas['sort_by'];
                         delete urlParmas['sort'];
                     };
-		            
+
                     // //get data
                     this.getAjaxData(urlParmas).then(()=>{
                         closeLoading.call(this);
@@ -271,9 +271,9 @@
                       this.search_ev_time_stamp = now;
                       //get url Parmas
                       let urlParmas = getUrlParmas();
-                      
+
                       delete urlParmas['page'];
-                      
+
                       if(target.val() === ''){
                           delete urlParmas['searchStr'];
                       }else{
@@ -285,7 +285,7 @@
                          messageController.call(this);
                          this.checkAlreadySelect();
                      });
-                     
+
                       changeUrlParmas(urlParmas);
                 })
             },
@@ -302,31 +302,31 @@
               let checkStatus = $(event.target).prop("checked");
               this.toggleCheck(checkStatus, $(event.target).parents('#financial_provide_list').find('input:checkbox'));
                 let all_ids = Object.assign([], this.all_ids);
-                
+
                 if (checkStatus) {
-                  
+
                   this.select_financial_id = all_ids;
-                  
+
                   this.ajaxCalculatFinancialBonus(this.select_financial_id);
-                  
+
               } else {
                   this.select_financial_id = [];
                   $('#total_money').html(0);
               }
-              
+
 		        },
 		        select_leavel2_children(){
 
                 let checkStatus = $(event.target).prop("checked");
                 let targetDom = $(event.target).parents('.item').find('.treeview-items').find('input:checkbox');
-								
+
                 this.toggleCheck(checkStatus, targetDom);
                 this.selectIdValue(checkStatus,targetDom);
                 this.calculatBonus(checkStatus,targetDom);
 		        },
 		        treeview_open(){
                 let tragetDom = $(event.target).parent().children('.treeview-items');
-                
+
                 if (tragetDom.hasClass('is-show')) {
                     tragetDom.slideUp();
                     tragetDom.removeClass('is-show');
@@ -355,7 +355,7 @@
                         checkStatus = targetDom.prop("checked");
 		                    break;
                 }
-				        
+
               if(targetDom[0].tagName == 'INPUT'){
                   this.toggleCheck(checkStatus, targetDom);
                   this.selectIdValue(checkStatus,targetDom);
@@ -365,9 +365,9 @@
 		        },
             calculatBonus(checkStatus,targetDom){
                 targetDom.map(function(index,v){
-                 
+
 	                let this_money = $(v).parent().parent().parent('.item').find('div[data-money]').data('money');
-	                
+
 	                let nowTotal =  parseInt($('#total_money').html());
 	                if (checkStatus) {
 	                    $('#total_money').html(nowTotal + this_money);
@@ -387,27 +387,27 @@
             },
             selectIdValue(checkStatus,targetDom){
                 let select_financial_id =  Object.assign([], this.select_financial_id);
-                
+
                 if(checkStatus){
                     targetDom.map(function(index){
                         index = select_financial_id.indexOf(parseInt($(this).val()));
-                        
+
                         if (index == -1) {
                             select_financial_id.push(parseInt($(this).val()));
                         }
                     });
-                   
+
                 }else{
                     targetDom.map(function(index){
                         index = select_financial_id.indexOf(parseInt($(this).val()));
-                        
+
                         if (index > -1) {
                             select_financial_id.splice(index, 1);
                         }
                     });
                 }
                 this.select_financial_id = select_financial_id;
-                
+
             },
 		        changeDateDate(date){
                 let urlParmas = getUrlParmas();
@@ -441,7 +441,7 @@
             },
             ajaxCalculatFinancialBonus(selectIds) {
                 let parmas = {'select_financial_ids': JSON.stringify(selectIds)};
-                
+
                 return axios({
                     url: '/financial/provide/ajaxCalculatFinancialBonus',
                     method: 'post',
@@ -453,7 +453,7 @@
                     (res)=>{
                         // thisVue.row = res.data.row;
 		                    $('#total_money').html(res.data);
-		                    
+
                     }
                 ).catch(err => console.error(err));
             },
@@ -512,7 +512,7 @@
         },
         watch:{
             change_date: {
-                immediate: true,    // 这句重要
+                immediate: true,
                 handler (val, oldVal) {
                     if(oldVal !== undefined) {
                         // this.changeDateDate(val);

@@ -30,9 +30,7 @@
     <financial-provide-ajax-component :csrf='"{{csrf_token()}}"'></financial-provide-ajax-component>
     <div class='row'>
         <div class="box box-widget widget-user">
-            <!-- Add the bg color to the header using any of the bg-* classes -->
             <div class="widget-user-header bg-aqua">
-                <!-- small box -->
                 <div class="small-box no-shadow col-md-6 col-sm-6 col-xs-12">
                     <div class="inner text-center">
                         <count-total :domid='"total_money"' data-step="4" data-intro="該條件發放總金額..<a href='/info/scheduleList'>獎金發放規則請見</a>"></count-total>
@@ -59,10 +57,7 @@
                                      :row='{!! json_encode($userList) !!}'
                             ></select2>
                         </div>
-                        <!-- /input-group -->
                     </div>
-                    <!-- /.col-lg-6 -->
-{{--                    @if($saleGroups)--}}
                     <div class="col-lg-6">
                         <label>選擇團隊</label>
                         <div class="input-group" data-step="3" data-intro="選擇團隊">
@@ -76,10 +71,7 @@
                                      :row='{!! json_encode($saleGroups) !!}'
                             ></select2>
                         </div>
-                        <!-- /input-group -->
                     </div>
-                    <!-- /.col-lg-6 -->
-{{--                        @endif--}}
                 </div>
             </div>
         </div>
@@ -140,7 +132,7 @@
                             :type='"pie"'
                             :title='"團隊"'
                             :labels='[]'
-                            :height='300'
+{{--                            :height='300'--}}
                             :chart_data='{{ json_encode([ ["data"=>[0]],["data"=>[0] ]  ]) }}'
                         ></chart-component>
                     </div>

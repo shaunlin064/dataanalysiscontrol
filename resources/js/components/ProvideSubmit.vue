@@ -16,7 +16,7 @@
             return {}
         },
         computed: {
-            ...mapState(['table_select']),
+            ...mapState('financial',['table_select']),
         },
         methods:{
             post(){

@@ -1,5 +1,5 @@
 <template>
-    <form class="form-horizontal" id='roleSettingForm'>
+    <form class="form-horizontal">
         <div class="box-body">
             <div class="form-group">
                 <div>
@@ -10,7 +10,7 @@
                     </div>
                 </div>
                 <label class="col-sm-2 control-label pull-left" data-step="2" data-intro="權限名稱">備註</label>
-                
+
                 <input v-if="type == 'edit'" type='text' name='label' :value='role.label' required>
                 <input v-else type='text' name='label' required>
             </div>
@@ -21,7 +21,7 @@
                     </div>
                     <!-- /.box-header -->
                     <div class="box-body">
-                        <table :id='table_id' class="table table-bordered table-striped">
+                        <table :id='dom_id' class="table table-bordered table-striped">
                             <thead>
                             <tr>
                                 <th></th>
@@ -56,7 +56,7 @@
     export default {
         name: "roleForm",
         props: {
-            table_id: String,
+            dom_id: String,
             csrf: String,
             row: Array,
             select_id: Array,
@@ -65,6 +65,10 @@
         },
         data() {
             return {}
+        },
+        computed :{
+            ...mapState('dataTable',['table_select']),
+            ...mapActions('dataTable',['setTableSelect']),
         },
         methods: {
             format(d) {
@@ -116,7 +120,7 @@
             var rowData = vue.row;
 
             $(document).ready(function () {
-                let domtable = $('#'+vue.table_id);
+                let domtable = $('#'+vue.dom_id);
                 let dataTableConfig =
                     {
                         paging: true,
@@ -189,21 +193,20 @@
                 });
 
                 // Array holding selected row IDs
-                var rows_selected = vue.$store.getters.getTableSelect;
-                rows_selected[vue.table_id] = vue.select_id ? vue.select_id : [];
+                vue.$store.dispatch('dataTable/setTableSelect', {select_ids:vue.select_id,dom_id:vue.dom_id});
 
                 //頁面載入確認已勾選項目 修改css
                 $('.permission').each(function (e, d) {
                     var rowId = parseInt($(d).val());
                     // If row ID is in the list of selected row IDs
-                    if ($.inArray(rowId, rows_selected[vue.table_id]) !== -1) {
+                    if ($.inArray(rowId, vue.table_select[vue.dom_id]) !== -1) {
                         $(d).prop('checked', true);
                         $(d).closest('tr').addClass('selected');
                         vue.checkChildAllSelect(d);
                     }
                 });
 
-                /*父選單選取 開啟子選單與 勾選全子選單*/
+                // /*父選單選取 開啟子選單與 勾選全子選單*/
                 domtable.find('tbody').on('click', 'input[type="checkbox"]', function (e) {
                     var $row = $(this).closest('tr');
 
@@ -216,7 +219,7 @@
                         $row.addClass('selected');
                         $(this).closest('tr').next('tr').find('table').find('input').each(function (e, d) {
                             let rowId = parseInt($(this).val());
-                            eval(`rows_selected.${vue.table_id}`).push(rowId);
+                            vue.$store.dispatch('dataTable/pushTableSelect', {select_id:rowId,dom_id:vue.dom_id});
                             $(d).prop("checked", true);
                             $(d).closest('tr').addClass('selected');
                         });
@@ -224,8 +227,7 @@
                         $row.removeClass('selected');
                         $(this).closest('tr').next('tr').find('table').find('input').each(function (e, d) {
                             let rowId = parseInt($(this).val());
-                            let index = $.inArray(rowId, rows_selected[vue.table_id]);
-                            eval(`rows_selected.${vue.table_id}`).splice(index, 1);
+                            vue.$store.dispatch('dataTable/spliceTableSelect',{select_id:rowId,dom_id:vue.dom_id});
                             $(d).prop("checked", false);
                             $(d).closest('tr').removeClass('selected');
                         });
@@ -236,10 +238,10 @@
                 });
 
                 // 子選單開闔
-                $('#permissionsTable tbody').on('click', 'td.details-control', function () {
+                $(`#${vue.dom_id} tbody`).on('click', 'td.details-control', function () {
 
-                    var tr = $(this).closest('tr');
-                    var row = vue.dataTable.row(tr);
+                    let tr = $(this).closest('tr');
+                    let row = vue.dataTable.row(tr);
 
                     if (row.child.isShown()) {
                         // This row is already open - close it
@@ -251,8 +253,8 @@
                         tr.addClass('shown');
                     }
                     tr.next('tr').find('table').find('input').each(function (e, d) {
-                        var rowId = parseInt($(d).val());
-                        if ($.inArray(rowId, rows_selected[vue.table_id]) !== -1) {
+                        let rowId = parseInt($(d).val());
+                        if ($.inArray(rowId, vue.table_select[vue.dom_id]) !== -1) {
                             let tr = $(d).closest('tr');
                             tr.addClass('selected');
                             tr.find('input[name="permission_ids[]"]').prop('checked', true);
@@ -261,15 +263,12 @@
                 });
 
                 // 子選單 select
-                $('#permissionsTable tbody').on('click', 'input.permission', function () {
-
+                $(`#${vue.dom_id} tbody`).on('click', 'input.permission', function () {
+                    let rowId = parseInt($(this).val());
                     if (this.checked) {
-                        let rowId = parseInt($(this).val());
-                        eval(`rows_selected.${vue.table_id}`).push(rowId);
+                        vue.$store.dispatch('dataTable/pushTableSelect',{select_id:rowId,dom_id:vue.dom_id});
                     } else {
-                        let rowId = parseInt($(this).val());
-                        let index = $.inArray(rowId, rows_selected[vue.table_id]);
-                        eval(`rows_selected.${vue.table_id}`).splice(index, 1);
+                        vue.$store.dispatch('dataTable/spliceTableSelect',{select_id:rowId,dom_id:vue.dom_id});
                     }
                     vue.checkChildAllSelect(this);
                 });

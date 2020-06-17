@@ -15,7 +15,10 @@
             }
         },
         computed: {
-            ...mapState(['start_date', 'end_date', 'user_ids', 'sale_group_ids', 'loading', 'agency_ids', 'client_ids', 'media_companies_ids', 'medias_names','bonus_char_bar_stack']),
+            ...mapState(['loading']),
+            ...mapState('dateRange',['start_date', 'end_date']),
+            ...mapState('select',['user_ids', 'sale_group_ids', 'agency_ids', 'client_ids', 'media_companies_ids', 'medias_names']),
+            ...mapState('chart',['bonus_char_bar_stack']),
         },
         methods: {
             tableClear: function () {
@@ -26,69 +29,40 @@
             }, getData() {
                 let data = {
                     _token: this.csrf,
-                    startDate: this.$store.state.start_date,
-                    endDate: this.$store.state.end_date,
-                    saleGroupIds: this.$store.state.sale_group_ids,
-                    userIds: this.$store.state.user_ids,
-                    agencyIdArrays: this.$store.state.agency_ids,
-                    clientIdArrays: this.$store.state.client_ids,
-                    mediaCompaniesIdArrays: this.$store.state.media_companies_ids,
-                    mediasNameArrays: this.$store.state.medias_names,
+                    startDate: this.start_date,
+                    endDate: this.end_date,
+                    saleGroupIds: this.sale_group_ids,
+                    userIds: this.user_ids,
+                    agencyIdArrays: this.agency_ids,
+                    clientIdArrays: this.client_ids,
+                    mediaCompaniesIdArrays: this.media_companies_ids,
+                    mediasNameArrays: this.medias_names,
                 };
 
                 if ((data.saleGroupIds == '' && data.userIds == '') || data._token === undefined) {
                     return false;
                 }
 
-                this.$store.state.loading = true;
+                this.$store.dispatch('changeLoadingStatus',true);
                 this.tableClear();
 
                 axios.post(this.ajax_url, data).then(
                     response => {
-                        this.$store.state.loading = false;
+                         this.$store.dispatch('changeLoadingStatus',false);
                         // let total = parseInt(0);
                         if (response.data) {
                             /*sales char*/
-                            this.$store.commit('changeMoneyStatus', {
+                            this.$store.dispatch('chart/changeMoneyStatus', {
                                 paid: response.data.chart_money_status.paid,
                                 unpaid: response.data.chart_money_status.unpaid
                             });
 
-                            this.$store.commit('changeMonthBalancen', {
+                            this.$store.dispatch('chart/changeMonthBalance', {
                                 'month_income': response.data.chart_financial_bar.totalIncome,
                                 'month_cost': response.data.chart_financial_bar.totalCost,
                                 'month_profit': response.data.chart_financial_bar.totalProfit
                             });
-
-                            this.$store.state.last_record_month_income  = response.data.chart_financial_bar_last_record.totalIncome;
-                            this.$store.state.last_record_month_cost  = response.data.chart_financial_bar_last_record.totalCost;
-                            this.$store.state.last_record_month_profit = response.data.chart_financial_bar_last_record.totalProfit;
-                            this.$store.state.last_record_month_label = response.data.chart_financial_bar_last_record.labels;
-
-                            this.$store.state.chart_bar_max_y =  response.data.chart_bar_max_y;
-                            /*sales list*/
-                            this.$store.state.group_progress_list = response.data.group_progress_list;
-                            this.$store.state.group_progress_list_total = response.data.group_progress_list_total;
-                            this.$store.state.progress_list = response.data.progress_list;
-                            this.$store.state.progress_list_total = response.data.progress_list_total;
-                            /*customer char*/
-                            this.$store.state.agency_profit  = response.data.customer_precentage_profit['agency_profit'];
-                            this.$store.state.client_profit  = response.data.customer_precentage_profit['client_profit'];
-                            this.$store.state.month_label = response.data.customer_precentage_profit['date'];
-                            this.$store.state.sale_channel_profitData = response.data.sale_channel_profit_data;
-
-                            /*customer table list*/
-                            this.$store.state.customer_groups_profit_data = response.data.customer_groups_profit_data;
-                            this.$store.state.customer_profit_data = response.data.customer_profit_data;
-                            this.$store.state.medias_profit_data = response.data.medias_profit_data;
-                            this.$store.state.media_companies_profit_data = response.data.media_companies_profit_data;
-
-                            /*bonus_list*/
-                            this.$store.state.bonus_list = response.data.bonus_list;
-
-                            /*bonus_char_bar_stack*/
-                            this.$store.state.bonus_char_bar_stack = response.data.bonus_char_bar_stack;
-
+                            this.$store.dispatch('chart/setChartData',response.data);
                         }
                     },
                     err => {
@@ -102,7 +76,7 @@
         },
         watch: {
             start_date: {
-                immediate: true,    // 这句重要
+                immediate: true,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && val !== oldVal) {
                         this.getData();
@@ -110,7 +84,7 @@
                 }
             },
             end_date: {
-                immediate: true,    // 这句重要
+                immediate: true,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && val !== oldVal) {
                         this.getData();
@@ -118,7 +92,7 @@
                 }
             },
             user_ids: {
-                immediate: true,    // 这句重要
+                immediate: true,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && val !== oldVal) {
                         this.getData();
@@ -126,7 +100,7 @@
                 }
             },
             sale_group_ids: {
-                immediate: true,// 这句重要
+                immediate: true,
                 // lazy:true,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && val !== oldVal) {
@@ -135,7 +109,7 @@
                 }
             },
             agency_ids: {
-                immediate: true,// 这句重要
+                immediate: true,
                 // lazy:true,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && val !== oldVal) {
@@ -144,7 +118,7 @@
                 }
             },
             client_ids: {
-                immediate: true,// 这句重要
+                immediate: true,
                 // lazy:true,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && val !== oldVal) {
@@ -153,7 +127,7 @@
                 }
             },
             media_companies_ids: {
-                immediate: true,// 这句重要
+                immediate: true,
                 // lazy:true,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && val !== oldVal) {
@@ -162,7 +136,7 @@
                 }
             },
             medias_names: {
-                immediate: true,// 这句重要
+                immediate: true,
                 // lazy:true,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '') {

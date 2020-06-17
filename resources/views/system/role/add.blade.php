@@ -33,7 +33,7 @@
             </div>
             <!-- /.box-header -->
                     <role-form
-                        :table_id='"permissionsTable"'
+                        :dom_id='"permissions_table"'
                         :csrf= '"{{csrf_token()}}"'
                         :row = '{!! json_encode($permissionList) !!}'
                         :type='"{{$type ?? 'add'}}"'
@@ -58,11 +58,11 @@
                 <div class="box-footer">
                     <role-form-submit
                         :csrf= '"{{csrf_token()}}"'
-                        :domid='"permissionsTable"'
+                        :domid='"permissions_table"'
                         :post_action_url='"/system/rolePost"'
                         :role_id='"{{$role->id ?? 0}}"'
                     ></role-form-submit>
-{{--                    <button type="submit" class="btn btn-info pull-right">送出</button>--}}
+                    <button type="submit" class="btn btn-info pull-right">送出</button>
                 </div>
         </div>
 
