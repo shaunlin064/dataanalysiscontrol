@@ -5,7 +5,8 @@
 </template>
 
 <script>
-    import {mapActions, mapState} from 'vuex';
+    import {mapActions, mapState , mapGetters} from 'vuex';
+    import * as types from "../store/types";
 
     export default {
         name: "MediaPrecentagePie",
@@ -362,7 +363,6 @@
 
                 /*計算媒體利潤平均值*/
                 let trimData = vue.getMediaCopyData();
-
                 if (trimData.length > 0) {
                     /*依利潤排序*/
                     trimData = trimData.sort((a, b) => a.profit < b.profit ? 1 : -1);

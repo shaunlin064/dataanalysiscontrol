@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 Vue.use(Vuex)
-
+import * as types from './types'
 import state from './state'
 import mutations from './mutations'
 import actions from './actions'

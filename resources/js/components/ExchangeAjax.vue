@@ -4,6 +4,7 @@
 
 <script>
     import {mapState, mapMutations, mapActions, mapGetters} from 'vuex';
+    import * as types from '../store/types'
 
     export default {
         name: "exchangeAjax",
@@ -17,10 +18,12 @@
         },
         computed: {
             ...mapState(['loading']),
-            ...mapState('exchangeRate',['exchange_rates_list','chart_exchange_line','currency']),
+            ...mapState('exchangeRate',['currency']),
             ...mapState('datePick',['change_date']),
         },
         methods: {
+            ...mapActions([types.CHANGE_LOADING_STATUS]),
+            ...mapActions('exchangeRate',[types.CHANGE_CHART_EXCHANGE_LINE,types.CHANGE_EXCHANGE_RATES_LIST,types.CHANGE_CURRENCY]),
             tableClear: function () {
                 $('table').map(function (e, v) {
                     $.fn.dataTable.Api(v).clear();
@@ -33,23 +36,18 @@
                     year_month: this.change_date.replace("/", "") ,
                     currency: this.currency,
                 };
-                console.log(data);
                 if ((data.change_date == '' && data.currency == '') || data._token === undefined) {
                     return false;
                 }
-                this.$store.dispatch('changeLoadingStatus',true);
+                this[types.CHANGE_LOADING_STATUS](true);
                 this.tableClear();
 
                 axios.post(this.ajax_url, data).then(
                     response => {
-                         this.$store.dispatch('changeLoadingStatus',false);
-                        // let total = parseInt(0);
+                        this[types.CHANGE_LOADING_STATUS](false);
                         if (response.data) {
-                            // this.$store.state.chart_exchange_line = response.data.exchangeChartData;
-                            // this.$store.state.exchange_rates_list = response.data.exchangeTableData;
-
-                            this.$store.dispatch('exchangeRate/changeChartExchangeLine',response.data.exchangeChartData);
-                            this.$store.dispatch('exchangeRate/changeExchangeRatesList',response.data.exchangeTableData);
+                            this[types.CHANGE_CHART_EXCHANGE_LINE](response.data.exchangeChartData);
+                            this[types.CHANGE_EXCHANGE_RATES_LIST](response.data.exchangeTableData);
                         }
                         /*業績計算使用當月最後一天即期賣出匯率*/
                         let lastPeriodSell = response.data.exchangeTableData.slice(-1)[0][4];

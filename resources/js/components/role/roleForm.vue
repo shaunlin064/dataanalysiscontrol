@@ -52,7 +52,7 @@
 
 <script>
     import {mapState, mapMutations, mapActions, mapGetters} from 'vuex';
-
+    import * as types from '../../store/types'
     export default {
         name: "roleForm",
         props: {
@@ -68,9 +68,9 @@
         },
         computed :{
             ...mapState('dataTable',['table_select']),
-            ...mapActions('dataTable',['setTableSelect']),
         },
         methods: {
+            ...mapActions('dataTable',[types.SET_TABLE_SELECT,types.PUSH_TABLE_SELECT,types.SPLICE_TABLE_SELECT]),
             format(d) {
                 // `d` is the original data object for the row
                 let itemTemplate = '';
@@ -118,7 +118,6 @@
         beforeMount: function () {
             var vue = this;
             var rowData = vue.row;
-
             $(document).ready(function () {
                 let domtable = $('#'+vue.dom_id);
                 let dataTableConfig =
@@ -193,7 +192,7 @@
                 });
 
                 // Array holding selected row IDs
-                vue.$store.dispatch('dataTable/setTableSelect', {select_ids:vue.select_id,dom_id:vue.dom_id});
+                vue[types.SET_TABLE_SELECT]( {select_id:vue.select_id,dom_id:vue.dom_id});
 
                 //頁面載入確認已勾選項目 修改css
                 $('.permission').each(function (e, d) {
@@ -214,12 +213,11 @@
                     if ($row.find('.details-control').parent().hasClass('shown') === false) {
                         $row.find('.details-control').click();
                     }
-
                     if (this.checked) {
                         $row.addClass('selected');
                         $(this).closest('tr').next('tr').find('table').find('input').each(function (e, d) {
                             let rowId = parseInt($(this).val());
-                            vue.$store.dispatch('dataTable/pushTableSelect', {select_id:rowId,dom_id:vue.dom_id});
+                            vue[types.PUSH_TABLE_SELECT]( {select_id:rowId,dom_id:vue.dom_id});
                             $(d).prop("checked", true);
                             $(d).closest('tr').addClass('selected');
                         });
@@ -227,7 +225,7 @@
                         $row.removeClass('selected');
                         $(this).closest('tr').next('tr').find('table').find('input').each(function (e, d) {
                             let rowId = parseInt($(this).val());
-                            vue.$store.dispatch('dataTable/spliceTableSelect',{select_id:rowId,dom_id:vue.dom_id});
+                            vue[types.SPLICE_TABLE_SELECT]( {select_id:rowId,dom_id:vue.dom_id});
                             $(d).prop("checked", false);
                             $(d).closest('tr').removeClass('selected');
                         });
@@ -242,7 +240,6 @@
 
                     let tr = $(this).closest('tr');
                     let row = vue.dataTable.row(tr);
-
                     if (row.child.isShown()) {
                         // This row is already open - close it
                         row.child.hide();
@@ -266,9 +263,9 @@
                 $(`#${vue.dom_id} tbody`).on('click', 'input.permission', function () {
                     let rowId = parseInt($(this).val());
                     if (this.checked) {
-                        vue.$store.dispatch('dataTable/pushTableSelect',{select_id:rowId,dom_id:vue.dom_id});
+                        vue[types.PUSH_TABLE_SELECT]( {select_id:rowId,dom_id:vue.dom_id});
                     } else {
-                        vue.$store.dispatch('dataTable/spliceTableSelect',{select_id:rowId,dom_id:vue.dom_id});
+                        vue[types.SPLICE_TABLE_SELECT]( {select_id:rowId,dom_id:vue.dom_id});
                     }
                     vue.checkChildAllSelect(this);
                 });

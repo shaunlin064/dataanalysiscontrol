@@ -103,7 +103,7 @@
                         :type='"pie"'
                         :title='"團隊"'
                         :labels='[]'
-                        :height='300'
+{{--                        :height='300'--}}
                         :chart_data='{{ json_encode([ ["data"=>[0]],["data"=>[0] ]  ]) }}'
                     ></chart-component>
                 </div>

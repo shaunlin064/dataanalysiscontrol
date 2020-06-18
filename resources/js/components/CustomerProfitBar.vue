@@ -6,6 +6,7 @@
 
 <script>
     import {mapState, mapMutations, mapActions} from 'vuex';
+    import * as types from "../store/types";
 
     export default {
         name: "CustomerProfitBar",
@@ -14,7 +15,7 @@
             title: String,
             labels: Array
         },
-        computed: {...mapState(['agency_profit','client_profit','month_label'])},
+        computed: {...mapState('chart',['agency_profit','client_profit','month_label'])},
         data: function () {
             return {
                 default_color: {
@@ -43,7 +44,7 @@
                                 borderWidth: 2,
                                 "data": 0}
                         ],
-                        'labels': this.$store.state.month_label,
+                        'labels': this.month_label,
                     },
                     options: {
                         responsive: true,
@@ -90,16 +91,13 @@
                         vue_this.client_profit,
                         totalProfit
                     ];
-                    vue_this.chart_obj.data.labels = vue_this.$store.state.month_label;
+                    vue_this.chart_obj.data.labels = vue_this.month_label;
                     vue_this.chart_obj.data.datasets.map(function (dataset, key) {
                         dataset.data = monthdata[key];
                     });
 
                 vue_this.chart_obj.update();
             },
-            ...mapActions({
-                saveName: 'saveName'
-            }),
         },
         watch: {
             agency_profit: {

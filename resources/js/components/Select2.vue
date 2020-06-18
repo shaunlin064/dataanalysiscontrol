@@ -1,67 +1,69 @@
 <template>
-		<select class="form-control select2" :id='id' :multiple='multiple' :data-placeholder='placeholder' :disabled='disabled'
-		        style="width: 100%;">
-			<option :value='item.id' v-for='item in row' :selected='!disabled'> {{item.name}} </option>
-		</select>
-		<!-- /.user-select-block -->
+    <select class="form-control select2" :id='id' :multiple='multiple' :data-placeholder='placeholder'
+            :disabled='disabled'
+            style="width: 100%;">
+        <option :value='item.id' v-for='item in row' :selected='!disabled'> {{item.name}}</option>
+    </select>
+    <!-- /.user-select-block -->
 </template>
 
 <script>
-    import {mapState} from 'vuex';
+    import {mapActions, mapState} from 'vuex';
+    import * as types from "../store/types";
+
     export default {
         name: "select2",
         props: {
-			    id:String,
-			    multiple:Boolean,
-	            disabled:Boolean,
-                selected:Boolean,
-			    placeholder:String,
-			    row:Array
+            id: String,
+            multiple: Boolean,
+            disabled: Boolean,
+            selected: Boolean,
+            placeholder: String,
+            row: Array
         },
         data() {
             return {}
         },
-        methods:{
-            updateSelectToVux(domId){
-              switch(domId){
-                case 'select_user':
-                    this.changeUserId($('#'+domId+'').val());
-                    break;
-                case 'select_groups' :
-                    this.changeSaleGroupId($('#'+domId+'').val());
-                    break;
-              case 'select_currency':
-                      this.$store.dispatch('exchangeRate/changeCurrency',$('#'+domId+'').val());
-                  break;
-              }
+        methods: {
+            ...mapActions('exchangeRate', [types.CHANGE_CURRENCY]),
+            ...mapActions('select', [types.CHANGE_USER_ID, types.CHANGE_SALE_GROUP_ID]),
+            updateSelectToVux(domId) {
+
+                switch (domId) {
+                    case 'select_user':
+                        this.changeUserId($('#' + domId + '').val());
+                        break;
+                    case 'select_groups' :
+                        this.changeSaleGroupId($('#' + domId + '').val());
+                        break;
+                    case 'select_currency':
+                        this[types.CHANGE_CURRENCY]($('#' + domId + '').val());
+                        break;
+                }
             },
             changeUserId(ids) {
-                // this.$store.commit('changeUserId', ids);
-                this.$store.dispatch('select/changeUserId', ids);
+                this[types.CHANGE_USER_ID](ids);
             },
             changeSaleGroupId(ids) {
-                // this.$store.commit('changeSaleGroupId', ids);
-                this.$store.dispatch('select/changeSaleGroupId', ids);
+                this[types.CHANGE_SALE_GROUP_ID](ids);
             },
         },
         computed: {
-            ...mapState('select',['user_ids','sale_group_ids']),
-            ...mapState('exchangeRate',['currency']),
+            ...mapState('select', ['user_ids', 'sale_group_ids']),
+            ...mapState('exchangeRate', ['currency']),
         },
-        // computed: mapState(['user_ids','sale_group_ids']),
-        mounted: function(){
-
-            $('#'+this.id+'').select2();
-
-            var domId = this.id;
+        mounted: function () {
             var thisVue = this;
+            var domId = thisVue.id;
+
+            $('#' + domId + '').select2();
 
             thisVue.updateSelectToVux(domId);
-            $('#'+this.id+'').on('change', function (e) {
+            $('#' + domId + '').on('change', function (e) {
                 thisVue.updateSelectToVux(domId);
             });
             var evTimeStamp = 0;
-            $('.row').on('click','input[name="selectType"]',function(v,k){
+            $('.row').on('click', 'input[name="selectType"]', function (v, k) {
                 let now = new Date();
 
                 if (now - evTimeStamp < 100) {
@@ -73,43 +75,26 @@
                 let select_user = $('#select_user');
                 let select_groups = $('#select_groups');
                 let type = $(this).data('type');
-                switch (type){
+
+                switch (type) {
                     case 'select_user':
-                        select_user.attr('disabled',false);
-                        select_groups.attr('disabled',true).val(null).trigger("change");
+                        select_user.attr('disabled', false);
+                        select_groups.attr('disabled', true).val(null).trigger("change");
                         select_groups.next().find('li.select2-selection__choice').remove();
-                        select_groups.next().find('.select2-search__field').attr('placeholder','選擇團隊').css('width','415px');
-                        thisVue.changeSaleGroupId($('#'+domId+'').val());
+                        select_groups.next().find('.select2-search__field').attr('placeholder', '選擇團隊').css('width', '415px');
+                        thisVue.changeSaleGroupId($('#' + domId + '').val());
                         break;
                     case 'select_groups':
-                        select_groups.attr('disabled',false);
-                        select_user.attr('disabled',true).val(null).trigger("change");
+                        select_groups.attr('disabled', false);
+                        select_user.attr('disabled', true).val(null).trigger("change");
                         select_user.next().find('li.select2-selection__choice').remove();
-                        select_user.next().find('.select2-search__field').attr('placeholder','選擇成員').css('width','415px');
-                        thisVue.changeUserId($('#'+domId+'').val());
+                        select_user.next().find('.select2-search__field').attr('placeholder', '選擇成員').css('width', '415px');
+                        thisVue.changeUserId($('#' + domId + '').val());
                         break;
                 }
             });
-            // $('#'+this.id+'').on('select2:select', function (e) {
-            //     var data = e.params.data;
-            //     console.log(data);
-            // });
-            // $('#'+this.id+'').on('select2:unselect', function (e) {
-            //     var data = e.params.data;
-            //     console.log(data);
-            // });
         },
-        watch:{
-            // change_date: {
-            //     immediate: true,
-            //     handler (val, oldVal) {
-            //         if(oldVal !== undefined) {
-            //
-            //             console.log(val,oldVal);
-            //         }
-            //     }
-            // }
-        }
+        watch: {}
     }
 </script>
 

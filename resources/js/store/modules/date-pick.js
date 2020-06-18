@@ -1,3 +1,4 @@
+import * as types from '../types';
 const state = {
     change_date : ''
 }
@@ -7,14 +8,14 @@ const getters = {
 }
 
 const mutations = {
-    changeDate(state, payload) {
+    [types.MUTATE_DATE] : (state, payload) => {
         state.change_date = payload;
     },
 }
 
 const actions ={
-    changeDate({commit}, payload) {
-        commit('changeDate',payload)
+    [types.CHANGE_DATE] : ({commit}, payload) => {
+        commit(types.MUTATE_DATE,payload)
     },
 }
 

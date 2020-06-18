@@ -10,9 +10,11 @@ require('./bootstrap');
 
 import Vue from 'vue';
 import Vuex from 'vuex';
+import VueCompositionApi from '@vue/composition-api';
 
 
 Vue.use(Vuex);
+Vue.use(VueCompositionApi);
 
 // Vuex Store
 import store from './store/store'

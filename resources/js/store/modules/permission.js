@@ -1,3 +1,4 @@
+import * as types from '../types';
 const state = {
     permission_data : [],
     permission_class_data : []
@@ -8,22 +9,22 @@ const getters = {
 }
 
 const mutations = {
-    changePermissionData(state,payload){
+    [types.MUTATE_PERMISSION_DATA] : (state,payload) => {
         state.permission_data = [];
         payload.map((v)=>{state.permission_data.push(v)} );
     },
-    changePermissionClassData(state,payload){
+    [types.MUTATE_PERMISSION_CLASS_DATA] : (state,payload) => {
         state.permission_class_data = [];
         payload.map((v)=>{state.permission_class_data.push(v)} );
     }
 }
 
 const actions = {
-    changePermissionData({commit},payload){
-        commit('changePermissionData',payload);
+    [types.CHANGE_PERMISSION_DATA]:({commit},payload)=>{
+        commit(types.MUTATE_PERMISSION_DATA,payload);
     },
-    changePermissionClassData({commit},payload){
-        commit('changePermissionClassData',payload);
+    [types.CHANGE_PERMISSION_CLASS_DATA]:({commit},payload)=>{
+        commit(types.MUTATE_PERMISSION_CLASS_DATA,payload);
     }
 }
 

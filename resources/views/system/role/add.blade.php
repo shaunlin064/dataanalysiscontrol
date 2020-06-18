@@ -42,18 +42,6 @@
                             :select_id='{{ json_encode( $role->permissions->pluck('id')) }}'
                         @endif
                     ></role-form>
-{{--                    <simple-data-table-componet--}}
-{{--                        :table_id='"permission_list"'--}}
-{{--                        :table_head='"權限列表"'--}}
-{{--                        :table_title='["選擇","名稱"]'--}}
-{{--                        :type = '"select"'--}}
-{{--                        @if( ($type ?? '') == 'edit')--}}
-{{--                        :select_id='{{ json_encode( $role->role->pluck('id')) }}'--}}
-{{--                        @endif--}}
-{{--                        :row = '{!! json_encode($permissionList) !!}'--}}
-{{--                        :csrf= '"{{csrf_token()}}"'--}}
-{{--                        :columns = '{!!json_encode($columns)!!}'--}}
-{{--                    ></simple-data-table-componet>--}}
                 <!-- /.box-body -->
                 <div class="box-footer">
                     <role-form-submit

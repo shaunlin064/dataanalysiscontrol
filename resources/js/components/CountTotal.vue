@@ -6,8 +6,8 @@
 </template>
 
 <script>
-    import {mapState} from 'vuex';
-
+    import {mapActions, mapState , mapGetters} from 'vuex';
+    import * as types from "../store/types";
     export default {
         name: "count_total",
         props: {

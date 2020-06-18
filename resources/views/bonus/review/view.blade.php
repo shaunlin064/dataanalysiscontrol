@@ -105,7 +105,7 @@
                     <div class="form-group col-sm-6">
                         <label class="col-sm-4 control-label input-md">代理商 : </label>
                         <div class="col-sm-8">
-                            <select2-customer :id='"agency_ids"'
+                            <select2-customer :dom_id='"agency_ids"'
                                               :selected='false'
                                               :multiple='true'
                                               :placeholder='"請選擇"'
@@ -116,7 +116,7 @@
                     <div class="form-group col-sm-6">
                         <label class="col-sm-4 control-label input-md">直客 : </label>
                         <div class="col-sm-8">
-                            <select2-customer :id='"client_ids"'
+                            <select2-customer :dom_id='"client_ids"'
                                               :selected='false'
                                               :multiple='true'
                                               :placeholder='"請選擇"'
@@ -127,7 +127,7 @@
                     <div class="form-group col-sm-6">
                         <label class="col-sm-4 control-label input-md">媒體 : </label>
                         <div class="col-sm-8">
-                            <select2-customer :id='"medias_names"'
+                            <select2-customer :dom_id='"medias_names"'
                                               :selected='false'
                                               :multiple='true'
                                               :placeholder='"請選擇"'
@@ -138,7 +138,7 @@
                     <div class="form-group col-sm-6">
                         <label class="col-sm-4 control-label input-md">媒體經銷商 : </label>
                         <div class="col-sm-8">
-                            <select2-customer :id='"media_companies_ids"'
+                            <select2-customer :dom_id='"media_companies_ids"'
                                               :selected='false'
                                               :multiple='true'
                                               :placeholder='"請選擇"'

@@ -1,3 +1,5 @@
+import * as types from '../types';
+
 const state = {
     month_income : [],
     month_cost : [],
@@ -22,21 +24,24 @@ const state = {
     group_progress_list_total:[],
     progress_list:[],
     progress_list_total:[],
-    exchange_rates_list : []
+    exchange_rates_list : [],
+    agency_profit : 0,
+    client_profit : 0,
+    sale_channel_profitData : []
 }
 const mutations = {
-    changeMoneyStatus(state, payload) {
+    [types.MUTATE_MONEY_STATUS] : (state, payload) => {
         state.money_status_paid = payload.paid;
         state.money_status_unpaid = payload.unpaid;
         state.money_status_bonus_paid = payload.bPaid;
         state.money_status_bonus_unpaid = payload.bUnPaid;
     },
-    changeMonthBalance(state, payload) {
+    [types.MUTATE_MONTH_BALANCE] : (state, payload) => {
         state.month_income = payload.month_income;
         state.month_cost = payload.month_cost;
         state.month_profit = payload.month_profit;
     },
-    setChartData(state,payload){
+    [types.MUTATE_CHART_DATA] : (state,payload) => {
         state.last_record_month_income  = payload.chart_financial_bar_last_record.totalIncome;
         state.last_record_month_cost  = payload.chart_financial_bar_last_record.totalCost;
         state.last_record_month_profit = payload.chart_financial_bar_last_record.totalProfit;
@@ -80,16 +85,15 @@ const mutations = {
 }
 
 const actions = {
-    changeMoneyStatus({commit},payload){
-        commit('changeMoneyStatus',payload);
+    [types.CHANGE_MONEY_STATUS] : ({commit},payload) => {
+        commit(types.MUTATE_MONEY_STATUS,payload);
     },
-    changeMonthBalance({commit}, payload){
-        commit('changeMonthBalance',payload);
+    [types.CHANGE_MONTH_BALANCE] : ({commit}, payload)=>{
+        commit(types.MUTATE_MONTH_BALANCE,payload);
     },
-    setChartData({commit},payload){
+    [types.SET_CHART_DATA] : ({commit},payload)=>{
 
-        commit('setChartData',payload);
-
+        commit(types.MUTATE_CHART_DATA,payload);
         /*customer table list*/
         commit('changeCustomerGroupsProfitData',payload.customer_groups_profit_data);
         commit('changeCustomerProfitData',payload.customer_profit_data);

@@ -1,3 +1,5 @@
+import * as types from '../types';
+
 const state = {
     bonus_total_money: 0,
     sale_group_total_money: 0,
@@ -12,57 +14,33 @@ const state = {
     provide_money: 0,
 }
 const mutations = {
-    changeProvideStatisticsList(state, payload) {
+    [types.MUTATE_PROVIDE_STATISTICS_LIST] : (state, payload) => {
         state.provide_statistics_list['user'] = payload['user'];
         state.provide_statistics_list['group'] = payload['group'];
     },
-    changeProvideTotalMoney(state, payload) {
+    [types.MUTATE_PROVIDE_TOTAL_MONEY] : (state, payload) => {
         state.provide_total_money = payload;
     },
-    increaseProvideTotalMoney(state,payload){
-      state.provide_total_money += payload;
-    },
-    decreaseProvideTotalMoney(state,payload){
-        state.provide_total_money += payload;
-    },
-    changeBonusTotalMoney(state, payload) {
+    [types.MUTATE_BONUS_TOTAL_MONEY] : (state, payload) => {
         state.bonus_total_money = payload;
     },
-    changeSaleGroupTotalMoney(state, payload){
+    [types.MUTATE_SALE_GROUP_TOTAL_MONEY] : (state, payload) => {
         state.sale_group_total_money = payload;
     },
-    changeProvideBonusList(state,payload){
+    [types.MUTATE_PROVIDE_BONUS_LIST] : (state,payload) => {
         state.provide_bonus_list = payload;
     },
-    changeProvideGroupsList(state,payload){
+    [types.MUTATE_PROVIDE_GROUPS_LIST](state,payload){
         state.provide_groups_list = payload;
     },
-    changeProvideCharBarStack(state,payload){
+    [types.MUTATE_PROVIDE_CHAR_BAR_STACK] : (state,payload) => {
         state.provide_char_bar_stack = payload;
     },
-    sortProvideStatisticsList(state){
-        // let entries = Object.entries(state.provide_statistics_list.user); //把 obj 拆成 array
-        // entries = entries.map( ( a, b) =>{
-        //     // if(a.group_id < b.group_id){
-        //     //     return 1;
-        //     // }
-        //     // if(a.group_id > b.group_id){
-        //     //     return -1;
-        //     // }
-        //     // return 0;
-        //     return a[1];
-        // });
-        // state.provide_statistics_list.user  = Object.fromEntries(entries); //把array 轉回 obj
-        // console.log(state.provide_statistics_list.user);
-        // state.provide_statistics_list.group = state.provide_statistics_list.group.sort(function (a, b) {
-        //     return a.group_id < b.group_id ? 1 : -1;
-        // });
-        //
+    [types.MUTATE_SORT_PROVIDE_STATISTICS_LIST] : (state) =>{
         state.provide_statistics_list.user = getSort(state.provide_statistics_list.user,'group_id');
         state.provide_statistics_list.group = getSort(state.provide_statistics_list.group,'group_id');
-
     },
-    setStatistics(state,payload){
+    [types.MUTATE_STATISTICS] : (state,payload) => {
             // /*user*/
             if (state.provide_statistics_list['user'][payload.user_name] === undefined) {
                 state.provide_statistics_list['user'][payload.user_name] = {};
@@ -101,7 +79,7 @@ const mutations = {
             state.provide_char_bar_stack[separateDate][payload.user_name]['erp_user_id'] = payload.user !== undefined ? payload.user.erp_user_id : payload.sale_user.erp_user_id;
 
     },
-    selectData(state, payload) {
+    [types.MUTATE_SELECT_DATA] : (state, payload) => {
 
         let thisSelectMoney = payload.data.provide_money;
         let groupName = payload.data.sale_group_name ? payload.data.sale_group_name : payload.data.group_name;
@@ -133,49 +111,32 @@ const mutations = {
     }
 }
 const actions = {
-    changeProvideStatisticsList({commit}, payload) {
-        commit('changeProvideStatisticsList', payload)
-    },
-    changeProvideTotalMoney({commit}, payload) {
-        commit('changeProvideTotalMoney', payload)
-    },
-    increaseProvideTotalMoney({commit},payload){
-        commit('increaseProvideTotalMoney', payload)
-    },
-    decreaseProvideTotalMoney({commit},payload){
-        commit('decreaseProvideTotalMoney', payload)
-    },
-    changeBonusTotalMoney({commit}, payload){
-        commit('changeBonusTotalMoney',payload)
-    },
-    changeSaleGroupTotalMoney({commit}, payload){
-        commit('changeSaleGroupTotalMoney',payload)
-    },
-    changeProvideBonusList({commit}, payload){
-        payload.map((v)=>{
-            commit('setStatistics',v);
+    [types.SET_PROVIDE_AJAX_DATA] : ({commit}, payload) => {
+        commit(types.MUTATE_PROVIDE_STATISTICS_LIST, payload.provideStatisticsList);
+        commit(types.MUTATE_PROVIDE_TOTAL_MONEY, payload.provideTotalMoney);
+        commit(types.MUTATE_BONUS_TOTAL_MONEY, payload.bonusTotalMoney);
+        commit(types.MUTATE_SALE_GROUP_TOTAL_MONEY,payload.saleGroupTotalMoney);
+
+        payload.provideBonusList.map((v)=>{
+            commit(types.MUTATE_STATISTICS,v);
         });
-        commit('sortProvideStatisticsList');
-        commit('changeProvideBonusList',payload)
-    },
-    changeProvideGroupsList({commit}, payload){
-        payload.map((v)=>{
-                commit('setStatistics',v);
+        payload.provideGroupsList.map((v) => {
+            commit(types.MUTATE_STATISTICS, v);
         });
-        commit('sortProvideStatisticsList');
-        commit('changeProvideGroupsList',payload)
+
+        commit(types.MUTATE_PROVIDE_BONUS_LIST,payload.provideBonusList);
+        commit(types.MUTATE_PROVIDE_GROUPS_LIST, payload.provideGroupsList);
+        commit(types.MUTATE_PROVIDE_CHAR_BAR_STACK,payload.provideCharBarStack);
+        commit(types.MUTATE_SORT_PROVIDE_STATISTICS_LIST);
     },
-    setStatistics({commit}, payload) {
-        commit('setStatistics',payload);
+    [types.SET_STATISTICS] : ({commit}, payload) => {
+        commit(types.MUTATE_STATISTICS,payload);
     },
-    selectData({commit}, payload) {
-       commit('selectData',payload);
+    [types.SELECT_DATA] : ({commit}, payload) => {
+       commit(types.MUTATE_SELECT_DATA,payload);
     },
-    sortProvideStatisticsList({commit}, payload) {
-        commit('sortProvideStatisticsList',payload);
-    },
-    changeProvideCharBarStack({commit}, payload){
-        commit('changeProvideCharBarStack',payload)
+    [types.SORT_PROVIDE_STATISTICS_LIST]({commit}, payload) {
+        commit(types.MUTATE_SORT_PROVIDE_STATISTICS_LIST,payload);
     },
 }
 const getters = {

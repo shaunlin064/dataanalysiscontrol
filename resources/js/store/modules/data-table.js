@@ -1,3 +1,4 @@
+import * as types from '../types';
 const state = {
     table_select: {},
 }
@@ -9,22 +10,23 @@ const getters = {
 }
 
 const mutations = {
-    setTableSelect(state,payload = []){
+    [types.MUTATE_TABLE_SELECT] : (state,payload = []) => {
+
         if(state.table_select[payload.dom_id] === undefined){
             state.table_select[payload.dom_id] = [];
         }
-        payload.select_ids.map((v)=>{
+        payload.select_id.map((v)=>{
             state.table_select[payload.dom_id].push(v)
         })
     },
-    pushTableSelect(state,payload){
-
+    [types.MUTATE_PUSH_TABLE_SELECT] : (state,payload) => {
         let index = $.inArray(payload.select_id, state.table_select[payload.dom_id]);
         if(index === -1){
             state.table_select[payload.dom_id].push(payload.select_id);
         }
     },
-    spliceTableSelect(state,payload){
+    [types.MUTATE_SPLICE_TABLE_SELECT] : (state,payload) => {
+
         let index = $.inArray(payload.select_id, state.table_select[payload.dom_id]);
         while( index !== -1 ){
             state.table_select[payload.dom_id].splice(index, 1);
@@ -33,14 +35,14 @@ const mutations = {
     },
 }
 const actions = {
-    setTableSelect({commit},payload){
-        commit('setTableSelect',payload)
+    [types.SET_TABLE_SELECT] : ({commit},payload) => {
+        commit(types.MUTATE_TABLE_SELECT,payload)
     },
-    pushTableSelect({commit},payload){
-        commit('pushTableSelect',payload)
+    [types.PUSH_TABLE_SELECT] : ({commit},payload) => {
+        commit(types.MUTATE_PUSH_TABLE_SELECT,payload)
     },
-    spliceTableSelect({commit},payload){
-        commit('spliceTableSelect',payload)
+    [types.SPLICE_TABLE_SELECT] : ({commit},payload) => {
+        commit(types.MUTATE_SPLICE_TABLE_SELECT,payload)
     },
 }
 

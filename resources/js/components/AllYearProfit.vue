@@ -6,7 +6,7 @@
 
 <script>
     import {mapState, mapMutations, mapActions} from 'vuex';
-
+    import * as types from "../store/types";
     export default {
         name: "AllYearProfit",
         props: {

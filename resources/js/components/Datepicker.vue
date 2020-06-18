@@ -9,6 +9,7 @@
 
 <script>
     import {mapState, mapMutations, mapActions, mapGetters} from 'vuex';
+    import * as types from '../store/types'
     export default {
         name: "Datepicker",
         props: {
@@ -23,13 +24,11 @@
         computed: {
         },
         methods: {
-            changeDate(value) {
-                this.$store.dispatch('datePick/changeDate', value);
-            },
+            ...mapActions('datePick',[types.CHANGE_DATE]),
         },
         created: function () {
             let d = new Date(this.date);
-            this.changeDate(moment(d).format('YYYY/MM'));
+            this[types.CHANGE_DATE](moment(d).format('YYYY/MM'));
         },
         mounted: function () {
             let vue = this;
@@ -52,7 +51,7 @@
                 format: 'yyyy/mm',
                 language: 'zh-TW',
             }).on("change", function () {
-                vue.changeDate(this.value);
+                vue[types.CHANGE_DATE](this.value);
             });
         }
     }

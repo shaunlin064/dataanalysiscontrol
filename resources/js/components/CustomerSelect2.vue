@@ -1,5 +1,5 @@
 <template>
-    <select class="form-control select2" :id='id' :multiple='multiple' :data-placeholder='placeholder'
+    <select class="form-control select2" :id='dom_id' :multiple='multiple' :data-placeholder='placeholder'
             :disabled='disabled'
             style="width: 100%;">
         <option :value='item.id' v-for='item in row' :selected='selected ? selected : item.id==0'> {{item.name}}
@@ -10,11 +10,11 @@
 
 <script>
     import {mapState, mapMutations, mapActions} from 'vuex';
-
+    import * as types from "../store/types";
     export default {
         name: "select2-customer",
         props: {
-            id: String,
+            dom_id: String,
             multiple: Boolean,
             disabled: Boolean,
             selected: Boolean,
@@ -25,36 +25,33 @@
             return {}
         },
         methods: {
+            ...mapActions('select',[types.CHANGE_AGENCY_IDS,types.CHANGE_CLIENT_IDS,types.CHANGE_MEDIA_COMPANIES_IDS,types.CHANGE_MEDIAS_NAMES]),
             updateSelectToVux(domId) {
                 let ids = $('#' + domId + '').val();
                 switch (domId) {
                     case 'agency_ids':
-                        this.$store.dispatch('select/changeAgencyIds', ids);
+                        this[types.CHANGE_AGENCY_IDS](ids);
                         break;
                     case 'client_ids':
-                        this.$store.dispatch('select/changeClientIds', ids);
+                        this[types.CHANGE_CLIENT_IDS](ids);
                         break;
                     case 'media_companies_ids':
-                        this.$store.dispatch('select/changeMediaCompaniesIds', ids);
+                        this[types.CHANGE_MEDIA_COMPANIES_IDS](ids);
                         break;
                     case 'medias_names':
-                        this.$store.dispatch('select/changeMediasNames', ids);
+                        this[types.CHANGE_MEDIAS_NAMES](ids);
                         break;
                 }
             },
         },
         computed: {
-            ...mapState(
-                'select', ['agency_ids', 'client_ids', 'media_companies_ids', 'medias_names']),
         },
         mounted: function () {
-            $('#' + this.id + '').select2();
-
-            var domId = this.id;
-            var thisVue = this;
-            thisVue.updateSelectToVux(domId);
-            $('#' + this.id + '').on('change', function (e) {
-                thisVue.updateSelectToVux(domId);
+            var vue = this;
+            $('#' + vue.dom_id + '').select2();
+            vue.updateSelectToVux(vue.dom_id);
+            $('#' + vue.dom_id + '').on('change', function (e) {
+                vue.updateSelectToVux(vue.dom_id);
             });
         }
         ,

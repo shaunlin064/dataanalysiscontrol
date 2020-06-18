@@ -43,8 +43,8 @@
 </template>
 
 <script>
-    import {mapState} from 'vuex';
-
+    import {mapActions, mapState , mapGetters} from 'vuex';
+    import * as types from "../../store/types";
     export default {
         name: "permissionsDataTable",
         props: {
@@ -60,6 +60,7 @@
             ...mapState('permission', ['permission_data', 'permission_class_data']),
         },
         methods: {
+            ...mapActions('permission',[types.CHANGE_PERMISSION_DATA,types.CHANGE_PERMISSION_CLASS_DATA]),
             renderDatatable() {
                 if (this.dataTable !== undefined) {
                     this.dataTable.clear();
@@ -71,8 +72,8 @@
                 $('.select2').select2();
             },
             updateVuex: function (res) {
-                this.$store.dispatch('permission/changePermissionData', res.data.row);
-                this.$store.dispatch('permission/changePermissionClassData', res.data.permissionClassData);
+                this[types.CHANGE_PERMISSION_DATA](res.data.row);
+                this[types.CHANGE_PERMISSION_CLASS_DATA](res.data.permissionClassData);
             },
             axioPost(params, id) {
                 params['_token'] = this.csrf;
@@ -133,7 +134,7 @@
         },
         beforeMount: function () {
             var vue = this;
-            this.$store.dispatch('permission/changePermissionData', vue.row);
+            vue[types.CHANGE_PERMISSION_DATA](vue.row);
 
             $(document).ready(function () {
                 let domtable = $('#' + vue.table_id);

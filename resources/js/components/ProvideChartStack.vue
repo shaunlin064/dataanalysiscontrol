@@ -138,8 +138,8 @@
                         }
                     },columnUserNameLabel);
                 },columnUserNameLabel);
-                Object.keys(newSortDatas).forEach(date=>{
 
+                Object.keys(newSortDatas).forEach(date=>{
                     let items = [];
                     let datas = newSortDatas[date];
                     stackDateLabel.push(date);

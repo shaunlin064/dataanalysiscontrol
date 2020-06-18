@@ -2,7 +2,8 @@
 </template>
 
 <script>
-    import {mapState, mapMutations, mapActions, mapGetters} from 'vuex';
+    import {mapActions, mapState, mapMutations, mapGetters} from 'vuex';
+    import * as types from '../store/types';
 
     export default {
         name: "BonusReviewAjaxCenter",
@@ -11,16 +12,23 @@
         },
         data() {
             return {
-                ajax_url : '/bonus/review/getAjaxData',
+                ajax_url: '/bonus/review/getAjaxData',
             }
         },
         computed: {
             ...mapState(['loading']),
-            ...mapState('dateRange',['start_date', 'end_date']),
-            ...mapState('select',['user_ids', 'sale_group_ids', 'agency_ids', 'client_ids', 'media_companies_ids', 'medias_names']),
-            ...mapState('chart',['bonus_char_bar_stack']),
+            ...mapState('dateRange', ['start_date', 'end_date']),
+            ...mapState('select', ['user_ids', 'sale_group_ids', 'agency_ids', 'client_ids', 'media_companies_ids', 'medias_names']),
+            ...mapState('chart', ['bonus_char_bar_stack']),
+
         },
         methods: {
+            ...mapActions([types.CHANGE_LOADING_STATUS]),
+            ...mapActions('chart',[
+                types.CHANGE_MONEY_STATUS,
+                types.CHANGE_MONTH_BALANCE,
+                types.SET_CHART_DATA
+            ]),
             tableClear: function () {
                 $('table').map(function (e, v) {
                     $.fn.dataTable.Api(v).draw();
@@ -43,26 +51,24 @@
                     return false;
                 }
 
-                this.$store.dispatch('changeLoadingStatus',true);
+                this[types.CHANGE_LOADING_STATUS](true);
                 this.tableClear();
 
                 axios.post(this.ajax_url, data).then(
                     response => {
-                         this.$store.dispatch('changeLoadingStatus',false);
-                        // let total = parseInt(0);
+                        this[types.CHANGE_LOADING_STATUS](false);
                         if (response.data) {
                             /*sales char*/
-                            this.$store.dispatch('chart/changeMoneyStatus', {
+                            this[types.CHANGE_MONEY_STATUS]({
                                 paid: response.data.chart_money_status.paid,
                                 unpaid: response.data.chart_money_status.unpaid
                             });
-
-                            this.$store.dispatch('chart/changeMonthBalance', {
+                            this[types.CHANGE_MONTH_BALANCE]({
                                 'month_income': response.data.chart_financial_bar.totalIncome,
                                 'month_cost': response.data.chart_financial_bar.totalCost,
                                 'month_profit': response.data.chart_financial_bar.totalProfit
                             });
-                            this.$store.dispatch('chart/setChartData',response.data);
+                            this[types.SET_CHART_DATA](response.data);
                         }
                     },
                     err => {

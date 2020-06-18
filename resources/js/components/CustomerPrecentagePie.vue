@@ -5,7 +5,8 @@
 </template>
 
 <script>
-    import {mapState, mapMutations, mapActions} from 'vuex';
+    import {mapActions, mapState} from 'vuex';
+
     export default {
         name: "CustomerPrecentagePie",
         props: {
@@ -13,7 +14,9 @@
             title: String,
             labels: Array,
         },
-        computed: {...mapState(['agency_profit','client_profit','sale_channel_profitData'])},
+        computed: {
+            ...mapState('chart', ['agency_profit', 'client_profit', 'sale_channel_profitData'])
+        },
         data: function () {
             return {
                 default_color: {
@@ -36,9 +39,10 @@
                     type: 'pie',
                     data: {
                         'datasets': [
-                            {"data":[0,0,0,0,0]},
-                            {"data":[0,0,0,0,0]
-                        }],
+                            {"data": [0, 0, 0, 0, 0]},
+                            {
+                                "data": [0, 0, 0, 0, 0]
+                            }],
                         'labels': this.labels,
                     },
                     options: {
@@ -48,12 +52,6 @@
                             text: this.title
                         },
                         plugins: {
-                            // labels:
-                            //     {
-                            //     render: 'percentage',
-                            //     fontColor: ['black'],
-                            //     precision: 1
-                            // }
                             datalabels: {
                                 align: 'bottom',
                                 formatter: (value, ctx) => {
@@ -62,15 +60,15 @@
                                     let dataArr = ctx.chart.data.datasets[index].data;
 
                                     dataArr.map(data => {
-                                        if(data < 0){
+                                        if (data < 0) {
                                             data = 0;
                                         }
                                         sum += data;
                                     });
 
-                                    let percentage = (value*100 / sum).toFixed(1);
-                                    if(percentage != '0.0'){
-                                        return percentage+"%";
+                                    let percentage = (value * 100 / sum).toFixed(1);
+                                    if (percentage != '0.0') {
+                                        return percentage + "%";
                                     }
                                     return null;
 
@@ -97,8 +95,8 @@
         methods: {
             update(vue_this) {
                 vue_this.chart_obj.data.datasets[0].data = [
-                    vue_this.agency_profit.reduce((a,b)=>a+b),
-                    vue_this.client_profit.reduce((a,b)=>a+b),
+                    vue_this.agency_profit.reduce((a, b) => a + b),
+                    vue_this.client_profit.reduce((a, b) => a + b),
                     0,
                     0,
                     0
@@ -106,9 +104,9 @@
                 vue_this.chart_obj.data.datasets[1].data = [
                     0,
                     0,
-                    vue_this.$store.state.sale_channel_profitData['AP'],
-                    vue_this.$store.state.sale_channel_profitData['BR'],
-                    vue_this.$store.state.sale_channel_profitData['EC']
+                    vue_this.sale_channel_profitData['AP'],
+                    vue_this.sale_channel_profitData['BR'],
+                    vue_this.sale_channel_profitData['EC']
                 ];
                 vue_this.chart_obj.update();
             },
@@ -128,7 +126,7 @@
             client_profit: {
                 immediate: true,
                 handler(val, oldVal) {
-                    if (oldVal !== undefined ) {
+                    if (oldVal !== undefined) {
                         this.update(this);
                     }
                 }

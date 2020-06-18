@@ -29,6 +29,7 @@
 
     // require('../../../public/adminLte_componets/bootstrap-daterangepicker/daterangepicker');
     import {mapState, mapMutations, mapActions} from 'vuex';
+    import * as types from "../store/types";
 
     export default {
         name: "DataTable",

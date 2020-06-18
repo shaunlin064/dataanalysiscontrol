@@ -15,6 +15,7 @@
 
 <script>
     import {mapState, mapMutations, mapActions} from 'vuex';
+    import * as types from '../store/types';
 
     export default {
         name: "date-range",
@@ -28,37 +29,31 @@
         },
         data() {
             return {
-                starDate : this.input_start_date,
-                endDate : this.input_end_date,
                 daterangepickerObj: {},
             }
         },
         mounted: function(){
             //Date range picker
             var dateRoot =  $('#' + this.dom_id + '');
-            var thisVue = this;
-            thisVue.changeDate();
-            this.daterangepickerObj = dateRoot.daterangepicker({
+            var vue = this;
+            vue[types.CHANGE_DATE_RANGE]([vue.input_start_date,vue.input_end_date]);
+            vue.daterangepickerObj = dateRoot.daterangepicker({
                 showDropdowns: true,
                 batchMode: "months-range",
                 locale: { format: 'YYYY/MM' },
-                startDate: this.$store.state.start_date,
-                endDate: this.$store.state.end_date,
+                startDate: vue.start_date,
+                endDate: vue.end_date,
             });
-            // thisVue.changeDate();
+
             $('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
-                thisVue.starDate = picker.startDate.format('YYYY-MM-01');
-                thisVue.endDate = picker.endDate.format('YYYY-MM-01');
-                thisVue.changeDate();
+                let starDate = picker.startDate.format('YYYY-MM-01');
+                let endDate = picker.endDate.format('YYYY-MM-01');
+                vue[types.CHANGE_DATE_RANGE]([starDate,endDate]);
             });
         },
         methods: {
-            changeDate() {
-                this.$store.dispatch('dateRange/changeDateRange',[this.starDate,this.endDate])
-                // this.$store.commit('changeDateRange', [this.starDate,this.endDate]);
-            },
+            ...mapActions('dateRange',[types.CHANGE_DATE_RANGE]),
             update(){
-                // $('#' + this.dom_id + '').val(`${this.$store.state.start_date.replace("-01", "")} - ${this.$store.state.end_date.replace("-01", "")}`);
                 $('#' + this.dom_id + '').val(`${this.start_date.replace("-01", "")} - ${this.end_date.replace("-01", "")}`);
             },
         },

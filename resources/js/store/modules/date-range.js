@@ -1,18 +1,19 @@
+import * as types from '../types';
 const state = {
     start_date: '',
     end_date: '',
 }
 
 const mutations = {
-    changeDateRange(state, payload) {
+    [types.MUTATE_DATE_RANGE] : (state, payload) => {
         state.start_date = payload[0];
         state.end_date = payload[1];
     },
 }
 
 const actions = {
-    changeDateRange({commit}, payload) {
-        commit('changeDateRange', payload)
+    [types.CHANGE_DATE_RANGE] : ({commit}, payload) => {
+        commit(types.MUTATE_DATE_RANGE, payload)
     },
 }
 

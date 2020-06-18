@@ -7,8 +7,8 @@
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu">
-                    <li><a href="#" @click="click('lM')">前月</a></li>
-                    <li><a href="#" @click="click('tM')">本月</a></li>
+                    <li><a href="#" @click="quickClick('lM')">前月</a></li>
+                    <li><a href="#" @click="quickClick('tM')">本月</a></li>
                 </ul>
             </div>
         </div>
@@ -19,10 +19,10 @@
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu">
-                    <li><a href="#" @click="click('q1')">Q1</a></li>
-                    <li><a href="#" @click="click('q2')">Q2</a></li>
-                    <li><a href="#" @click="click('q3')">Q3</a></li>
-                    <li><a href="#" @click="click('q4')">Q4</a></li>
+                    <li><a href="#" @click="quickClick('q1')">Q1</a></li>
+                    <li><a href="#" @click="quickClick('q2')">Q2</a></li>
+                    <li><a href="#" @click="quickClick('q3')">Q3</a></li>
+                    <li><a href="#" @click="quickClick('q4')">Q4</a></li>
                 </ul>
             </div>
         </div>
@@ -33,8 +33,8 @@
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu">
-                    <li><a href="#" @click="click('lY')">前年度</a></li>
-                    <li><a href="#" @click="click('tY')">本年度</a></li>
+                    <li><a href="#" @click="quickClick('lY')">前年度</a></li>
+                    <li><a href="#" @click="quickClick('tY')">本年度</a></li>
                 </ul>
             </div>
         </div>
@@ -43,32 +43,26 @@
 
 <script>
     import {mapState, mapMutations, mapActions} from 'vuex';
-
+    import * as types from '../store/types'
     export default {
         name: "SelectButtonGroup",
         props: {
             input_start_date : String,
             input_end_date : String,
         },
-        computed: {...mapState('dateRange',['start_date','end_date'])},
-        data() {
-            return {
-            }
+        computed: {
+            ...mapState('dateRange',['start_date','end_date']),
         },
-        mounted: function(){
-
+        mounted: ()=>{
         },
         methods: {
-            update(){
-
-            },
-            click(dataSelectType) {
+            ...mapActions('dateRange',[types.CHANGE_DATE_RANGE]),
+            quickClick(dataSelectType) {
                 let d = new Date();
                 let dateStrStart;
                 let dateStrEnd;
                 let year = d.getFullYear();
                 let month = d.getMonth();
-
                 switch (dataSelectType) {
                     case 'lY':
                         dateStrStart = `${d.getFullYear() - 1}-01-01`;
@@ -80,7 +74,7 @@
                             month = 12;
                         }
                         /*月份補零*/
-                        if( month.toString().length == 1 ){
+                        if( month.toString().length === 1 ){
                             month = "0" + month;
                         }
                         dateStrStart = `${year}-${month}-01`;
@@ -93,7 +87,7 @@
                     case 'tM':
                         month = month+1;
                         /*月份補零*/
-                        if( month.toString().length == 1 ){
+                        if( month.toString().length === 1 ){
                             month = "0" + month;
                         }
                         dateStrStart = `${year}-${month}-01`;
@@ -117,8 +111,7 @@
                         dateStrEnd = `${year}-12-01`;
                         break;
                 }
-
-                this.$store.dispatch('dateRange/changeDateRange', [dateStrStart,dateStrEnd]);
+                this[types.CHANGE_DATE_RANGE]([dateStrStart,dateStrEnd]);
             }
         },
     }

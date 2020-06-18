@@ -40,7 +40,7 @@
 
 <script>
     import {mapState, mapMutations, mapActions, mapGetters} from 'vuex';
-
+    import * as types from '../../store/types';
     export default {
         name: "permissionsClassDataTable",
         props: {
@@ -56,13 +56,14 @@
             ...mapState('permission', ['permission_data', 'permission_class_data']),
         },
         methods: {
+            ...mapActions('permission',[types.CHANGE_PERMISSION_CLASS_DATA]),
             renderDatatable(){
                 this.dataTable.clear();
                 this.dataTable.rows.add(this.permission_class_data);
                 this.dataTable.draw();
             },
             updateVuex: function (res) {
-                this.$store.dispatch('permission/changePermissionClassData',res.data.permissionClassData);
+                this[types.CHANGE_PERMISSION_CLASS_DATA](res.data.permissionClassData);
             },
             axioPost(params, id){
                 params['_token'] = this.csrf;

@@ -36,8 +36,8 @@
 </template>
 
 <script>
-    import {mapState} from 'vuex';
-
+    import {mapActions, mapState , mapGetters} from 'vuex';
+    import * as types from "../store/types";
     export default {
         name: "SimpleDatatable",
         props: {
@@ -69,6 +69,8 @@
             ...mapState(['loading']),
         },
         methods: {
+            ...mapActions('financial',[types.SORT_PROVIDE_STATISTICS_LIST,types.SELECT_DATA,types.SET_STATISTICS]),
+            ...mapActions('dataTable',[types.PUSH_TABLE_SELECT,types.SPLICE_TABLE_SELECT]),
             tableClear() {
                 if (this.dataTable !== undefined) {
                     this.dataTable.clear();
@@ -97,14 +99,13 @@
                     let rowId = data.id;
                     let index = $.inArray(rowId, this.table_select[this.table_id]);
                     let table_id = this.table_id;
-                    this.$store.dispatch('financial/setStatistics',data);
+                    this[types.SET_STATISTICS](data);
 
                     switch (type) {
                         case 'select':
                             if (index === -1) {
-                                this.$store.dispatch('financial/selectData',{table_id,data,index,type:'select'})
-                                this.$store.dispatch('dataTable/pushTableSelect',{select_id:rowId,dom_id:table_id});
-
+                                this[types.SELECT_DATA]({table_id,data,index,type:'select'})
+                                this[types.PUSH_TABLE_SELECT]({select_id:rowId,dom_id:table_id});
                             }
                             if (vue.type === 'select') {
                                 $(row).find('input[type="checkbox"]').prop('checked', true);
@@ -113,8 +114,8 @@
                            break;
                         case 'unselect':
                             if (index !== -1) {
-                                this.$store.dispatch('financial/selectData',{table_id,data,index,type:'unselect'})
-                                this.$store.dispatch('dataTable/spliceTableSelect',{select_id:rowId,dom_id:table_id});
+                                this[types.SELECT_DATA]({table_id,data,index,type:'unselect'})
+                                this[types.SPLICE_TABLE_SELECT]({select_id:rowId,dom_id:table_id});
                             }
 
                             if (vue.type === 'select') {
@@ -124,7 +125,7 @@
                             break;
                     }
 
-                    this.$store.dispatch('financial/sortProvideStatisticsList');
+                    this[types.SORT_PROVIDE_STATISTICS_LIST];
                 }
 
             },
@@ -242,7 +243,6 @@
 
                         // If row ID is in the list of selected row IDs
                         if ($.inArray(rowId, vue.table_select[vue.table_id]) !== -1) {
-
                             $(row).find('input[type="checkbox"]').prop('checked', true);
                             $(row).addClass('selected');
                         }
@@ -252,6 +252,13 @@
                     domtable.on('click', 'tbody td, thead th:first-child', function (e) {
 
                         $(this).parent().find('input[type="checkbox"]').trigger('click');
+                        let targetId = $(this).parent().find('input[type="checkbox"]').attr('id');
+
+                        if($('#'+targetId).is(':checked')){
+                            $('#'+targetId).parent().parent().addClass('selected');
+                        }else{
+                            $('#'+targetId).parent().parent().removeClass('selected');
+                        }
                     });
                 }
                 if (ex_buttons) {

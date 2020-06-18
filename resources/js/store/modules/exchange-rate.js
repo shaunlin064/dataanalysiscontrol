@@ -1,3 +1,5 @@
+import * as types from '../types';
+
 const state = {
     chart_exchange_line: [],
     exchange_rates_list: [],
@@ -5,26 +7,27 @@ const state = {
 }
 
 const mutations = {
-    changeChartExchangeLine(state, payload) {
+    [types.MUTATE_CHART_EXCHANGE_LINE]: (state, payload)=> {
         state.chart_exchange_line = payload;
     },
-    changeExchangeRatesList(state, payload) {
+    [types.MUTATE_EXCHANGE_RATES_LIST]: (state, payload)=> {
         state.exchange_rates_list = payload;
     },
-    changeCurrency(state, payload) {
+    [types.MUTATE_CURRENCY]: (state, payload)=> {
+
         state.currency = payload;
     },
 }
 
 const actions = {
-    changeChartExchangeLine({commit}, payload) {
-        commit('changeChartExchangeLine',payload);
+    [types.CHANGE_CHART_EXCHANGE_LINE]: ({commit}, payload) => {
+        commit(types.MUTATE_CHART_EXCHANGE_LINE, payload);
     },
-    changeExchangeRatesList({commit}, payload) {
-        commit('changeExchangeRatesList',payload);
+    [types.CHANGE_EXCHANGE_RATES_LIST]: ({commit}, payload) => {
+        commit(types.MUTATE_EXCHANGE_RATES_LIST, payload);
     },
-    changeCurrency({commit}, payload) {
-       commit('changeCurrency',payload);
+    [types.CHANGE_CURRENCY]: ({commit}, payload) => {
+        commit(types.MUTATE_CURRENCY, payload);
     },
 }
 

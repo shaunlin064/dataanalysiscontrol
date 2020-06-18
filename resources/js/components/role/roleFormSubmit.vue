@@ -4,6 +4,7 @@
 
 <script>
     import {mapState,mapMutations,mapActions,mapGetters} from 'vuex';
+    import * as types from '../../store/types';
     export default {
         name: "roleFormSubmit",
         props: {
