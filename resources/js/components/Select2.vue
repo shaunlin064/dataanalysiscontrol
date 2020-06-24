@@ -28,7 +28,6 @@
             ...mapActions('exchangeRate', [types.CHANGE_CURRENCY]),
             ...mapActions('select', [types.CHANGE_USER_ID, types.CHANGE_SALE_GROUP_ID]),
             updateSelectToVux(domId) {
-
                 switch (domId) {
                     case 'select_user':
                         this.changeUserId($('#' + domId + '').val());

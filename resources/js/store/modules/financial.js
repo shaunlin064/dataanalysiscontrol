@@ -96,6 +96,7 @@ const mutations = {
         state.provide_statistics_list['group'][groupName]['money'] += thisSelectMoney;
         state.provide_statistics_list['group'][groupName]['group_id'] = groupId;
         state.provide_char_bar_stack[set_date][userName]['provide_money'] += thisSelectMoney;
+
         if (state.provide_statistics_list['user'][userName]['money'] === 0) {
             delete state.provide_statistics_list['user'][userName];
         }
@@ -121,12 +122,12 @@ const actions = {
             commit(types.MUTATE_STATISTICS,v);
         });
         payload.provideGroupsList.map((v) => {
-            commit(types.MUTATE_STATISTICS, v);
+            commit(types.MUTATE_STATISTICS,v);
         });
 
         commit(types.MUTATE_PROVIDE_BONUS_LIST,payload.provideBonusList);
         commit(types.MUTATE_PROVIDE_GROUPS_LIST, payload.provideGroupsList);
-        commit(types.MUTATE_PROVIDE_CHAR_BAR_STACK,payload.provideCharBarStack);
+        // commit(types.MUTATE_PROVIDE_CHAR_BAR_STACK,payload.provideCharBarStack);
         commit(types.MUTATE_SORT_PROVIDE_STATISTICS_LIST);
     },
     [types.SET_STATISTICS] : ({commit}, payload) => {

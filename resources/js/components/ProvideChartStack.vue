@@ -125,6 +125,7 @@
                 let columnUserNameLabel = [];
                 let newSortDatas = {};
                 let dateSortArray = Object.entries(originalData); //把 obj 拆成 array
+
                 dateSortArray = dateSortArray.map( (a) => a[0]).sort();
 
                  dateSortArray.map((date) => {

@@ -181,13 +181,13 @@
             $date      = new DateTime(date('Ym01'));
             $erpUserId = Auth::user()->erp_user_id;
             //
-            //                        $provideStart = '2020-05-01';
-            //                        $provideEnd = '2020-06-01';
-            //                        $saleGroupIds = [1, 2, 3, 4];
-            //                        $userIds = [];
-            //                        $request = new Request(['startDate' => $provideStart, 'endDate' => $provideEnd, 'saleGroupIds' => $saleGroupIds, 'userIds' => $userIds]);
-            //                        $datas = $this->getAjaxProvideData($request, 'return');
-            //                        dd($datas);
+//            $provideStart = '2020-05-01';
+//            $provideEnd = '2020-05-01';
+//            $saleGroupIds = [1, 2, 3, 4,5,6,7,8];
+//            $userIds = [];
+//            $request = new Request(['startDate' => $provideStart, 'endDate' => $provideEnd, 'saleGroupIds' => $saleGroupIds, 'userIds' => $userIds]);
+//            $datas = $this->getAjaxProvideData($request, 'return');
+//            dd($datas);
 
             [
                 $saleGroups,
@@ -329,21 +329,26 @@
             $provideEnd   = new DateTime($request->endDate);
             $saleGroupIds = $request->saleGroupIds;
             $userIds      = $request->userIds;
+            $dateRange = date_range($provideStart->format('Y-m-01'), $provideEnd->format('Y-m-01'));
+
             if ( !empty($userIds) ) {
                 $userIds = User::whereIn('id', $userIds)->get()->pluck('erp_user_id')->toArray();
             }
+
             if ( $saleGroupIds && $userIds == null ) {
                 $userIds = SaleGroups::with('groupsUsers')->whereIn('id', $saleGroupIds)->get()->map(
-                        function ( $v, $k ) {
-                            return $v->groupsUsers->pluck('erp_user_id');
+                        function ( $v, $k ) use($dateRange) {
+                            return $v->groupsUsers->whereIn('set_date',$dateRange)->pluck('erp_user_id');
                         }
                     )->flatten()->unique()->values();
             }
+            $saleGroupIds = User::whereIn('erp_user_id', $userIds)->get()->map(
+                    function ( $v, $k ) use($dateRange) {
+                        return $v->userGroups->whereIn('set_date',$dateRange)->pluck('sale_groups_id');
+                    }
+                )->flatten()->unique()->values();
+
             /*cache start*/
-            if ( $provideStart != $provideEnd ) {
-                $dateRange = date_range($provideStart->format('Y-m-01'), $provideEnd->format('Y-m-01'));
-            }
-            $dateRange[] = $provideEnd->format('Y-m-01');
             $cacheData   = collect([]);
             $dateNow     = new DateTime();
             /*check cache exists*/
@@ -401,14 +406,6 @@
             /*get provide Bar TrimData*/
             $allName = Bonus::all()->pluck('erp_user_id')->unique()->values();
 
-            //            $allName = $saleGroupRowData->groupBy('user_name')->map(function($v,$k){
-            //                return ['provide_money' => 0,'erp_user_id'=> $v->max('sale_user.erp_user_id'),'groupId' => $v->max('sale_groups.sale_groups_id')?? 0];
-            //            })->sortBy('erp_user_id');
-            //            $allName = $bonusRowData->groupBy('user_name')->map(function($v,$k){
-            //                return ['provide_money' => 0,'erp_user_id'=> $v->max('user.erp_user_id'),'groupId' => $v->max('sale_groups.sale_groups_id')?? 0];
-            //            })->sortBy('erp_user_id')->merge($allName);
-
-
             $provideCharBarStack = $bonusRowData->groupBy('provide_set_date')->map(
                 function ( $v, $k ) {
                     $results = $v->groupBy('user_name')->map(
@@ -460,10 +457,17 @@
                     return collect($v)->whereIn('erp_user_id', $userIds);
                 }
             );
+            $provide_groups_list = $saleGroupRowData->whereIn('erp_user_id', $userIds);
+            $provide_bonus_list = $bonusRowData->whereIn('erp_user_id', $userIds);
+
+            if($saleGroupIds){
+                $provide_groups_list = $provide_groups_list->whereIn('sale_groups_id', $saleGroupIds);
+                $provide_bonus_list = $provide_bonus_list->whereIn('sale_groups_id', $saleGroupIds);
+            }
 
             $returnData = [
-                "provide_groups_list"    => $saleGroupRowData->whereIn('erp_user_id', $userIds)->values()->toArray(),
-                "provide_bonus_list"     => $bonusRowData->whereIn('erp_user_id', $userIds)->values()->toArray(),
+                "provide_groups_list"    => $provide_groups_list->values()->toArray(),
+                "provide_bonus_list"     => $provide_bonus_list->values()->toArray(),
                 "provide_char_bar_stack" => $provideCharBarStack->toArray(),
             ];
 
@@ -676,8 +680,8 @@
 
             $provideBonus = $provideBonus->map(
                 function ( $v, $k ) {
-
                     $v['sale_group_name']  = isset($v->saleGroups) ? $v->saleGroups->saleGroups->name : '';
+                    $v['sale_groups_id'] =  isset($v->saleGroups) ? $v->saleGroups->sale_groups_id : '';
                     $v['user_name']        = ucfirst($v->user->name);
                     $v['provide_set_date'] = $v->provide->created_at->format('Y-m');
                     $v['provide_money']    = $v->provide->provide_money;

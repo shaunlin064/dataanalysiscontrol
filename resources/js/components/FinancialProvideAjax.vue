@@ -122,8 +122,8 @@
                 });
             },
             chartClear() {
-                bus.$emit('chartClear');
-                bus.$emit('chartStackClear');
+                // bus.$emit('chartClear');
+                // bus.$emit('chartStackClear');
             },
             getData() {
                 var now = +new Date();
@@ -149,6 +149,7 @@
                 this.chartClear();
                 axios.post(this.ajax_url, data).then(
                     response => {
+
                         this[types.CHANGE_LOADING_STATUS](false);
 
                         let bonus_total_money = parseInt(0);
@@ -181,7 +182,6 @@
                                     fromPage: 'provide/view'
                                 });
                             });
-
                         }
                     },
                     err => {

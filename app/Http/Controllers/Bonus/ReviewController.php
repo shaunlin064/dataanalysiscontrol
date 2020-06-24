@@ -201,28 +201,28 @@
             ];
 
             /*ajax check debug*/ //
-//            $dateStart = $date->format('2020-05-01');
-//            $dateEnd   = $date->format('2020-05-01');
-//            $userIds   = collect($userList)->pluck('erp_user_id')->toArray();
-//            $request   = new Request(
-//                [
-//                    'startDate'    => $dateStart,
-//                    'endDate'      => $dateEnd,
-//                    'saleGroupIds' => [
-//                        1,
-//                        2,
-//                        3,
-//                        4,
-//                        5,
-//                        6,
-//                        7,
-//                        8
-//                    ],
-//                    'userIds'      => []
-//                ]
-//            );
-//            $return    = $this->getAjaxData($request, 'return');
-//            dd($return);
+            //            $dateStart = $date->format('2020-05-01');
+            //            $dateEnd   = $date->format('2020-05-01');
+            //            $userIds   = collect($userList)->pluck('erp_user_id')->toArray();
+            //            $request   = new Request(
+            //                [
+            //                    'startDate'    => $dateStart,
+            //                    'endDate'      => $dateEnd,
+            //                    'saleGroupIds' => [
+            //                        1,
+            //                        2,
+            //                        3,
+            //                        4,
+            //                        5,
+            //                        6,
+            //                        7,
+            //                        8
+            //                    ],
+            //                    'userIds'      => []
+            //                ]
+            //            );
+            //            $return    = $this->getAjaxData($request, 'return');
+            //            dd($return);
             return view(
                 'bonus.review.view', [
                                        'data'                        => $this->resources,
@@ -265,6 +265,7 @@
                 $dateStart, $dateEnd, $saleGroupIds, $userIds, $agencyIdArrays, $clientIdArrays,
                 $mediaCompaniesIdArrays, $mediasNameArrays
             );
+            $dateRange               = date_range($request->startDate, $request->endDate);
 
             $SaleGroupsObj = new SaleGroups();
             if ( !empty($userIds) ) {
@@ -273,8 +274,8 @@
 
             if ( $saleGroupIds && empty($userIds) ) {
                 $userIds = $SaleGroupsObj->all()->map(
-                    function ( $v, $k ) {
-                        return $v->groupsUsers;
+                    function ( $v, $k ) use($dateRang) {
+                        return $v->groupsUsers->whereIn('set_date',$dateRange)->pluck('erp_user_id');
                     }
                 )->flatten();
             }
@@ -417,17 +418,16 @@
                                 'set_date', $dateItem
                             )->pluck('erp_user_id');
 
-                            /*如果該月抓不到責任額 則抓上月資料*/
-//                            if ( $tmpUserIds->count() == 0 ) {
-//                                $tmpdate = new DateTime($dateItem);
-//                                $tmpdate->modify('-1Month');
-//                                $tmpUserIds = $userIds->where('sale_groups_id', $saleGroupId)->where(
-//                                    'set_date', $tmpdate->format(
-//                                    'Y-m-01'
-//                                )
-//                                )->pluck('erp_user_id');
-//                            }
-                            $tmpBonus        = $tmpBonus->concat(
+                            /*如果該月抓不到責任額 則抓上月資料*/ //                            if ( $tmpUserIds->count() == 0 ) {
+                            //                                $tmpdate = new DateTime($dateItem);
+                            //                                $tmpdate->modify('-1Month');
+                            //                                $tmpUserIds = $userIds->where('sale_groups_id', $saleGroupId)->where(
+                            //                                    'set_date', $tmpdate->format(
+                            //                                    'Y-m-01'
+                            //                                )
+                            //                                )->pluck('erp_user_id');
+                            //                            }
+                            $tmpBonus = $tmpBonus->concat(
                                 $bonus_list->where('set_date', substr($dateItem, 0, 7))->whereIn(
                                     'erp_user_id', $tmpUserIds
                                 )
@@ -1009,9 +1009,15 @@
          */
         private function getProgressDates ( Collection $erpReturnData ): Collection {
             $progressDatas = collect([]);
-            $erpReturnData->groupBy([ 'set_date', 'erp_user_id' ]
-            )->map(function ( $items, $setDate ) use ( &$progressDatas ) {
-                    $items         = $items->map(function ( $v, $erpUserId ) use ( $setDate ) {
+            $erpReturnData->groupBy(
+                [
+                    'set_date',
+                    'erp_user_id'
+                ]
+            )->map(
+                function ( $items, $setDate ) use ( &$progressDatas ) {
+                    $items         = $items->map(
+                        function ( $v, $erpUserId ) use ( $setDate ) {
                             $tmpData                    = $this->getUserBonus($erpUserId, $v->sum('profit'), $setDate);
                             $tmpData['totalProfit']     = $v->sum('profit');
                             $tmpData['sale_group_name'] = $v->max('sale_group_name');
