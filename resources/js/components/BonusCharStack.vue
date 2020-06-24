@@ -90,9 +90,35 @@
                         },
                         plugins: {
                             datalabels: {
-                                display: false,
+                                formatter: (value, ctx) => {
+                                    let sum = 0;
+                                    let index = ctx.datasetIndex;
+                                    let dataArr = ctx.chart.data.datasets[index].data;
+
+                                    dataArr.map(data => {
+                                        if(data < 0){
+                                            data = 0;
+                                        }
+                                        sum += data;
+                                    });
+
+                                        let strNumber = value;
+                                        if(value/1000000000 > 1){
+                                            strNumber = (value / 1000000000).toFixed(1) + 'G'
+                                        }
+                                        else if(value/1000000 > 1){
+                                            strNumber = (value / 1000000).toFixed(1) + 'M'
+                                        }else if(value/1000 > 1){
+                                            strNumber = Math.round(value / 1000) + 'k'
+                                        }else{
+                                            strNumber = Math.round(value * 1000) / 1000;
+                                        }
+                                        // strNumber = currencyFilters(parseInt(Math.round(value * 1000) / 1000));
+                                        return strNumber;
+                                },
+                                color: '#0c0b0b',
                             }
-                        }
+                        },
                     }
                 },
             }
