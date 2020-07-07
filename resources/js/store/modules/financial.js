@@ -122,17 +122,9 @@ const actions = {
         commit(types.MUTATE_BONUS_TOTAL_MONEY, payload.bonusTotalMoney);
         commit(types.MUTATE_SALE_GROUP_TOTAL_MONEY,payload.saleGroupTotalMoney);
 
-        payload.provideBonusList.map((v)=>{
-            commit(types.MUTATE_STATISTICS,v);
-        });
-        payload.provideGroupsList.map((v) => {
-            commit(types.MUTATE_STATISTICS,v);
-        });
-
         commit(types.MUTATE_PROVIDE_BONUS_LIST,payload.provideBonusList);
         commit(types.MUTATE_PROVIDE_GROUPS_LIST, payload.provideGroupsList);
-        // commit(types.MUTATE_PROVIDE_CHAR_BAR_STACK,payload.provideCharBarStack);
-        commit(types.MUTATE_SORT_PROVIDE_STATISTICS_LIST);
+        commit(types.MUTATE_PROVIDE_CHAR_BAR_STACK,payload.provideCharBarStack);
     },
     [types.SET_STATISTICS] : ({commit}, payload) => {
         commit(types.MUTATE_STATISTICS,payload);
@@ -140,8 +132,8 @@ const actions = {
     [types.SELECT_DATA] : ({commit}, payload) => {
        commit(types.MUTATE_SELECT_DATA,payload);
     },
-    [types.SORT_PROVIDE_STATISTICS_LIST]({commit}, payload) {
-        commit(types.MUTATE_SORT_PROVIDE_STATISTICS_LIST,payload);
+    [types.SORT_PROVIDE_STATISTICS_LIST]({commit}) {
+        commit(types.MUTATE_SORT_PROVIDE_STATISTICS_LIST);
     },
 }
 const getters = {

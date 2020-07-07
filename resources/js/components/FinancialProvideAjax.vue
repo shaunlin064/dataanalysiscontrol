@@ -174,6 +174,14 @@
                                 provideCharBarStack: response.data.provide_char_bar_stack,
                             }
                             this[types.SET_PROVIDE_AJAX_DATA](payload);
+                            response.data.provide_groups_list.map((v) => {
+                                this[types.SET_STATISTICS](v);
+                                this[types.SELECT_DATA]({
+                                    data: v,
+                                    type: 'select',
+                                    fromPage: 'provide/view'
+                                });
+                            });
                             response.data.provide_bonus_list.map(v => {
                                 this[types.SET_STATISTICS](v);
                                 this[types.SELECT_DATA]({
@@ -182,6 +190,7 @@
                                     fromPage: 'provide/view'
                                 });
                             });
+                            this[types.SORT_PROVIDE_STATISTICS_LIST]();
                         }
                     },
                     err => {
