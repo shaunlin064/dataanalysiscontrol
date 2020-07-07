@@ -13,6 +13,7 @@
         data() {
             return {
                 ajax_url: '/bonus/review/getAjaxData',
+                evTimeStamp : 0,
             }
         },
         computed: {
@@ -35,6 +36,12 @@
                     $.fn.dataTable.Api(v).clear();
                 });
             }, getData() {
+                var now = +new Date();
+                if (now - this.evTimeStamp < 100) {
+                    return;
+                }
+                this.evTimeStamp = now;
+
                 let data = {
                     _token: this.csrf,
                     startDate: this.start_date,

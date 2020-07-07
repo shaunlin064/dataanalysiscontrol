@@ -62,7 +62,8 @@
             }
         },
         computed: {
-            ...mapState('financial',['provide_money', 'loading', 'provide_bonus_list', 'provide_groups_list', 'start_date', 'end_date',  'provide_statistics_list', 'provide_char_bar_stack','provide_total_money']),
+            ...mapState('financial',['provide_money', 'loading', 'provide_bonus_list', 'provide_groups_list',  'provide_statistics_list', 'provide_char_bar_stack','provide_total_money']),
+            ...mapState('dateRange', ['start_date', 'end_date']),
             ...mapState('chart',['bonus_list','customer_profit_data', 'customer_groups_profit_data', 'medias_profit_data', 'media_companies_profit_data', 'group_progress_list', 'group_progress_list_total', 'progress_list', 'progress_list_total','exchange_rates_list']),
             ...mapState('exchangeRate',['exchange_rates_list']),
             ...mapState('dataTable',['table_select']),
@@ -78,6 +79,29 @@
                 }
             },
             updataTable(row) {
+                var $owl = $('.owl-carousel').owlCarousel({
+                    loop: false,
+                    center: true,
+                    items: 1,
+                    margin: 10,
+                    autoHeight:true,
+                    responsive: {
+                        800: {
+                            items: 1
+                        }
+                    }
+                });
+
+                async function sleep(ms = 0) {
+                    return new Promise(r => setTimeout(r, ms));
+                }
+
+                async function run() {
+                    await sleep(500);
+                    $owl.trigger('refresh.owl.carousel');
+                }
+                run();
+
                 let vue = this;
                 if (vue.dataTable !== undefined) {
                     vue.dataTable.clear();
@@ -87,6 +111,7 @@
                 }
             },
             getExportFileName() {
+                console.log(this.start_date);
                 return `${this.table_head}_${this.start_date.substr(0, 7)}-${this.end_date.substr(0, 7)}`;
             },
             selectToggle(dom, type) {
@@ -302,7 +327,6 @@
                 immediate: false,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '' && this.table_id == 'customer_groups_profit_data') {
-
                         this.updataTable(val);
                     }
                 }

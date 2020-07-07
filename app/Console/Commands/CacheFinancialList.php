@@ -42,16 +42,29 @@ class CacheFinancialList extends Command
     {
         //
         $startTime = microtime(true);
-        
+
         $date = new \DateTime();
-        $dateStart =  $date->format('2017-01-01');
+        $dateStart =  $date->format('2018-01-01');
         $dateEnd = $date->format('Y-m-01');
         $ObjSaleGroups = new SaleGroups();
-        $saleGroupsIds = $ObjSaleGroups->all()->pluck('id')->toArray();
-        $request = new Request(['startDate' => $dateStart,'endDate'=>$dateEnd,'saleGroupIds' => $saleGroupsIds,'userIds'=>null]);
+        $saleGroupsIds = $ObjSaleGroups->all()->pluck('id')->map(function($v){
+            return (string)$v;
+        })->toArray();
+        /*cache start*/
+        $dateRange = date_range($dateStart, $dateEnd);
+        $dateRange[] = $dateEnd;
         $reviewObj = new ReviewController();
-        $reviewObj->getAjaxData($request,'none');
-    
+
+        foreach($dateRange as $date){
+            $request = new Request([
+                'startDate'    => $date,
+                'endDate'      => $date,
+                'saleGroupIds' => $saleGroupsIds,
+                'userIds'      => []
+            ]);
+            $reviewObj->getAjaxData($request,'none');
+        }
+
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }

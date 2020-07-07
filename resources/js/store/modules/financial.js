@@ -40,6 +40,9 @@ const mutations = {
         state.provide_statistics_list.user = getSort(state.provide_statistics_list.user,'group_id');
         state.provide_statistics_list.group = getSort(state.provide_statistics_list.group,'group_id');
     },
+    [types.MUTATE_RESET_PROVIDE_CHAR_BAR_STACK] : (state) => {
+        state.provide_char_bar_stack = {};
+    },
     [types.MUTATE_STATISTICS] : (state,payload) => {
             // /*user*/
             if (state.provide_statistics_list['user'][payload.user_name] === undefined) {
@@ -113,6 +116,7 @@ const mutations = {
 }
 const actions = {
     [types.SET_PROVIDE_AJAX_DATA] : ({commit}, payload) => {
+        commit(types.MUTATE_RESET_PROVIDE_CHAR_BAR_STACK);
         commit(types.MUTATE_PROVIDE_STATISTICS_LIST, payload.provideStatisticsList);
         commit(types.MUTATE_PROVIDE_TOTAL_MONEY, payload.provideTotalMoney);
         commit(types.MUTATE_BONUS_TOTAL_MONEY, payload.bonusTotalMoney);

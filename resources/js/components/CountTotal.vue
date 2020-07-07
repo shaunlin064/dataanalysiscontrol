@@ -24,7 +24,7 @@
         },
         methods: {
             getTotal() {
-                return this.bonus_total_money + this.sale_group_total_money;
+                return this.provide_total_money;
             }
         },
         mounted: function () {

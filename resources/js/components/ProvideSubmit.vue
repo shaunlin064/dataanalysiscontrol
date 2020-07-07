@@ -16,7 +16,7 @@
             return {}
         },
         computed: {
-            ...mapState('financial',['table_select']),
+            ...mapState('dataTable',['table_select']),
         },
         methods:{
             post(){
@@ -30,9 +30,10 @@
                 //添加参数
                 let paramters = {
                     '_token' : this.csrf,
-                    'provide_bonus' : this.$store.state.table_select.provide_bonus_list,
-                    'provide_sale_groups_bonus' : this.$store.state.table_select.provide_groups_list,
+                    'provide_bonus' : this.table_select.provide_bonus_list,
+                    'provide_sale_groups_bonus' : this.table_select.provide_groups_list,
                 };
+
                 // paramters.map(function(v){
                 //     console.log(v);
                 // });

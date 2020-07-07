@@ -5,33 +5,46 @@ ini_set('max_execution_time', 600);
 ini_set('memory_limit','1024M');
 use App\Http\Controllers\FinancialController;
 use Illuminate\Database\Eloquent\Model;
+use App\cachekey;
+use Illuminate\Support\Facades\Cache;
 
 class FinancialReceipt extends Model
 {
     //
 	protected $fillable = ['financial_lists_id','created_at','updated_at'];
-	
+
 	public function updateFinancialMoneyReceipt ($type='select')
 	{
 		$financial = new FinancialController();
+
 		/*cp_detail_id and balance date */
-        collect($financial->getBalancePayMentData($type))->each(function($balanceData){
-            $results = FinancialList::where('cp_detail_id',$balanceData['cp_detail_id'])->get();
-            $financialListIdReceipMoney = $results->filter(function($item,$k) use($balanceData){
-                /*一對多的情況 需要判斷 financial set_date 是小於 收款日 才更新*/
-                return $item['set_date'] < date("Y-m-d",strtotime($balanceData['balance_date']));
-            })->pluck('id');
-            /*更新financialList狀態 只更改狀態0 避免已發獎金又被修改為狀態1*/
-            FinancialList::whereIn('id',$financialListIdReceipMoney)->where('status',0)->update(['status' => 1]);
-            /*建立 financialReceipt 未存在才建立*/
-            $financialListIdReceipMoney->reject(function($v){
-                return $this->where('financial_lists_id',$v)->exists();
-            })->map(function ($v) use($balanceData){
-                $this->create(['financial_lists_id' => $v,'created_at' => $balanceData['balance_date']]);
-            });
-            
+        $receiptData = collect($financial->getBalancePayMentData($type));
+        $receiptDataCpIds = $receiptData->pluck('cp_detail_id');
+
+        $needUpdateFinancialList = FinancialList::whereIn('cp_detail_id',$receiptDataCpIds)->where('status',0)->get()->filter(function($v) use($receiptData){
+            $balance_date = $receiptData->where('cp_detail_id',$v->cp_detail_id)->first()['balance_date'] ?? '0000-00-00 00:00:00';
+            return $v['set_date'] < date("Y-m-d",strtotime($balance_date));
+        })->values();
+
+        /*建立 financialReceipt 未存在才建立*/
+        $needUpdateFinancialList->reject(function($v){
+            return $this->where('financial_lists_id',$v->id)->exists();
+        })->map(function ($v) use($receiptData){
+            $balance_date = $receiptData->where('cp_detail_id',$v->cp_detail_id)->first()['balance_date'] ?? '0000-00-00 00:00:00';
+            $this->create(['financial_lists_id' => $v->id,'created_at' => $balance_date]);
         });
-	}
+
+        /*更新收款狀態*/
+        FinancialList::whereIn('cp_detail_id',$needUpdateFinancialList->pluck('cp_detail_id'))->where('status',0)->update(['status'=>1]);
+
+        /*cache release*/
+        $financial = new FinancialList();
+        $needReleaseDates = $financial->whereIn('cp_detail_id',$receiptDataCpIds)->pluck('set_date')->unique()->values();
+
+        $cacheKey = new CacheKey();
+        $cacheKey->releaseCacheBySetDate($needReleaseDates);
+
+    }
 	public function checkinPassData( FinancialList $v)
 	{
 		$nowAvalibelUser = ['ids' => [67, 84, 131, 132, 133, 136, 153, 170, 174, 181, 186, 188,200,201,204,205],
@@ -60,30 +73,30 @@ class FinancialReceipt extends Model
 		//save financialList
 		$finListObj->status = 2;
 		$finListObj->save();
-		
+
 		//calculat exchangeProfit
 		$exchangeProfitMoney = $finListObj->exchangeMoney($finListObj)->profit;
-		
+
 		$oldCreated_at = new \DateTime($finListObj->set_date);
 		$oldCreated_at->modify('+4 month');
-		
+
 		$financial_lists_id = $finListObj->id;
 		$bonusReach = isset($finListObj->bonus) ? $finListObj->bonus->bonusReach : [];
-		
+
 		$bonusId = $bonusReach->bonus_id ?? 0;
 
 		$reachRate = $bonusReach->reach_rate ?? 0;
-		
+
 		$provideMoney = $exchangeProfitMoney * $reachRate / 100;
-		
+
 		$provide = Provide::where('financial_lists_id', $financial_lists_id)->first();
-		
+
 		$provideData = [
 		 'bonus_id' => $bonusId,
 		 'financial_lists_id' => $financial_lists_id,
 		 'provide_money' => $provideMoney
 		];
-		
+
 		if (isset($provide)) {
 			//update
 			foreach ($provideData as $key => $item) {
@@ -95,11 +108,11 @@ class FinancialReceipt extends Model
 			$provideData['created_at'] = $oldCreated_at->format('Y-m-01 H:i:s');
 			$provideData['updated_at'] = $oldCreated_at->format('Y-m-01 H:i:s');
 			$oldCreated_at->modify('-1 month');
-			
+
 			if(isset($finListObj->receipt)){
                 $finListObj->receipt->update(['created_at'=> $oldCreated_at->format('Y-m-01 H:i:s'),'updated_at'=> $oldCreated_at->format('Y-m-01 H:i:s')]);
             }
-			
+
 			Provide::create($provideData);
 		}
 	}

@@ -98,6 +98,7 @@
             $cacheData = Cache::store('memcached')->get($this->cacheKeyProvide);
 
             $bonuslist       = $cacheData['bonuslist'];
+
             $saleGroupsReach = $cacheData['saleGroupsReach'];
 
             $saleGroupsTableColumns = [
@@ -181,8 +182,8 @@
             $date      = new DateTime(date('Ym01'));
             $erpUserId = Auth::user()->erp_user_id;
             //
-//            $provideStart = '2020-05-01';
-//            $provideEnd = '2020-05-01';
+//            $provideStart = '2020-07-01';
+//            $provideEnd = '2020-07-01';
 //            $saleGroupIds = [1, 2, 3, 4,5,6,7,8];
 //            $userIds = [];
 //            $request = new Request(['startDate' => $provideStart, 'endDate' => $provideEnd, 'saleGroupIds' => $saleGroupIds, 'userIds' => $userIds]);
@@ -306,6 +307,7 @@
 
             $selectFincialIds = $request->provide_bonus;
             $selectFincialIds = $selectFincialIds != null ? explode(',', $selectFincialIds) : [];
+
             $this->resetFinancialStatus();
             $this->save($selectFincialIds);
 
@@ -342,12 +344,6 @@
                         }
                     )->flatten()->unique()->values();
             }
-            $saleGroupIds = User::whereIn('erp_user_id', $userIds)->get()->map(
-                    function ( $v, $k ) use($dateRange) {
-                        return $v->userGroups->whereIn('set_date',$dateRange)->pluck('sale_groups_id');
-                    }
-                )->flatten()->unique()->values();
-
             /*cache start*/
             $cacheData   = collect([]);
             $dateNow     = new DateTime();
@@ -505,10 +501,6 @@
                     convener 取該團隊
                     user 取自己
                     */
-            $saleGroupsIds = [];
-            $saleGroups    = [];
-            $userList      = [];
-            $userIds       = [];
 
             if ( $isAdmin || $isBusinessDirector ) {
                 $saleGroups = SaleGroups::all();

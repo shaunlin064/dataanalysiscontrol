@@ -11,7 +11,7 @@
     | contains the "web" middleware group. Now create something great!
     |
     */
-
+    use App\FinancialReceipt;
     use App\ExchangeRate;
     use App\FinancialList;
     use App\Http\Controllers\FinancialController;
@@ -31,12 +31,8 @@
     /*
      * 登入系統
      */
-    Route::get('/info', function () {
-        phpinfo();
-    });
-
     Route::get('/cacheflush', function () {
-        dd(Cache::store('memcached')->flush(),Cache::store('file')->flush());
+        dd(Cache::store('memcached')->flush(),Cache::store('file')->flush(),DB::table('cache_key')->truncate(),DB::table('cache_key_subs')->truncate(),DB::table('cache_key_cache_key_subs')->truncate());
     });
 
     Route::group(['namespace' => '\App\Http\Controllers\Auth'], function () {
