@@ -15,10 +15,10 @@ window.changeUrlParmas = function(data) {
 window.sleep = function(time) {
     return new Promise((resolve) => setTimeout(resolve, time));
 };
-window.currencyFilters = function(price){
-    // return price.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
-    return price.toLocaleString('en-US');  /*寫法二：轉為千分號*/
-},
+// window.currencyFilters = function(price){
+//     // return price.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
+//     return price.toLocaleString('en-US');  /*寫法二：轉為千分號*/
+// },
 window.getSort = function(datas,useKey){
     let v1 = {};
     let v2 = datas;

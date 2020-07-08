@@ -124,7 +124,8 @@
                                                 });
                                                 let percentage = (value * 100 / sum).toFixed(1);
                                                 let strNumber = value;
-                                                strNumber = currencyFilters(parseInt(Math.round(value * 1000) / 1000));
+
+                                                strNumber = parseInt(Math.round(value * 1000) / 1000).toLocaleString('en-US');
                                                 return ctx.active
                                                     ? strNumber
                                                     : percentage + "%";
