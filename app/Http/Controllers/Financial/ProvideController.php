@@ -331,7 +331,11 @@
             $provideEnd   = new DateTime($request->endDate);
             $saleGroupIds = $request->saleGroupIds;
             $userIds      = $request->userIds;
-            $dateRange = date_range($provideStart->format('Y-m-01'), $provideEnd->format('Y-m-01'));
+
+            if ( $provideStart->format('Y-m-01') != $provideEnd->format('Y-m-01') ) {
+                $dateRange = date_range($provideStart->format('Y-m-01'), $provideEnd->format('Y-m-01'));
+            }
+            $dateRange[] = $provideEnd->format('Y-m-01');
 
             if ( !empty($userIds) ) {
                 $userIds = User::whereIn('id', $userIds)->get()->pluck('erp_user_id')->toArray();

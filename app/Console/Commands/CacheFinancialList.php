@@ -60,8 +60,13 @@ class CacheFinancialList extends Command
                 'startDate'    => $date,
                 'endDate'      => $date,
                 'saleGroupIds' => $saleGroupsIds,
-                'userIds'      => []
+                'userIds'      => [],
+                'agencyIdArrays' => [],
+                'clientIdArrays' => [],
+                'mediaCompaniesIdArrays' => [],
+                'mediasNameArrays' => [],
             ]);
+
             $reviewObj->getAjaxData($request,'none');
         }
 
