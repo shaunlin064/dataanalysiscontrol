@@ -5,6 +5,7 @@
 
     use Illuminate\Database\Eloquent\Model;
     use Illuminate\Support\Facades\Cache;
+    use Illuminate\Support\Facades\DB;
 
     class cachekey extends model {
         //
@@ -72,16 +73,21 @@
         }
 
         public function releaseCache () {
-            $releaseData = CacheKey::where( 'release_time' ,'<', now())->get();
-            $releaseData->each(function($v,$k){
-                $keys = collect([]);
-                $keys = $keys->concat($v->cacheKeySub->pluck('key')->values());
+            $releaseData = CacheKey::where('release_time' ,'<', now())->get();
+
+            $missDataCacheKeySubIds = DB::table('cache_key_subs')->selectRaw('id')->leftJoin('cache_key_cache_key_subs','id','cache_key_cache_key_subs.cache_key_subs_id')->where('cache_key_subs_id',null)->pluck('id');
+
+            $keys = collect([]);
+            $releaseData->each(function($v,$k) use(&$keys){
+                $keys[] = $keys->concat($v->cacheKeySub->pluck('key')->values());
                 $keys[] = $v->key;
                 $v->cacheKeySub()->detach();
-                $v->cacheKeySub()->delete();
                 $v->delete();
-                return $keys;
-            })->flatten()->each(function($v){
+            });
+            $key = $keys->flatten();
+
+            CacheKeySub::whereIn('key',$key)->orWhereIn('id',$missDataCacheKeySubIds)->delete();
+            $keys->each(function($v){
                 Cache::store('file')->forget($v);
             });
         }
