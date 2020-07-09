@@ -83,16 +83,11 @@ Vue.component('chart-component', require('./components/Chart').default);
 Vue.component('chart-customer-precentage-profit', require('./components/CustomerPrecentagePie').default);
 Vue.component('chart-media-precentage-profit', require('./components/MediaPrecentagePie').default);
 Vue.component('chart-customer-profit-bar', require('./components/CustomerProfitBar').default);
-Vue.component('chart-all-year-profit-line', require('./components/AllYearProfit').default);
 Vue.component('provide-chart-stack', require('./components/ProvideChartStack').default);
 Vue.component('bonus-chart-stack', require('./components/BonusCharStack').default);
 // exchangeRate
 Vue.component('exchange-ajax', require('./components/ExchangeAjax').default);
 Vue.component('exchange-chart-line', require('./components/ExchangeChartLine').default);
-
-
-Vue.component('test-component', require('./components/test.vue').default);
-Vue.component('test2-component', require('./components/test2.vue').default);
 
 // saleGroup
 Vue.component('sale-group-form-component', require('./components/SaleGroupForm').default);

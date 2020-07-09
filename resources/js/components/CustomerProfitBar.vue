@@ -38,6 +38,22 @@
                             display: true,
                             text: this.title
                         },
+                        scales: {
+                            xAxes: [{
+                                stacked: true,
+                                display: true,
+                                ticks: {
+                                    beginAtZero: true,
+                                }
+                            }],
+                            yAxes: [{
+                                stacked: true,
+                                display: true,
+                                ticks: {
+                                    beginAtZero: true,
+                                }
+                            }]
+                        },
                         plugins: {
                             labels:
                                 {

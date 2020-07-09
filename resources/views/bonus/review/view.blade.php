@@ -197,18 +197,18 @@
                     <h3 class="box-title">媒體圖表</h3>
                     <div class="box-tools pull-right">
                         <button type="button" class="btn btn-box-tool" data-widget="collapse"
-                                data-ui-contorl='customer_char'><i
+                                data-ui-contorl='media_char'><i
                                 class="fa fa-minus"></i>
                         </button>
                     </div>
                     <!-- /.box-tools -->
                 </div>
                 <div class="box-body" data-step="8" data-intro="圓餅圖表可點擊查看細節">
-                        <chart-media-precentage-profit
-                            :table_id='"media_precentage_profit"'
-                            :title='"媒體毛利佔比"'
-                            :labels='[]'
-                        ></chart-media-precentage-profit>
+                    <chart-media-precentage-profit
+                        :table_id='"media_precentage_profit"'
+                        :title='"媒體毛利佔比"'
+                        :labels='[]'
+                    ></chart-media-precentage-profit>
                 </div>
             </div>
         </div>
@@ -235,7 +235,8 @@
                 </div>
             </div>
             <div class="box box-warning">
-                <div class="box-header with-border" data-step="6" data-intro="1.客戶列表 名稱可以點擊檢視更多資訊． 2.媒體經銷商列表 如有名稱為空白,代表後台案件媒體審核沒有設定媒體公司">
+                <div class="box-header with-border" data-step="6"
+                     data-intro="1.客戶列表 名稱可以點擊檢視更多資訊． 2.媒體經銷商列表 如有名稱為空白,代表後台案件媒體審核沒有設定媒體公司">
                     <h3 class="box-title">客戶列表</h3>
                     <div class="box-tools pull-right">
                         <button type="button" class="btn btn-box-tool" data-widget="collapse"
@@ -253,7 +254,7 @@
                                 :table_head='"客戶列表"'
                                 :table_title='["名稱","類型","發稿量","收入","成本","毛利","毛利率"]'
                                 :row='[]'
-                                :ex_buttons= '["excel"]'
+                                :ex_buttons='["excel"]'
                                 :csrf='"{{csrf_token()}}"'
                                 :columns='{!!json_encode($customerProfitColumns)!!}'
                                 :ajax_url='"/bonus/review/getAjaxData"'
@@ -267,7 +268,7 @@
                                 :table_head='"集團列表"'
                                 :table_title='["名稱","發稿量","收入","成本","毛利","毛利率"]'
                                 :row='[]'
-                                :ex_buttons= '["excel"]'
+                                :ex_buttons='["excel"]'
                                 :csrf='"{{csrf_token()}}"'
                                 :columns='{!!json_encode($customerGroupProfitColumns)!!}'
                                 :ajax_url='"/bonus/review/getAjaxData"'
@@ -281,7 +282,7 @@
                                 :table_head='"媒體經銷商列表"'
                                 :table_title='["名稱","收入","成本","毛利","毛利率"]'
                                 :row='[]'
-                                :ex_buttons= '["excel"]'
+                                :ex_buttons='["excel"]'
                                 :csrf='"{{csrf_token()}}"'
                                 :columns='{!!json_encode($mediaCompaniesProfitColumns)!!}'
                                 :ajax_url='"/bonus/review/getAjaxData"'
@@ -295,7 +296,7 @@
                                 :table_head='"媒體列表"'
                                 :table_title='["名稱","銷售區域","收入","成本","毛利","毛利率"]'
                                 :row='[]'
-                                :ex_buttons= '["excel"]'
+                                :ex_buttons='["excel"]'
                                 :csrf='"{{csrf_token()}}"'
                                 :columns='{!!json_encode($mediasProfitColumns)!!}'
                                 :ajax_url='"/bonus/review/getAjaxData"'
@@ -321,15 +322,15 @@
                 </div>
                 <div class="box-body">
                     <div class='owl-carousel owl-theme' data-owl-name='sale_char'>
-{{--                        <chart-component--}}
-{{--                            :table_id='"chart_financial_bar"'--}}
-{{--                            :type='"bar"'--}}
-{{--                            :title='"業績統計"'--}}
-{{--                            :ajax_url='"/bonus/review/getAjaxData"'--}}
-{{--                            :csrf='"{{csrf_token()}}"'--}}
-{{--                            :labels='[]'--}}
-{{--                            :chart_data='{{ json_encode([ ["data"=>0],["data"=>0],["data"=>0,"type"=> 'line'] ]) }}'--}}
-{{--                        ></chart-component>--}}
+                        {{--                        <chart-component--}}
+                        {{--                            :table_id='"chart_financial_bar"'--}}
+                        {{--                            :type='"bar"'--}}
+                        {{--                            :title='"業績統計"'--}}
+                        {{--                            :ajax_url='"/bonus/review/getAjaxData"'--}}
+                        {{--                            :csrf='"{{csrf_token()}}"'--}}
+                        {{--                            :labels='[]'--}}
+                        {{--                            :chart_data='{{ json_encode([ ["data"=>0],["data"=>0],["data"=>0,"type"=> 'line'] ]) }}'--}}
+                        {{--                        ></chart-component>--}}
                         <chart-component
                             :table_id='"chart_money_status"'
                             :type='"pie"'
@@ -361,7 +362,7 @@
                                 :table_head='"成員績效表"'
                                 :table_title='["月份","業務","團隊","毛利","達成率","%","獎金","英雄榜"]'
                                 :row='[]'
-                                :ex_buttons= '["excel"]'
+                                :ex_buttons='["excel"]'
                                 :csrf='"{{csrf_token()}}"'
                                 :columns='{!!json_encode($progressColumns)!!}'
                                 :ajax_url='"/bonus/review/getAjaxData"'
@@ -375,7 +376,7 @@
                                 :table_head='"成員總計績效表"'
                                 :table_title='["業務","團隊","毛利","達成率","責任額"]'
                                 :row='[]'
-                                :ex_buttons= '["excel"]'
+                                :ex_buttons='["excel"]'
                                 :csrf='"{{csrf_token()}}"'
                                 :columns='{!!json_encode($progressTotalColumns)!!}'
                                 :ajax_url='"/bonus/review/getAjaxData"'
@@ -389,7 +390,7 @@
                                 :table_head='"團隊績效表"'
                                 :table_title='["月份","團隊","毛利","達成率"]'
                                 :row='[]'
-                                :ex_buttons= '["excel"]'
+                                :ex_buttons='["excel"]'
                                 :csrf='"{{csrf_token()}}"'
                                 :columns='{!!json_encode($groupProgressColumns)!!}'
                                 :ajax_url='"/bonus/review/getAjaxData"'
@@ -403,7 +404,7 @@
                                 :table_head='"團隊總計績效表"'
                                 :table_title='["團隊","毛利","達成率","責任額"]'
                                 :row='[]'
-                                :ex_buttons= '["excel"]'
+                                :ex_buttons='["excel"]'
                                 :csrf='"{{csrf_token()}}"'
                                 :columns='{!!json_encode($groupProgressTotalColumns)!!}'
                                 :ajax_url='"/bonus/review/getAjaxData"'
@@ -456,30 +457,12 @@
             if (cookie.bonus_review === undefined) {
                 cookie.bonus_review = {};
             }
-
-            let boxToggleCookie = cookie.bonus_review;
-            $('button[data-ui-contorl]').click(function () {
-                let field = $(this).data('ui-contorl');
-                eval(`boxToggleCookie.${field} = $(this).children('i').hasClass('fa-plus') ? 1 : 0;`);
-                setCookie('ui-contorl', JSON.stringify(cookie));
-            });
-
-            if (boxToggleCookie !== undefined) {
-                Object.keys(boxToggleCookie).forEach(key => {
-                    if (boxToggleCookie[key] === 0) {
-                        $('*[data-ui-contorl="' + key + '"]').parents('.box-header.with-border').parent().addClass('collapsed-box');
-                        $('*[data-ui-contorl="' + key + '"]').children('i.fa').removeClass('fa-minus').addClass('fa-plus');
-                    }
-                });
-            }
-
-
             var $owl = $('.owl-carousel').owlCarousel({
                 loop: false,
                 center: true,
                 items: 1,
                 margin: 10,
-                autoHeight:true,
+                autoHeight: true,
                 responsive: {
                     800: {
                         items: 1
@@ -487,20 +470,28 @@
                 }
             });
 
+            let boxToggleCookie = cookie.bonus_review;
+            $('button[data-ui-contorl]').click(function () {
+                let field = $(this).data('ui-contorl');
+                eval(`boxToggleCookie.${field} = $(this).children('i').hasClass('fa-plus') ? 1 : 0;`);
+                setCookie('ui-contorl', JSON.stringify(cookie));
+                run();
+            });
+
+
             async function sleep(ms = 0) {
                 return new Promise(r => setTimeout(r, ms));
             }
 
             async function run() {
-                await sleep(1500);
+                await sleep(100);
                 $owl.trigger('refresh.owl.carousel');
             }
-
-            run();
             /*cookie 紀錄使用者 習慣看哪個 owl item*/
             if (cookie.bonus_review_owl === undefined) {
                 cookie.bonus_review_owl = {};
             }
+
             let owlShowItemCookie = cookie.bonus_review_owl;
             $('.owl-carousel').on('changed.owl.carousel', function (event) {
                 eval(`owlShowItemCookie.${$(this).data('owlName')} = event.item.index;`);
@@ -513,6 +504,16 @@
                     }
                 });
             }
+            sleep(2000);
+            if (boxToggleCookie !== undefined) {
+                Object.keys(boxToggleCookie).forEach(key => {
+                    if (boxToggleCookie[key] === 0) {
+                        $('*[data-ui-contorl="' + key + '"]').parents('.box-header.with-border').parent().addClass('collapsed-box');
+                        $('*[data-ui-contorl="' + key + '"]').children('i.fa').removeClass('fa-minus').addClass('fa-plus');
+                    }
+                });
+            }
+
 
         });
     </script>
