@@ -92,8 +92,8 @@
                     endDate: this.end_date,
                     saleGroupIds: this.sale_group_ids,
                     userIds: this.user_ids,
-                    agencyIdArrays: customerIdsData.type === 'agency' ? customerIdsData.id  : [],
-                    clientIdArrays: customerIdsData.type === 'client' ? customerIdsData.id  : [],
+                    agencyIdArrays: customerIdsData.type === 'agency' ? [customerIdsData.id]  : [],
+                    clientIdArrays: customerIdsData.type === 'client' ? [customerIdsData.id]  : [],
                     mediaCompaniesIdArrays: [],
                     mediasNameArrays: [],
                 };
