@@ -30,6 +30,7 @@
     class ReviewController extends BaseController {
         //
         protected $policyModel;
+        protected $cacheObj;
 
         public function __construct () {
 
@@ -59,7 +60,10 @@
             //            $allYearProfit = $this->getAllYearProfit($userList);
 
             $customerProfitColumns = [
-                [ 'data' => 'name' ],
+                [
+                    'data'   => 'name',
+                    'render' => '<a class="point customer_chart_link" data-id="${row.id}" data-type="${row.customer_type}">${data}</a>',
+                ],
                 [
                     'data'   => 'type',
                     'render' => '<span class="badge bg-${style}">${data}</span>',
@@ -168,19 +172,25 @@
                 [ 'data' => 'paymentStatus' ],
                 [ 'data' => 'bonusStatus' ],
             ];
+//            if(auth()->user()->name === 'shaun'){
+//                /*ajax check debug*/ //
+//                $dateStart = $date->format('2020-06-01');
+//                $dateEnd = $date->format('2020-06-01');
+//                $userIds = collect($userList)->pluck('erp_user_id')->toArray();
+//                $request = new Request([
+//                    'startDate'    => $dateStart,
+//                    'endDate'      => $dateEnd,
+//                    'saleGroupIds' => [ '1','2','3','4','5','6','7','8' ],
+//                    'userIds'      => [],
+//                    'agencyIdArrays' => [],
+//                    'clientIdArrays' => [],
+//                    'mediaCompaniesIdArrays' => [],
+//                    'mediasNameArrays' => []
+//                ]);
+//                $return = $this->getAjaxData($request, 'return');
+//                dd($return);
+//            }
 
-            /*ajax check debug*/ //
-//            $dateStart = $date->format('2020-01-01');
-//            $dateEnd = $date->format('2020-03-01');
-//            $userIds = collect($userList)->pluck('erp_user_id')->toArray();
-//            $request = new Request([
-//                'startDate'    => $dateStart,
-//                'endDate'      => $dateEnd,
-//                'saleGroupIds' => [  ],
-//                'userIds'      => ['151']
-//            ]);
-//            $return = $this->getAjaxData($request, 'return');
-//            dd($return);
             return view('bonus.review.view', [
                 'data'                        => $this->resources,
                 'bonusColumns'                => $bonusColumns,
@@ -210,53 +220,26 @@
          * @throws Exception
          */
         public function getAjaxData ( Request $request, $outType = 'echo' ) {
-            $dateStart = $request->startDate;
-            $dateEnd = $request->endDate;
+            $starDate = $request->startDate;
+            $endDate = $request->endDate;
             $saleGroupIds = $request->saleGroupIds;
             $userIds = $request->userIds;
             $agencyIdArrays = collect($request->agencyIdArrays)->filter()->toArray();
             $clientIdArrays = collect($request->clientIdArrays)->filter()->toArray();
             $mediaCompaniesIdArrays = collect($request->mediaCompaniesIdArrays)->filter()->toArray();
             $mediasNameArrays = collect($request->mediasNameArrays)->filter()->toArray();
-            $cacheObj = new CacheKey('file');
-
-            /*cache all user erp Id*/
-            $allUserErpIds = $cacheObj->remember('allUserErpId', ( 4 * 360 ), function () {
-                return User::all()->pluck('erp_user_id')->toArray();
-            });
-            /*cache all groupId*/
-            $allGroupIds = $cacheObj->remember('allGroupId', ( 10 * 60 ), function () {
-                return SaleGroups::all()->pluck('id')->toArray();
-            });
+            $this->cacheObj = new CacheKey('file');
 
             /*cache start*/
-            if ( $dateStart != $dateEnd ) {
-                $dateRange = date_range($dateStart, $dateEnd);
+            if ( $starDate != $endDate ) {
+                $dateRange = date_range($starDate, $endDate);
             }
-            $dateRange[] = $dateEnd;
-            $dateNow = new DateTime();
+            $dateRange[] = $endDate;
+
             /*check cache exists*/
-            $cacheKey = 'financial.review';
+            $this->cacheEachDataBase($dateRange);
 
-            foreach ( $dateRange as $date ) {
-                $lastRecordDate = new DateTime($date);
-                $lastRecordDate->modify('-1Year');
-                $lastRecordDate = $lastRecordDate->format('Y-m-d');
-                /*cache 選擇資料 與 比對資料*/
-                foreach ( [ $lastRecordDate, $date ] as $dateItem ) {
-                    $date2 = new DateTime($dateItem);
-                    $dateDistance = round(( $dateNow->getTimestamp() - $date2->getTimestamp() ) / ( 3600 * 24 )); //計算資料與現在日期相差幾天
-                    // 計算快取 releaseTime
-                    if ( $dateDistance > 45 ) { // over 1.5 month
-                        $cacheTime = 24 * 365 * 2; // 2 year
-                    } else { // close one month
-                        $cacheTime = 1; // 6hr
-                    };
-                    $this->cacheDataBase($cacheObj, $cacheKey, $dateItem, $allUserErpIds, $allGroupIds, $cacheTime);
-                }
-            }
             /*get other cache data*/
-
             /*第一層篩選 人員 日期*/
             [
                 $tmpBonus,
@@ -264,161 +247,39 @@
                 $progress_list,
                 $tmpGroupProgressList,
                 $progress_list_total
-            ] = $this->getUserDateSelectData($dateRange, $cacheKey, $saleGroupIds, $userIds);
+            ] = $this->getUserDateSelectData($dateRange, $saleGroupIds, $userIds);
 
             /*第二層篩選 代理商'直客'媒體經銷商'媒體*/
-            $condition = json_encode([
-                'startDate'              => $dateStart,
-                'endDate'                => $dateEnd,
+            $condition = [
+                'startDate'              => $starDate,
+                'endDate'                => $endDate,
                 'saleGroupIds'           => $saleGroupIds,
                 'userIds'                => $userIds,
                 'agencyIdArrays'         => $agencyIdArrays,
                 'clientIdArrays'         => $clientIdArrays,
                 'mediaCompaniesIdArrays' => $mediaCompaniesIdArrays,
                 'mediasNameArrays'       => $mediasNameArrays,
-            ]);
-            $cacheSubObj = CacheKeySub::where('key', md5($condition));
-
-            if ( $cacheSubObj->count() === 0 ) {
-                $bonus_list = $this->getFilterData($tmpBonus->toArray(), $agencyIdArrays, $clientIdArrays,
-                    $mediaCompaniesIdArrays, $mediasNameArrays);
-                $last_record_bonus_list = $this->getFilterData($tmpBonusLastRecord->toArray(), $agencyIdArrays,
-                    $clientIdArrays, $mediaCompaniesIdArrays, $mediasNameArrays);
-
-                $chartMoneyStatus = [
-                    'unpaid' => round($bonus_list->where('status', '=', 0)->sum('income')),
-                    'paid'   => round($bonus_list->where('status', '>=', 1)->sum('income'))
-                ];
-
-                $chartFinancialBar = [ 'labels' => [], 'totalIncome' => [], 'totalCost' => [], 'totalProfit' => [] ];
-
-                foreach ( $dateRange as $dateItem ) {
-                    $newtmpDate = new DateTime($dateItem);
-                    $chartFinancialBar['labels'][] = $newtmpDate->format('Ym');
-                    $chartFinancialBar['totalIncome'][] = 0;
-                    $chartFinancialBar['totalCost'][] = 0;
-                    $chartFinancialBar['totalProfit'][] = 0;
-                }
-
-                $bonus_list->groupBy('set_date')->map(function ( $v, $k ) use ( &$chartFinancialBar ) {
-                    $tmpDate = new DateTime($k);
-                    $key = array_search($tmpDate->format('Ym'), $chartFinancialBar['labels']);
-
-                    $chartFinancialBar['totalIncome'][ $key ] = round($v->sum('income'));
-                    $chartFinancialBar['totalCost'][ $key ] = round($v->sum('cost'));
-                    $chartFinancialBar['totalProfit'][ $key ] = round($v->sum('profit'));
-                });
-
-                $chartFinancialBarLastRecord = [
-                    'labels'      => [],
-                    'totalIncome' => [],
-                    'totalCost'   => [],
-                    'totalProfit' => []
-                ];
-
-                foreach ( $dateRange as $dateItem ) {
-                    $newtmpDate = new DateTime($dateItem);
-                    $newtmpDate->modify('-1Year');
-
-                    $chartFinancialBarLastRecord['labels'][] = $newtmpDate->format('Ym');
-                    $chartFinancialBarLastRecord['totalIncome'][] = 0;
-                    $chartFinancialBarLastRecord['totalCost'][] = 0;
-                    $chartFinancialBarLastRecord['totalProfit'][] = 0;
-                }
-
-                $last_record_bonus_list->groupBy('set_date')->map(function ( $v, $k ) use (
-                    &$chartFinancialBarLastRecord
-                ) {
-                    $tmpDate = new DateTime($k);
-                    $key = array_search($tmpDate->format('Ym'), $chartFinancialBarLastRecord['labels']);
-
-                    $chartFinancialBarLastRecord['totalIncome'][ $key ] = round($v->sum('income'));
-                    $chartFinancialBarLastRecord['totalCost'][ $key ] = round($v->sum('cost'));
-                    $chartFinancialBarLastRecord['totalProfit'][ $key ] = round($v->sum('profit'));
-                });
-
-                [
-                    $customerPrecentageProfit,
-                    $customerProfitData,
-                    $customerGroupsProfitData
-                ] = $this->getCustomerAllAnalysis($bonus_list, $dateRange);
-                [
-                    $mediaCompaniesProfitData,
-                    $mediasProfitData,
-                    $saleChannelProfitData
-                ] = $this->getMediaAllAnalysis($bonus_list);
-                $chart_bar_max_y = collect(array_merge($chartFinancialBar['totalIncome'],
-                    $chartFinancialBarLastRecord['totalIncome']))->max();
-                /*取總stack*/
-                $bonusCharBarStack = $bonus_list->groupBy('user_name')->map(function ( $v, $k ) {
-                    return [
-                        'income'      => $v->sum('income'),
-                        'cost'        => $v->sum('cost'),
-                        'profit'      => $v->sum('profit'),
-                        'erp_user_id' => $v->max('user.erp_user_id')
-                    ];
-                })->sortByDesc('erp_user_id')->toArray();
-                $group_progress_list_total = $tmpGroupProgressList->groupBy('id')->map(function ( $v, $k ) {
-                    return [
-                        'id'                 => $v->max('id'),
-                        'name'               => $v->max('name'),
-                        'total_boundary'     => number_format($v->sum('boundary')),
-                        'total_profit'       => number_format($v->sum('profit')),
-                        'percentage_average' => round($v->sum('percentage') / $v->count())
-                    ];
-                })->values();
-
-                $cacheData = [
-                    $customerPrecentageProfit,
-                    $customerProfitData,
-                    $customerGroupsProfitData,
-                    $mediaCompaniesProfitData,
-                    $mediasProfitData,
-                    $saleChannelProfitData,
-                    $chartMoneyStatus,
-                    $chartFinancialBar,
-                    $bonus_list,
-                    $progress_list,
-                    $progress_list_total,
-                    $chartFinancialBarLastRecord,
-                    $chart_bar_max_y,
-                    $bonusCharBarStack,
-                    $group_progress_list_total
-                ];
-
-                $type = 'finance.review.mediaFilter.finalData';
-                $cacheObj->where('type', 'financial.review')->whereIn('set_date', $dateRange)->get()->map(function (
-                    $v, $k
-                ) use ( $condition, $cacheData, $type ) {
-
-                    $tmp = CacheKeySub::where('key', md5($condition))->first();
-
-                    if ( $tmp ) {
-                        $v->cacheKeySub()->attach($tmp->id);
-                    } else {
-                        $v->subput($type, $condition, $cacheData);
-                    }
-                });
-
-            } else {
-                [
-                    $customerPrecentageProfit,
-                    $customerProfitData,
-                    $customerGroupsProfitData,
-                    $mediaCompaniesProfitData,
-                    $mediasProfitData,
-                    $saleChannelProfitData,
-                    $chartMoneyStatus,
-                    $chartFinancialBar,
-                    $bonus_list,
-                    $progress_list,
-                    $progress_list_total,
-                    $chartFinancialBarLastRecord,
-                    $chart_bar_max_y,
-                    $bonusCharBarStack,
-                    $group_progress_list_total
-                ] = $cacheSubObj->first()->getCacheData();
-            }
+            ];
+            $data = [
+                'tmpBonus'             => $tmpBonus,
+                'tmpBonusLastRecord'   => $tmpBonusLastRecord,
+                'tmpGroupProgressList' => $tmpGroupProgressList
+            ];
+            [
+                $bonus_list,
+                $chartMoneyStatus,
+                $chartFinancialBar,
+                $chartFinancialBarLastRecord,
+                $customerPrecentageProfit,
+                $customerProfitData,
+                $customerGroupsProfitData,
+                $mediaCompaniesProfitData,
+                $mediasProfitData,
+                $saleChannelProfitData,
+                $chart_bar_max_y,
+                $bonusCharBarStack,
+                $group_progress_list_total
+            ] = $this->getCustomerMediaSelectData($condition, $data);
             /*$bonusCharBarStack*/
             $bonus_list = $bonus_list->map(function ( $v, $k ) {
                 $v['income'] = isset($v['income']) ? number_format($v['income']) : 0;
@@ -429,7 +290,7 @@
 
             $progress_list = $progress_list->map(function ( $v, $k ) {
                 $v['profit'] = isset($v['profit']) ? number_format($v['profit']) : 0;
-                $v['totalProfit'] =  isset($v['totalProfit']) ? number_format($v['totalProfit']) : 0;
+                $v['totalProfit'] = isset($v['totalProfit']) ? number_format($v['totalProfit']) : 0;
                 return $v;
             });
             $progress_list_total = $progress_list_total->map(function ( $v, $k ) {
@@ -441,6 +302,14 @@
                 $v['profit'] = isset($v['profit']) ? number_format($v['profit']) : 0;
                 return $v;
             });
+
+            $mediaCompaniesProfitData = collect($mediaCompaniesProfitData)->map(function($v){
+
+                $v['income'] = isset($v['income']) ? number_format($v['income']) : 0;
+                $v['cost'] = isset($v['cost']) ? number_format($v['cost']) : 0;
+                $v['profit'] = isset($v['profit']) ? number_format($v['profit']) : 0;
+                return $v;
+            })->values()->toArray();
 
             $returnData = [
                 "bonus_list"                      => $bonus_list,
@@ -771,6 +640,8 @@
                 [ $income, $profit, $cost, $profitPercenter ] = $this->getNumberSum($v);
 
                 $customerProfitData[ $id ] = [
+                    'id'               => $id,
+                    'customer_type'    => 'agency',
                     'name'             => $v->max('agency_name'),
                     'type'             => '代理商',
                     'receipt_times'    => $receiptAgencyTimes ?? 0,
@@ -795,6 +666,8 @@
                 [ $income, $profit, $cost, $profitPercenter ] = $this->getNumberSum($v);
 
                 $customerProfitData[] = [
+                    'id'               => $id,
+                    'customer_type'    => 'client',
                     'name'             => $v->max('client_name'),
                     'type'             => '直客',
                     'receipt_times'    => $receiptClientTimes ?? 0,
@@ -846,6 +719,7 @@
          * @return array
          */
         private function getMediaAllAnalysis ( Collection $bonus_list ): array {
+
             /*部份資料前置時有做 number_format 這邊做還原*/
             $bonus_list = $bonus_list->map(function ( $v, $k ) {
                 $v['profit'] = str_replace(',', '', $v['profit']);
@@ -864,9 +738,9 @@
 
                 $data = [
                     'name'             => $v->max('companies_name'),
-                    'income'           => number_format($income),
-                    'cost'             => number_format($cost),
-                    'profit'           => number_format($profit),
+                    'income'           => $income,
+                    'cost'             => $cost,
+                    'profit'           => $profit,
                     'profit_percenter' => $profitPercenter
                 ];
                 return $data;
@@ -916,22 +790,22 @@
 
         /**
          * @param array $dateRange
-         * @param string $cacheKey
          * @param $saleGroupIds
          * @param $userIds
          * @return array
          * @throws Exception
          */
         private function getUserDateSelectData (
-            array $dateRange, string $cacheKey, $saleGroupIds, $userIds
+            array $dateRange, $saleGroupIds, $userIds
         ): array {
 
-            $cacheObj = new CacheKey();
             $newdata = [
                 'dateAfter'  => [],
                 'dateBefore' => [],
             ];
-            $erpUserId = User::whereIn('id',$userIds)->get()->pluck('erp_user_id');
+            $cacheKey = 'financial.review';
+
+            $erpUserId = User::whereIn('id', $userIds)->get()->pluck('erp_user_id');
 
             // user select
             foreach ( $dateRange as $dateItem ) {
@@ -941,11 +815,11 @@
                     "userIds"      => $userIds
                 ];
 
-                $dateAfter = $cacheObj->where('key', md5($cacheKey . $dateItem))->first();
+                $dateAfter = $this->cacheObj->where('key', md5($cacheKey . $dateItem))->first();
 
                 $tmpdatelast = new DateTime($dateItem);
                 $tmpdatelast->modify('-1Year');
-                $dateBefore = $cacheObj->where('key', md5($cacheKey . $tmpdatelast->format('Y-m-d')))->first();
+                $dateBefore = $this->cacheObj->where('key', md5($cacheKey . $tmpdatelast->format('Y-m-d')))->first();
 
                 $needCacheDate = [];
                 foreach ( [ 'dateAfter', 'dateBefore' ] as $item ) {
@@ -1016,7 +890,7 @@
 
             });
             collect($newdata['dateBefore'])->map(function ( $v ) use ( &$tmpBonusLastRecord ) {
-                    $tmpBonusLastRecord = $tmpBonusLastRecord->concat($v['bonus_list'] ?? []);
+                $tmpBonusLastRecord = $tmpBonusLastRecord->concat($v['bonus_list'] ?? []);
             });
 
             $progress_list_total = $tmpProgressList->groupBy('erp_user_id')->map(function ( $v, $k ) {
@@ -1034,6 +908,287 @@
             return [ $tmpBonus, $tmpBonusLastRecord, $tmpProgressList, $tmpGroupProgressList, $progress_list_total ];
         }
 
+        /**
+         * @param array $dateRange
+         * @param CacheKey $cacheObj
+         * @param string $cacheKey
+         * @throws Exception
+         */
+        private function cacheEachDataBase (
+            array $dateRange
+        ) {
+            $cacheKey = 'financial.review';
+            $dateNow = new DateTime();
+            /*cache all user erp Id*/
+            $allUserErpIds = $this->cacheObj->remember('allUserErpId', ( 4 * 360 ), function () {
+                return User::all()->pluck('erp_user_id')->toArray();
+            });
+            /*cache all groupId*/
+            $allGroupIds = $this->cacheObj->remember('allGroupId', ( 10 * 60 ), function () {
+                return SaleGroups::all()->pluck('id')->toArray();
+            });
+
+            foreach ( $dateRange as $date ) {
+                $lastRecordDate = new DateTime($date);
+                $lastRecordDate->modify('-1Year');
+                $lastRecordDate = $lastRecordDate->format('Y-m-d');
+                /*cache 選擇資料 與 比對資料*/
+                foreach ( [ $lastRecordDate, $date ] as $dateItem ) {
+                    $date2 = new DateTime($dateItem);
+                    $dateDistance = round(( $dateNow->getTimestamp() - $date2->getTimestamp() ) / ( 3600 * 24 )); //計算資料與現在日期相差幾天
+                    // 計算快取 releaseTime
+                    if ( $dateDistance > 45 ) { // over 1.5 month
+                        $cacheTime = 24 * 365 * 2; // 2 year
+                    } else { // close one month
+                        $cacheTime = 1; // 6hr
+                    };
+                    $this->cacheDataBase($this->cacheObj, $cacheKey, $dateItem, $allUserErpIds, $allGroupIds,
+                        $cacheTime);
+                }
+            }
+        }
+
+        /**
+         * @param $condition
+         * @param $data
+         * @return array
+         * @throws Exception
+         */
+        private function getCustomerMediaSelectData (
+            $condition, $data
+        ): array {
+
+            $startDate = $condition['startDate'];
+            $endDate = $condition['endDate'];
+            $saleGroupIds = $condition['saleGroupIds'];
+            $userIds = $condition['userIds'];
+            $agencyIdArrays = $condition['agencyIdArrays'];
+            $clientIdArrays = $condition['clientIdArrays'];
+            $mediaCompaniesIdArrays = $condition['mediaCompaniesIdArrays'];
+            $mediasNameArrays = $condition['mediasNameArrays'];
+            $tmpBonus = $data['tmpBonus'];
+            $tmpBonusLastRecord = $data['tmpBonusLastRecord'];
+            $tmpGroupProgressList = $data['tmpGroupProgressList'];
+            $conditionJson = json_encode($condition);
+            /*cache start*/
+            if ( $startDate != $endDate ) {
+                $dateRange = date_range($startDate, $endDate);
+            }
+            $dateRange[] = $condition['endDate'];
+
+
+            $cacheSubObj = CacheKeySub::where('key', md5($conditionJson));
+
+            if ( $cacheSubObj->count() === 0 ) {
+                $bonus_list = $this->getFilterData($tmpBonus->toArray(), $agencyIdArrays, $clientIdArrays,
+                    $mediaCompaniesIdArrays, $mediasNameArrays);
+                $last_record_bonus_list = $this->getFilterData($tmpBonusLastRecord->toArray(), $agencyIdArrays,
+                    $clientIdArrays, $mediaCompaniesIdArrays, $mediasNameArrays);
+
+                $chartMoneyStatus = [
+                    'unpaid' => round($bonus_list->where('status', '=', 0)->sum('income')),
+                    'paid'   => round($bonus_list->where('status', '>=', 1)->sum('income'))
+                ];
+                $chartFinancialBar = [ 'labels' => [], 'totalIncome' => [], 'totalCost' => [], 'totalProfit' => [] ];
+
+                foreach ( $dateRange as $dateItem ) {
+                    $newtmpDate = new DateTime($dateItem);
+                    $chartFinancialBar['labels'][] = $newtmpDate->format('Ym');
+                    $chartFinancialBar['totalIncome'][] = 0;
+                    $chartFinancialBar['totalCost'][] = 0;
+                    $chartFinancialBar['totalProfit'][] = 0;
+                }
+
+                $bonus_list->groupBy('set_date')->map(function ( $v, $k ) use ( &$chartFinancialBar ) {
+                    $tmpDate = new DateTime($k);
+                    $key = array_search($tmpDate->format('Ym'), $chartFinancialBar['labels']);
+
+                    $chartFinancialBar['totalIncome'][ $key ] = round($v->sum('income'));
+                    $chartFinancialBar['totalCost'][ $key ] = round($v->sum('cost'));
+                    $chartFinancialBar['totalProfit'][ $key ] = round($v->sum('profit'));
+                });
+
+                $chartFinancialBarLastRecord = [
+                    'labels'      => [],
+                    'totalIncome' => [],
+                    'totalCost'   => [],
+                    'totalProfit' => []
+                ];
+
+                foreach ( $dateRange as $dateItem ) {
+                    $newtmpDate = new DateTime($dateItem);
+                    $newtmpDate->modify('-1Year');
+
+                    $chartFinancialBarLastRecord['labels'][] = $newtmpDate->format('Ym');
+                    $chartFinancialBarLastRecord['totalIncome'][] = 0;
+                    $chartFinancialBarLastRecord['totalCost'][] = 0;
+                    $chartFinancialBarLastRecord['totalProfit'][] = 0;
+                }
+
+                $last_record_bonus_list->groupBy('set_date')->map(function ( $v, $k ) use (
+                    &$chartFinancialBarLastRecord
+                ) {
+                    $tmpDate = new DateTime($k);
+                    $key = array_search($tmpDate->format('Ym'), $chartFinancialBarLastRecord['labels']);
+
+                    $chartFinancialBarLastRecord['totalIncome'][ $key ] = round($v->sum('income'));
+                    $chartFinancialBarLastRecord['totalCost'][ $key ] = round($v->sum('cost'));
+                    $chartFinancialBarLastRecord['totalProfit'][ $key ] = round($v->sum('profit'));
+                });
+
+                [
+                    $customerPrecentageProfit,
+                    $customerProfitData,
+                    $customerGroupsProfitData
+                ] = $this->getCustomerAllAnalysis($bonus_list, $dateRange);
+                [
+                    $mediaCompaniesProfitData,
+                    $mediasProfitData,
+                    $saleChannelProfitData
+                ] = $this->getMediaAllAnalysis($bonus_list);
+                $chart_bar_max_y = collect(array_merge($chartFinancialBar['totalIncome'],
+                    $chartFinancialBarLastRecord['totalIncome']))->max();
+                /*取總stack*/
+                $bonusCharBarStack = $bonus_list->groupBy('user_name')->map(function ( $v, $k ) {
+                    return [
+                        'income'      => $v->sum('income'),
+                        'cost'        => $v->sum('cost'),
+                        'profit'      => $v->sum('profit'),
+                        'erp_user_id' => $v->max('user.erp_user_id'),
+                        'sale_group_id' => $v->max('sale_group_id')
+                    ];
+                })->sortByDesc('erp_user_id')->toArray();
+                $group_progress_list_total = $tmpGroupProgressList->groupBy('id')->map(function ( $v, $k ) {
+                    return [
+                        'id'                 => $v->max('id'),
+                        'name'               => $v->max('name'),
+                        'total_boundary'     => number_format($v->sum('boundary')),
+                        'total_profit'       => number_format($v->sum('profit')),
+                        'percentage_average' => round($v->sum('percentage') / $v->count())
+                    ];
+                })->values();
+
+                $cacheData = [
+                    $customerPrecentageProfit,
+                    $customerProfitData,
+                    $customerGroupsProfitData,
+                    $mediaCompaniesProfitData,
+                    $mediasProfitData,
+                    $saleChannelProfitData,
+                    $chartMoneyStatus,
+                    $chartFinancialBar,
+                    $bonus_list,
+                    $chartFinancialBarLastRecord,
+                    $chart_bar_max_y,
+                    $bonusCharBarStack,
+                    $group_progress_list_total
+                ];
+//                $saleUserData = $bonus_list->groupBy('erp_user_id')->map(function($v){
+//                    return [$v->sum('profit'),$v->max('user_name')];
+//                });
+//                $companiesData = $bonus_list->groupBy('companies_id')->map(function($v){
+//                    return [$v->sum('cost'),$v->max('companies_name')];
+//                });
+//                dd($bonusCharBarStack);
+                $type = 'finance.review.mediaFilter.finalData';
+                $this->cacheObj->where('type', 'financial.review')
+                               ->whereIn('set_date', $dateRange)
+                               ->get()
+                               ->map(function (
+                                   $v, $k
+                               ) use ( $conditionJson, $cacheData, $type ) {
+
+                                   $tmp = CacheKeySub::where('key', md5($conditionJson))->first();
+
+                                   if ( $tmp ) {
+                                       $v->cacheKeySub()->attach($tmp->id);
+                                   } else {
+                                       $v->subput($type, $conditionJson, $cacheData);
+                                   }
+                               });
+
+            } else {
+                [
+                    $customerPrecentageProfit,
+                    $customerProfitData,
+                    $customerGroupsProfitData,
+                    $mediaCompaniesProfitData,
+                    $mediasProfitData,
+                    $saleChannelProfitData,
+                    $chartMoneyStatus,
+                    $chartFinancialBar,
+                    $bonus_list,
+                    $chartFinancialBarLastRecord,
+                    $chart_bar_max_y,
+                    $bonusCharBarStack,
+                    $group_progress_list_total
+                ] = $cacheSubObj->first()->getCacheData();
+            }
+            return [
+                $bonus_list,
+                $chartMoneyStatus,
+                $chartFinancialBar,
+                $chartFinancialBarLastRecord,
+                $customerPrecentageProfit,
+                $customerProfitData,
+                $customerGroupsProfitData,
+                $mediaCompaniesProfitData,
+                $mediasProfitData,
+                $saleChannelProfitData,
+                $chart_bar_max_y,
+                $bonusCharBarStack,
+                $group_progress_list_total,
+            ];
+        }
+
+        public function getAjaxCustomerChartData ( Request $request ,$outType = 'echo') {
+            $starDate = $request->startDate;
+            $endDate = $request->endDate;
+            $saleGroupIds = $request->saleGroupIds;
+            $userIds = $request->userIds;
+            $agencyIdArrays = collect($request->agencyIdArrays)->filter()->toArray();
+            $clientIdArrays = collect($request->clientIdArrays)->filter()->toArray();
+            $mediaCompaniesIdArrays = collect($request->mediaCompaniesIdArrays)->filter()->toArray();
+            $mediasNameArrays = collect($request->mediasNameArrays)->filter()->toArray();
+            $this->cacheObj = new CacheKey('file');
+
+            /*cache start*/
+            if ( $starDate != $endDate ) {
+                $dateRange = date_range($starDate, $endDate);
+            }
+            $dateRange[] = $endDate;
+
+            /*check cache exists*/
+            $this->cacheEachDataBase($dateRange);
+
+            /*get other cache data*/
+            /*第一層篩選 人員 日期*/
+            [
+                $tmpBonus,
+                $tmpBonusLastRecord,
+                $progress_list,
+                $tmpGroupProgressList,
+                $progress_list_total
+            ] = $this->getUserDateSelectData($dateRange, $saleGroupIds, $userIds);
+
+            $bonus_list = $this->getFilterData($tmpBonus->toArray(), $agencyIdArrays, $clientIdArrays,
+                $mediaCompaniesIdArrays, $mediasNameArrays);
+
+
+            $returnData = [
+                $tmpBonus,
+                $tmpBonusLastRecord,
+                $progress_list,
+                $tmpGroupProgressList,
+                $progress_list_total
+            ] ;
+
+            if ( $outType == 'echo' ) {
+                echo json_encode($returnData);
+            } else {
+                return $returnData;
+            }
+        }
 
     }
 

@@ -288,6 +288,14 @@
                         }
                     });
                 }
+
+                /*業績檢視 客戶列表*/
+                if ($.inArray(tableId,['customer_profit_data'] )!== -1){
+                    domtable.on('click', 'tr td a.customer_chart_link', function(e,v){
+                        bus.$emit('getCustomerChartData', {type : $(this).data('type') , id : $(this).data('id')});
+
+                    })
+                }
                 if (ex_buttons) {
                     dataTableConfig.dom = 'Bfrtip';
                     ex_buttons.map(function (v) {

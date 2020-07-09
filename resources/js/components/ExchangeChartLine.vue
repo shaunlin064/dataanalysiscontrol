@@ -7,7 +7,7 @@
 </template>
 
 <script>
-    import {mapState, mapMutations, mapActions, mapGetters} from 'vuex';
+    import {mapState} from 'vuex';
 
     export default {
         name: "ExchangeChartLine",
@@ -15,29 +15,14 @@
             table_id: String,
             title: String,
             chart_data: Array,
-            item_labels:Array,
+            item_labels: Array,
             labels: Array,
             ajax_url: String,
             csrf: String,
-            height:Number
+            height: Number
         },
         data() {
             return {
-                default_color: {
-                    red: 'rgba(255, 99, 132,0.5)',
-                    orange: 'rgba(255, 159, 64,0.5)',
-                    yellow: 'rgba(255, 205, 86,0.5)',
-                    green: 'rgba(75, 192, 192,0.5)',
-                    blue: 'rgba(54, 162, 235,0.5)',
-                    purple: 'rgba(153, 102, 255,0.5)',
-                    grey: 'rgba(201, 203, 207,0.5)'
-                },
-                color: [
-                    'rgba(255, 99, 132,0.5)',
-                    'rgba(54, 162, 235,0.5)',
-                    'rgba(255, 99, 132,0.5)',
-                    'rgba(54, 162, 235,0.5)',
-                ],
                 label: this.item_labels,
                 config: {
                     type: 'line',
@@ -83,7 +68,8 @@
             }
         },
         computed: {
-                ...mapState('exchangeRate',['chart_exchange_line']),
+            ...mapState('exchangeRate', ['chart_exchange_line']),
+            ...mapState('chart', ['default_color'])
         },
         methods: {
             update(vue_this) {
@@ -117,7 +103,8 @@
                 });
                 vue_this.chart_obj.update({
                     duration: 700,
-                    easing: 'linear'});
+                    easing: 'linear'
+                });
             },
         },
         beforeMount: function () {
@@ -125,10 +112,11 @@
         created: function () {
             let vue_this = this;
             this.config.data.datasets.map(function (v, k, i) {
-                    v.label = vue_this.label[k];
-                    v.backgroundColor = vue_this.color[k];
-                    v.borderColor = vue_this.color[k];
-                    v.fill= false;
+                v.label = vue_this.label[k];
+                console.log( k === 0 || k === 2 ? vue_this.default_color.blue : vue_this.default_color.red);
+                v.backgroundColor = k === 0 || k === 2 ? vue_this.default_color.blue : vue_this.default_color.red;
+                v.borderColor =  k === 0 || k === 2 ? vue_this.default_color.blue : vue_this.default_color.red;
+                v.fill = false;
             });
         },
         mounted: function () {
@@ -136,7 +124,7 @@
             this.chart_obj = new Chart(ctx, this.config);
         },
         watch: {
-            chart_exchange_line:{
+            chart_exchange_line: {
                 immediate: true,
                 handler(val, oldVal) {
                     if (oldVal !== undefined && val !== '') {

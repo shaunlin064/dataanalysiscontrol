@@ -139,7 +139,6 @@
                     saleGroupIds: this.sale_group_ids,
                     userIds: this.user_ids,
                 };
-
                 if ((data.saleGroupIds == '' && data.userIds == '') || data._token === undefined) {
                     return false;
                 }

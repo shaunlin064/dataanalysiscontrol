@@ -34,6 +34,7 @@
 @section('content')
     <bonus-review-ajax :csrf='"{{csrf_token()}}"'></bonus-review-ajax>
     <div class="row">
+        <customer-modal></customer-modal>
         <div class="box box-widget widget-user">
             <!-- Add the bg color to the header using any of the bg-* classes -->
             <div class="widget-user-header bg-aqua">
@@ -223,13 +224,8 @@
                     </div>
                     <!-- /.box-tools -->
                 </div>
-                <div class="box-body" data-step="5" data-intro="圖表可以左右切換">
+                <div class="box-body">
                     <div class='owl-carousel owl-theme' data-owl-name='customer_char'>
-                        <chart-customer-precentage-profit
-                            :table_id='"customer_precentage_profit"'
-                            :title='"總毛利佔比"'
-                            :labels='["代理商","直客","AP","BR","EC"]'
-                        ></chart-customer-precentage-profit>
                         <chart-customer-profit-bar
                             :table_id='"customer_profit_bar"'
                             :title='"客戶毛利統計"'
@@ -239,7 +235,7 @@
                 </div>
             </div>
             <div class="box box-warning">
-                <div class="box-header with-border" data-step="6" data-intro="媒體經銷商列表 如有名稱為空白,代表後台案件媒體審核沒有設定媒體公司">
+                <div class="box-header with-border" data-step="6" data-intro="1.客戶列表 名稱可以點擊檢視更多資訊． 2.媒體經銷商列表 如有名稱為空白,代表後台案件媒體審核沒有設定媒體公司">
                     <h3 class="box-title">客戶列表</h3>
                     <div class="box-tools pull-right">
                         <button type="button" class="btn btn-box-tool" data-widget="collapse"
@@ -249,7 +245,7 @@
                     </div>
                     <!-- /.box-tools -->
                 </div>
-                <div class="box-body">
+                <div class="box-body" data-step="5" data-intro="圖表可以左右切換">
                     <div class='owl-carousel owl-theme' data-owl-name='customer_list'>
                         <div class="col-xs-12">
                             <simple-data-table-componet
@@ -325,15 +321,15 @@
                 </div>
                 <div class="box-body">
                     <div class='owl-carousel owl-theme' data-owl-name='sale_char'>
-                        <chart-component
-                            :table_id='"chart_financial_bar"'
-                            :type='"bar"'
-                            :title='"業績統計"'
-                            :ajax_url='"/bonus/review/getAjaxData"'
-                            :csrf='"{{csrf_token()}}"'
-                            :labels='[]'
-                            :chart_data='{{ json_encode([ ["data"=>0],["data"=>0],["data"=>0,"type"=> 'line'] ]) }}'
-                        ></chart-component>
+{{--                        <chart-component--}}
+{{--                            :table_id='"chart_financial_bar"'--}}
+{{--                            :type='"bar"'--}}
+{{--                            :title='"業績統計"'--}}
+{{--                            :ajax_url='"/bonus/review/getAjaxData"'--}}
+{{--                            :csrf='"{{csrf_token()}}"'--}}
+{{--                            :labels='[]'--}}
+{{--                            :chart_data='{{ json_encode([ ["data"=>0],["data"=>0],["data"=>0,"type"=> 'line'] ]) }}'--}}
+{{--                        ></chart-component>--}}
                         <chart-component
                             :table_id='"chart_money_status"'
                             :type='"pie"'

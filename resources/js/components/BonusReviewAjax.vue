@@ -2,7 +2,7 @@
 </template>
 
 <script>
-    import {mapActions, mapState, mapMutations, mapGetters} from 'vuex';
+    import {mapActions, mapState} from 'vuex';
     import * as types from '../store/types';
 
     export default {
@@ -13,7 +13,7 @@
         data() {
             return {
                 ajax_url: '/bonus/review/getAjaxData',
-                evTimeStamp : 0,
+                evTimeStamp: 0,
             }
         },
         computed: {
@@ -25,7 +25,7 @@
         },
         methods: {
             ...mapActions([types.CHANGE_LOADING_STATUS]),
-            ...mapActions('chart',[
+            ...mapActions('chart', [
                 types.CHANGE_MONEY_STATUS,
                 types.CHANGE_MONTH_BALANCE,
                 types.SET_CHART_DATA
@@ -35,7 +35,8 @@
                     $.fn.dataTable.Api(v).draw();
                     $.fn.dataTable.Api(v).clear();
                 });
-            }, getData() {
+            },
+            getData() {
                 var now = +new Date();
                 if (now - this.evTimeStamp < 100) {
                     return;
@@ -84,6 +85,39 @@
                     }
                 );
             },
+            getCustomerChartData(customerIdsData){
+                let data = {
+                    _token: this.csrf,
+                    startDate: this.start_date,
+                    endDate: this.end_date,
+                    saleGroupIds: this.sale_group_ids,
+                    userIds: this.user_ids,
+                    agencyIdArrays: customerIdsData.type === 'agency' ? customerIdsData.id  : [],
+                    clientIdArrays: customerIdsData.type === 'client' ? customerIdsData.id  : [],
+                    mediaCompaniesIdArrays: [],
+                    mediasNameArrays: [],
+                };
+                bus.$emit('customerEmptyPie');
+                bus.$emit('openCustomerModal');
+                this[types.CHANGE_LOADING_STATUS](true);
+
+                axios.post(this.ajax_url, data).then(
+                    response => {
+                        this[types.CHANGE_LOADING_STATUS](false);
+                        if (response.data) {
+                            /*sales char*/
+                            bus.$emit('customerPrecentagePieUpdate',response.data);
+                        }
+                    },
+                    err => {
+                        reject(err);
+                    }
+                );
+
+            }
+        },
+        created: function () {
+            bus.$on('getCustomerChartData', this.getCustomerChartData);
         },
         mounted: function () {
         },

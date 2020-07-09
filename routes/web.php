@@ -11,6 +11,9 @@
     | contains the "web" middleware group. Now create something great!
     |
     */
+
+    use App\cachekey;
+    use App\CacheKeySub;
     use App\FinancialReceipt;
     use App\ExchangeRate;
     use App\FinancialList;
@@ -31,6 +34,17 @@
     /*
      * 登入系統
      */
+    Route::get('/test', function () {
+        $cacheobj = new CacheKey('file');
+        $cacheobj->releaseCache();
+//        $cacheSubObj = CacheKeySub::all();
+//        $cacheSubObj->each(function($v){
+//            if(CacheKeySub::where('key',$v->key)->count() > 1){
+//                dd(CacheKeySub::where('key',$v->key)->get());
+//            }
+//        });
+    });
+
     Route::get('/cacheflush', function () {
         dd(Cache::store('memcached')->flush(),Cache::store('file')->flush(),DB::table('cache_key')->truncate(),DB::table('cache_key_subs')->truncate(),DB::table('cache_key_cache_key_subs')->truncate());
     });

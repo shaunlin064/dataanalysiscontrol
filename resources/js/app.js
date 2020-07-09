@@ -64,6 +64,8 @@ Vue.component('bonus-setting-form', require('./components/BonusSettingForm.vue')
 Vue.component('bonus-setting-history', require('./components/BonusSettingHistory.vue').default);
 
 Vue.component('bonus-review-ajax', require('./components/BonusReviewAjax.vue').default);
+Vue.component('customer-modal', require('./components/CustomerModal.vue').default);
+
 Vue.component('financial-provide-ajax-component', require('./components/FinancialProvideAjax.vue').default);
 
 Vue.component('person-profile-component', require('./components/PersonProfile.vue').default);

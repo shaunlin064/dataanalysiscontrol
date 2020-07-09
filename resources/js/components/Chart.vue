@@ -22,50 +22,11 @@
             height: Number,
         },
         computed: {
-            ...mapState('chart',['month_income', 'month_cost', 'month_profit', 'money_status_paid', 'money_status_unpaid', 'money_status_bonus_paid', 'money_status_bonus_unpaid', 'month_label', 'last_record_month_income', 'last_record_month_cost', 'last_record_month_profit', 'last_record_month_label', 'chart_bar_max_y',]),
+            ...mapState('chart',['month_income', 'month_cost', 'month_profit', 'money_status_paid', 'money_status_unpaid', 'money_status_bonus_paid', 'money_status_bonus_unpaid', 'month_label', 'last_record_month_income', 'last_record_month_cost', 'last_record_month_profit', 'last_record_month_label', 'chart_bar_max_y','color','group_id_color','default_color']),
             ...mapState('financial',['provide_statistics_list','provide_total_money'])
         },
         data: function () {
             return {
-                color:[
-                    'rgba(142,197,252,0.5)',
-                    'rgba(251,171,126,0.5)',
-                    'rgba(255, 99, 132,0.5)',
-                    'rgba(255, 159, 64,0.5)',
-                    'rgba(255, 205, 86,0.5)',
-                    'rgba(75, 192, 192,0.5)',
-                    'rgba(54, 162, 235,0.5)',
-                    'rgba(153, 102, 255,0.5)',
-                    'rgba(201, 203, 207,0.5)'
-                ],
-                group_id_color:{
-                    1:'rgba(142,197,252,0.5)',
-                    2:'rgba(251,171,126,0.5)',
-                    3:'rgba(255, 99, 132,0.5)',
-                    4:'rgba(255, 159, 64,0.5)',
-                    5:'rgba(201, 203, 207,0.5)',
-                    6:'rgba(177,12,71,0.5)',
-                    7:'rgba(111,222,170,0.5)',
-                    8:'rgba(83,208,185,0.5)',
-                    10:'rgba(75, 192, 192,0.5)',
-                    11:'rgba(251,171,126,0.5)',
-                    12:'rgba(255, 177, 145,0.5)',
-                    13:'rgba(255, 183, 167,0.5)',
-                    14:'rgba(142,197,252,0.5)',
-                    15:'rgba(143, 171, 235,0.5)',
-                    16:'rgba(149, 144, 213,0.5)',
-                    17:'rgba(255, 99, 132,0.5)',
-                    18:'rgba(216,62,100,0.5)',
-                },
-                default_color: {
-                    red: 'rgba(255, 99, 132,0.5)',
-                    orange: 'rgba(255, 159, 64,0.5)',
-                    yellow: 'rgba(255, 205, 86,0.5)',
-                    green: 'rgba(75, 192, 192,0.5)',
-                    blue: 'rgba(54, 162, 235,0.5)',
-                    purple: 'rgba(153, 102, 255,0.5)',
-                    grey: 'rgba(201, 203, 207,0.5)'
-                },
                 pie_color: [
                     'rgb(255, 205, 86)',
                     'rgb(75, 192, 192)',
@@ -196,7 +157,7 @@
                     vue_this.chart_obj.data.datasets.map(function (dataset, key) {
 
                         if (key == 0) {
-                            dataset.data = [vue_this.money_status_unpaid, vue_this.money_status_paid, 0, 0];
+                            dataset.data = [vue_this.money_status_unpaid, vue_this.money_status_paid];
                         }
                     });
                     if (vue_this.table_id == 'chart_provide_pie') {

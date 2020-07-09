@@ -10,7 +10,7 @@
             ...mapState(['loading']),
         },
     }
-    
+
 </script>
 
 <style scoped>

@@ -15,23 +15,9 @@
             title: String,
             labels: Array
         },
-        computed: {...mapState('chart',['agency_profit','client_profit','month_label'])},
+        computed: {...mapState('chart',['agency_profit','client_profit','month_label','color','group_id_color','default_color'])},
         data: function () {
             return {
-                default_color: {
-                    red: 'rgba(255, 99, 132,0.5)',
-                    orange: 'rgba(255, 159, 64,0.5)',
-                    yellow: 'rgba(255, 205, 86,0.5)',
-                    green: 'rgba(75, 192, 192,0.5)',
-                    blue: 'rgba(54, 162, 235,0.5)',
-                    purple: 'rgba(153, 102, 255,0.5)',
-                    grey: 'rgba(201, 203, 207,0.5)'
-                },
-                color: [
-                    'rgba(255, 99, 132,0.5)',
-                    'rgba(54, 162, 235,0.5)',
-                    'rgba(75, 192, 192,0.5)',
-                ],
                 config: {
                     type: 'bar',
                     data: {
@@ -70,7 +56,19 @@
             let vue_this = this;
             this.config.data.datasets.map(function (v, k, i) {
                     v.label = vue_this.labels[k];
-                    v.backgroundColor = vue_this.color[k];
+                    let color;
+                    switch(k){
+                        case 0 :
+                            color = vue_this.default_color.red;
+                            break;
+                        case 1 :
+                            color = vue_this.default_color.blue;
+                            break;
+                        case 2 :
+                            color =vue_this.default_color.green;
+                            break;
+                    }
+                    v.backgroundColor = color;
                     v.stack = `${k}`;
             });
         },
