@@ -262,20 +262,20 @@
                                 :length_change='"hide"'
                             ></simple-data-table-componet>
                         </div>
-                        <div class="col-xs-12">
-                            <simple-data-table-componet
-                                :table_id='"customer_groups_profit_data"'
-                                :table_head='"集團列表"'
-                                :table_title='["名稱","發稿量","收入","成本","毛利","毛利率"]'
-                                :row='[]'
-                                :ex_buttons='["excel"]'
-                                :csrf='"{{csrf_token()}}"'
-                                :columns='{!!json_encode($customerGroupProfitColumns)!!}'
-                                :ajax_url='"/bonus/review/getAjaxData"'
-                                :page_length='15'
-                                :length_change='"hide"'
-                            ></simple-data-table-componet>
-                        </div>
+{{--                        <div class="col-xs-12">--}}
+{{--                            <simple-data-table-componet--}}
+{{--                                :table_id='"customer_groups_profit_data"'--}}
+{{--                                :table_head='"集團列表"'--}}
+{{--                                :table_title='["名稱","發稿量","收入","成本","毛利","毛利率"]'--}}
+{{--                                :row='[]'--}}
+{{--                                :ex_buttons='["excel"]'--}}
+{{--                                :csrf='"{{csrf_token()}}"'--}}
+{{--                                :columns='{!!json_encode($customerGroupProfitColumns)!!}'--}}
+{{--                                :ajax_url='"/bonus/review/getAjaxData"'--}}
+{{--                                :page_length='15'--}}
+{{--                                :length_change='"hide"'--}}
+{{--                            ></simple-data-table-componet>--}}
+{{--                        </div>--}}
                         <div class="col-xs-12">
                             <simple-data-table-componet
                                 :table_id='"media_companies_profit_data"'
