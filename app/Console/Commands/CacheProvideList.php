@@ -3,8 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Http\Controllers\Financial\ProvideController;
-use App\SaleGroups;
-use Illuminate\Http\Request;
 use Illuminate\Console\Command;
 
 class CacheProvideList extends Command
@@ -21,7 +19,7 @@ class CacheProvideList extends Command
      *
      * @var string
      */
-    protected $description = '快取獎金發放資料';
+    protected $description = '快取發放獎金清單';
 
     /**
      * Create a new command instance.
@@ -43,15 +41,8 @@ class CacheProvideList extends Command
         //
         $startTime = microtime(true);
 
-        $date = new \DateTime();
-        $dateStart =  $date->format('2018-12-01');
-        $dateEnd = $date->format('Y-m-01');
-        $ObjSaleGroups = new SaleGroups();
-        $saleGroupsIds = $ObjSaleGroups->all()->pluck('id')->toArray();
-        $request = new Request(['startDate' => $dateStart,'endDate'=>$dateEnd,'saleGroupIds' => $saleGroupsIds,'userIds'=>[]]);
-        $provideObj = new ProvideController();
-
-        $provideObj->getAjaxProvideData($request,'return');
+        $provideController = new ProvideController();
+        $provideController->getProvideListDatas();
 
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");

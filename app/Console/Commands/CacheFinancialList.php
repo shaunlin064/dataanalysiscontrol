@@ -1,76 +1,79 @@
 <?php
 
-namespace App\Console\Commands;
 
-use App\Http\Controllers\Bonus\ReviewController;
-use App\SaleGroups;
-use Illuminate\Console\Command;
-use Illuminate\Http\Request;
+    namespace App\Console\Commands;
 
-class CacheFinancialList extends Command
-{
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'cache_financial_list';
+    use App\Cachekey;
+    use App\Http\Controllers\Bonus\ReviewController;
+    use App\Jobs\JobFinancialList;
+    use App\SaleGroups;
+    use Illuminate\Console\Command;
+    use Illuminate\Http\Request;
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'cache_financial_list';
+    class CacheFinancialList extends Command {
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+        protected $signature = 'cache_financial_list';
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
-    {
-        //
-        $startTime = microtime(true);
+        /**
+         * The console command description.
+         *
+         * @var string
+         */
+        protected $description = 'cache_financial_list';
 
-        $date = new \DateTime();
-        $dateStart =  $date->format('2018-01-01');
-        $dateEnd = $date->format('Y-m-01');
-        $ObjSaleGroups = new SaleGroups();
-        $saleGroupsIds = $ObjSaleGroups->all()->pluck('id')->map(function($v){
-            return (string)$v;
-        })->toArray();
-        /*cache start*/
-        $dateRange = date_range($dateStart, $dateEnd);
-        $dateRange[] = $dateEnd;
-        $reviewObj = new ReviewController();
-
-        foreach($dateRange as $date){
-            $request = new Request([
-                'startDate'    => $date,
-                'endDate'      => $date,
-                'saleGroupIds' => $saleGroupsIds,
-                'userIds'      => [],
-                'agencyIdArrays' => [],
-                'clientIdArrays' => [],
-                'mediaCompaniesIdArrays' => [],
-                'mediasNameArrays' => [],
-            ]);
-
-            $reviewObj->getAjaxData($request,'none');
+        /**
+         * Create a new job instance.
+         *
+         * @return void
+         */
+        public function __construct()
+        {
+            //
+            parent::__construct();
         }
 
-        $runTime = round(microtime(true) - $startTime, 2);
-        echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
+        /**
+         * Execute the console command.
+         *
+         * @return mixed
+         */
+        public function handle () {
+            //
+            $startTime = microtime(true);
+
+            $date = new \DateTime();
+            $dateStart = $date->format('2018-01-01');
+            $dateEnd = $date->format('Y-m-01');
+            $ObjSaleGroups = new SaleGroups();
+            $saleGroupsIds = $ObjSaleGroups->all()->pluck('id')->map(function ( $v ) {
+                return (string) $v;
+            })->toArray();
+            /*cache start*/
+            $dateRange = date_range($dateStart, $dateEnd);
+            $dateRange[] = $dateEnd;
+            $reviewObj = new ReviewController();
+            $cacheObj = Cachekey::where('type', 'financial.review')->get();
+
+            foreach ( $dateRange as $date ) {
+
+                if ( $cacheObj->where('set_date', $this->date)->count() == 0 ) {
+                    $request = new Request($this->arg);
+                    $reviewObj->getCacheDatas($request);
+                }
+//                JobFinancialList::dispatch( $date,
+//                    [
+//                        'startDate'              => $date,
+//                        'endDate'                => $date,
+//                        'saleGroupIds'           => $saleGroupsIds,
+//                        'userIds'                => [],
+//                        'agencyIdArrays'         => [],
+//                        'clientIdArrays'         => [],
+//                        'mediaCompaniesIdArrays' => [],
+//                        'mediasNameArrays'       => []
+//                    ]);
+            }
+
+            $runTime = round(microtime(true) - $startTime, 2);
+            echo( "Commands: {$this->signature} ({$runTime} seconds)\n" );
+        }
     }
-}

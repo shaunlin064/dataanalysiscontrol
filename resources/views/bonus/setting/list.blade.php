@@ -76,8 +76,7 @@
     <!-- page script -->
     <script>
         $(function () {
-            var users = {!! json_encode(session('users')) !!};
-            {{--var departments = {!! json_encode(session('department')) !!};--}}
+            var users = {!! json_encode($usersSession) !!};
 
             var dataTable = $('#bonusTable').DataTable({
                 'paging'      : true,

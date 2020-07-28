@@ -8,6 +8,7 @@ use App\SaleGroupsUsers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BaseController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Input;
 
 class SaleGroupController extends BaseController
@@ -42,7 +43,7 @@ class SaleGroupController extends BaseController
 		$user = $user->map(function($v,$k) use($datenow){
 			$new['erp_user_id'] = $v;
 			$new['boundary'] = SaleGroupsUsers::where(['set_date' => $datenow,'erp_user_id' => $v])->first()->getUserBonusBoundary->boundary ?? 0;
-			$new['name'] = session('users')[$v]['name'];
+			$new['name'] = Cache::store('file')->get('users')[$v]['name'];
 			$saleGroupIds = SaleGroupsUsers::where('erp_user_id',$v)->get()->pluck('sale_groups_id')->unique();
 			$new['sale_groups_name'] = implode(',',SaleGroups::whereIn('id',$saleGroupIds)->get()->pluck('name')->toArray());
 		 return $new;
@@ -104,7 +105,7 @@ class SaleGroupController extends BaseController
 			$new['groups_users'] = in_array($v,$userNowSelectArray) ? 1 : 0;
 			$new['groups_is_convener'] = in_array($v,$userNowIsConvenerArray) ? 1 : 0;
 			$new['boundary'] = SaleGroupsUsers::where(['set_date' => $datenow,'erp_user_id' => $v])->first()->getUserBonusBoundary->boundary ?? 0;
-			$new['name'] = session('users')[$v]['name'];
+			$new['name'] = Cache::store('file')->get('users')[$v]['name'];
 			$saleGroupIds = SaleGroupsUsers::where('erp_user_id',$v)->get()->pluck('sale_groups_id')->unique();
 			$new['sale_groups_name'] = implode(',',SaleGroups::whereIn('id',$saleGroupIds)->get()->pluck('name')->toArray());
 			return $new;
@@ -148,7 +149,7 @@ class SaleGroupController extends BaseController
 		}
 		//trim user data
 
-		$user = session('users');
+		$user = Cache::store('file')->get('users');
 
 		return view('saleGroup.setting.view',[
 		 'data' => $this->resources,

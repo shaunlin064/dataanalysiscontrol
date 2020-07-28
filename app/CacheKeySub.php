@@ -13,7 +13,7 @@ class CacheKeySub extends Model
         'use_times'            => 0,
     ];
     public function cacheKey (  ) {
-        return $this->belongsToMany(CacheKey::Class,'cache_key_cache_key_subs','cache_key_id','cache_key_subs_id');
+        return $this->belongsToMany(Cachekey::Class,'cache_key_cache_key_subs','cache_key_id','cache_key_subs_id');
     }
 
     public function getCacheData () {

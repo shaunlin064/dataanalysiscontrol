@@ -15,6 +15,7 @@
     use App\Role;
     use App\User;
     use Illuminate\Http\Request;
+    use Illuminate\Support\Facades\Cache;
     use Illuminate\Support\Facades\DB;
     use Route;
 
@@ -171,9 +172,9 @@
                     return $v->label;
                 })->implode(',');
                 // get epr department Name
-                $v['department'] = session('users')[$v->erp_user_id]['department_name'];
+                $v['department'] = Cache::store('file')->get('users')[$v->erp_user_id]['department_name'];
                 // by use filter resign user
-                $v['user_resign_date'] = session('users')[$v->erp_user_id]['user_resign_date'];
+                $v['user_resign_date'] = Cache::store('file')->get('users')[$v->erp_user_id]['user_resign_date'];
                 return $v;
             })->filter(function ($v) {
                 return $v['user_resign_date'] == '0000-00-00';

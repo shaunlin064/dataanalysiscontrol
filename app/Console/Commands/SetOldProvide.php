@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Console\Commands;
-ini_set('max_execution_time', 600);
 
 use App\FinancialReceipt;
 use App\FinancialList;
@@ -45,17 +44,17 @@ class SetOldProvide extends Command
     {
         //
         $startTime = microtime(true);
-        
+
 	    $financialList = FinancialList::with('receipt')->where('set_date','<',config('custom.setOldDateLine'))->get();
 	    $finReceiptObj = new FinancialReceipt();
-	    
+
 	    //add && update
 	    $financialList->map(function ($v) use($finReceiptObj){
-	     
+
 		    $finReceiptObj->checkinPassData($v);
-	    	
+
 	    });
-    
+
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }

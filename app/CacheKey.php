@@ -7,7 +7,7 @@
     use Illuminate\Support\Facades\Cache;
     use Illuminate\Support\Facades\DB;
 
-    class cachekey extends model {
+    class Cachekey extends model {
         //
         protected $table = 'cache_key';
         protected $fillable = [ 'type', 'key', 'set_date', 'release_time', 'use_times' ];
@@ -34,12 +34,12 @@
 
             Cache::store('file')->forever($md5Key, $data);
 
-            if ( !empty(CacheKey::where('key', $md5Key)->first()) ) {
-                $tmpData = CacheKey::where('key', $md5Key)->first();
+            if ( !empty(Cachekey::where('key', $md5Key)->first()) ) {
+                $tmpData = Cachekey::where('key', $md5Key)->first();
                 $tmpData->release_time = now()->addHours($cachetime)->format('Y-m-d H:i:s');
                 $tmpData->update();
             } else {
-                $tmpData = new CacheKey();
+                $tmpData = new Cachekey();
                 $tmpData->key = $md5Key;
                 $tmpData->type = $cahcekey;
                 $tmpData->set_date = $date;
@@ -67,13 +67,13 @@
 
         public function has ( $cahcekey ) {
             $md5Key = md5($cahcekey);
-            $data = CacheKey::where('key', $md5Key)->first();
+            $data = Cachekey::where('key', $md5Key)->first();
 
             return empty($data) ? false : true;
         }
 
         public function releaseCache () {
-            $releaseData = CacheKey::where('release_time' ,'<', now())->get();
+            $releaseData = Cachekey::where('release_time' ,'<', now())->get();
 
             $missDataCacheKeySubIds = DB::table('cache_key_subs')->selectRaw('id')->leftJoin('cache_key_cache_key_subs','id','cache_key_cache_key_subs.cache_key_subs_id')->where('cache_key_subs_id',null)->pluck('id');
 
@@ -93,7 +93,7 @@
         }
 
         public function releaseCacheBySetDate ($setDates) {
-            $releaseData = CacheKey::whereIn( 'set_date' ,$setDates)->get();
+            $releaseData = Cachekey::whereIn( 'set_date' ,$setDates)->get();
             $releaseData->each(function($v,$k){
                 $keys = collect([]);
                 $keys = $keys->concat($v->cacheKeySub->pluck('key')->values());

@@ -1,11 +1,10 @@
 <?php
 
 namespace App;
-ini_set('max_execution_time', 600);
-ini_set('memory_limit','1024M');
+
 use App\Http\Controllers\FinancialController;
 use Illuminate\Database\Eloquent\Model;
-use App\cachekey;
+use App\Cachekey;
 use Illuminate\Support\Facades\Cache;
 
 class FinancialReceipt extends Model
@@ -41,7 +40,7 @@ class FinancialReceipt extends Model
         $financial = new FinancialList();
         $needReleaseDates = $financial->whereIn('cp_detail_id',$receiptDataCpIds)->pluck('set_date')->unique()->values();
 
-        $cacheKey = new CacheKey();
+        $cacheKey = new Cachekey();
         $cacheKey->releaseCacheBySetDate($needReleaseDates);
 
     }

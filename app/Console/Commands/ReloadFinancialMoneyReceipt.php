@@ -1,8 +1,6 @@
 <?php
 
 namespace App\Console\Commands;
-ini_set('max_execution_time', 600);
-ini_set('memory_limit','1024M');
 use App\FinancialReceipt;
 use Illuminate\Console\Command;
 
@@ -41,10 +39,10 @@ class ReloadFinancialMoneyReceipt extends Command
     {
         //
         $startTime = microtime(true);
-        
+
 	    $finanicalReceiptObj = new FinancialReceipt();
 	    $finanicalReceiptObj->updateFinancialMoneyReceipt('all');
-	    
+
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }

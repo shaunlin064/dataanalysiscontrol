@@ -1,6 +1,4 @@
 <?php
-    ini_set('max_execution_time', 1200);
-    ini_set('memory_limit','1024M');
     /*
     |--------------------------------------------------------------------------
     | Web Routes
@@ -12,7 +10,8 @@
     |
     */
 
-    use App\cachekey;
+    use App\Bonus;
+    use App\Cachekey;
     use App\CacheKeySub;
     use App\FinancialReceipt;
     use App\ExchangeRate;
@@ -34,18 +33,14 @@
     /*
      * 登入系統
      */
-    Route::get('/test', function () {
-        $cacheobj = new CacheKey('file');
-        $cacheobj->releaseCache();
-//        $cacheSubObj = CacheKeySub::all();
-//        $cacheSubObj->each(function($v){
-//            if(CacheKeySub::where('key',$v->key)->count() > 1){
-//                dd(CacheKeySub::where('key',$v->key)->get());
-//            }
-//        });
+//    補後勤人員 與 離職業務 資料
+    Route::get('/test', function(){
+
     });
 
     Route::get('/cacheflush', function () {
+        $cacheobj = new CacheKey('file');
+        $cacheobj->releaseCache();
         dd(Cache::store('memcached')->flush(),Cache::store('file')->flush(),DB::table('cache_key')->truncate(),DB::table('cache_key_subs')->truncate(),DB::table('cache_key_cache_key_subs')->truncate());
     });
 

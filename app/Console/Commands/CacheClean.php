@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\cachekey;
+use App\Cachekey;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 
@@ -42,7 +42,7 @@ class CacheClean extends Command
         //
         Cache::store('memcached')->flush();
 
-        $cacheKey = new CacheKey();
+        $cacheKey = new Cachekey();
         $cacheKey->releaseCache();
     }
 }

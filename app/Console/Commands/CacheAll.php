@@ -5,8 +5,6 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 
-ini_set('max_execution_time', 600);
-ini_set('memory_limit','1024M');
 
 class CacheAll extends Command
 {
@@ -47,6 +45,7 @@ class CacheAll extends Command
         Artisan::call('cache_clean');
         Artisan::call('cache_financial_list');
         Artisan::call('cache_receipt_times');
+        Artisan::call('cache_provide_view');
         Artisan::call('cache_provide_list');
         Artisan::call('up');
         $runTime = round(microtime(true) - $startTime, 2);
