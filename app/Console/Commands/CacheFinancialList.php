@@ -67,6 +67,8 @@
                         'mediasNameArrays'       => []
                     ]);
                     $reviewObj->getCacheDatas($request);
+                    $runTime = round(microtime(true) - $startTime, 2);
+                    echo( "Commands: $date ({$runTime} seconds)\n" );
                 }
 //                JobFinancialList::dispatch( $date,
 //                    [
