@@ -43,7 +43,7 @@ class UpdateFinancialData extends Command
     {
         //
         $startTime = microtime(true);
-
+        Artisan::Call('cache_erp_datas');
 	    $finanicalList = new FinancialList();
 
         $datetime = new DateTime(date('Ym01'));

@@ -5,7 +5,6 @@
 
     use App\Cachekey;
     use App\Http\Controllers\Bonus\ReviewController;
-    use App\Jobs\JobFinancialList;
     use App\SaleGroups;
     use Illuminate\Console\Command;
     use Illuminate\Http\Request;
@@ -56,8 +55,17 @@
 
             foreach ( $dateRange as $date ) {
 
-                if ( $cacheObj->where('set_date', $this->date)->count() == 0 ) {
-                    $request = new Request($this->arg);
+                if ( $cacheObj->where('set_date', $date)->count() == 0 ) {
+                    $request = new Request([
+                        'startDate'              => $date,
+                        'endDate'                => $date,
+                        'saleGroupIds'           => $saleGroupsIds,
+                        'userIds'                => [],
+                        'agencyIdArrays'         => [],
+                        'clientIdArrays'         => [],
+                        'mediaCompaniesIdArrays' => [],
+                        'mediasNameArrays'       => []
+                    ]);
                     $reviewObj->getCacheDatas($request);
                 }
 //                JobFinancialList::dispatch( $date,
