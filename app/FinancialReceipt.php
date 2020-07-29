@@ -60,7 +60,7 @@
                                               ->values();
 
 
-                $releaseData = Cachekey::where('type','financial.review')->whereIn( 'set_date' ,$needReleaseDates)->orWhere('type','financial.provide')->get();
+                $releaseData = Cachekey::where('type','financial.review')->whereIn( 'set_date' ,$needReleaseDates)->orWhere('type','provide.list')->get();
 
                 Cachekey::releaseCacheByDatas($releaseData);
 

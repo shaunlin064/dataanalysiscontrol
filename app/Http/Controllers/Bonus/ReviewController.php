@@ -31,6 +31,7 @@
         //
         protected $policyModel;
         protected $cacheObj;
+        protected $cacheKey = 'financial.review';
 
         public function __construct () {
 
@@ -729,7 +730,6 @@
         }
 
         /**
-         * @param string $cacheKey
          * @param $date
          * @param $allUserErpIds
          * @param $allGroupIds
@@ -737,13 +737,13 @@
          * @throws Exception
          */
         private function cacheDataBase (
-            string $cacheKey, $date, $allUserErpIds, $allGroupIds, $cacheTime
+            $date, $allUserErpIds, $allGroupIds, $cacheTime
         ) {
-            if ( !$this->cacheObj->has($cacheKey . $date) ) {
+            if ( !$this->cacheObj->has($this->cacheKey . $date) ) {
                 //
                 [ $erpReturnData, $progressDatas, $groupProfitDatas ] = $this->getDataFromDataBase($allUserErpIds,
                     $allGroupIds, $date, $date);
-                $this->cacheObj->put($cacheKey, $date, [
+                $this->cacheObj->put($this->cacheKey, $date, [
                     "bonus_list"          => $erpReturnData ?? [],
                     'progress_list'       => $progressDatas ?? [],
                     'group_progress_list' => $groupProfitDatas ?? []
@@ -766,7 +766,7 @@
                 'dateAfter'  => [],
                 'dateBefore' => [],
             ];
-            $cacheKey = 'financial.review';
+
 
             $erpUserId = User::whereIn('id', $userIds)->get()->pluck('erp_user_id');
 
@@ -778,11 +778,11 @@
                     "userIds"      => $userIds
                 ];
 
-                $dateAfter = $this->cacheObj->where('key', md5($cacheKey . $dateItem))->first();
+                $dateAfter = $this->cacheObj->where('key', md5($this->cacheKey . $dateItem))->first();
 
                 $tmpdatelast = new DateTime($dateItem);
                 $tmpdatelast->modify('-1Year');
-                $dateBefore = $this->cacheObj->where('key', md5($cacheKey . $tmpdatelast->format('Y-m-d')))->first();
+                $dateBefore = $this->cacheObj->where('key', md5($this->cacheKey . $tmpdatelast->format('Y-m-d')))->first();
 
                 $needCacheDate = [];
                 foreach ( [ 'dateAfter', 'dateBefore' ] as $item ) {
@@ -873,14 +873,11 @@
 
         /**
          * @param array $dateRange
-         * @param Cachekey $cacheObj
-         * @param string $cacheKey
          * @throws Exception
          */
         private function cacheEachDataBase (
             array $dateRange
         ) {
-            $cacheKey = 'financial.review';
             $dateNow = new DateTime();
             /*cache all user erp Id*/
             $allUserErpIds = $this->cacheObj->remember('allUserErpId', ( 1 * 3600 ), function () {
@@ -897,7 +894,7 @@
                 $lastRecordDate = $lastRecordDate->format('Y-m-d');
                 /*cache 選擇資料 與 比對資料*/
                 foreach ( [ $lastRecordDate, $date ] as $dateItem ) {
-                     if ( !$this->cacheObj->has($cacheKey . $dateItem) ) {
+                     if ( !$this->cacheObj->has($this->cacheKey . $dateItem) ) {
                          $date2 = new DateTime($dateItem);
                          $dateDistance = round(( $dateNow->getTimestamp() - $date2->getTimestamp() ) / ( 3600 * 24 )); //計算資料與現在日期相差幾天
                          // 計算快取 releaseTime
@@ -906,7 +903,7 @@
                          } else { // close one month
                              $cacheTime = 1; // 6hr
                          };
-                         $this->cacheDataBase($cacheKey, $dateItem, $allUserErpIds, $allGroupIds, $cacheTime);
+                         $this->cacheDataBase( $dateItem, $allUserErpIds, $allGroupIds, $cacheTime);
                      }
                 }
             }

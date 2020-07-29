@@ -53,7 +53,7 @@ class CacheProvideView extends Command
         $ObjSaleGroups = new SaleGroups();
         $saleGroupsIds = $ObjSaleGroups->all()->pluck('id')->toArray();
 
-        $cacheObj = Cachekey::where('type', 'financial.list')->get();
+        $cacheObj = Cachekey::where('type', 'provide.view')->get();
         foreach($dateRange as $date){
             if ( $cacheObj->where('set_date', $date)->count() == 0) {
                 $request = new Request([

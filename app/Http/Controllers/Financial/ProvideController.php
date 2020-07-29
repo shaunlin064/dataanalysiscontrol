@@ -22,8 +22,8 @@
 
     class ProvideController extends BaseController {
         //
-        protected $cacheKeyProvide = 'financial.provide';
-        protected $cacheKeyFinancial = 'financial.list';
+        protected $cacheKeyProvide = 'provide.list';
+        protected $cacheKeyFinancial = 'provide.view';
         /*判斷獎金發放資料要入本月還是次月 日期*/
         protected $saveDateLine = 6;
         protected $policyModel;
