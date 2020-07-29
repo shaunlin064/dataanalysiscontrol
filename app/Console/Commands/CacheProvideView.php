@@ -66,7 +66,7 @@ class CacheProvideView extends Command
                 $provideObj->getAjaxProvideData($request, 'return');
 
                 $runTime = round(microtime(true) - $startTime, 2);
-                echo( "Commands: {$date} ({$runTime} seconds)\n" );
+                echo( "Commands: {$this->signature} {$date} ({$runTime} seconds)\n" );
             }
         }
 

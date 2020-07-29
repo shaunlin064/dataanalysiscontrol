@@ -1143,7 +1143,8 @@
             } else {
                 return $returnData;
             }
-        }/**
+        }
+        /**
      * @param Request $request
      * @return array
      * @throws Exception

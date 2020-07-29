@@ -3,6 +3,7 @@
 
     namespace App;
 
+    use Illuminate\Database\Eloquent\Collection;
     use Illuminate\Database\Eloquent\Model;
     use Illuminate\Support\Facades\Cache;
     use Illuminate\Support\Facades\DB;
@@ -92,9 +93,11 @@
             });
         }
 
-        public function releaseCacheBySetDate ($setDates) {
-            $releaseData = Cachekey::whereIn( 'set_date' ,$setDates)->get();
-            $releaseData->each(function($v,$k){
+        /**
+         * @param Collection[CacheKey] $data
+         */
+        static function releaseCacheByDatas (Collection $data):void {
+            $data->each(function($v,$k){
                 $keys = collect([]);
                 $keys = $keys->concat($v->cacheKeySub->pluck('key')->values());
                 $keys[] = $v->key;
