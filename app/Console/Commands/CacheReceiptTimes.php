@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Http\Controllers\FinancialController;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class CacheReceiptTimes extends Command
 {
