@@ -6,6 +6,7 @@ use App\FinancialList;
 use DateTime;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 
 class UpdateFinancialData extends Command
 {
@@ -42,32 +43,39 @@ class UpdateFinancialData extends Command
     public function handle()
     {
         //
-        $startTime = microtime(true);
-        Artisan::Call('cache_erp_datas');
-	    $finanicalList = new FinancialList();
+        try {
+            DB::beginTransaction();
+            $startTime = microtime(true);
+            Artisan::Call('cache_erp_datas');
+            $finanicalList = new FinancialList();
 
-        $datetime = new DateTime(date('Ym01'));
-        $nowdate = new DateTime();
-        /*last month*/
-        if($nowdate->format('d') < 16){
-            $datetime->modify('-1Month');
-            $finanicalList->saveCloseData($datetime->format('Ym01'));
+            $datetime = new DateTime(date('Ym01'));
+            $nowdate = new DateTime();
+            /*last month*/
+            if($nowdate->format('d') < 16){
+                $datetime->modify('-1Month');
+                $finanicalList->saveCloseData($datetime->format('Ym01'));
+            }
+            /*this month*/
+            $finanicalList->saveCloseData($nowdate->format('Ym01'));
+
+            /*next month*/
+            $dateNextMonth = new DateTime(date('Ym01'));
+            $dateNextMonth->modify('+1Month');
+            $finanicalList->saveCloseData($dateNextMonth->format('Ym01'));
+
+            DB::commit();
+
+        } catch (\Exception $ex) {
+            DB::rollback();
+            /*mail notice Job*/
+            \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => `${this->signature} error ${ex->getMessage()}`]);
         }
-        /*this month*/
-	    $finanicalList->saveCloseData($nowdate->format('Ym01'));
-
-	    /*next month*/
-        $dateNextMonth = new DateTime(date('Ym01'));
-        $dateNextMonth->modify('+1Month');
-        $finanicalList->saveCloseData($dateNextMonth->format('Ym01'));
-
-        $runTime = round(microtime(true) - $startTime, 2);
-        echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
 
         Artisan::call('update_financial_money_receipt');
         Artisan::call('cache_all');
+        $runTime = round(microtime(true) - $startTime, 2);
+        echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
 
-        /*mail notice Job*/
-        \App\Jobs\SentMail::dispatch('crontab',['mail'=>'shaun@js-adways.com.tw','name'=>'admin', 'title' => 'update_financial_data schedule down']);
     }
 }

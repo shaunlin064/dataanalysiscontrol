@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\FinancialReceipt;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class UpdateFinancialMoneyReceipt extends Command
 {
@@ -40,10 +41,17 @@ class UpdateFinancialMoneyReceipt extends Command
     {
         //
         $startTime = microtime(true);
-        
-	    $finanicalReceiptObj = new FinancialReceipt();
-	    $finanicalReceiptObj->updateFinancialMoneyReceipt();
-    
+        try {
+            DB::beginTransaction();
+            $finanicalReceiptObj = new FinancialReceipt();
+            $finanicalReceiptObj->updateFinancialMoneyReceipt();
+            DB::commit();
+        } catch(\Exception $e) {
+            DB::rollback();
+            // Handle Error
+            \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => `${this->signature} error ${e->getMessage()}`]);
+        }
+
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }

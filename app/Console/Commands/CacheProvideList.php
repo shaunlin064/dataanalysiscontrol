@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Http\Controllers\Financial\ProvideController;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class CacheProvideList extends Command
 {
@@ -41,8 +42,18 @@ class CacheProvideList extends Command
         //
         $startTime = microtime(true);
 
-        $provideController = new ProvideController();
-        $provideController->getProvideListDatas();
+        try {
+            DB::beginTransaction();
+               //Dosomething...
+            $provideController = new ProvideController();
+            $provideController->getProvideListDatas();
+            DB::commit();
+        } catch(\Exception $e) {
+            DB::rollback();
+            // Handle Error
+            \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => `${this->signature} error ${e->getMessage()}`]);
+        }
+
 
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");

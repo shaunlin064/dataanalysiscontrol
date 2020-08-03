@@ -31,7 +31,7 @@ class UpdateExchangeRate extends Command
     {
         parent::__construct();
     }
-    
+
     /**
      * Execute the console command.
      *
@@ -43,10 +43,10 @@ class UpdateExchangeRate extends Command
         //
         exec('python python/getExchangeRate.py');
         exec('chmod 777 -R storage/app/public/exchangeRate.txt');
-    
+
         if(!Storage::exists('/public/exchangeRate.txt')){
             /*mail notice Job*/
-            \App\Jobs\SentMail::dispatch('crontab',['mail'=>'shaun@js-adways.com.tw','name'=>'admin', 'title' => '匯率更新失敗']);
+            \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => `${this->signature} error /public/exchangeRate.txt not exists`]);
         }else{
             $data = json_decode(Storage::get('/public/exchangeRate.txt'));
             $rates = new \App\ExchangeRatesAll();
@@ -54,13 +54,14 @@ class UpdateExchangeRate extends Command
                 DB::beginTransaction();
                     $rates->saveData($data);
                 DB::commit();
+                exec('rm -rf storage/app/public/exchangeRate.txt');
             } catch(\Exception $e) {
                 DB::rollback();
                 // Handle Error
                 /*mail notice Job*/
-                \App\Jobs\SentMail::dispatch('crontab',['mail'=>'shaun@js-adways.com.tw','name'=>'admin', 'title' => '匯率更新失敗']);
+                \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => `${this->signature} error ${$e->getMessage()}`]);
             }
-            exec('rm -rf storage/app/public/exchangeRate.txt');
+
         }
     }
 }

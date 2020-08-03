@@ -8,6 +8,7 @@ use App\Jobs\UpdateExchange;
 use App\SaleGroupsReach;
 use DateTime;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class UpdateConvenerReach extends Command
 {
@@ -49,7 +50,7 @@ class UpdateConvenerReach extends Command
 
         if(!ExchangeRate::checkDataExsist($setDate,"USD")){
             /*mail notice Job*/
-            SentMail::dispatch('crontab',['mail'=>'shaun@js-adways.com.tw','name'=>'admin', 'title' => 'update_convener_reach 更新失敗沒有該月匯率資料']);
+            SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => 'update_convener_reach 更新失敗沒有該月匯率資料']);
             //加入隊列
             /*重新更新匯率 重新更資資料*/
             UpdateExchange::dispatch()->delay(now()->addHour(10));
@@ -57,13 +58,18 @@ class UpdateConvenerReach extends Command
             die;
         }
 
-	    $saleGroupsReach = new SaleGroupsReach();
-	    $saleGroupsReach->setAllConvenerReach($setDate);
+        try {
+            DB::beginTransaction();
+            $saleGroupsReach = new SaleGroupsReach();
+            $saleGroupsReach->setAllConvenerReach($setDate);
+            DB::commit();
+        } catch (\Exception $ex) {
+            DB::rollback();
+            /*mail notice Job*/
+            SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => `${this->signature} error ${ex->getMessage()}`]);
+        }
 
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
-
-        /*mail notice Job*/
-        SentMail::dispatch('crontab',['mail'=>'shaun@js-adways.com.tw','name'=>'admin', 'title' => 'update_convener_reach schedule down']);
     }
 }

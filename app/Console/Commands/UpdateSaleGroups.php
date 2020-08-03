@@ -6,6 +6,7 @@ use App\SaleGroups;
 use App\SaleGroupsBonusLevels;
 use App\SaleGroupsUsers;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class UpdateSaleGroups extends Command
 {
@@ -45,35 +46,41 @@ class UpdateSaleGroups extends Command
 
 	    $thisMonth = date('Y-m-01');
 	    $allSale = SaleGroups::where('id','!=',0)->with(['groupsUsersLastMonth'])->with(['groupsBonusLastMonth'])->get();
-	    SaleGroupsBonusLevels::where('set_Date',$thisMonth)->delete();
-	    SaleGroupsUsers::where('set_Date',$thisMonth)->delete();
-	    foreach($allSale as $sale){
-		    foreach (['groupsUsersLastMonth','groupsBonusLastMonth'] as $keyfiled){
 
-			    if(isset($sale[$keyfiled])){
-				    $tmp = [];
+	    try {
+            DB::beginTransaction();
+            SaleGroupsBonusLevels::where('set_Date',$thisMonth)->delete();
+            SaleGroupsUsers::where('set_Date',$thisMonth)->delete();
+            foreach($allSale as $sale){
+                foreach (['groupsUsersLastMonth','groupsBonusLastMonth'] as $keyfiled){
 
-				    $sale[$keyfiled]->flatMap(function ($values,$key) use($thisMonth,&$tmp) {
+                    if(isset($sale[$keyfiled])){
+                        $tmp = [];
 
-					    $values = $values->toArray();
-					    $unsetArr = ['id','created_at','updated_at'];
+                        $sale[$keyfiled]->flatMap(function ($values,$key) use($thisMonth,&$tmp) {
 
-					    foreach($unsetArr as $filed){
-						    unset($values[$filed]);
-					    };
-					    $values['set_date'] = $thisMonth;
-					    $tmp[] =  $values;
-				    });
-				    $sale->$keyfiled()->createMany($tmp);
-			    }
-		    }
-		    $sale->push();
-	    };
+                            $values = $values->toArray();
+                            $unsetArr = ['id','created_at','updated_at'];
+
+                            foreach($unsetArr as $filed){
+                                unset($values[$filed]);
+                            };
+                            $values['set_date'] = $thisMonth;
+                            $tmp[] =  $values;
+                        });
+                        $sale->$keyfiled()->createMany($tmp);
+                    }
+                }
+                $sale->push();
+            };
+            DB::commit();
+	    } catch (\Exception $ex) {
+	        DB::rollBack();
+            /*mail notice Job*/
+            \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => ` ${this->signature} error ${ex->getMessage()}`]);
+	    }
 
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
-
-        /*mail notice Job*/
-        \App\Jobs\SentMail::dispatch('crontab',['mail'=>'shaun@js-adways.com.tw','name'=>'admin', 'title' => 'update_sale_groups schedule down']);
     }
 }

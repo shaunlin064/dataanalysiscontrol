@@ -40,23 +40,33 @@ class CacheReceiptTimes extends Command
     public function handle()
     {
         //
-        $startTime = microtime(true);
-    
-        $erpFin = new FinancialController();
-        $results = collect($erpFin->getReciptTimes());
-//
-        $receiptCachedDateMonth = new \DateTime();
-        $receiptCachedDateMonth->modify('-2Month');
-        $receiptCachedDateMonth = $receiptCachedDateMonth->format('Ym');
-    
-        $results->groupBy('datemonth')->each(function($v,$date) use($receiptCachedDateMonth){
-            if($date <= $receiptCachedDateMonth){
-                Cache::store('memcached')->forever('receiptTimes'.$date, $v);
-            } else{
-                Cache::store('memcached')->put('receiptTimes'  . $date, $v,( 1 * 3600 ));
-            }
-        });
-        
+        try {
+            DB::beginTransaction();
+               //Dosomething...
+            $startTime = microtime(true);
+
+            $erpFin = new FinancialController();
+            $results = collect($erpFin->getReciptTimes());
+
+            $receiptCachedDateMonth = new \DateTime();
+            $receiptCachedDateMonth->modify('-2Month');
+            $receiptCachedDateMonth = $receiptCachedDateMonth->format('Ym');
+
+            $results->groupBy('datemonth')->each(function($v,$date) use($receiptCachedDateMonth){
+                if($date <= $receiptCachedDateMonth){
+                    Cache::store('memcached')->forever('receiptTimes'.$date, $v);
+                } else{
+                    Cache::store('memcached')->put('receiptTimes'  . $date, $v,( 1 * 3600 ));
+                }
+            });
+            DB::commit();
+        } catch(\Exception $e) {
+            DB::rollback();
+            // Handle Error
+            \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => `${this->signature} error ${e->getMessage()}`]);
+        }
+
+
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }

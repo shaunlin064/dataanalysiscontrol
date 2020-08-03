@@ -7,6 +7,7 @@ use App\Http\Controllers\Bonus\BonusReachController;
 use App\Jobs\SentMail;
 use App\Jobs\UpdateExchange;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class UpdateBonusReach extends Command
 {
@@ -50,7 +51,7 @@ class UpdateBonusReach extends Command
 
         if(!ExchangeRate::checkDataExsist(now()->setDays(1)->subMonth()->format('Y-m-d'),"USD")){
             /*mail notice Job*/
-            SentMail::dispatch('crontab',['mail'=>'shaun@js-adways.com.tw','name'=>'admin', 'title' => 'update_bonus_reach 更新失敗沒有該月匯率資料']);
+            SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => 'update_bonus_reach 更新失敗沒有該月匯率資料']);
             //加入隊列
             /*重新更新匯率 重新更資資料*/
             UpdateExchange::dispatch()->delay(now()->addHour(10));
@@ -58,12 +59,19 @@ class UpdateBonusReach extends Command
             die;
         }
 
-	    $bonusReach->update($date_now->format('Y-m-01'));
+        try {
+            DB::beginTransaction();
+            $bonusReach->update($date_now->format('Y-m-01'));
+            DB::commit();
+
+        } catch (\Exception $ex) {
+            DB::rollback();
+            /*mail notice Job*/
+            \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => ` ${this->signature} error ${ex->getMessage()}`]);
+        }
 
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
 
-        /*mail notice Job*/
-        \App\Jobs\SentMail::dispatch('crontab',['mail'=>'shaun@js-adways.com.tw','name'=>'admin', 'title' => 'update_bonus_reach schedule down']);
     }
 }

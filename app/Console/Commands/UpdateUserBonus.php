@@ -81,13 +81,13 @@
             } catch (\Exception $ex)
             {
                 DB::rollback();
-                \Log::error($ex->getMessage());
+                /*mail notice Job*/
+                \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => `${this->signature} error ${ex->getMessage()}`]);
             }
 
             $runTime = round(microtime(true) - $startTime, 2);
             echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
 
-            /*mail notice Job*/
-            \App\Jobs\SentMail::dispatch('crontab',['mail'=>'shaun@js-adways.com.tw','name'=>'admin', 'title' => 'update_user_bonus schedule down']);
+
         }
     }

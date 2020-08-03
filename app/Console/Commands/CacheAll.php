@@ -42,7 +42,7 @@ class CacheAll extends Command
         //
         $startTime = microtime(true);
         Artisan::call('down');
-        Artisan::Call('cache_erp_datas');
+        Artisan::call('cache_erp_datas');
         Artisan::call('cache_clean');
         Artisan::call('cache_financial_list');
         Artisan::call('cache_receipt_times');
@@ -53,3 +53,4 @@ class CacheAll extends Command
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }
 }
+

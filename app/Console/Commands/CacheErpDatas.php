@@ -41,29 +41,39 @@ class CacheErpDatas extends Command
      */
     public function handle()
     {
-        $userObj = new UserController();
-        $userObj->getErpUser();
+        try {
+            DB::beginTransaction();
+               //Dosomething...
+            $userObj = new UserController();
+            $userObj->getErpUser();
 
-        if(isset($userObj->users)){
-            Cache::store('file')->forever('department', $userObj->department);
-            Cache::store('file')->forever('users', $userObj->users);
-            foreach (['users','department'] as $item){
-                $cacheObj = CacheKey::where('type',$item);
+            if(isset($userObj->users)){
+                Cache::store('file')->forever('department', $userObj->department);
+                Cache::store('file')->forever('users', $userObj->users);
+                foreach (['users','department'] as $item){
+                    $cacheObj = CacheKey::where('type',$item);
 
-                if($cacheObj->exists()){
-                    $cacheObj->update([
-                        'set_date' => now()->format('Y-m-d'),
-                        'release_time' => now()->addHour(1)->format('Y-m-d H:i:s')
-                    ]);
-                }else{
-                    $cacheObj = new Cachekey();
-                    $cacheObj->key = $item;
-                    $cacheObj->type = $item;
-                    $cacheObj->set_date = now()->format('Y-m-d');
-                    $cacheObj->release_time = now()->addHours(1)->format('Y-m-d H:i:s');
-                    $cacheObj->save();
+                    if($cacheObj->exists()){
+                        $cacheObj->update([
+                            'set_date' => now()->format('Y-m-d'),
+                            'release_time' => now()->addHour(1)->format('Y-m-d H:i:s')
+                        ]);
+                    }else{
+                        $cacheObj = new Cachekey();
+                        $cacheObj->key = $item;
+                        $cacheObj->type = $item;
+                        $cacheObj->set_date = now()->format('Y-m-d');
+                        $cacheObj->release_time = now()->addHours(1)->format('Y-m-d H:i:s');
+                        $cacheObj->save();
+                    }
                 }
             }
+            DB::commit();
+        } catch(\Exception $e) {
+            DB::rollback();
+            // Handle Error
+            \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => `${this->signature} error ${e->getMessage()}`]);
         }
+
     }
 }
