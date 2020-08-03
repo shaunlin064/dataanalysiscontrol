@@ -66,10 +66,10 @@ class UpdateFinancialData extends Command
 
             DB::commit();
 
-        } catch (\Exception $ex) {
+        } catch (\Exception $e) {
             DB::rollback();
             /*mail notice Job*/
-            \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => `${this->signature} error ${ex->getMessage()}`]);
+            \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => "{$this->signature} error {$e->getMessage()}"]);
         }
 
         Artisan::call('update_financial_money_receipt');

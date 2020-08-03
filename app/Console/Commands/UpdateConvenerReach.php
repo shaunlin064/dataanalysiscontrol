@@ -63,10 +63,10 @@ class UpdateConvenerReach extends Command
             $saleGroupsReach = new SaleGroupsReach();
             $saleGroupsReach->setAllConvenerReach($setDate);
             DB::commit();
-        } catch (\Exception $ex) {
+        } catch (\Exception $e) {
             DB::rollback();
             /*mail notice Job*/
-            SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => `${this->signature} error ${ex->getMessage()}`]);
+            SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => "{$this->signature} error {$e->getMessage()}"]);
         }
 
         $runTime = round(microtime(true) - $startTime, 2);

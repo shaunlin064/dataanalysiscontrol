@@ -64,10 +64,10 @@ class UpdateBonusReach extends Command
             $bonusReach->update($date_now->format('Y-m-01'));
             DB::commit();
 
-        } catch (\Exception $ex) {
+        } catch (\Exception $e) {
             DB::rollback();
             /*mail notice Job*/
-            \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => ` ${this->signature} error ${ex->getMessage()}`]);
+            \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' =>"{$this->signature} error {$e->getMessage()}"]);
         }
 
         $runTime = round(microtime(true) - $startTime, 2);

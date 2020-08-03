@@ -49,7 +49,7 @@ class UpdateFinancialMoneyReceipt extends Command
         } catch(\Exception $e) {
             DB::rollback();
             // Handle Error
-            \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => `${this->signature} error ${e->getMessage()}`]);
+            \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => "{$this->signature} error {$e->getMessage()}"]);
         }
 
         $runTime = round(microtime(true) - $startTime, 2);

@@ -46,7 +46,7 @@ class UpdateExchangeRate extends Command
 
         if(!Storage::exists('/public/exchangeRate.txt')){
             /*mail notice Job*/
-            \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => `${this->signature} error /public/exchangeRate.txt not exists`]);
+            \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => "{$this->signature} error error /public/exchangeRate.txt not exists" ]);
         }else{
             $data = json_decode(Storage::get('/public/exchangeRate.txt'));
             $rates = new \App\ExchangeRatesAll();
@@ -59,7 +59,7 @@ class UpdateExchangeRate extends Command
                 DB::rollback();
                 // Handle Error
                 /*mail notice Job*/
-                \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => `${this->signature} error ${$e->getMessage()}`]);
+                \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => "{$this->signature} error {$e->getMessage()}"]);
             }
 
         }

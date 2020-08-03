@@ -77,7 +77,7 @@
                 \App\Jobs\SentMail::dispatch('crontab', [
                     'mail'  => env('NOTIFICATION_EMAIL'),
                     'name'  => 'admin',
-                    'title' => `${this->signature} error ${e->getMessage()}`
+                    'title' => "{$this->signature} error {$e->getMessage()}"
                 ]);
             }
 
