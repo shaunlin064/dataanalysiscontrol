@@ -31,13 +31,18 @@
     <div class='row'>
         <div class="box box-widget widget-user">
             <div class="widget-user-header bg-aqua">
-                <div class="small-box no-shadow col-md-6 col-sm-6 col-xs-12">
+
+                <div class="small-box no-shadow col-md-4 col-sm-4 col-xs-12">
                     <div class="inner text-center">
                         <count-total :domid='"total_money"' data-step="4" data-intro="該條件發放總金額..<a href='/info/scheduleList'>獎金發放規則請見</a>"></count-total>
                         <p>總計發放金額</p>
                     </div>
                 </div>
-                <div class="form-group col-xs-12 col-md-6 pull-left">
+                <div class="form-group col-md-4 col-sm-4 col-xs-12">
+                    <label>快速查詢:</label>
+                    <select-button-group></select-button-group>
+                </div>
+                <div class="form-group col-xs-12 col-md-4 pull-left">
                     <date-range :dom_id='"provide_date_ranger"' :input_start_date='"{{date("Y-m-01")}}"' :input_end_date='"{{date("Y-m-01")}}"'
                                 data-step="1" data-intro="選擇要檢視的月份區間"></date-range>
                 </div>
