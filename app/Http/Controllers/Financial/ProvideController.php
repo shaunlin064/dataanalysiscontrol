@@ -369,7 +369,7 @@
                     convener 取該團隊
                     user 取自己
                     */
-
+            $userList = collect([]);
             if ( $thisLoginUser->isAdmin() || $thisLoginUser->isBusinessDirector() ) {
                 $saleGroups = SaleGroups::all();
 
@@ -396,7 +396,6 @@
                     $userList[] = $thisLoginUser;
                 }
             }
-
             return [
                 $saleGroups,
                 $userList->toArray()
