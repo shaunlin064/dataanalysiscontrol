@@ -10,21 +10,11 @@
     |
     */
 
-    use App\Cachekey;
-    use Illuminate\Support\Facades\Cache;
-    use Illuminate\Support\Facades\DB;
     /*
      * 登入系統
      */
     Route::get('/test', function () {
 
-    });
-
-    Route::get('/cacheflush', function () {
-        $cacheobj = new CacheKey('file');
-        $cacheobj->releaseCache();
-        dd(Cache::store('memcached')->flush(), Cache::store('file')->flush(), DB::table('cache_key')->truncate(),
-            DB::table('cache_key_subs')->truncate(), DB::table('cache_key_cache_key_subs')->truncate());
     });
 
     Route::group([ 'namespace' => '\App\Http\Controllers\Auth' ], function () {
