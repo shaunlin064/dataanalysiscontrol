@@ -48,6 +48,7 @@ class CacheAll extends Command
         Artisan::call('cache_receipt_times');
         Artisan::call('cache_provide_view');
         Artisan::call('cache_provide_list');
+        exec(sprintf('chown -R root:www-data %s/*', storage_path()));
         Artisan::call('up');
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
