@@ -17,6 +17,7 @@
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Auth;
     use Illuminate\Support\Facades\Cache;
+    use Illuminate\Support\Facades\DB;
     use Illuminate\Support\Facades\Input;
     use Route;
 
@@ -39,7 +40,7 @@
 
             $this->authorize('viewSetting', $this->policyModel);
 
-            list($bonuslist,$saleGroupsReach,$allUserName)  = $this->getProvideListDatas();
+            [$bonuslist,$saleGroupsReach,$allUserName]  = $this->getProvideListDatas();
 
             $saleGroupsTableColumns = [
                 [ 'data' => 'id' ],
@@ -94,14 +95,14 @@
         public function view () {
             $date = new DateTime(date('Ym01'));
             $erpUserId = Auth::user()->erp_user_id;
-            //
-            //            $provideStart = '2020-07-01';
-            //            $provideEnd = '2020-07-01';
-            //            $saleGroupIds = [1, 2, 3, 4,5,6,7,8];
-            //            $userIds = [];
-            //            $request = new Request(['startDate' => $provideStart, 'endDate' => $provideEnd, 'saleGroupIds' => $saleGroupIds, 'userIds' => $userIds]);
-            //            $datas = $this->getAjaxProvideData($request, 'return');
-            //            dd($datas);
+//
+//            $provideStart = '2020-09-01';
+//            $provideEnd = '2020-09-01';
+//            $saleGroupIds = [1, 2, 3, 4,5,6,7,8];
+//            $userIds = [];
+//            $request = new Request(['startDate' => $provideStart, 'endDate' => $provideEnd, 'saleGroupIds' => $saleGroupIds, 'userIds' => $userIds]);
+//            $datas = $this->getAjaxProvideData($request, 'return');
+//            dd($datas);
 
             [
                 $saleGroups,
@@ -190,29 +191,40 @@
         }
 
         public function post ( Request $request ) {
+
             $this->authorize('create', $this->policyModel);
 
-            $selectSaleGroupsReachIds = explode(',', $request->provide_sale_groups_bonus);
+            try {
+                DB::beginTransaction();
+                   //Dosomething...
+                $selectSaleGroupsReachIds = explode(',', $request->provide_sale_groups_bonus);
 
-            $this->setSaleGroupsReachProvide($selectSaleGroupsReachIds);
+                $this->setSaleGroupsReachProvide($selectSaleGroupsReachIds);
 
-            $selectFincialIds = $request->provide_bonus;
-            $selectFincialIds = $selectFincialIds != null ? explode(',', $selectFincialIds) : [];
+                $selectFincialIds = $request->provide_bonus;
+                $selectFincialIds = $selectFincialIds != null ? explode(',', $selectFincialIds) : [];
 
-            $this->resetFinancialStatus();
-            $this->save($selectFincialIds);
 
-            $this->cacheRelease();
 
-            $message['status_string'] = 'success';
-            $message['message'] = '更新成功';
+                $this->resetFinancialStatus();
+                $this->save($selectFincialIds);
 
+                $message['status_string'] = 'success';
+                $message['message'] = '更新成功';
+                DB::commit();
+            } catch(\Exception $e) {
+                DB::rollback();
+                // Handle Error
+                $message['message'] = $e->getMessage();
+            }
 
             return view('handle', [
-                    'message'   => $message,
-                    'data'      => $this->resources,
-                    'returnUrl' => Route('financial.provide.list')
-                ]);
+                'message'   => $message,
+                'data'      => $this->resources,
+                'returnUrl' => Route('financial.provide.list')
+            ]);
+
+
         }
 
         public function getAjaxProvideData ( Request $request, $outType = 'echo' ) {
@@ -231,11 +243,13 @@
             }
 
             if ( $saleGroupIds && $userIds == null ) {
-                $userIds = SaleGroups::with('groupsUsers')->whereIn('id', $saleGroupIds)->get()->map(function ( $v, $k
-                ) use ( $dateRange ) {
-                    return $v->groupsUsers->whereIn('set_date', $dateRange)->pluck('erp_user_id');
-                })->flatten()->unique()->values();
+//                $userIds = SaleGroups::with('groupsUsers')->whereIn('id', $saleGroupIds)->get()->map(function ( $v, $k
+//                ) use ( $dateRange ) {
+//                    return $v->groupsUsers->whereIn('set_date', $dateRange)->pluck('erp_user_id');
+//                })->flatten()->unique()->values();
+                $userIds = SaleGroupsUsers::whereIn('sale_groups_id', $saleGroupIds)->get()->pluck('erp_user_id')->unique()->values();
             }
+
             /*cache start*/
             $cacheData = collect([]);
             $dateNow = new DateTime();
@@ -261,6 +275,7 @@
                     } else { // close one month
                         $cacheTime = 1; // 1hr
                     };
+
                     $cacheObj->put($this->cacheKeyFinancial, $date, [
                         'saleGroupRowData' => $saleGroupRowData ?? [],
                         'bonusRowData'     => $bonusRowData ?? []
@@ -279,6 +294,7 @@
                 $bonusRowData = $bonusRowData->concat($v['bonusRowData']);
 
             });
+
             /*get provide Bar TrimData*/
             $allName = Bonus::all()->pluck('erp_user_id')->unique()->values();
 
@@ -412,6 +428,7 @@
             }
 
             $financialList = FinancialList::whereIn('id', $selectFincialIds)->get();
+
             //add && update
             $financialList->map(function ( $v ) use ( $createdTime ) {
                 //save financialList
@@ -447,6 +464,7 @@
                 }
 
             });
+            $this->releaseCache($selectFincialIds);
         }
 
         /**
@@ -475,10 +493,11 @@
         ) {
 
             if ( $saleGroupIds && $userIds == null ) {
-                $userIds = SaleGroups::with('groupsUsers')->whereIn('id', $saleGroupIds)->get()->map(function ( $v, $k
-                ) {
-                    return $v->groupsUsers->pluck('erp_user_id');
-                })->flatten();
+//                $userIds = SaleGroups::with('groupsUsers')->whereIn('id', $saleGroupIds)->get()->map(function ( $v, $k
+//                ) {
+//                    return $v->groupsUsers->pluck('erp_user_id');
+//                })->flatten();
+                $userIds = SaleGroupsUsers::whereIn('sale_groups_id', $saleGroupIds)->get()->pluck('erp_user_id');
             }
 
             /* sale Groups Bonus*/
@@ -513,10 +532,11 @@
         ) {
 
             if ( $saleGroupIds && $userIds == null ) {
-                $userIds = SaleGroups::with('groupsUsers')->whereIn('id', $saleGroupIds)->get()->map(function ( $v, $k
-                ) {
-                    return $v->groupsUsers->pluck('erp_user_id');
-                })->flatten();
+//                $userIds = SaleGroups::with('groupsUsers')->whereIn('id', $saleGroupIds)->get()->map(function ( $v, $k
+//                ) {
+//                    return $v->groupsUsers->pluck('erp_user_id');
+//                })->flatten();
+                $userIds = SaleGroupsUsers::whereIn('sale_groups_id', $saleGroupIds)->get()->pluck('erp_user_id');
             }
 
             // financial bonus list
@@ -570,19 +590,7 @@
             return $selectIds;
         }
 
-        private function cacheRelease (): void {
-            $date = new DateTime();
-            /*provide list*/
-            Cachekey::where('type', $this->cacheKeyProvide)->delete();
-            Cache::store('file')->forget(md5($this->cacheKeyProvide));
-
-            /*provide view*/
-            Cachekey::where('key', md5($this->cacheKeyFinancial. $date->format('Y-m-01')))->delete();
-            Cache::store('file')->forget(md5($this->cacheKeyFinancial. $date->format('Y-m-01')));
-            $date->modify('-1Month');
-            Cachekey::where('key', md5($this->cacheKeyFinancial. $date->format('Y-m-01')))->delete();
-            Cache::store('file')->forget(md5($this->cacheKeyFinancial. $date->format('Y-m-01')));
-        }/**
+    /**
      * @return array
      */
         public function getProvideListDatas (): array {
@@ -648,6 +656,32 @@
             }
 
             return Cachekey::where('key', $md5Key)->first()->getCacheData();
+        }
+
+    /**
+     * @param array $selectFincialIds
+     */
+        private function releaseCache ( array $selectFincialIds ): void {
+            $releaseCacheDate = new DateTime();
+            if ( $releaseCacheDate->format('d') >= $this->saveDateLine ) {
+                $releaseCacheDate->modify('+1Month');
+            }
+
+            $financialSetDate = FinancialList::whereIn('id', $selectFincialIds)
+                                             ->get()
+                                             ->pluck('set_date')
+                                             ->unique()
+                                             ->values();
+
+            $cacheObj = CacheKey::where('type', $this->cacheKeyProvide)->orWhere(function ( $query ) use (
+                $releaseCacheDate
+            ) {
+                $query->where('set_date', $releaseCacheDate->format('Y-m-d'))->where('type', $this->cacheKeyFinancial);
+            })->orWhere(function ( $query ) use ($financialSetDate) {
+                $query->where( 'type','financial.review')->whereIn('set_date', $financialSetDate);
+                })->get();
+
+            CacheKey::releaseCacheByDatas($cacheObj);
         }
     }
 

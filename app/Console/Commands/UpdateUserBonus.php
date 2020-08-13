@@ -61,13 +61,14 @@
                     if(in_array($v->erp_user_id,$leaveUser)){
                         $v->boundary = 0;
                     }
-
-                    if(!Bonus::where('erp_user_id',$v->erp_user_id)->where('set_date',$v->set_date)->exists()){
+                    $BonusThisDate = Bonus::where('erp_user_id',$v->erp_user_id)->where('set_date',$v->set_date);
+                    if(!$BonusThisDate->exists()){
                         $bonus = Bonus::create($v->toArray());
 
                         if(in_array($v->erp_user_id,$leaveUser)) {
                             return;
                         }
+
                         collect($v->levels)->map(function ($v) use ($bonus) {
                             $v->bonus_id = $bonus->id;
 
