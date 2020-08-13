@@ -10,9 +10,9 @@ class BonusReach extends Model
     //
 	protected $table = 'bonus_reach';
 	protected $fillable = ['bonus_id','reach_rate'];
-	
+
 	public function bonus()
 	{
-		return $this->hasOne(Bonus::CLASS);
+		return $this->belongsTo(Bonus::CLASS);
 	}
 }
