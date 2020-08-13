@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Cachekey;
+use App\FinancialList;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 
