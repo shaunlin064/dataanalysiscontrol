@@ -38,8 +38,8 @@ class UpdateFinancialMoneyReceiptCost extends Command
     {
         $startTime = microtime(true);
         $date = new DateTime(date('Ym01'));
-        $date->modify('-1Month');
-        //抓取 上個月以前 僅填成本 尚未有收款過的資料
+        $date->modify('-2Month');
+        //抓取 兩個月前 僅填成本 尚未有收款過的資料
         $fin = FinancialList::doesntHave('receipt')->where(['income' => 0 , 'status' => 0 ])->where('cost','!=' , 0)->where('set_date','<=',$date->format('Y-m-d'))->get();
         // 比對 確認該案件 是否已經有收過款
         $result = FinancialList::where('status','!=',0)->whereIn('cp_detail_id',$fin->pluck('cp_detail_id'))
