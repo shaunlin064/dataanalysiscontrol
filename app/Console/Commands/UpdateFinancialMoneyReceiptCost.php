@@ -39,10 +39,14 @@ class UpdateFinancialMoneyReceiptCost extends Command
         $startTime = microtime(true);
         $date = new DateTime(date('Ym01'));
         $date->modify('-1Month');
-        //抓取 有僅填成本 且未歸入已收款的成本
-        $financial = FinancialList::doesntHave('receipt')->where('income',0)->where('cost','!=',0)->where('set_date','<=',$date->format('Y-m-d'))->get();
-        //建立financialReceipt
+        //抓取 上個月以前 僅填成本 尚未有收款過的資料
+        $fin = FinancialList::doesntHave('receipt')->where(['income' => 0 , 'status' => 0 ])->where('cost','!=' , 0)->where('set_date','<=',$date->format('Y-m-d'))->get();
+        // 比對 確認該案件 是否已經有收過款
+        $result = FinancialList::where('status','!=',0)->whereIn('cp_detail_id',$fin->pluck('cp_detail_id'))
+                               ->get();
+        $financial = $fin->wherein('cp_detail_id',$result->pluck('cp_detail_id'))->values();
 
+        //建立financialReceipt
         try {
             DB::beginTransaction();
             $financial->each(function($v){
