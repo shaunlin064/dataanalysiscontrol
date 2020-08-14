@@ -318,13 +318,14 @@
         }
 
         public function getDataList ( $fieldName, $fieldid ) {
-            $this->cacheObj = new Cachekey('file');
-            $data = $this->cacheObj->remember($fieldName, ( 1 * 3600 ), function () use($fieldName,$fieldid) {
+
+            $data = Cache::store('memcached')->remember($fieldName, ( 1 * 3600 ), function () use($fieldName,$fieldid) {
                 return $this->all()->pluck($fieldName, $fieldid)->filter()->unique()->map(function ( $v, $id ) {
                     $tmp = [ 'name' => $v, 'id' => $id ];
                     return $tmp;
                 })->sortBy('name')->values()->toArray();
             });
+
             return $data;
         }
 

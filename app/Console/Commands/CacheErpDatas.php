@@ -49,8 +49,12 @@ class CacheErpDatas extends Command
             $userObj->getErpUser();
 
             if(isset($userObj->users)){
+
                 Cache::store('file')->forever('department', $userObj->department);
                 Cache::store('file')->forever('users', $userObj->users);
+                exec(sprintf('chown root:www-data -R %s/*', storage_path()));
+                exec(sprintf('chmod 775 -R %s/*', storage_path()));
+
                 foreach (['users','department'] as $item){
                     $cacheObj = CacheKey::where('type',$item);
 
