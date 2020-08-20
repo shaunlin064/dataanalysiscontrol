@@ -5,15 +5,7 @@ pipeline:
   ssh-commands:
     image: appleboy/drone-ssh
     settings:
-    secrets:
-      - source: ssh_key
-        target: ssh_key
-      - source: host_ip
-        target: host
-      - source: user
-        target: username
-      - source: project
-        target: project
+    secrets: [ ssh_key,host,username,project]
     port: 22
     script:
       - echo $HOST && echo $USERNAME && echo $PROJECT && echo $HOST_IP
