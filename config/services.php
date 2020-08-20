@@ -43,5 +43,8 @@ return [
             'tolerance' => env('STRIPE_WEBHOOK_TOLERANCE', 300),
         ],
     ],
-
+    'discord' => [
+        'token' => env('DISCORD_WEBHOOK_TOKEN'),
+        'channel_id' => env('DISCORD_WEBHOOK_ID')
+    ],
 ];

@@ -165,7 +165,7 @@ return [
         /*
          * Package Service Providers...
          */
-
+        MarvinLabs\DiscordLogger\ServiceProvider::class,
         /*
          * Application Service Providers...
          */
@@ -175,7 +175,6 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\TelescopeServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-
     ],
 
     /*
