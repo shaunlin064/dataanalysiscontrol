@@ -12,6 +12,7 @@ pipeline:
         target: host
       - source: user
         target: username
+      - source: project
     port: 22
     script:
       - docker exec -i php74 php ./${PROJECT}/artisan down
