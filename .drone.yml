@@ -12,7 +12,7 @@ pipeline:
         target: host
       - source: user
         target: username
-      - source: project
+      - [project]
     port: 22
     script:
       - echo $PROJECT
