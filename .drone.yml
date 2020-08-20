@@ -16,10 +16,11 @@ pipeline:
         target: project
     port: 22
     script:
-      - docker exec -i php74 php ./${PROJECT}/artisan down
-      - docker exec -i php74 bash -c "git -C ${PROJECT} pull"
-      - docker exec -i php74 bash -c "cd ${PROJECT} && composer install && npm install -y && npm run dev"
-      - docker exec -i php74 php ./${PROJECT}/artisan up
+      - echo $PROJECT
+#      - docker exec -i php74 php ./${PROJECT}/artisan down
+#      - docker exec -i php74 bash -c "git -C ${PROJECT} pull"
+#      - docker exec -i php74 bash -c "cd ${PROJECT} && composer install && npm install -y && npm run dev"
+#      - docker exec -i php74 php ./${PROJECT}/artisan up
     when:
       status: [ success ]
   notification:
