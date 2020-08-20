@@ -504,7 +504,7 @@
                     }
                 });
             }
-            sleep(2000);
+            sleep(1000);
             if (boxToggleCookie !== undefined) {
                 Object.keys(boxToggleCookie).forEach(key => {
                     if (boxToggleCookie[key] === 0) {

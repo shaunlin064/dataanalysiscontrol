@@ -1,0 +1,27 @@
+name:
+kind: secret
+get:
+pipeline:
+  ssh-commands:
+    image: appleboy/drone-ssh
+    settings:
+    secrets:
+      - source: ssh_key
+        target: ssh_key
+      - source: host_ip
+        target: host
+      - source: user
+        target: username
+    port: 22
+    script:
+      - docker exec -i php74 php ./dataanalysiscontrol/artisan down
+      - docker exec -i php74 bash -c "git -C dataanalysiscontrol pull"
+      - docker exec -i php74 bash -c "cd dataanalysiscontrol && composer install && npm install -y && npm run dev"
+      - docker exec -i php74 php ./dataanalysiscontrol/artisan up
+    when:
+      status: [ success ]
+  notification:
+    image: appleboy/drone-discord
+    secrets: [ discord_webhook_id,discord_webhook_token ]
+    when:
+      status: [ failure ]
