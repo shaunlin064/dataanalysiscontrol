@@ -50,8 +50,8 @@ class CacheErpDatas extends Command
 
             if(isset($userObj->users)){
 
-                Cache::store('file')->forever('department', $userObj->department);
-                Cache::store('file')->forever('users', $userObj->users);
+                Cache::forever('department', $userObj->department);
+                Cache::forever('users', $userObj->users);
                 exec(sprintf('chown root:www-data -R %s/*', storage_path()));
                 exec(sprintf('chmod 775 -R %s/*', storage_path()));
 

@@ -20,7 +20,7 @@ class CacheKeySub extends Model
         if($this->key){
             $this->use_times += 1;
             $this->update();
-            return Cache::store('file')->get($this->key);
+            return Cache::get($this->key);
         }
     }
 

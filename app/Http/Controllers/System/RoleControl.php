@@ -172,9 +172,9 @@
                     return $v->label;
                 })->implode(',');
                 // get epr department Name
-                $v['department'] = Cache::store('file')->get('users')[$v->erp_user_id]['department_name'];
+                $v['department'] = Cache::get('users')[$v->erp_user_id]['department_name'];
                 // by use filter resign user
-                $v['user_resign_date'] = Cache::store('file')->get('users')[$v->erp_user_id]['user_resign_date'];
+                $v['user_resign_date'] = Cache::get('users')[$v->erp_user_id]['user_resign_date'];
                 return $v;
             })->filter(function ($v) {
                 return $v['user_resign_date'] == '0000-00-00';

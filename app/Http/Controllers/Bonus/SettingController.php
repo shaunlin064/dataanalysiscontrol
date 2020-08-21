@@ -61,7 +61,7 @@
 			return view('bonus.setting.list',[
 			    'data' => $this->resources,
                 'listdata' => $listdata,
-                'usersSession' => Cache::store('file')->get('users')]);
+                'usersSession' => Cache::get('users')]);
 		}
 
 		public function edit(Bonus $bonus)

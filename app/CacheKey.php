@@ -26,14 +26,14 @@
         }
 
         public function remember ( $key, $time, $callback ) {
-            return Cache::store('file')->remember($key, $time, $callback);
+            return Cache::remember($key, $time, $callback);
         }
 
         public function put ( $cahcekey, $date, $data, $cachetime ) {
 
             $md5Key = md5($cahcekey . $date);
 
-            Cache::store('file')->forever($md5Key, $data);
+            Cache::forever($md5Key, $data);
 
             if ( !empty(Cachekey::where('key', $md5Key)->first()) ) {
                 $tmpData = Cachekey::where('key', $md5Key)->first();
@@ -52,7 +52,7 @@
 
         public function subPut ( $type, $condition, $data ) {
             $md5Key = md5($condition);
-            Cache::store('file')->forever($md5Key, $data);
+            Cache::forever($md5Key, $data);
 
             $this->cacheKeySub()->create([ 'type' => $type, 'key' => $md5Key, 'condition' => $condition ]);
             return $this;
@@ -62,7 +62,7 @@
             if ( $this->key ) {
                 $this->use_times += 1;
                 $this->update();
-                return Cache::store('file')->get($this->key);
+                return Cache::get($this->key);
             }
         }
 
@@ -89,7 +89,7 @@
 
             CacheKeySub::whereIn('key',$key)->orWhereIn('id',$missDataCacheKeySubIds)->delete();
             $keys->each(function($v){
-                Cache::store('file')->forget($v);
+                Cache::forget($v);
             });
         }
 
@@ -107,12 +107,12 @@
                 $v->cacheKeySub()->detach();
                 $v->delete();
             })->flatten()->each(function($v){
-                Cache::store('file')->forget($v);
+                Cache::forget($v);
             });
             $key = $keys->flatten();
             CacheKeySub::whereIn('key',$key)->orWhereIn('id',$missDataCacheKeySubIds)->delete();
             $keys->each(function($v){
-                Cache::store('file')->forget($v);
+                Cache::forget($v);
             });
         }
     }

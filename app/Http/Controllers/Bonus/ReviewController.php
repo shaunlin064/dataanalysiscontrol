@@ -452,7 +452,7 @@
          */
         private function getProgressDates ( Collection $erpReturnData, $dateStart, $dateEnd, $userIds ): Collection {
             $progressDatas = collect([]);
-            $resignUsers = collect(Cache::store('file')->get('users'))->where('user_resign_date', '!=', '0000-00-00');
+            $resignUsers = collect(Cache::get('users'))->where('user_resign_date', '!=', '0000-00-00');
 
             $erpReturnData->groupBy([ 'set_date', 'erp_user_id' ])->map(function ( $items, $setDate ) use (
                 &$progressDatas

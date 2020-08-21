@@ -107,7 +107,7 @@ class UpdatePassDatas extends Command
         $userdata = $bonuslist->pluck('erp_user_id')->unique()->values()->map(function($v,$k){
             $new = [
                 'erp_user_id' => $v,
-                'name' => Cache::store('file')->get('users')[$v]['name'],
+                'name' => Cache::get('users')[$v]['name'],
                 'boundary' => 0
             ];
             return $new;

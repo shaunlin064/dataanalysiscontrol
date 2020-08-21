@@ -283,7 +283,7 @@
 
                 }
 
-                $cacheData[] = Cache::store('file')->get($md5Key);
+                $cacheData[] = Cache::get($md5Key);
             }
             $saleGroupRowData = collect([]);
             $bonusRowData = collect([]);
@@ -581,7 +581,7 @@
         private function getProvideBalanceSelectedId ( $dataList ) {
             $dataList = $dataList->groupBy('erp_user_id');
             $selectIds = $dataList->map(function ( $v, $erpUserId ) {
-                $isAlive = Cache::store('file')->get('users')[ $erpUserId ]['user_resign_date'] == '0000-00-00';
+                $isAlive = Cache::get('users')[ $erpUserId ]['user_resign_date'] == '0000-00-00';
                 if ( $isAlive && $v->sum('provide_money') >= 0 ) {
                     return $v->pluck('id');
                 }
@@ -619,7 +619,7 @@
                     $v['profit'] = $this->exchangeMoney($v);
                     $v['provide_money'] = round($v['profit'] * $v['rate'] / 100);
                     $v['set_date'] = substr($v['set_date'], 0, 7);
-                    $v['user_resign_date'] = Cache::store('file')->get('users')[ $v->erp_user_id ]['user_resign_date'];
+                    $v['user_resign_date'] = Cache::get('users')[ $v->erp_user_id ]['user_resign_date'];
                     return $v;
                 })->values();
 
@@ -641,7 +641,7 @@
                         return $v;
                     });
 
-                Cache::store('file')->forever($md5Key, [
+                Cache::forever($md5Key, [
                     $bonuslist,
                     $saleGroupsReach,
                     $allUserName,

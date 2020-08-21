@@ -35,7 +35,7 @@ class CacheFlush extends Command
 
     public function handle()
     {
-        dd(Cache::store('memcached')->flush(), Cache::store('file')->flush(), DB::table('cache_key')->truncate(),
+        dd(Cache::store('memcached')->flush(), Cache::flush(), DB::table('cache_key')->truncate(),
             DB::table('cache_key_subs')->truncate(), DB::table('cache_key_cache_key_subs')->truncate());
     }
 }
