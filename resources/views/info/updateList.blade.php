@@ -73,7 +73,7 @@
 
                 <li class="time-label">
                     <span class="bg-red">
-                        {{$article->created_at->format('y/m/d')}}
+                        {{$article->created_at->format('Y/m/d')}}
                     </span>
                 </li>
                 <!-- /.timeline-label -->
