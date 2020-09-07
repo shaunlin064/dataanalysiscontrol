@@ -191,7 +191,7 @@
         }
 
         public function post ( Request $request ) {
-
+		
             $this->authorize('create', $this->policyModel);
 
             try {
@@ -203,9 +203,7 @@
 
                 $selectFincialIds = $request->provide_bonus;
                 $selectFincialIds = $selectFincialIds != null ? explode(',', $selectFincialIds) : [];
-
-
-
+                
                 $this->resetFinancialStatus();
                 $this->save($selectFincialIds);
 
@@ -217,7 +215,6 @@
                 // Handle Error
                 $message['message'] = $e->getMessage();
             }
-
             return view('handle', [
                 'message'   => $message,
                 'data'      => $this->resources,
@@ -464,6 +461,7 @@
                 }
 
             });
+            
             $this->releaseCache($selectFincialIds);
         }
 
@@ -673,14 +671,14 @@
                                              ->unique()
                                              ->values();
 
-            $cacheObj = CacheKey::where('type', $this->cacheKeyProvide)->orWhere(function ( $query ) use (
+            $cacheObj = CacheKey::where('type', $this->cacheKeyProvide)->orWhere('type',$this->cacheKeyFinancial)->orWhere(function ( $query ) use (
                 $releaseCacheDate
             ) {
                 $query->where('set_date', $releaseCacheDate->format('Y-m-d'))->where('type', $this->cacheKeyFinancial);
             })->orWhere(function ( $query ) use ($financialSetDate) {
                 $query->where( 'type','financial.review')->whereIn('set_date', $financialSetDate);
                 })->get();
-
+			
             CacheKey::releaseCacheByDatas($cacheObj);
         }
     }

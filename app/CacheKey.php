@@ -97,22 +97,17 @@
          * @param Collection[CacheKey] $data
          */
         static function releaseCacheByDatas (Collection $data):void {
-            $keys = collect([]);
-
+        	
             $missDataCacheKeySubIds = DB::table('cache_key_subs')->selectRaw('id')->leftJoin('cache_key_cache_key_subs','id','cache_key_cache_key_subs.cache_key_subs_id')->where('cache_key_subs_id',null)->pluck('id');
-
-            $data->each(function($v,$k) use( $keys ){
-                $keys = $keys->concat($v->cacheKeySub->pluck('key')->values());
-                $keys[] = $v->key;
+	
+	        $keys = $data->map(function($v,$k) {
                 $v->cacheKeySub()->detach();
                 $v->delete();
-            })->flatten()->each(function($v){
-                Cache::forget($v);
-            });
-            $key = $keys->flatten();
-            CacheKeySub::whereIn('key',$key)->orWhereIn('id',$missDataCacheKeySubIds)->delete();
-            $keys->each(function($v){
-                Cache::forget($v);
-            });
+		        return $v->key;
+            })->each(function($v){
+		        Cache::forget($v);
+	        });;
+            CacheKeySub::whereIn('key',$keys)->orWhereIn('id',$missDataCacheKeySubIds)->delete();
+            
         }
     }
