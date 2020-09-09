@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers\System;
 
-use App\Bonus;
 use App\Menu;
 use App\MenuSub;
-use Cache;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BaseController;
 class MenuController extends BaseController
@@ -13,7 +11,13 @@ class MenuController extends BaseController
     //
     private $menu;
     private $subMenu;
-    public function __construct () {
+	private $menuSub;
+	/**
+	 * @var MenuSub
+	 */
+	
+	
+	public function __construct () {
         parent::__construct();
         $this->menu = new Menu();
         $this->menuSub = new MenuSub();
@@ -34,7 +38,7 @@ class MenuController extends BaseController
         /*
          * 驗證欄位
          */
-        $validatedData = $request->validate([
+        $request->validate([
             'name' => 'required|max:255',
             'priority' => 'required',
             'region' => 'required|max:255',
@@ -44,7 +48,7 @@ class MenuController extends BaseController
         if(isset($menudata['id'])){
             $this->menu->where('id', $menudata['id'])->update($menudata);
         }else{
-            $this->menu->fill($menudata)->save();
+            $this->menu->create($menudata);
         }
         
         return redirect('/system/menu/list');
@@ -58,7 +62,7 @@ class MenuController extends BaseController
         /*
          * 驗證欄位
          */
-        $validatedData = $request->validate([
+        $request->validate([
             'id' => 'required',
         ]);
         
@@ -81,7 +85,7 @@ class MenuController extends BaseController
         /*
          * 驗證欄位
          */
-        $validatedData = $request->validate([
+        $request->validate([
             'name' => 'required|max:255',
             'priority' => 'required',
             'url' => 'required|max:255',
@@ -90,7 +94,7 @@ class MenuController extends BaseController
         if(isset($menudata['id'])){
             $this->menuSub->where('id', $menudata['id'])->update($menudata);
         }else{
-            $this->menuSub->fill($menudata)->save();
+            $this->menuSub->create($menudata);
             
         }
         
@@ -105,7 +109,7 @@ class MenuController extends BaseController
         /*
          * 驗證欄位
          */
-        $validatedData = $request->validate([
+        $request->validate([
             'id' => 'required',
         ]);
         

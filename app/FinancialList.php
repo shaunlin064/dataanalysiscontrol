@@ -188,7 +188,7 @@
                 $newdata = [];
                 foreach ( $erpReturnData as $erpReturnDatum ) {
                     $financeList = new FinancialList();
-                    $financeList->fill($erpReturnDatum)->dataFormat()->save();
+                    $financeList->fill($this->rawKeyChange($erpReturnDatum))->dataFormat()->save();
                 }
 
                 DB::commit();
@@ -211,7 +211,7 @@
 
             $erpReturnData = collect($financial->getErpMemberFinancial([ 'all' ],
                 $date->format('Ym')))->whereIn('organization', [ 'js', 'ff' ]);
-
+			
             $erpReturnData = $erpReturnData->filter(function ( $v, $k ) {
                 $tmpDate = new DateTime($v['year_month'] . '01');
                 $setDate = $tmpDate->format('Y-m-d');
@@ -232,7 +232,7 @@
             try {
                 $erpReturnData->each(function ( $v ) {
                     $financeList = new FinancialList();
-                    $financeList->fill($v)->dataFormat()->save();
+                    $financeList->fill($this->rawKeyChange($v))->dataFormat()->save();
                 });
                 $this->whereIn('cp_detail_id', $erpReturnVoidData)->delete();
                 DB::commit();
