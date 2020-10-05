@@ -19,3 +19,10 @@ use Illuminate\Http\Request;
 		Route::post('login', 'ApiLoginController@login');
 		Route::post('logout', 'ApiLoginController@logout');
 	});
+
+	#匯率
+	Route::namespace('Financial')->group(function () {
+		Route::prefix('exchangeRate/')->group(function () {
+			Route::post('getExchangeRateAverage', 'ExchangeRatesController@getExchangeRateAverage');
+		});
+	});

@@ -9,7 +9,8 @@
     use DateTime;
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Auth;
-
+    use Illuminate\Support\Facades\Validator;
+    
     class ExchangeRatesController extends BaseController
     {
         //
@@ -24,6 +25,7 @@
             parent::__construct();
 
             $this->policyModel = new ExchangeRate();
+      
         }
 
         public function setting ()
@@ -111,5 +113,60 @@
             } else {
                 return ['exchangeChartData' => $exchangeChartData , 'exchangeTableData' => $data];
             }
+        }
+        
+	    /**
+	     * @parmeter $request
+	     *  ['yearMonth' example '202009'
+	     *  'currency'  example 'usd']
+	     * @param Request $request
+	     * @return false|string
+	     */
+	    public function getExchangeRateAverage ( Request $request ) {
+
+		    $validator = Validator::make($request->all(), [
+			        'token' => ['required' ,'max:255',function ($attribute, $value, $fail) {
+				        if ($value !== env('API_TOKEN')) {
+					        $fail($attribute.' is invalid.');
+				        }
+			        }],
+				 'yearMonth' => 'required|max:255',
+				 'currency' => 'required|max:255',
+			 ]);
+		    $validator->sometimes('currency', 'required', function ($input) {
+			    return $input->token !== env('API_TOKEN');
+		    });
+		     $message = collect([
+			    'status'        => 2,
+			    'message'       => '',
+			    'data'          => []
+		    ]);
+			 if ( $validator->errors()->any() ) {
+				 $message['message'] = $validator->errors();
+				 return  $message->toJson();
+			 }
+		    try {
+			    $yearMonth = $request->yearMonth;
+			    $currency = $request->currency;
+			    $result = ExchangeRatesAll::where(['year_month'=>$yearMonth,'currency'=> strtoupper($currency)])->first();
+			    $keyFiled = collect(['date','buy','sell','spot_buy','spot_sell']);
+			    $exchangeRate = collect(json_decode($result->data))->map(function($v,$k) use($keyFiled){
+				    $combined = $keyFiled->combine($v);
+				    return $combined;
+			    });
+			    $rateAverage = [
+				    'year_month' => $yearMonth,
+				    'buy'=> round($exchangeRate->average('buy'),2),
+				    'sell' => round($exchangeRate->average('sell'),2),
+				    'spot_buy' => round($exchangeRate->average('spot_buy'),2),
+				    'spot_sell' => round($exchangeRate->average('spot_sell'),2)
+			    ];
+			    $message['data'] = $rateAverage;
+			    $message['status'] = 1;
+			    return $message->toJson();
+		    } catch (\Exception $ex) {
+		        echo $ex->getMessage();
+		    }
+		   
         }
     }

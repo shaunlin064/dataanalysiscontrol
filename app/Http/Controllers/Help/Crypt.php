@@ -11,7 +11,7 @@
 	
 	class Crypt
 	{
-		public static $key = "FAA2C53CA77AEF2F77C6E3C83C81B798";
+		public static $key;
 		/**
 		 * handle decrypt function
 		 *
@@ -20,6 +20,11 @@
 		 * @param string $method : decrypt method , AES-256-CBC
 		 * @return item after decrypt
 		 */
+		
+		public function __construct (  ) {
+			$this->key = env('API_KEY');
+		}
+		
 		static function decrypt(string $data, string $method)
 		{
 			$data = base64_decode($data);
