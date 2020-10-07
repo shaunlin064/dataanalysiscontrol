@@ -117,7 +117,9 @@
         
 	    /**
 	     * @parmeter $request
-	     *  ['yearMonth' example '202009'
+	     *  [
+	     * 'token'
+	     * 'yearMonth' example '202009'
 	     *  'currency'  example 'usd']
 	     * @param Request $request
 	     * @return false|string
@@ -169,4 +171,55 @@
 		    }
 		   
         }
+	
+	    /**
+	     * @parmeter $request
+	     *  [
+	     * 'token'
+	     * 'yearMonth' example '202009'
+	     *  'currency'  example 'usd']
+	     * @parmeter Request $request
+	     * @return false|string
+	     */
+	    public function getExchangeRateLastData ( Request $request ) {
+		
+		    $validator = Validator::make($request->all(), [
+			    'token' => ['required' ,'max:255',function ($attribute, $value, $fail) {
+				    if ($value !== env('API_TOKEN')) {
+					    $fail($attribute.' is invalid.');
+				    }
+			    }],
+			    'yearMonth' => 'required|max:255',
+			    'currency' => 'required|max:255',
+		    ]);
+		    $validator->sometimes('currency', 'required', function ($input) {
+			    return $input->token !== env('API_TOKEN');
+		    });
+		    $message = collect([
+			    'status'        => 2,
+			    'message'       => '',
+			    'data'          => []
+		    ]);
+		    if ( $validator->errors()->any() ) {
+			    $message['message'] = $validator->errors();
+			    return  $message->toJson();
+		    }
+		    try {
+			    $jsonResult = ExchangeRatesAll::where(['year_month'=>$request->yearMonth,'currency'=> strtoupper($request->currency)])->first()->data;
+			    $resultData = collect(json_decode($jsonResult));
+			    $lastDate = $resultData->max(0);
+			    $keyFiled = collect(['date','buy','sell','spot_buy','spot_sell']);
+			    
+			    $exchangeRate =$resultData->map(function($v) use($keyFiled,$lastDate){
+				    return $keyFiled->combine($v);
+			    })->where('date',$lastDate)->first();
+			    
+			    $message['data'] = $exchangeRate;
+			    $message['status'] = 1;
+			    return $message->toJson();
+		    } catch (\Exception $ex) {
+			    echo $ex->getMessage();
+		    }
+		
+	    }
     }

@@ -24,5 +24,6 @@ use Illuminate\Http\Request;
 	Route::namespace('Financial')->group(function () {
 		Route::prefix('exchangeRate/')->group(function () {
 			Route::post('getExchangeRateAverage', 'ExchangeRatesController@getExchangeRateAverage');
+			Route::post('getExchangeRateLastData', 'ExchangeRatesController@getExchangeRateLastData');
 		});
 	});
