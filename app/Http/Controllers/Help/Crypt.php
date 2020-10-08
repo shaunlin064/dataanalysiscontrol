@@ -11,7 +11,6 @@
 	
 	class Crypt
 	{
-		public static $key;
 		/**
 		 * handle decrypt function
 		 *
@@ -21,16 +20,12 @@
 		 * @return item after decrypt
 		 */
 		
-		public function __construct (  ) {
-			$this->key = env('API_KEY');
-		}
-		
 		static function decrypt(string $data, string $method)
 		{
 			$data = base64_decode($data);
 			$ivSize = openssl_cipher_iv_length($method);
 			$iv = substr($data, 0, $ivSize);
-			$data = openssl_decrypt(substr($data, $ivSize), $method, self::$key, OPENSSL_RAW_DATA, $iv);
+			$data = openssl_decrypt(substr($data, $ivSize), $method, env('API_KEY'), OPENSSL_RAW_DATA, $iv);
 			
 			return $data;
 		}
@@ -48,7 +43,7 @@
 			$ivSize = openssl_cipher_iv_length($method);
 			$iv = openssl_random_pseudo_bytes($ivSize);
 			
-			$encrypted = openssl_encrypt($data, $method, self::$key, OPENSSL_RAW_DATA, $iv);
+			$encrypted = openssl_encrypt($data, $method, env('API_KEY'), OPENSSL_RAW_DATA, $iv);
 			
 			// For storage/transmission, we simply concatenate the IV and cipher text
 			$encrypted = base64_encode($iv . $encrypted);
@@ -62,7 +57,7 @@
 		 * @return string $key
 		 */
 		public function getKey(){
-			return self::$key;
+			return env('API_KEY');
 		}
 	}
 
