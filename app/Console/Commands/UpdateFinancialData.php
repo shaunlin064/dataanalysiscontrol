@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\FinancialList;
+use App\Service\DisturbDataService;
 use DateTime;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
@@ -73,7 +74,14 @@ class UpdateFinancialData extends Command
         }
 
         Artisan::call('update_financial_money_receipt');
-//        Artisan::call('update_financial_money_receipt_cost');
+        
+        if(env('APP_DEMO')){
+	        $disturbDataService = new DisturbDataService();
+	        $disturbDataService->customer('today');
+	        $disturbDataService->campaign('today');
+	        $disturbDataService->financialNumber('today');
+        }
+        
         Artisan::call('cache_all');
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");

@@ -53,15 +53,15 @@
 			$date = new \DateTime();
 
 			$listdata = Bonus::where('set_date','=',$date->format('Y-m-01'))->get()->map(function($v){
+				
 				$v->name =  ucfirst($v->user->name);
+				$v->erp_user_id = $v->erp_user_id;
 				$v->sale_groups_name = $this->getUserGroups($v);
 			 return $v;
 			})->toArray();
-
 			return view('bonus.setting.list',[
 			    'data' => $this->resources,
-                'listdata' => $listdata,
-                'usersSession' => Cache::get('users')]);
+                'listdata' => $listdata]);
 		}
 
 		public function edit(Bonus $bonus)

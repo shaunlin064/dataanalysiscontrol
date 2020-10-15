@@ -8,35 +8,33 @@
 
 	namespace App\Http\Controllers\Auth;
 	use App\Cachekey;
-    use App\Http\Controllers\ApiController;
-    use App\Http\Controllers\BaseController;
-	use App\Http\Controllers\UserController;
-    use App\Role;
-    use Illuminate\Foundation\Auth\AuthenticatesUsers;
-	use App\User;
-	use Illuminate\Http\Request;
-    use Illuminate\Support\Facades\Artisan;
-    use Illuminate\Support\Facades\Auth;
-    use Illuminate\Support\Facades\Cache;
-    use Illuminate\Support\Facades\Hash;
-	use Illuminate\Support\Facades\Redirect;
+	use App\Http\Controllers\ApiController;
+	use App\Http\Controllers\BaseController;
 	use App\Http\Controllers\Help\Crypt;
+	use App\Role;
+	use App\User;
+	use Illuminate\Foundation\Auth\AuthenticatesUsers;
+	use Illuminate\Http\Request;
+	use Illuminate\Support\Facades\Artisan;
+	use Illuminate\Support\Facades\Auth;
+	use Illuminate\Support\Facades\Hash;
+	use Illuminate\Support\Facades\Redirect;
 	use Session;
-
+	
 	class AuthCustomerController extends BaseController
 	{
 		use AuthenticatesUsers;
-
-
+		
 		public function index (Request $request)
 		{
+			
 			$this->resources['cssPath'][] = '/css/login.css';
-
+			
 			$key = $request->key;
 			if( $key == null ){
 				return view('auth.login',['data' => $this->resources]);
 			}
-
+			
 			$result = explode('_', Crypt::decrypt($key, 'AES-256-CBC'));
 
 			if(empty($result[0])){
@@ -52,7 +50,7 @@
 
 
 			$message = self::login($newRequest);
-
+			
 			return Redirect::route('index');
 
 		}
@@ -63,6 +61,31 @@
 			if(empty($request->auto)){
 				$request->password = md5($request->password);
 			}
+			
+			if(env('APP_DEMO')){
+				$credentials = $request->only('name','password');
+				
+				if (Auth::attempt($credentials)) {
+					$user = auth()->user();
+					return [
+						"status"        => 1,
+						"status_string" => "登入成功",
+						"message"       => "",
+						"data"          => [
+							"user"  => [
+								"name"          => $user->name,
+								"id"            => $user->erp_user_id,
+								"email"         => $user->email,
+								"department_id" => "1",
+								"department"    => 'Demo',
+								"created_at"    => "2018-04-23",
+							],
+							"token" => "=",
+						]
+					];
+				}
+			}
+			
 			$apiObj = new ApiController();
 
 			$data = 'username='.$request->name.'&password='.$request->password.'&apikey='.env('API_KEY');
@@ -99,6 +122,7 @@
 		{
 
 			$message = $this->erpLogin($request);
+			
 			//
 			if($message['status'] != 1){
 				return view('handle',['message'=>$message,'returnUrl' => Route('auth.index')]);
