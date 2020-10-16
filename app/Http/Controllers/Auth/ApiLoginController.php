@@ -66,7 +66,7 @@
             }
             //遠端登入
             $message = AuthCustomerController::erpLogin($request);
-			
+
             if ( $message['status'] == 1 ) {
                 //				$message['data']['user']['password'] = $request->get('password');
                 $request->merge($message['data']['user']);

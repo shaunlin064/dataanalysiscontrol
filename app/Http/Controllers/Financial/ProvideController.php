@@ -579,8 +579,7 @@
         private function getProvideBalanceSelectedId ( $dataList ) {
             $dataList = $dataList->groupBy('erp_user_id');
             $selectIds = $dataList->map(function ( $v, $erpUserId ) {
-            	/*TODO::離職日*/
-                $isAlive = '0000-00-00' == '0000-00-00';
+                $isAlive = Cache::get('users')[ $erpUserId ]['user_resign_date'] == '0000-00-00';
                 if ( $isAlive && $v->sum('provide_money') >= 0 ) {
                     return $v->pluck('id');
                 }
@@ -618,8 +617,7 @@
                     $v['profit'] = $this->exchangeMoney($v);
                     $v['provide_money'] = round($v['profit'] * $v['rate'] / 100);
                     $v['set_date'] = substr($v['set_date'], 0, 7);
-                    /*離職日期*/
-                    $v['user_resign_date'] = '';
+                    $v['user_resign_date'] = Cache::get('users')[ $v->erp_user_id ]['user_resign_date'];
                     return $v;
                 })->values();
 
@@ -654,6 +652,7 @@
                 $cacheObj->release_time = now()->addday(30)->format('Y-m-d H:i:s');
                 $cacheObj->save();
             }
+
             return Cachekey::where('key', $md5Key)->first()->getCacheData();
         }
 

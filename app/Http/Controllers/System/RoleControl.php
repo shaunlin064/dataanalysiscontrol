@@ -172,16 +172,13 @@
                     return $v->label;
                 })->implode(',');
                 // get epr department Name
-	            /*TODO::部門*/
-                $v['department'] = $v->userGroups->last()->saleGroups->name ?? null;
+                $v['department'] = Cache::get('users')[$v->erp_user_id]['department_name'];
                 // by use filter resign user
-	            /*TODO::離職日*/
-                $v['user_resign_date'] = '0000-00-00';
+                $v['user_resign_date'] = Cache::get('users')[$v->erp_user_id]['user_resign_date'];
                 return $v;
             })->filter(function ($v) {
                 return $v['user_resign_date'] == '0000-00-00';
             })->values();
-            
             return $userList;
         }
 

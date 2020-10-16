@@ -9,12 +9,9 @@
 
     namespace App\Http\Controllers\Bonus;
 
-    use App\Agency;
     use App\Bonus;
     use App\Cachekey;
     use App\CacheKeySub;
-    use App\Client;
-    use App\Companie;
     use App\CustomerGroups;
     use App\FinancialList;
     use App\Http\Controllers\BaseController;
@@ -54,10 +51,10 @@
             $date = new DateTime();
 
             $objFin = new FinancialList();
-	        $agencyList = Agency::select('name','id')->where('id','!=',0)->get()->toArray();
-	        $clientList = Client::select('name','id')->where('id','!=',0)->get()->toArray();
-	        $mediaCompaniesList = Companie::select('name','id')->where('id','!=',0)->get()->toArray();
-	        
+
+            $agencyList = $objFin->getDataList('agency_name', 'agency_id');
+            $clientList = $objFin->getDataList('client_name', 'client_id');
+            $mediaCompaniesList = $objFin->getDataList('companies_name', 'companies_id');
             $medias = $objFin->getDataList('media_channel_name', 'media_channel_name');
 
             $provideObj = new ProvideController();
@@ -180,10 +177,10 @@
             ];
 //
 //            if(auth()->user()->name === 'shaun'){
-                /*ajax check debug*/ //
+//                /*ajax check debug*/ //
 //
-//                $dateStart = $date->format('2020-10-01');
-//                $dateEnd = $date->format('2020-10-01');
+//                $dateStart = $date->format('2020-07-01');
+//                $dateEnd = $date->format('2020-07-01');
 //                $request = new Request([
 //                    'startDate'    => $dateStart,
 //                    'endDate'      => $dateEnd,
@@ -246,6 +243,7 @@
                 $bonusCharBarStack,
                 $group_progress_list_total
             ] = $this->getCacheDatas($request);
+
             /*$bonusCharBarStack*/
             $bonus_list = $bonus_list->map(function ( $v, $k ) {
                 $v['income'] = isset($v['income']) ? number_format($v['income']) : 0;
@@ -552,7 +550,7 @@
             $customerPrecentageProfit = $this->getCustomerProfitSum($bonus_list, $dateRange);
             $customerProfitData = $this->getCustomerReceiptTimes($bonus_list, $dateRange);
             $customerGroupsProfitData = $this->getCustomerGroupsProfit($bonus_list, $dateRange);
-			
+
             return [ $customerPrecentageProfit, $customerProfitData, $customerGroupsProfitData ];
         }
 
@@ -609,7 +607,7 @@
                 $customerProfitData[ $id ] = [
                     'id'               => $id,
                     'customer_type'    => 'agency',
-                    'name'             => Agency::find($id)->name ?? '',
+                    'name'             => $v->max('agency_name'),
                     'type'             => '代理商',
                     'receipt_times'    => $receiptAgencyTimes ?? 0,
                     'income'           => number_format($income),
@@ -631,11 +629,11 @@
                                                            ->sum('receipt_count_times');
                 }
                 [ $income, $profit, $cost, $profitPercenter ] = $this->getNumberSum($v);
-				
+
                 $customerProfitData[] = [
                     'id'               => $id,
                     'customer_type'    => 'client',
-                    'name'             => Client::find($id)->name ?? '',
+                    'name'             => $v->max('client_name'),
                     'type'             => '直客',
                     'receipt_times'    => $receiptClientTimes ?? 0,
                     'income'           => number_format($income),
@@ -699,12 +697,12 @@
             });
             $saleChannelProfitData = collect($saleChannelProfitData)->sortKeys();
 
-            $mediaCompaniesProfitData = $bonus_list->groupBy('companies_id')->map(function ( $v, $companiesId ) {
+            $mediaCompaniesProfitData = $bonus_list->groupBy('companies_id')->map(function ( $v, $k ) {
 
                 [ $income, $profit, $cost, $profitPercenter ] = $this->getNumberSum($v);
-				
+
                 $data = [
-                    'name'             => $companiesId != null ? Companie::find($companiesId)->name : '未設定',
+                    'name'             => $v->max('companies_name'),
                     'income'           => $income,
                     'cost'             => $cost,
                     'profit'           => $profit,
@@ -951,7 +949,7 @@
                     'paid'   => round($bonus_list->where('status', '>=', 1)->sum('income'))
                 ];
                 $chartFinancialBar = [ 'labels' => [], 'totalIncome' => [], 'totalCost' => [], 'totalProfit' => [] ];
-              
+
                 foreach ( $dateRange as $dateItem ) {
                     $newtmpDate = new DateTime($dateItem);
                     $chartFinancialBar['labels'][] = $newtmpDate->format('Ym');
@@ -968,7 +966,7 @@
                     $chartFinancialBar['totalCost'][ $key ] = round($v->sum('cost'));
                     $chartFinancialBar['totalProfit'][ $key ] = round($v->sum('profit'));
                 });
-	            
+
                 $chartFinancialBarLastRecord = [
                     'labels'      => [],
                     'totalIncome' => [],
@@ -996,7 +994,7 @@
                     $chartFinancialBarLastRecord['totalCost'][ $key ] = round($v->sum('cost'));
                     $chartFinancialBarLastRecord['totalProfit'][ $key ] = round($v->sum('profit'));
                 });
-	            
+
                 [
                     $customerPrecentageProfit,
                     $customerProfitData,
@@ -1179,7 +1177,7 @@
                 $tmpGroupProgressList,
                 $progress_list_total
             ] = $this->getUserDateSelectData($dateRange, $saleGroupIds, $userIds);
-           
+
 
             /*第二層篩選 代理商'直客'媒體經銷商'媒體*/
             $condition = [
@@ -1213,7 +1211,7 @@
                 $bonusCharBarStack,
                 $group_progress_list_total
             ] = $this->getCustomerMediaSelectData($condition, $data);
-	        
+
             return [
                 $progress_list,
                 $tmpGroupProgressList,

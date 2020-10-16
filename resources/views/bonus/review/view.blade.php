@@ -110,7 +110,7 @@
                                               :selected='false'
                                               :multiple='true'
                                               :placeholder='"請選擇"'
-                                              :row='{{json_encode($agencyList)}}'
+                                              :row='{!! json_encode($agencyList) !!}'
                             ></select2-customer>
                         </div>
                     </div>
@@ -121,7 +121,7 @@
                                               :selected='false'
                                               :multiple='true'
                                               :placeholder='"請選擇"'
-                                              :row='{{json_encode($clientList)}}'
+                                              :row='{!! json_encode($clientList) !!}'
                             ></select2-customer>
                         </div>
                     </div>
@@ -132,7 +132,7 @@
                                               :selected='false'
                                               :multiple='true'
                                               :placeholder='"請選擇"'
-                                              :row='{{json_encode($medias)}}'
+                                              :row='{!! json_encode($medias) !!}'
                             ></select2-customer>
                         </div>
                     </div>
@@ -143,7 +143,7 @@
                                               :selected='false'
                                               :multiple='true'
                                               :placeholder='"請選擇"'
-                                              :row='{{json_encode($mediaCompaniesList)}}'
+                                              :row='{!! json_encode($mediaCompaniesList) !!}'
                             ></select2-customer>
                         </div>
                     </div>

@@ -76,6 +76,7 @@
     <!-- page script -->
     <script>
         $(function () {
+            var users = {!! json_encode($usersSession) !!};
 
             var dataTable = $('#bonusTable').DataTable({
                 'paging'      : true,
@@ -102,7 +103,12 @@
                     }
                 },
                 columns: [
-                    {data: "name"},
+                    {
+                        data: "erp_user_id",
+                        render: function(data, type, row){
+                            return users[data]['name'];
+                        }
+                    },
                     { data: 'sale_groups_name'},
                     { data: 'boundary'},
                     { data: 'id',
