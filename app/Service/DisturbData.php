@@ -93,7 +93,7 @@
 			//financial campaign name
 			if($range === 'today'){
 				$date = new Carbon();
-				$financial = \App\FinancialList::where('created_at','>',$date->format('Y-m-d 00:00:00'))->get();
+				$financial = \App\FinancialList::where('updated_at','>',$date->format('Y-m-d 00:00:00'))->get();
 			}else if($range === 'all'){
 				$financial = \App\FinancialList::all();
 			}
