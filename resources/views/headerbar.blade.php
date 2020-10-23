@@ -76,7 +76,7 @@
 							</div>
                             @can('system.index')
 							<div class='pull-left pl-5'>
-								<a href='/system' class='btn btn-default btn-flat'>系統管理</a>
+								<a href='/system/menu/list' class='btn btn-default btn-flat'>系統管理</a>
 							</div>
                             @endcan
 							<div class='pull-right'>
