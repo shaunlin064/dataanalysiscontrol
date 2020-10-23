@@ -8,7 +8,6 @@
 
 	namespace App\Http\Controllers\Auth;
 	use App\Cachekey;
-	use App\Http\Controllers\ApiController;
 	use App\Http\Controllers\BaseController;
 	use App\Http\Controllers\Help\Crypt;
 	use App\Role;
@@ -18,6 +17,7 @@
 	use Illuminate\Support\Facades\Artisan;
 	use Illuminate\Support\Facades\Auth;
 	use Illuminate\Support\Facades\Hash;
+	use Illuminate\Support\Facades\Http;
 	use Illuminate\Support\Facades\Redirect;
 	use Session;
 	
@@ -86,14 +86,13 @@
 				}
 			}
 			
-			$apiObj = new ApiController();
-
-			$data = 'username='.$request->name.'&password='.$request->password.'&apikey='.env('API_KEY');
-
-			$url = env('API_LOGIN_URL');
-
-			return $apiObj->curlPost($data,$url,'form',false);
-
+			$data = [
+				'username'=> $request->name,
+				'password'=> $request->password,
+				'apikey'=> env('API_KEY')
+			];
+			
+			return Http::asForm()->post(env('API_LOGIN_URL'),$data)->json();
 		}
 
 		static function dacLogin (Request $request){

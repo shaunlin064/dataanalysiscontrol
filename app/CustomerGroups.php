@@ -8,23 +8,21 @@
     
     namespace App;
     
-    
-    use App\Http\Controllers\ApiController;
     use Illuminate\Support\Facades\Cache;
-    
+    use Illuminate\Support\Facades\Http;
+
     class CustomerGroups
     {
         const CUSTOMER_TYPE = [
             'client' => 1,
             'agency' => 2,
         ];
-        private $api;
+        
         private $apiData;
         private $cacheKey = 'customerGroups';
         
         public function __construct ()
         {
-            $this->api = new ApiController();
             $this->apiData = [
                 'token' => env('API_TOKEN'),
             ];
@@ -90,31 +88,27 @@
             /* example $dateTimeStr = "2019-11-12 :00:00:00"*/
             $this->apiData['update_at'] = $dateTimeStr;
             $apiUrl = env('API_GET_GROUP');
-            
-            return $this->api->curlPost(json_encode($this->apiData), $apiUrl, 'json');
+	        return Http::post($apiUrl, $this->apiData)->json();
         }
         
         public function getApiAllGroupData ()
         {
             $this->apiData['update_at'] = '2018-01-01 00:00:00';
             $apiUrl = env('API_GET_GROUP');
-            
-            return $this->api->curlPost(json_encode($this->apiData), $apiUrl, 'json');
+	        return Http::post($apiUrl, $this->apiData)->json();
         }
         
-        public function getApiCustomerGroups (Integer $customerErpId, String $customerType)
+        public function getApiCustomerGroups ($customerErpId, String $customerType)
         {
             $this->apiData['id'] = $this::CUSTOMER_TYPE[$customerType];
             $apiUrl = env('API_GET_CUSTOMER_GROUP');
-            
-            return $this->api->curlPost(json_encode($this->apiData), $apiUrl, 'json');
+	        return Http::post($apiUrl, $this->apiData)->json();
         }
         
-        public function getApiGroupCustomer (Integer $customerGrouupId)
+        public function getApiGroupCustomer ($customerGrouupId)
         {
             $this->apiData['id'] = $customerGrouupId;
             $apiUrl = env('API_GET_GROUP_CUSTOMER');
-            
-            return $this->api->curlPost(json_encode($this->apiData), $apiUrl, 'json');
+	        return Http::post($apiUrl, $this->apiData)->json();
         }
     }

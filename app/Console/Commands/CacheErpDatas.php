@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Cachekey;
-use App\Http\Controllers\ApiController;
 use App\Http\Controllers\UserController;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
