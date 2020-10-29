@@ -1,4 +1,3 @@
-
 ## About data_analysis_control
 
 ### Tech Stack
@@ -36,3 +35,17 @@
  * user權限設定 (為RBAC0規範)
  * menu 設定
  * 每日抓取台灣銀行牌價匯率 (python) 
+ 
+ ## show case
+ 
+![GITHUB](https://raw.githubusercontent.com/shaunlin064/dataanalysiscontrol/master/storage/app/public/showcase/head.png "head")
+![GITHUB](https://raw.githubusercontent.com/shaunlin064/dataanalysiscontrol/master/storage/app/public/showcase/review-1.png "review")
+![GITHUB](https://raw.githubusercontent.com/shaunlin064/dataanalysiscontrol/master/storage/app/public/showcase/review-2.png "review")
+![GITHUB](https://raw.githubusercontent.com/shaunlin064/dataanalysiscontrol/master/storage/app/public/showcase/review-3.png "review")
+![GITHUB](https://raw.githubusercontent.com/shaunlin064/dataanalysiscontrol/master/storage/app/public/showcase/review-4.png "review")
+![GITHUB](https://raw.githubusercontent.com/shaunlin064/dataanalysiscontrol/master/storage/app/public/showcase/review-5.png "review")
+![GITHUB](https://raw.githubusercontent.com/shaunlin064/dataanalysiscontrol/master/storage/app/public/showcase/provide-1.png "review")
+![GITHUB](https://raw.githubusercontent.com/shaunlin064/dataanalysiscontrol/master/storage/app/public/showcase/info-1.png "review")
+![GITHUB](https://raw.githubusercontent.com/shaunlin064/dataanalysiscontrol/master/storage/app/public/showcase/info-2.png "review")
+![GITHUB](https://raw.githubusercontent.com/shaunlin064/dataanalysiscontrol/master/storage/app/public/showcase/setting.png "review")
+![GITHUB](https://raw.githubusercontent.com/shaunlin064/dataanalysiscontrol/master/storage/app/public/showcase/exchange.png "review")
