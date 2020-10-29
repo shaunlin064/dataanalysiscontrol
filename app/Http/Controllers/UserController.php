@@ -7,24 +7,18 @@
 	 */
 
 	namespace App\Http\Controllers;
-	use App\Http\Controllers\ApiController;
-	use App\Http\Controllers\Controller;
     use Illuminate\Support\Facades\Cache;
-
-    class UserController extends Controller
+	use Illuminate\Support\Facades\Http;
+	
+	class UserController extends Controller
 	{
 		public $users;
 		public $department;
 
 		public function getErpUser ()
 		{
-			$apiObj = new ApiController();
-
-			$data = 'token=';
-			$data .= urlencode(env('API_TOKEN'));
-			$url = env('API_GET_MEMBER_URL');
-
-			$returnData = $apiObj->curlPost($data,$url,'form');
+			$returnData = Http::asForm()->post(env('API_GET_MEMBER_URL'),[ 'token' => env('API_TOKEN') ])->json();
+			
 			if(isset($returnData['data'])){
                 $this->department = $returnData['data']['department'];
 

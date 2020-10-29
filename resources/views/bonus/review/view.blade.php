@@ -484,8 +484,9 @@
             }
 
             async function run() {
-                await sleep(100);
-                $owl.trigger('refresh.owl.carousel');
+                await sleep(100).then(()=>{
+                    $owl.trigger('refresh.owl.carousel');
+                });
             }
             /*cookie 紀錄使用者 習慣看哪個 owl item*/
             if (cookie.bonus_review_owl === undefined) {
@@ -513,8 +514,6 @@
                     }
                 });
             }
-
-
         });
     </script>
 @endsection

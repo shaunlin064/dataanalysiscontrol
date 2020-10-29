@@ -8,6 +8,8 @@
 
 	namespace App\Http\Controllers;
 
+	use Illuminate\Support\Facades\Http;
+	
 	class FinancialController extends BaseController
 	{
 		const CUSTOMER_FIELDS_LOCAL_API_DIFFERENCE = [
@@ -20,9 +22,6 @@
 		];
 		public function getBalancePayMentData (String $tpye = 'select')
 		{
-
-			$apiObj = new ApiController();
-
 			$data = [
 			 'token' => env('API_TOKEN'),
 			 'action' => 'balancePayMent',
@@ -30,11 +29,8 @@
 				'selectType' => $tpye
 			 ]
 			];
-			$url = env('API_GET_BALANCE_PAYMENT_IDS_URL');
-
-			$returnData = $apiObj->curlPost(json_encode($data),$url,'json');
-
-			return $returnData;
+			
+			return Http::post(env('API_GET_BALANCE_PAYMENT_IDS_URL'),$data)->json();
 		}
         public function getErpMemberCancelFinancial (Array $userIds,String $dateYearMonth = null ,String  $organizationStr = 'all',$outgroup = null)
         {
@@ -43,8 +39,6 @@
                 $dateYearMonth = new \DateTime();
                 $dateYearMonth = $dateYearMonth->format('Ym');
             }
-
-            $apiObj = new ApiController();
 
             $data = [
                 'token' => env('API_TOKEN'),
@@ -57,15 +51,12 @@
                 ]
             ];
 
-            $url = env('API_GET_MEMBER_FINANCIAL_URL');
-
-            $returnData = $apiObj->curlPost(json_encode($data),$url,'json');
-//            dd($returnData,$url);
+			$returnData = Http::post(env('API_GET_MEMBER_FINANCIAL_URL'),$data)->json();
+			
             foreach($returnData as $key => $items){
 
                 $items = $this->apiKeyFieldNameChange($items);
 
-                //				$returnData[$key] = $this->exchangeMoney($items);
                 $returnData[$key] = $items;
             }
             return $returnData;
@@ -78,8 +69,6 @@
 				$dateYearMonth = $dateYearMonth->format('Ym');
 			}
 
-			$apiObj = new ApiController();
-
 			$data = [
 			 'token' => env('API_TOKEN'),
 			 'action' => 'getUserProfitByCamCue',
@@ -90,15 +79,12 @@
 			  'outgroup' => $outgroup
 			 ]
 			];
+			
 			$url = env('API_GET_MEMBER_FINANCIAL_URL');
-
-			$returnData = $apiObj->curlPost(json_encode($data),$url,'json');
+			$returnData = Http::post($url,$data)->json();
 
 			foreach($returnData as $key => $items){
-
 				$items = $this->apiKeyFieldNameChange($items);
-
-//				$returnData[$key] = $this->exchangeMoney($items);
 				$returnData[$key] = $items;
 			}
 			return $returnData;
@@ -106,8 +92,6 @@
 
         public function getReciptTimes ($dateMonth = null)
         {
-            $apiObj = new ApiController();
-
             $data = [
                 'token' => env('API_TOKEN'),
                 'action' => 'receiptTimes',
@@ -117,7 +101,7 @@
             ];
 
             $url = env('API_GET_RECEIPT_TIMES_URL');
-            return $apiObj->curlPost(json_encode($data),$url,'json');
+            return Http::post($url,$data)->json();
 
 		}
 
