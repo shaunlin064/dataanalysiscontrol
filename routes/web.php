@@ -13,10 +13,6 @@
     /*
      * 登入系統
      */
-    Route::get('/test', function () {
-
-    });
-
     Route::group([ 'namespace' => '\App\Http\Controllers\Auth' ], function () {
         Route::get('/login', 'AuthCustomerController@index')->name('auth.index');
         Route::post('/login', 'AuthCustomerController@login')->name('auth.login');

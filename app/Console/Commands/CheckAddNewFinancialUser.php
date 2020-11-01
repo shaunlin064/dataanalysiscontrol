@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use UsersTableSeeder;
 
 class CheckAddNewFinancialUser extends Command
 {
@@ -63,6 +64,12 @@ class CheckAddNewFinancialUser extends Command
 			    ]);
 		    });
 	    });
+	
+	    if($newErpUserIds->isNotEmpty()){
+		    $userSeed = new UsersTableSeeder();
+		    $userSeed->run();
+	    }
+	    
 	    $runTime = round(microtime(true) - $startTime, 2);
 	    echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }
