@@ -376,7 +376,7 @@
                     'set_date'    => $dateStr
                 ])->first();
             $isConvener = $saleGroupsUsers->is_convener ?? false;
-
+	        
             /* 依照權限不同 取的 user list 資料差異
                     admin 全取
                     convener 取該團隊
@@ -389,9 +389,15 @@
                 $userList = Bonus::with('user')->groupBy('erp_user_id')->orderBy('erp_user_id')->get()->map(function (
                     $v
                 ) {
-                    $newUser = $v->user;
-                    $newUser->name = ucfirst($newUser->name);
-                    return $newUser;
+                 
+	                if(isset($v->user)){
+		                $newUser = $v->user;
+		                $newUser->name = ucfirst($newUser->name);
+	                }else{
+		                $newUser  = new User();
+		                $newUser->erp_user_id = $v->erp_user_id;
+	                }
+	                return $newUser;
                 });
             } else {
                 if ( $isConvener ) {
