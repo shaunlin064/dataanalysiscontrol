@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\User;
 use Illuminate\Console\Command;
 
 class CheckAddNewFinancialUser extends Command
@@ -63,6 +64,11 @@ class CheckAddNewFinancialUser extends Command
 			    ]);
 		    });
 	    });
+	    if($newErpUserIds->isNotEmpty()){
+		    $user = new User();
+            $user->syncUserDataFromErp();
+	    }
+	    
 	    $runTime = round(microtime(true) - $startTime, 2);
 	    echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }

@@ -2,10 +2,13 @@
 
 namespace App;
 
+use App\Http\Controllers\UserController;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Role;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
 {
@@ -101,5 +104,38 @@ class User extends Authenticatable
         }
 
         return $check;
+    }
+	
+	public function syncUserDataFromErp (  ) {
+		$erpUserDatas = new UserController();
+		$erpUserDatas->getErpUser();
+		
+		$fillable = [
+			'name', 'email', 'password','erp_user_id'
+		];
+		
+		foreach ($erpUserDatas->users as $item){
+			
+			$userObj = User::where('erp_user_id',$item['id'])->first();
+			$item['name'] = $item['account'];
+			
+			if(empty($userObj)){
+				
+				$item = collect($item);
+				$item['password'] = Hash::make($item->get('password'));
+				$item['erp_user_id'] = $item->get('id');
+				$item->map(function($v,$k) use($fillable,&$item){
+					if(!in_array($k,$fillable)){
+						unset($item[$k]);
+					}
+				});
+				User::create($item->toArray());
+				
+			}else{
+				$userObj->name = $item['account'];
+				$userObj->email = $item['email'];
+				$userObj->save();
+			}
+		}
     }
 }
