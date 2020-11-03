@@ -65,7 +65,7 @@ class UpdateFinancialMoneyReceiptCost extends Command
             })->unique()->values();
 
             //刪除快取 financial_list 與 provide.list
-	        $needDeleteCache = Cachekey::where('type','financial.review')->whereIn('set_date',['2020-10-01','2020-11-01'])->orWhere('type','provide.list')->get();
+	        $needDeleteCache = Cachekey::where('type','financial.review')->whereIn('set_date',$needReleaseDate->toArray())->orWhere('type','provide.list')->get();
             Cachekey::releaseCacheByDatas($needDeleteCache);
 
             DB::commit();
