@@ -55,9 +55,9 @@ class CacheReceiptTimes extends Command
 
             $results->groupBy('datemonth')->each(function($v,$date) use($receiptCachedDateMonth){
                 if($date <= $receiptCachedDateMonth){
-                    Cache::store('memcached')->forever('receiptTimes'.$date, $v);
+                    Cache::forever('receiptTimes'.$date, $v);
                 } else{
-                    Cache::store('memcached')->put('receiptTimes'  . $date, $v,( 1 * 3600 ));
+                    Cache::put('receiptTimes'  . $date, $v,( 1 * 3600 ));
                 }
             });
             DB::commit();

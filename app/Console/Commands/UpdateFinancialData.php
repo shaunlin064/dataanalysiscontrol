@@ -74,6 +74,7 @@ class UpdateFinancialData extends Command
         }
 
         Artisan::call('update_financial_money_receipt');
+        Artisan::call('update_financial_money_receipt_cost');
         
         if(env('APP_DEMO')){
 	        $disturbDataService = new DisturbDataService();
