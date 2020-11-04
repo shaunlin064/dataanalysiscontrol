@@ -134,7 +134,7 @@ class User extends Authenticatable
 			}else{
 				$userObj->name = $item['account'];
 				$userObj->email = $item['email'];
-				$userObj->save();
+				$userObj->update();
 			}
 		}
     }

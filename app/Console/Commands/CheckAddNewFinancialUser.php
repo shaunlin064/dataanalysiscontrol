@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class CheckAddNewFinancialUser extends Command
 {
@@ -41,34 +42,43 @@ class CheckAddNewFinancialUser extends Command
 	    $startTime = microtime(true);
 	    $bounusErpUserId = \App\Bonus::all()->pluck('erp_user_id')->unique()->values();
 	    $newErpUserIds = \App\FinancialList::whereNotIn('erp_user_id',$bounusErpUserId)->get()->groupBy('erp_user_id');
-	
-	    $newErpUserIds->each(function($datas,$erpUserId){
-		    $setDates = $datas->pluck('set_date')->unique()->values();
-		    $setDates->each(function($setDate) use($erpUserId){
-			    $bonus = \App\Bonus::create(
-				    [
-					    'erp_user_id' => $erpUserId,
-					    'set_date' => $setDate,
-					    'boundary' => 0,
-				    ]
-			    );
-			    $bonus->levels()->create([
-				    'achieving_rate' => 100,
-				    'bonus_rate' => 0,
-				    'bonus_direct' => 0,
-			    ]);
-			    $saleGroup = \App\SaleGroups::find(4);
-			    $saleGroup->groupsUsers()->create([
-				    'erp_user_id' => $erpUserId,
-				    'set_date' => $setDate,
-			    ]);
-		    });
-	    });
-	    if($newErpUserIds->isNotEmpty()){
-		    $user = new User();
-            $user->syncUserDataFromErp();
-	    }
-	    
+	    DB::beginTransaction();
+		try {
+			$newErpUserIds->each(function($datas,$erpUserId){
+				$setDates = $datas->pluck('set_date')->unique()->values();
+				$setDates->each(function($setDate) use($erpUserId){
+					$bonus = \App\Bonus::create(
+						[
+							'erp_user_id' => $erpUserId,
+							'set_date' => $setDate,
+							'boundary' => 0,
+						]
+					);
+					$bonus->levels()->create([
+						'achieving_rate' => 100,
+						'bonus_rate' => 0,
+						'bonus_direct' => 0,
+					]);
+					$saleGroup = \App\SaleGroups::find(4);
+					$saleGroup->groupsUsers()->create([
+						'erp_user_id' => $erpUserId,
+						'set_date' => $setDate,
+					]);
+				});
+			});
+			if($newErpUserIds->isNotEmpty()){
+				DB::statement('SET FOREIGN_KEY_CHECKS=0');
+				DB::table('users')->truncate();
+				DB::statement('SET FOREIGN_KEY_CHECKS = 1');
+				$user = new User();
+				$user->syncUserDataFromErp();
+			}
+			DB::commit();
+		} catch(\Exception $ex) {
+			DB::rollback();
+		    echo log($ex->getMessage());
+		}
+		
 	    $runTime = round(microtime(true) - $startTime, 2);
 	    echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }
