@@ -129,12 +129,16 @@ class User extends Authenticatable
 						unset($item[$k]);
 					}
 				});
-				User::create($item->toArray());
+				$userObj = User::create($item->toArray());
 				
 			}else{
 				$userObj->name = $item['account'];
 				$userObj->email = $item['email'];
 				$userObj->update();
+			}
+			
+			if( !$userObj->hasRole('default') ){
+				$userObj->assignRole('default');
 			}
 		}
     }
