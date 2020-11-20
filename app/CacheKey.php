@@ -51,9 +51,9 @@
         }
 
         public function subPut ( $type, $condition, $data ) {
+			$this->cacheKeySub()->detach();
             $md5Key = md5($condition);
             Cache::forever($md5Key, $data);
-
             $this->cacheKeySub()->create([ 'type' => $type, 'key' => $md5Key, 'condition' => $condition ]);
             return $this;
         }
