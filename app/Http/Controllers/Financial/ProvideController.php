@@ -107,7 +107,7 @@
             [
                 $saleGroups,
                 $userList
-            ] = $this->getDataList($erpUserId, $date);
+            ] = $this->getDataList($erpUserId, $date, 'provide_view');
 
             $provideBonusColumns = [
                 [ 'data' => 'provide_set_date' ],
@@ -365,7 +365,7 @@
          * @param DateTime $date
          * @return array
          */
-        public function getDataList ( $erpUserId, DateTime $date ): array {
+        public function getDataList ( $erpUserId, DateTime $date, $type ): array {
 
             /*permission check select*/
             $thisLoginUser = auth()->user();
@@ -382,37 +382,60 @@
                     convener 取該團隊
                     user 取自己
                     */
-            $userList = collect([]);
-            if ( $thisLoginUser->isAdmin() || $thisLoginUser->isBusinessDirector() ) {
-                $saleGroups = SaleGroups::all();
-
-                $userList = Bonus::with('user')->groupBy('erp_user_id')->orderBy('erp_user_id')->get()->map(function (
-                    $v
-                ) {
-                    $newUser = $v->user;
-                    $newUser->name = ucfirst($newUser->name);
-                    return $newUser;
-                });
-            } else {
-                if ( $isConvener ) {
-                    $saleGroups = [ $saleGroupsUsers->saleGroups ];
-
-                    $userGroupIds = $saleGroupsUsers->getSameGroupsUser($erpUserId, $dateStr)
-                                                    ->pluck('user')
-                                                    ->pluck('erp_user_id')
-                                                    ->toArray();
-
-                    $userList = User::whereIn('erp_user_id', $userGroupIds)->get();
-                } else {
-                    $saleGroups = [];
-
-                    $userList[] = $thisLoginUser;
-                }
-            }
-            return [
-                $saleGroups,
-                $userList->toArray()
-            ];
+	        $userList = collect([]);
+	        $canGetAllUserList = False;
+	
+	
+	        if( $type == 'bonus_view' && $thisLoginUser->hasPermission('bonus.review.all_user') ){
+		        $canGetAllUserList = true;
+	        }
+	
+	        if( $type == 'provide_view' && $thisLoginUser->hasPermission('provide.view.all_user')){
+		        $canGetAllUserList = true;
+	        }
+	
+	        if ( $thisLoginUser->isAdmin()){
+		        $canGetAllUserList = true;
+	        }
+	
+	        if($canGetAllUserList){
+		
+		        $saleGroups = SaleGroups::all();
+		        $userList = Bonus::with('user')->groupBy('erp_user_id')->orderBy('erp_user_id')->get()->map(function (
+			        $v
+		        ) {
+			
+			        if(isset($v->user)){
+				        $newUser = $v->user;
+				        $newUser->name = ucfirst($newUser->name);
+			        }else{
+				        $newUser  = new User();
+				        $newUser->erp_user_id = $v->erp_user_id;
+			        }
+			        return $newUser;
+		        });
+		
+	        }else{
+		        if ( $isConvener ) {
+			
+			        $saleGroups = [ $saleGroupsUsers->saleGroups ];
+			        $userGroupIds = $saleGroupsUsers->getSameGroupsUser($erpUserId, $dateStr)
+			                                        ->pluck('user')
+			                                        ->pluck('erp_user_id')
+			                                        ->toArray();
+			        $userList = User::whereIn('erp_user_id', $userGroupIds)->get();
+		        } else {
+			
+			        $saleGroups = [];
+			        $userList[] = $thisLoginUser;
+			
+		        }
+	        }
+	
+	        return [
+		        $saleGroups,
+		        $userList->toArray()
+	        ];
         }
 
         /**
