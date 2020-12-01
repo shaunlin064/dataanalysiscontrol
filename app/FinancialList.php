@@ -76,6 +76,9 @@
 			return $this->belongsTo(Companie::CLASS);
 		}
 		
+		public function campaignProjectManager () {
+			return $this->hasMany(CampaignProjectManager::Class, 'campaign_id', 'campaign_id');
+		}
 		
 		public function customerSaveAndUpdate ( array $dates ) {
 			$checkColumnpPimaryKey = [
@@ -84,23 +87,23 @@
 				'client_name'    => 'client_id'
 			];
 			foreach ( $checkColumnpPimaryKey as $nameColumn => $pimaryKeyColumn ) {
-				collect($dates)->filter(function ( $v ) use ( $pimaryKeyColumn ) { return $v[ $pimaryKeyColumn ] != null; })
-				      ->pluck($nameColumn, $pimaryKeyColumn)
-				      ->each(function ( $name, $id ) use ( $nameColumn ) {
-					      switch ( $nameColumn ) {
-						      case 'companies_name':
-							      $res = \App\Companie::firstOrNew([ 'id' => $id ]);
-							      break;
-						      case 'agency_name':
-							      $res = \App\Agency::firstOrNew([ 'id' => $id ]);
-							      break;
-						      case 'client_name':
-							      $res = \App\Client::firstOrNew([ 'id' => $id ]);
-							      break;
-					      }
-					      $res->name = $name;
-					      $res->save();
-				      });
+				collect($dates)->filter(function ( $v ) use ( $pimaryKeyColumn ) {
+					return $v[ $pimaryKeyColumn ] != null;
+				})->pluck($nameColumn, $pimaryKeyColumn)->each(function ( $name, $id ) use ( $nameColumn ) {
+						switch ( $nameColumn ) {
+							case 'companies_name':
+								$res = \App\Companie::firstOrNew([ 'id' => $id ]);
+								break;
+							case 'agency_name':
+								$res = \App\Agency::firstOrNew([ 'id' => $id ]);
+								break;
+							case 'client_name':
+								$res = \App\Client::firstOrNew([ 'id' => $id ]);
+								break;
+						}
+						$res->name = $name;
+						$res->save();
+					});
 			}
 			
 			return $this;
@@ -183,7 +186,6 @@
 			unset($data['campaign_id']);
 			
 			if ( $this->checkDiff($id, $data) ) {
-				
 				return $this->where('id', $id)->update($data);
 			}
 		}
@@ -261,11 +263,10 @@
 			} else {
 				$date = new DateTime($yearMonthDayStr);
 			}
-			
 			$erpReturnData = collect($financial->getErpMemberFinancial([ 'all' ],
 				$date->format('Ym')))->whereIn('organization', [ 'js', 'ff' ]);
 			
-			$erpReturnData = $erpReturnData->filter(function ( $v, $k ) {
+			$createReturnData = $erpReturnData->filter(function ( $v, $k ){
 				$tmpDate = new DateTime($v['year_month'] . '01');
 				$setDate = $tmpDate->format('Y-m-d');
 				$searchData = $this->where([ 'cp_detail_id' => $v['o_id'], 'set_date' => $setDate ]);
@@ -284,20 +285,34 @@
 			
 			DB::beginTransaction();
 			try {
-				$erpReturnData->each(function ( $v ) {
+				$createReturnData->each(function ( $v ) {
 					$financeList = new FinancialList();
 					$financeList->fill($this->rawKeyChange($v))->dataFormat()->save();
 				});
 				
 				$this->whereIn('cp_detail_id', $erpReturnVoidData)->delete();
 				
+				/*更新資料*/
 				$this->customerSaveAndUpdate($erpReturnData->toArray());
+				
+				$this->projectManagerUpdateOrCreate($erpReturnData->pluck('cam_id')->toArray());
 				
 				DB::commit();
 				
 			} catch ( \Exception $ex ) {
 				DB::rollback();
-				\Log::error($ex->getMessage());
+				dd(\Log::error($ex->getMessage()));
+			}
+		}
+		
+		public function projectManagerUpdateOrCreate ( $campaigIds ) {
+			$project = new \App\CampaignProjectManager();
+			$results = collect($project->getErpProjectManagerData($campaigIds))->groupBy('campaign_id')->toArray();
+			
+			foreach ( $results as $campaignId => $items ) {
+				$fina = \App\FinancialList::where('campaign_id', $campaignId)->get()->first();
+				$fina->campaignProjectManager()->delete();
+				$fina->campaignProjectManager()->createMany($items);
 			}
 		}
 		

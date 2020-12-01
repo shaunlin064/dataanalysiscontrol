@@ -82,7 +82,7 @@
 			
 			$url = env('API_GET_MEMBER_FINANCIAL_URL');
 			$returnData = Http::post($url,$data)->json();
-
+			
 			foreach($returnData as $key => $items){
 				$items = $this->apiKeyFieldNameChange($items);
 				$returnData[$key] = $items;
