@@ -61,7 +61,7 @@
             $medias = $objFin->getDataList('media_channel_name', 'media_channel_name');
 
             $provideObj = new ProvideController();
-            [ $saleGroups, $userList ] = $provideObj->getDataList($loginUserId, $date);
+            [ $saleGroups, $userList ] = $provideObj->getDataList($loginUserId, $date, 'bonus_view');
 
             //            $allYearProfit = $this->getAllYearProfit($userList);
 
