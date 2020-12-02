@@ -179,24 +179,23 @@
                 [ 'data' => 'bonusStatus' ],
             ];
 //
-//            if(auth()->user()->name === 'shaun'){
-                /*ajax check debug*/ //
-//
-//                $dateStart = $date->format('2020-10-01');
-//                $dateEnd = $date->format('2020-10-01');
-//                $request = new Request([
-//                    'startDate'    => $dateStart,
-//                    'endDate'      => $dateEnd,
-//                    'saleGroupIds' => [ '1','2','3','4','5','6','7','8' ],
-//                    'userIds'      => [],
-//                    'agencyIdArrays' => [],
-//                    'clientIdArrays' => [],
-//                    'mediaCompaniesIdArrays' => [],
-//                    'mediasNameArrays' => []
-//                ]);
-//                $return = $this->getAjaxData($request, 'return');
-//                dd($return);
-//            }
+//           if(auth()->user()->name === 'shaun'){
+//                /*ajax check debug*/
+//               $dateStart = $date->format('2020-11-01');
+//               $dateEnd = $date->format('2020-11-01');
+//               $request = new Request([
+//                   'startDate'    => $dateStart,
+//                   'endDate'      => $dateEnd,
+//                   'saleGroupIds' => [ '1','2','3','4','5','6','7','8' ],
+//                   'userIds'      => [],
+//                   'agencyIdArrays' => [],
+//                   'clientIdArrays' => [],
+//                   'mediaCompaniesIdArrays' => [],
+//                   'mediasNameArrays' => []
+//               ]);
+//               $return = $this->getAjaxData($request, 'return');
+//               dd($return);
+//           }
 
             return view('bonus.review.view', [
                 'data'                        => $this->resources,
@@ -702,9 +701,11 @@
             $mediaCompaniesProfitData = $bonus_list->groupBy('companies_id')->map(function ( $v, $companiesId ) {
 
                 [ $income, $profit, $cost, $profitPercenter ] = $this->getNumberSum($v);
+                
+				$companies = Companie::find($companiesId);
 				
                 $data = [
-                    'name'             => $companiesId != null ? Companie::find($companiesId)->name : '未設定',
+                    'name'             => $companies->name ??  '未設定',
                     'income'           => $income,
                     'cost'             => $cost,
                     'profit'           => $profit,
