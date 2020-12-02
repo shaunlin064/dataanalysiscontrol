@@ -101,7 +101,7 @@
 								$res = \App\Client::firstOrNew([ 'id' => $id ]);
 								break;
 						}
-						$res->name = $name;
+						$res->name = $name ?? 'Error名稱錯誤';
 						$res->save();
 					});
 			}
