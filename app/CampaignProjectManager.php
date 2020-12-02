@@ -35,10 +35,16 @@ class CampaignProjectManager extends Model
 			]
 		];
 		$results = Http::post(env('API_GET_CAMPAIGN_PROJECT_URL'), $data)->json();
+		
+		if(isset($results['status']) && $results['status'] == 2){
+			return $results;
+		}
+		
 		return $this->keyChangeErpData($results)->toArray();
 	}
 	
 	public function keyChangeErpData ( $items ) {
+		
 		return collect($items)->map(function($v,$k){
 			$v['erp_user_id'] = $v['user_id'];
 			unset($v['user_id']);

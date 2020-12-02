@@ -17,8 +17,13 @@ class CampaignProjectMangersSeeder extends Seeder
         //
 	    $project = new \App\CampaignProjectManager();
 	    $results = $project->getErpProjectManagerData(['all']);
-	    DB::table('campaign_project_managers')->truncate();
+	
+	    if(isset($results['status']) && $results['status'] == 2){
+		    echo 'erp api fail CampaignProjectMangersSeeder';
+		    die;
+	    }
 	    
+	    DB::table('campaign_project_managers')->truncate();
 	    \App\CampaignProjectManager::insert($results);
     }
 }
