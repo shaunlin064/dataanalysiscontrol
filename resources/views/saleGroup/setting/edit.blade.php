@@ -1,10 +1,10 @@
 <?php
-    /**
-     * Created by PhpStorm.
-     * User: shaun
-     * Date: 2019-08-27
-     * Time: 16:37
-     */
+	/**
+	 * Created by PhpStorm.
+	 * User: shaun
+	 * Date: 2019-08-27
+	 * Time: 16:37
+	 */
 
 
 ?>
@@ -34,40 +34,27 @@
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#settings" data-toggle="tab" data-step="1" data-intro="設定召集人團隊">設定</a></li>
                 <li class=""><a href="#hirstory" data-toggle="tab" data-step="10" data-intro="歷史資料">歷史資料</a></li>
-                {{--<li :class="{'active':type == 'view'}" v-if="type == 'edit' || type == 'view'" ><a href="#hirstory" data-toggle="tab">歷史資料</a></li>--}}
             </ul>
             <div class="tab-content">
                 <sale-group-form-component
-                    :arg="{
-                        csrf_token:'{{ csrf_token()}}',
-                        date : '{{ date('Y-m') }}',
-                        user_now_select : '{{json_encode($userNowSelect)}}',
-                        user_now_select_is_convener : '{{json_encode($userNowIsConvener)}}',
-                        userdata : '{{ json_encode($user) }}',
-                        form_action:'{{Route('saleGroup.setting.post')}}',
-                        row: '{{ json_encode($row) }}',
-                        sale_group_id: '{{$row['id']}}',
-                        name: '{{$row['name']}}',
-                        bonus : '{{ json_encode($row['groups_bonus']) }}',
-                        groups_users: '{{json_encode($row['groups_users'])}}',
-                        total_boundary : '{{$totalBoundary}}'
-                        }"
+                        :arg="{
+                                csrf_token:'{{ csrf_token()}}',
+                                date : '{{ date('Y-m') }}',
+                                user_now_select : '{{json_encode($userNowSelect)}}',
+                                user_now_select_is_convener : '{{json_encode($userNowIsConvener)}}',
+                                userdata : '{{ json_encode($user) }}',
+                                form_action:'{{Route('saleGroup.setting.post')}}',
+                                row: '{{ json_encode($row) }}',
+                                sale_group_id: '{{$row['id']}}',
+                                name: '{{$row['name']}}',
+                                bonus : '{{ json_encode($row['groups_bonus']) }}',
+                                groups_users: '{{json_encode($row['groups_users'])}}',
+                                total_boundary : '{{$totalBoundary}}',
+                                max_rate: '{{config('sale_group.convenerRateStart')}}',
+                                bonus_rate: '{{$nowRate}}'
+                                }"
                 ></sale-group-form-component>
                 <div class="tab-pane" id="hirstory">
-                    <!-- /.tab-pane -->
-                    <!-- Date range -->
-                {{--<div class="form-group">--}}
-                {{--    <label>Date range:</label>--}}
-
-                {{--    <div class="input-group">--}}
-                {{--        <div class="input-group-addon">--}}
-                {{--            <i class="fa fa-calendar"></i>--}}
-                {{--        </div>--}}
-                {{--        <input type="text" class="form-control pull-right" id="reservation">--}}
-                {{--    </div>--}}
-                {{--    <!-- /.input group -->--}}
-                {{--</div>--}}
-                <!-- /.form group -->
                     {{--History Start--}}
                     @foreach( $groupsBonusHistory as $key => $items)
                         <div class="box box-warning collapsed-box">
@@ -76,7 +63,7 @@
 
                                 <div class="box-tools pull-right">
                                     <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
-                                            class="fa fa-plus"></i>
+                                                class="fa fa-plus"></i>
                                     </button>
                                 </div>
                                 <!-- /.box-tools -->
@@ -96,14 +83,6 @@
                                             <!-- /.description-block -->
                                         </div>
                                         <!-- /.col -->
-                                    {{--<div class="col-sm-4 border-right">--}}
-                                    {{--    <div class="description-block">--}}
-                                    {{--        <h5 class="">團隊名稱</h5>--}}
-                                    {{--        <h3>{{$row['name']}}</h3>--}}
-                                    {{--    </div>--}}
-                                    {{--    <!-- /.description-block -->--}}
-                                    {{--</div>--}}
-                                    <!-- /.col -->
                                         <div class="col-sm-6">
                                             <div class="description-block">
                                                 <h5 class="">責任額總計</h5>

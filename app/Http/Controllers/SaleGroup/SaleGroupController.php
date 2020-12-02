@@ -62,7 +62,6 @@ class SaleGroupController extends BaseController
 		$datenow = $date->format('Y-m-01');
 
 //		$saleGroups = SaleGroups::where('id',$id)->with('groupsUsers')->with('groupsBonus')->first();
-
 		//get nowdata
 		$row = $saleGroups->toArray();
 		$row['groups_bonus']  = $saleGroups->groupsBonus->where('set_date',$datenow)->values()->toArray();
@@ -74,18 +73,20 @@ class SaleGroupController extends BaseController
 		$groupsBonusHistory = $saleGroups->groupsBonus->groupBy('set_date')->map(function($v){
 		 return ['bonuslevel' => $v,'rate' => 5.5,'totalBoundary' => 0];
 		})->toArray();
-		$saleGroups->groupsUsers->map(function($v,$k) use(&$groupsBonusHistory){
+		$saleGroupsRate = $saleGroups->saleGroupsRate;
+		
+		$saleGroups->groupsUsers->map(function($v,$k) use(&$groupsBonusHistory,$saleGroupsRate){
 			$v['boundary'] = $v->getUserBonusBoundary->boundary ?? 0;
 			$v['name'] =  $v->user ? ucfirst($v->user->name) : '';
-
+			
 			if(isset($groupsBonusHistory[$v->set_date])){
                 $groupsBonusHistory[$v->set_date]['totalBoundary'] += $v['boundary'];
                 $groupsBonusHistory[$v->set_date]['user'][] =  $v;
                 if($v['boundary'] != 0){
-                    $groupsBonusHistory[$v->set_date]['rate'] -= 0.25;
+                    /*抓取rate 對應資料*/
+	                $groupsBonusHistory[$v->set_date]['rate'] = $saleGroupsRate->where('set_date',$v->set_date)->first()['rate'];
                 }
             }
-
 		});
 		
 		$tmpUser = collect($row['groups_users']);
@@ -121,7 +122,8 @@ class SaleGroupController extends BaseController
 		 'totalBoundary' => $totalBoundary,
 		 'groupsBonusHistory' => $groupsBonusHistory,
 		 'userNowSelect' => $userNowSelect,
-		 'userNowIsConvener' => $userNowIsConvener
+		 'userNowIsConvener' => $userNowIsConvener,
+		 'nowRate' => $groupsBonusHistory[$datenow]['rate'],
 		]);
 	}
 
@@ -166,7 +168,7 @@ class SaleGroupController extends BaseController
         $this->authorize('create',$this->policyModel);
 
 		$inputDatas = collect($request->all())->forget(['_token','user_table_length']);
-
+		
 		//get date
 		$date = new \DateTime();
 		//$inputDatas['set_date'] = '2019-07-01';
@@ -216,8 +218,9 @@ class SaleGroupController extends BaseController
 				$saleGroups->$keyfiled()->createMany($inputDatas[$keyfiled]);
 			}
 		}
+		$saleGroups->saleGroupsRate->where('set_date',today()->format('Y-m-01'))->first()['rate'] = $inputDatas['rate'];
 		$saleGroups->push();
-
+		
 		$message= [
 		 'status' => 0,
 		 'status_string' => '',

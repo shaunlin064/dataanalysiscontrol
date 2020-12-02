@@ -43,7 +43,7 @@ class SaleGroupsReach extends Model
 		//計算觸及之獎金階級 與 獎金
 		$saleGroupsBonus = new SaleGroupsBonusLevels();
 		
-		/*TODO::計算英雄榜獎金 與 呈現*/
+		/*TODO::計算英雄榜獎金 與 呈現 英雄榜獎金沒有透過系統發放 而是公司大會人工發放 故沒有計算進系統內*/
 		$finalBonus = $saleGroupsBonus->getReachBonusLevels($groupsTotalProfit,$saleGroupsId,$setDate);
 		
 		list($provideMoney,$rate) = $this->bonusMoney($haveBoundaryIds, $groupsTotalProfit);
