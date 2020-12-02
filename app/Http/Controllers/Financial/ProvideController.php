@@ -8,6 +8,7 @@
     use App\FinancialList;
     use App\Http\Controllers\BaseController;
     use App\Http\Controllers\FinancialController;
+    use App\Permission;
     use App\Provide;
     use App\SaleGroups;
     use App\SaleGroupsReach;
@@ -367,15 +368,12 @@
          */
         public function getDataList ( $erpUserId, DateTime $date, $type): array {
 
-            /*permission check select*/
-            $thisLoginUser = auth()->user();
             $dateStr = $date->format('Y-m-01');
             /*convener check*/
             $saleGroupsUsers = SaleGroupsUsers::where([
                     'erp_user_id' => $erpUserId,
                     'set_date'    => $dateStr
                 ])->first();
-            $isConvener = $saleGroupsUsers->is_convener ?? false;
 	        
             /* 依照權限不同 取的 user list 資料差異
                     admin 全取
@@ -383,22 +381,8 @@
                     user 取自己
                     */
             $userList = collect([]);
-            $canGetAllUserList = False;
             
-			
-	        if( $type == 'bonus_view' && $thisLoginUser->hasPermission('bonus.review.all_user') ){
-		        $canGetAllUserList = true;
-	        }
-	        
-	        if( $type == 'provide_view' && $thisLoginUser->hasPermission('provide.view.all_user')){
-	        	$canGetAllUserList = true;
-            }
-            
-	        if ( $thisLoginUser->isAdmin()){
-	        	$canGetAllUserList = true;
-            }
-	        
-	        if($canGetAllUserList){
+	        if(Permission::canReviewFinancialAllUserData($type)){
 	        	
 		        $saleGroups = SaleGroups::all();
 		        $userList = Bonus::with('user')->groupBy('erp_user_id')->orderBy('erp_user_id')->get()->map(function (
@@ -416,7 +400,7 @@
 		        });
 		        
 	        }else{
-		        if ( $isConvener ) {
+		        if ( Permission::canReviewFinancialGroupData($type) ) {
 		        	
 			        $saleGroups = [ $saleGroupsUsers->saleGroups ];
 			        $userGroupIds = $saleGroupsUsers->getSameGroupsUser($erpUserId, $dateStr)
@@ -427,7 +411,7 @@
 		        } else {
 		        	
 			        $saleGroups = [];
-			        $userList[] = $thisLoginUser;
+			        $userList[] = auth()->user();
 			        
 		        }
 	        }
