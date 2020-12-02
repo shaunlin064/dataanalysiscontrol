@@ -4,7 +4,9 @@ namespace App\Console\Commands;
 
 use App\SaleGroups;
 use App\SaleGroupsBonusLevels;
+use App\SaleGroupsRate;
 use App\SaleGroupsUsers;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -45,13 +47,20 @@ class UpdateSaleGroups extends Command
         $startTime = microtime(true);
 
 	    $thisMonth = date('Y-m-01');
-	    $allSale = SaleGroups::where('id','!=',0)->with(['groupsUsersLastMonth'])->with(['groupsBonusLastMonth'])->get();
+	    
+	    SaleGroupsBonusLevels::where('set_date', $thisMonth)->delete();
+	    SaleGroupsUsers::where('set_date', $thisMonth)->delete();
+	    SaleGroupsRate::where('set_date', $thisMonth)->delete();
+	    
+	    $allSale = SaleGroups::where('id','!=',0)->with('groupsUsersLastMonth','groupsBonusLastMonth')->get();
 
 	    try {
+	    	
             DB::beginTransaction();
-            SaleGroupsBonusLevels::where('set_Date',$thisMonth)->delete();
-            SaleGroupsUsers::where('set_Date',$thisMonth)->delete();
-            foreach($allSale as $sale){
+		    
+		    
+		    foreach($allSale as $sale){
+			    $sale->refresh();
                 foreach (['groupsUsersLastMonth','groupsBonusLastMonth'] as $keyfiled){
 
                     if(isset($sale[$keyfiled])){
@@ -71,8 +80,18 @@ class UpdateSaleGroups extends Command
                         $sale->$keyfiled()->createMany($tmp);
                     }
                 }
-                $sale->push();
+                
+                /*set Rate like last month*/
+			    $lastMonth = new Carbon(today()->modify('-1Month')->format('Y-m-01'));
+			    $lastMonth = $lastMonth->format('Y-m-01');
+			    $saleGroupsRate = $sale->saleGroupsRate->where('set_date',$lastMonth)->first()->toArray();
+			    $saleGroupsRate['set_date'] = $thisMonth;
+			    
+			    $sale->saleGroupsRate()->create($saleGroupsRate);
+			    
+			    $sale->push();
             };
+		    
             DB::commit();
 	    } catch (\Exception $e) {
 	        DB::rollBack();
@@ -83,4 +102,5 @@ class UpdateSaleGroups extends Command
         $runTime = round(microtime(true) - $startTime, 2);
         echo ("Commands: {$this->signature} ({$runTime} seconds)\n");
     }
+	
 }

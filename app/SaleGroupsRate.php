@@ -11,6 +11,8 @@ class SaleGroupsRate extends Model
     
     protected $fillable = ['set_date','rate'];
 	
+    public $timestamps = false;
+    
 	public function saleGroup () {
 		return $this->belongsTo(SaleGroups::Class,'sale_groups_id');
     }
