@@ -35,8 +35,10 @@ class SaleGroups extends Model
 
 		return $this->hasMany(SaleGroupsBonusLevels::CLASS)->where('set_date',$lastMonth)->orderBy('set_date', 'desc');
 	}
-
-
+	
+	public function saleGroupsRate () {
+		return $this->hasMany(SaleGroupsRate::Class);
+	}
 	/**
 	 * @param $saleGroupIds
 	 * @return array
