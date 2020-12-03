@@ -84,7 +84,13 @@ class SaleGroupController extends BaseController
                 $groupsBonusHistory[$v->set_date]['user'][] =  $v;
                 if($v['boundary'] != 0){
                     /*抓取rate 對應資料*/
-	                $groupsBonusHistory[$v->set_date]['rate'] = $saleGroupsRate->where('set_date',$v->set_date)->first()['rate'];
+	                try {
+		                $groupsBonusHistory[$v->set_date]['rate'] = $saleGroupsRate->where('set_date',$v->set_date)->first()['rate'];
+	                }catch (\Exception $ex) {
+	                    echo "sale_groups_id {$saleGroupsRate[0]->sale_groups_id} not exist saleGroupsRate set_date {$v->set_date}";
+	                    die;
+	                }
+	                
                 }
             }
 		});
