@@ -18,16 +18,10 @@ class SaleGroupsReach extends Model
 	}
 	public function saleUser(){
 		return $this->belongsTo(SaleGroupsUsers::Class,'sale_groups_users_id');
-		//return SaleGroupsUsers::where('id',$this->sale_groups_users_id)->first()->user;
 	}
 	public function setConvenerReach ($setDate,$saleGroupsId,$saleGroupsUsersId)
 	{
 		$sameGroupErpUserIds = SaleGroupsUsers::where(['sale_groups_id' => $saleGroupsId,'set_date' => $setDate])->get();
-		
-		$haveBoundaryIds =  $sameGroupErpUserIds->map(function($v,$k){
-		  $v['boundary'] = $v->getUserBonusBoundary->boundary ?? 0;
-		  return $v;
-		})->where('boundary','>' ,0)->pluck('erp_user_id');
 		
 		$sameGroupErpUserIds = $sameGroupErpUserIds->pluck('erp_user_id');
 		

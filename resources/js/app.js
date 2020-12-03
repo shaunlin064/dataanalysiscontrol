@@ -111,6 +111,7 @@ Vue.component('pagination', require('laravel-vue-pagination'));
 Vue.component('date-range', require('./components/DateRange').default);
 
 Vue.component('select2', require('./components/Select2').default);
+Vue.component('select2-pm', require('./components/Select2Pm').default);
 
 Vue.component('select2-customer', require('./components/CustomerSelect2').default);
 

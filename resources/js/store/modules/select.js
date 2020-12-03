@@ -7,7 +7,8 @@ const state = {
     client_ids: [],
     media_companies_ids: [],
     medias_names: [],
-}
+    select_pm: []
+};
 
 const mutations = {
     [types.MUTATE_USER_ID] : (state, payload) => {
@@ -28,6 +29,10 @@ const mutations = {
     [types.MUTATE_MEDIAS_NAMES] : (state, payload) => {
         state.medias_names = payload;
     },
+    [types.MUTATE_SELECT_PM] : (state, payload) => {
+
+        state.select_pm = payload;
+    }
 }
 
 const actions = {
@@ -48,6 +53,9 @@ const actions = {
     },
     [types.CHANGE_MEDIAS_NAMES] : ({commit}, payload) => {
         commit(types.MUTATE_MEDIAS_NAMES, payload)
+    },
+    [types.CHANGE_SELECT_PM] : ({commit}, payload) => {
+        commit(types.MUTATE_SELECT_PM, payload)
     },
 }
 

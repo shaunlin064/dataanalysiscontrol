@@ -31,6 +31,7 @@ export const CHANGE_AGENCY_IDS = 'select/CHANGE_AGENCY_IDS';
 export const CHANGE_CLIENT_IDS = 'select/CHANGE_CLIENT_IDS';
 export const CHANGE_MEDIA_COMPANIES_IDS = 'select/CHANGE_MEDIA_COMPANIES_IDS';
 export const CHANGE_MEDIAS_NAMES = 'select/CHANGE_MEDIAS_NAMES';
+export const CHANGE_SELECT_PM = 'select/CHANGE_SELECT_PM';
 
 
 // Mutations
@@ -73,3 +74,4 @@ export const MUTATE_AGENCY_IDS = 'select/MUTATE_AGENCY_IDS';
 export const MUTATE_CLIENT_IDS = 'select/MUTATE_CLIENT_IDS';
 export const MUTATE_MEDIA_COMPANIES_IDS = 'select/MUTATE_MEDIA_COMPANIES_IDS';
 export const MUTATE_MEDIAS_NAMES = 'select/MUTATE_MEDIAS_NAMES';
+export const MUTATE_SELECT_PM = 'select/MUTATE_SELECT_PM';

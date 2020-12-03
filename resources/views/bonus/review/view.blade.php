@@ -49,11 +49,45 @@
                                 :input_end_date='"{{date('Y-m-01')}}"'></date-range>
                 </div>
             </div>
-
-            <div class="box-footer" data-step="3" data-intro="條件2:人員團隊選擇">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <label>選擇成員</label>
+            <div class="box box-warning" data-step="3" data-intro="條件2:Pm選擇">
+                <div class="box-header with-border">
+                    <h3 class="box-title">PM篩選</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"
+                                data-ui-contorl='pm_filter'><i
+                                    class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                    <!-- /.box-tools -->
+                </div>
+                <form class="form-horizontal box-body">
+                    <div class="form-group col-sm-12">
+                        <label class="col-sm-1 control-label input-md">PM:</label>
+                        <div class="col-sm-11">
+                            <select2-pm :id='"select_pm"'
+                                     :multiple='"multiple"'
+                                     :selected='true'
+                                     :placeholder='"選擇pm"'
+                                     :row='{!! json_encode($pmList) !!}'
+                            ></select2-pm>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="box box-warning" data-step="3" data-intro="條件2:人員團隊選擇">
+                <div class="box-header with-border">
+                    <h3 class="box-title">AE篩選</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"
+                                data-ui-contorl='ae_filter'><i
+                                    class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                    <!-- /.box-tools -->
+                </div>
+                <form class="form-horizontal box-body">
+                    <div class="form-group col-sm-6">
+                        <label>選擇AE</label>
                         <div class="input-group">
                             <span class="input-group-addon">
                               <input type="radio" name='selectType'
@@ -69,9 +103,7 @@
                         </div>
                         <!-- /input-group -->
                     </div>
-                    <!-- /.col-lg-6 -->
-                    {{--                    @if($saleGroups)--}}
-                    <div class="col-lg-6">
+                    <div class="form-group col-lg-6">
                         <label>選擇團隊</label>
                         <div class="input-group">
                             <span class="input-group-addon">
@@ -89,7 +121,7 @@
                         <!-- /input-group -->
                     </div>
                     <!-- /.col-lg-6 -->
-                </div>
+                </form>
             </div>
             <div class="box box-warning" data-step="4" data-intro="條件3:客戶媒體類型選擇">
                 <div class="box-header with-border">
