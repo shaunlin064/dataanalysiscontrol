@@ -18,8 +18,8 @@ class CampaignProjectManager extends Model
 		return $this->belongsTo(FinancialList::Class,'campaign_id','campaign_id');
     }
 	
-	public function User () {
-		$this->belongsTo(User::Class,'erp_user_id','erp_user_id');
+	public function user () {
+		return $this->belongsTo(User::Class,'erp_user_id','erp_user_id');
     }
 	
 	/**
