@@ -45,8 +45,8 @@ class SaleGroupsReach extends Model
 		
 		/*TODO::計算英雄榜獎金 與 呈現 英雄榜獎金沒有透過系統發放 而是公司大會人工發放 故沒有計算進系統內*/
 		$finalBonus = $saleGroupsBonus->getReachBonusLevels($groupsTotalProfit,$saleGroupsId,$setDate);
-		
-		list($provideMoney,$rate) = $this->bonusMoney($haveBoundaryIds, $groupsTotalProfit);
+		$rate = SaleGroupsRate::where(['sale_groups_id' => $saleGroupsId , 'set_date' => $setDate])->first()['rate'] ?? 0;
+		$provideMoney = ( $rate > 0  && $groupsTotalProfit > 0 ) ? round($groupsTotalProfit * ($rate / 100)) : 0;
 		
 		$newData = SaleGroupsReach::create([
 		 'sale_groups_id' => $saleGroupsId,
@@ -84,22 +84,5 @@ class SaleGroupsReach extends Model
 		}
 		
 		return $newData ?? [] ;
-	}
-	
-	/**
-	 * @param $sameGroupErpUserIds
-	 * @param $groupsTotalProfit
-	 * @return float|int
-	 */
-	private function bonusMoney ($sameGroupErpUserIds, $groupsTotalProfit)
-	{
-		$convenerRateStart = config('sale_group.convenerRateStart');
-		$convenerRateLadder = config('sale_group.convenerRateLadder');
-		
-		$rate = $convenerRateStart - count($sameGroupErpUserIds) * $convenerRateLadder;
-		/*如未設定招集人此月份資料則會出錯*/
-		
-		$provideMoney = (isset($rate) && $groupsTotalProfit > 0 )? round($groupsTotalProfit * ($rate / 100)) : 0;
-		return [$provideMoney,$rate];
 	}
 }
