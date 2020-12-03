@@ -179,25 +179,25 @@
                 [ 'data' => 'paymentStatus' ],
                 [ 'data' => 'bonusStatus' ],
             ];
-//
-           if(auth()->user()->name === 'shaun'){
-                /*ajax check debug*/
-               $dateStart = $date->format('2020-11-01');
-               $dateEnd = $date->format('2020-12-01');
-               $request = new Request([
-                   'startDate'    => $dateStart,
-                   'endDate'      => $dateEnd,
-                   'saleGroupIds' => [ '1','2','3','4','5','6','7','8' ],
-                   'userIds'      => [],
-                   'agencyIdArrays' => [],
-                   'clientIdArrays' => [],
-                   'mediaCompaniesIdArrays' => [],
-                   'mediasNameArrays' => [],
-                   'selectPms' => [196]
-               ]);
-               $return = $this->getAjaxData($request, 'return');
-               dd($return);
-           }
+////
+//           if(auth()->user()->name === 'shaun'){
+//                /*ajax check debug*/
+//               $dateStart = $date->format('2020-11-01');
+//               $dateEnd = $date->format('2020-12-01');
+//               $request = new Request([
+//                   'startDate'    => $dateStart,
+//                   'endDate'      => $dateEnd,
+//                   'saleGroupIds' => [ '1','2','3','4','5','6','7','8' ],
+//                   'userIds'      => [],
+//                   'agencyIdArrays' => [],
+//                   'clientIdArrays' => [],
+//                   'mediaCompaniesIdArrays' => [],
+//                   'mediasNameArrays' => [],
+//                   'selectPms' => [196]
+//               ]);
+//               $return = $this->getAjaxData($request, 'return');
+//               dd($return);
+//           }
 
             return view('bonus.review.view', [
                 'data'                        => $this->resources,
