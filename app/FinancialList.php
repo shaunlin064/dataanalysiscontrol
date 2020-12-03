@@ -306,13 +306,15 @@
 		}
 		
 		public function projectManagerUpdateOrCreate ( $campaigIds ) {
-			$project = new \App\CampaignProjectManager();
-			$results = collect($project->getErpProjectManagerData($campaigIds))->groupBy('campaign_id')->toArray();
-			
-			foreach ( $results as $campaignId => $items ) {
-				$fina = \App\FinancialList::where('campaign_id', $campaignId)->get()->first();
-				$fina->campaignProjectManager()->delete();
-				$fina->campaignProjectManager()->createMany($items);
+			if(count($campaigIds) > 0){
+				$project = new \App\CampaignProjectManager();
+				$results = collect($project->getErpProjectManagerData($campaigIds))->groupBy('campaign_id')->toArray();
+				
+				foreach ( $results as $campaignId => $items ) {
+					$fina = \App\FinancialList::where('campaign_id', $campaignId)->first();
+					$fina->campaignProjectManager()->delete();
+					$fina->campaignProjectManager()->createMany($items);
+				}
 			}
 		}
 		
