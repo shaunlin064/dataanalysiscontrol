@@ -60,8 +60,7 @@ class SaleGroupController extends BaseController
 
 		$date = new \DateTime();
 		$datenow = $date->format('Y-m-01');
-
-//		$saleGroups = SaleGroups::where('id',$id)->with('groupsUsers')->with('groupsBonus')->first();
+		
 		//get nowdata
 		$row = $saleGroups->toArray();
 		$row['groups_bonus']  = $saleGroups->groupsBonus->where('set_date',$datenow)->values()->toArray();
@@ -71,7 +70,7 @@ class SaleGroupController extends BaseController
 		})->sum('boundary');
 		
 		$groupsBonusHistory = $saleGroups->groupsBonus->groupBy('set_date')->map(function($v){
-		 return ['bonuslevel' => $v,'rate' => 5.5,'totalBoundary' => 0];
+		 return ['bonuslevel' => $v,'rate' => 0,'totalBoundary' => 0];
 		})->toArray();
 		$saleGroupsRate = $saleGroups->saleGroupsRate;
 		
@@ -82,15 +81,12 @@ class SaleGroupController extends BaseController
 			if(isset($groupsBonusHistory[$v->set_date])){
                 $groupsBonusHistory[$v->set_date]['totalBoundary'] += $v['boundary'];
                 $groupsBonusHistory[$v->set_date]['user'][] =  $v;
-                if($v['boundary'] != 0){
-                    /*抓取rate 對應資料*/
-	                try {
-		                $groupsBonusHistory[$v->set_date]['rate'] = $saleGroupsRate->where('set_date',$v->set_date)->first()['rate'];
-	                }catch (\Exception $ex) {
-	                    echo "sale_groups_id {$saleGroupsRate[0]->sale_groups_id} not exist saleGroupsRate set_date {$v->set_date}";
-	                    die;
-	                }
-	                
+                /*抓取rate 對應資料*/
+                try {
+	                $groupsBonusHistory[$v->set_date]['rate'] = $saleGroupsRate->where('set_date',$v->set_date)->first()['rate'];
+                }catch (\Exception $ex) {
+                    echo "sale_groups_id {$saleGroupsRate[0]->sale_groups_id} not exist saleGroupsRate set_date {$v->set_date}";
+                    die;
                 }
             }
 		});
