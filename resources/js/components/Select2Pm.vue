@@ -93,7 +93,7 @@ export default {
       if(isNaN(type)){
         if( type === 'all'){
           selectTarget = this.row.map(function(v){
-            return v.user.id;
+            return v.user.erp_user_id;
           });
         }else{
           selectTarget = null;
