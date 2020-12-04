@@ -9,6 +9,7 @@
                 <ul class="dropdown-menu" role="menu">
                     <li><a href="#" @click="quickClick('lM')">前月</a></li>
                     <li><a href="#" @click="quickClick('tM')">本月</a></li>
+                    <li><a href="#" v-for='item in months' @click="quickClick(item+1)">{{item+1}}月</a></li>
                 </ul>
             </div>
         </div>
@@ -50,6 +51,11 @@
             input_start_date : String,
             input_end_date : String,
         },
+      data(){
+          return{
+            months: [...Array(12).keys()]
+          }
+      },
         computed: {
             ...mapState('dateRange',['start_date','end_date']),
         },
@@ -111,6 +117,14 @@
                         dateStrEnd = `${year}-12-01`;
                         break;
                 }
+                if(!isNaN(dataSelectType)){
+                  if(dataSelectType < 10) {
+                    dataSelectType = "0" + dataSelectType;
+                  }
+                  dateStrStart = `${year}-${dataSelectType}-01`;
+                  dateStrEnd = `${year}-${dataSelectType}-01`;
+                }
+
                 this[types.CHANGE_DATE_RANGE]([dateStrStart,dateStrEnd]);
             }
         },

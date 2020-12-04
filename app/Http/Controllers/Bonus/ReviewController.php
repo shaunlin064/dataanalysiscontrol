@@ -22,6 +22,7 @@
     use App\Http\Controllers\Financial\ProvideController;
     use App\Http\Controllers\FinancialController;
     use App\SaleGroups;
+    use App\Service\SelectUserList;
     use App\User;
     use Auth;
     use DateTime;
@@ -49,23 +50,16 @@
          * @throws Exception
          */
         public function view () {
-
-            $loginUserId = auth()->user()->erp_user_id;
-
-            $date = new DateTime();
-
+        	
             $objFin = new FinancialList();
 	        $agencyList = Agency::select('name','id')->where('id','!=',0)->get()->toArray();
 	        $clientList = Client::select('name','id')->where('id','!=',0)->get()->toArray();
 	        $mediaCompaniesList = Companie::select('name','id')->where('id','!=',0)->get()->toArray();
 	        
             $medias = $objFin->getDataList('media_channel_name', 'media_channel_name');
-
-            $provideObj = new ProvideController();
-            [ $saleGroups, $userList ] = $provideObj->getDataList($loginUserId, $date, 'bonus_view');
-	        $pmList = \App\CampaignProjectManager::with('user')->groupBy('erp_user_id')->get()->toArray();
             
-
+            [ $saleGroups, $userList, $pmList ] = $this->getSelectLists('bonus_view');
+           
             $customerProfitColumns = [
                 [
                     'data'   => 'name',
@@ -1252,7 +1246,23 @@
                 $group_progress_list_total
             ];
         }
-
+	
+	
+	    /**
+	     * @param $type
+	     * @return array
+	     */
+	    public function getSelectLists ( $type ) {
+	    	
+		    [ $saleGroups, $userList ] = SelectUserList::getUserList($type);
+			$pmList = SelectUserList::getPmList();
+			
+		    return [
+			    $saleGroups,
+			    $userList,
+			    $pmList
+		    ];
+        }
     }
 
 

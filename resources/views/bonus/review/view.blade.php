@@ -523,10 +523,15 @@
                 eval(`owlShowItemCookie.${$(this).data('owlName')} = event.item.index;`);
                 setCookie('ui-contorl', JSON.stringify(cookie));
             });
+
             if (owlShowItemCookie !== undefined) {
                 Object.keys(owlShowItemCookie).forEach(key => {
+                    let $owlTargetDom;
                     if (owlShowItemCookie[key] !== 0) {
-                        $('.owl-carousel[data-owl-name="' + key + '"]').data('owl.carousel').to(owlShowItemCookie[key]);
+                        $owlTargetDom = $('.owl-carousel[data-owl-name="' + key + '"]');
+                        if ($owlTargetDom[0]) {
+                            $owlTargetDom.data('owl.carousel').to(owlShowItemCookie[key]);
+                        }
                     }
                 });
             }
