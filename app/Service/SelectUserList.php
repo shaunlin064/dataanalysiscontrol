@@ -25,7 +25,7 @@
 		 */
 		static function getUserList ( $type ) {
 			
-			$erpUserId = auth()->user();
+			$erpUserId = auth()->user()->erp_user_id;
 			$date = new DateTime();
 			$dateStr = $date->format('Y-m-01');
 			/*convener check*/
@@ -61,6 +61,7 @@
 				if ( Permission::canReviewFinancialGroupData($type) ) {
 					
 					$saleGroups = [ $saleGroupsUsers->saleGroups ];
+					
 					$saleGroupErpUserIds = $saleGroupsUsers->getSameGroupsUser($erpUserId, $dateStr)
 					                                       ->pluck('user')
 					                                       ->pluck('erp_user_id')
