@@ -412,7 +412,7 @@
                                 <simple-data-table-componet
                                     :table_id='"group_progress_list"'
                                     :table_head='"團隊績效表"'
-                                    :table_title='["月份","團隊","毛利","達成率","團隊英雄榜","額外績效獎金"]'
+                                    :table_title='["月份","團隊","毛利","達成率","英雄榜","領導獎金"]'
                                     :row='[]'
                                     :ex_buttons='["excel"]'
                                     :csrf='"{{csrf_token()}}"'
