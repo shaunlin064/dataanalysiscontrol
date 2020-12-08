@@ -11,13 +11,13 @@
         //
         protected $fillable = [ 'financial_lists_id', 'created_at', 'updated_at' ];
 
-        public function updateFinancialMoneyReceipt ( $type = 'select' ) {
+        public function updateFinancialMoneyReceipt ( $type ) {
             $financial = new FinancialController();
 
             /*cp_detail_id and balance date */
             $receiptData = collect($financial->getBalancePayMentData($type));
+            
             $receiptDataCpIds = $receiptData->pluck('cp_detail_id');
-
             $needUpdateFinancialList = FinancialList::whereIn('cp_detail_id', $receiptDataCpIds)
 //                                                    ->where('status', 0)
                                                     ->get()

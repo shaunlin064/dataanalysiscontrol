@@ -39,7 +39,12 @@ class UpdateFinancialMoneyReceipt extends Command
         try {
             DB::beginTransaction();
             $finanicalReceiptObj = new FinancialReceipt();
-            $finanicalReceiptObj->updateFinancialMoneyReceipt();
+	        $dateRang = date_range(today()->modify('-3Month')->format('Ym01'), today()->format('Ym01'));
+	        $dateRang[] = today()->format('Y-m-01');
+	        
+	        foreach ($dateRang as $date){
+                $finanicalReceiptObj->updateFinancialMoneyReceipt($date);
+	        }
             DB::commit();
         } catch(\Exception $e) {
             DB::rollback();
