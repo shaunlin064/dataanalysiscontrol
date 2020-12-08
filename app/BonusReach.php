@@ -15,4 +15,15 @@ class BonusReach extends Model
 	{
 		return $this->belongsTo(Bonus::CLASS);
 	}
+	
+	static function getUserProfitPercentage($setDate,$erpUserId){
+		$profit = FinancialList::where(['set_date' => $setDate , 'erp_user_id' => $erpUserId])->sum('profit');
+		$userBonus = \App\Bonus::where(['set_date' => $setDate , 'erp_user_id' => $erpUserId])->first();
+		$percentage = 0;
+		
+		if(isset($userBonus['boundary'])){
+			$percentage = $userBonus['boundary'] != 0 ? round($profit / $userBonus['boundary'] * 100) : 0;
+		}
+		return $percentage;
+	}
 }

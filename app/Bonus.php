@@ -41,11 +41,6 @@
                               ])->with('levels')->get()->first()->toArray();
             } else
             {
-                //抓取 最新一筆設定資料
-                //			if( $this->where(['erp_user_id' => $erpUserId,])->with('levels')->exists() ){
-                //				$userbonus = $this->where(['erp_user_id' => $erpUserId,])->with('levels')->OrderBy('id','desc')->get()->first()->toArray();
-                //
-                //			}else{
                 $userbonus = [
                     'boundary' => 0,
                     'levels'   => [
@@ -55,7 +50,6 @@
                         ]
                     ]
                 ];
-                //			}
             }
             $reachLevle = null;
             $nextLevel = null;
@@ -68,7 +62,8 @@
                     ]
                 ];
             }
-            foreach ( $userbonus['levels'] as $key => $items )
+            
+            foreach ( collect($userbonus['levels'])->sortBy('achieving_rate') as $key => $items )
             {
                 $thisLevelAchieving = $userbonus['boundary'] * $items['achieving_rate'] * 0.01;
                 if ( $totalProfit > $thisLevelAchieving )
@@ -80,7 +75,6 @@
                     break;
                 }
             }
-
             //if not reach minleavel
             if ( $reachLevle == null )
             {

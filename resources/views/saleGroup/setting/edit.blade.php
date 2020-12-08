@@ -51,7 +51,9 @@
                                 groups_users: '{{json_encode($row['groups_users'])}}',
                                 total_boundary : '{{$totalBoundary}}',
                                 max_rate: '{{config('sale_group.convenerRateStart')}}',
-                                bonus_rate: '{{$nowRate}}'
+                                bonus_rate: '{{$nowRate}}',
+                                bonus_beyond_setting_sale_group_ids:'{{json_encode(config('sale_group.bonusMembersBeyondSetSaleGroupIds'))}}',
+                                bonus_beyond_role: '{{json_encode(config('sale_group.bonusMembersBeyondLevel'))}}'
                                 }"
                 ></sale-group-form-component>
                 <div class="tab-pane" id="hirstory">

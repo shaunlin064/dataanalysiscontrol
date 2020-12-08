@@ -146,12 +146,22 @@
         @if($saleGroups)
             <simple-data-table-componet
                     :table_id='"provide_groups_list"'
-                    :table_head='"招集人獎金檢視"'
+                    :table_head='"招集人-團隊獎金"'
                     :table_title='["發放月份","月份","業務","團隊","團隊毛利","比例","獎金"]'
                     :row = '{{ json_encode($saleGroupsReach) }}'
                     :ex_buttons= '["excel"]'
                     :csrf= '"{{csrf_token()}}"'
                     :columns = '{!!json_encode($saleGroupsReachColumns)!!}'
+                    :ajax_url= '"/financial/provide/getAjaxProvideData"'
+            ></simple-data-table-componet>
+            <simple-data-table-componet
+                    :table_id='"provide_bonus_beyond_list"'
+                    :table_head='"招集人-領導獎金"'
+                    :table_title='["發放月份","月份","業務","團隊","獎金"]'
+                    :row = '{{ "[]" }}'
+                    :ex_buttons= '["excel"]'
+                    :csrf= '"{{csrf_token()}}"'
+                    :columns = '{!!json_encode($bonusBeyondColumns)!!}'
                     :ajax_url= '"/financial/provide/getAjaxProvideData"'
             ></simple-data-table-componet>
         @endif

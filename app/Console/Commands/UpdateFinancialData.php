@@ -71,6 +71,7 @@ class UpdateFinancialData extends Command
             DB::rollback();
             /*mail notice Job*/
             \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => "{$this->signature} error {$e->getMessage()}"]);
+            
         }
 
         Artisan::call('update_financial_money_receipt');

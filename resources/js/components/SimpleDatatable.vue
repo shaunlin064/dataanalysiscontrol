@@ -63,7 +63,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('financial', ['provide_money', 'loading', 'provide_bonus_list', 'provide_groups_list', 'provide_statistics_list', 'provide_char_bar_stack', 'provide_total_money']),
+    ...mapState('financial', ['provide_money', 'loading', 'provide_bonus_list', 'provide_groups_list', 'provide_statistics_list', 'provide_char_bar_stack', 'provide_total_money','provide_bonus_beyond_list']),
     ...mapState('dateRange', ['start_date', 'end_date']),
     ...mapState('chart', ['bonus_list', 'customer_profit_data', 'customer_groups_profit_data', 'medias_profit_data', 'media_companies_profit_data', 'group_progress_list', 'group_progress_list_total', 'progress_list', 'progress_list_total', 'exchange_rates_list']),
     ...mapState('exchangeRate', ['exchange_rates_list']),
@@ -225,7 +225,7 @@ export default {
           }
         }];
         /*獎金發放使用  financial provide list*/
-        if ($.inArray(tableId, ['provide_groups_list', 'provide_bonus_list']) !== -1) {
+        if ($.inArray(tableId, ['provide_groups_list', 'provide_bonus_list','provide_bonus_beyond_list']) !== -1) {
           dataTableConfig.dom = 'Bfrtip';
           dataTableConfig.select = true;
           dataTableConfig.buttons = [{
@@ -432,6 +432,14 @@ export default {
         }
       }
     },
+    provide_bonus_beyond_list:{
+      immediate: false,
+      handler(val, oldVal) {
+        if (oldVal !== undefined && val !== '' && this.table_id == 'provide_bonus_beyond_list') {
+          this.updataTable(val);
+        }
+      }
+    }
   }
 }
 </script>

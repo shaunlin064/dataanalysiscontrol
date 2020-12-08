@@ -17,8 +17,8 @@
                 <h5 class='' data-step='2' data-intro='召集人獎金比例建議 最大5.5% 下修每增加1人 -0.25%'>獎金比例</h5>
                 <input type='text' name='rate' class='form-control text-center' v-model='bonus_rate'
                        @input='checkInput'>
-                <div class="alert alert-danger alert-dismissible" v-if='bonus_rate > max_rate'>
-                  獎金比例不能超過{{max_rate}}%
+                <div class='alert alert-danger alert-dismissible' v-if='bonus_rate > max_rate'>
+                  獎金比例不能超過{{ max_rate }}%
                 </div>
 
               </div>
@@ -50,34 +50,38 @@
           </div>
         </div>
         <div class='form-group'>
-          <div class='box-body'>
-            <table class='table table-bordered table-striped'>
-              <thead class='thead-light'>
-              <tr>
-                <th width='1'>#</th>
-                <th width='25%' data-step='5' data-intro='團隊毛利達成比例'>達成比例</th>
-                <!--<th width="25%">獎金比例</th>-->
-                <th width='25%' data-step='6' data-intro='額外獎金為召集人的英雄榜獎金'>額外獎金</th>
-                <th width='25%' data-step='7' data-intro='編輯須按下儲存'>Action</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr v-for='(item, index) in items' :key='index'>
-                <td>{{ index + 1 }}</td>
-                <td :class="{'has-error' : detail_has_error[index]['achieving_rate']}">
-                  <span v-if='editIndex !== index'>{{ item.achieving_rate }}</span>
-                  <input type='number' class='form-control form-control-sm' v-model='item.achieving_rate'
-                         v-else-if='editIndex === index'>
-                  <span class='help-block'
-                        :class="{'hidden' : !detail_has_error[index]['achieving_rate'] }">達成比例不能為0</span>
-                </td>
-                <td :class="{'has-error' : detail_has_error[index]['bonus_direct']}">
-                  <span v-if='editIndex !== index'>{{ item.bonus_direct }}</span>
-                  <span v-if='editIndex === index'>
+          <div class='box box-info'>
+            <div class='text-center'>
+              <h5 class='box-title'>英雄榜</h5>
+            </div>
+            <div class='box-body'>
+              <table class='table table-bordered table-striped'>
+                <thead class='thead-light'>
+                <tr>
+                  <th width='1'>#</th>
+                  <th width='25%' data-step='5' data-intro='團隊毛利達成比例'>達成比例</th>
+                  <!--<th width="25%">獎金比例</th>-->
+                  <th width='25%' data-step='6' data-intro='額外獎金為召集人的英雄榜獎金'>額外獎金</th>
+                  <th width='25%' data-step='7' data-intro='編輯須按下儲存'>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for='(item, index) in items' :key='index'>
+                  <td>{{ index + 1 }}</td>
+                  <td :class="{'has-error' : detail_has_error[index]['achieving_rate']}">
+                    <span v-if='editIndex !== index'>{{ item.achieving_rate }}</span>
+                    <input type='number' class='form-control form-control-sm' v-model='item.achieving_rate'
+                           v-else-if='editIndex === index'>
+                    <span class='help-block'
+                          :class="{'hidden' : !detail_has_error[index]['achieving_rate'] }">達成比例不能為0</span>
+                  </td>
+                  <td :class="{'has-error' : detail_has_error[index]['bonus_direct']}">
+                    <span v-if='editIndex !== index'>{{ item.bonus_direct }}</span>
+                    <span v-if='editIndex === index'>
 				              <input type='number' class='form-control form-control-sm' v-model='item.bonus_direct'>
 				            </span>
-                </td>
-                <td>
+                  </td>
+                  <td>
 				            <span v-if='editIndex !== index'>
 						            <div v-for='(item, index ) in items'>
 						              <input type='hidden' :name='"groupsBonus["+index+"][achieving_rate]"'
@@ -89,19 +93,53 @@
 					              <button type='button' @click='edit(item, index)' class='btn btn-info'>編輯</button>
 					              <button type='button' @click='remove(item, index)' class='btn btn-danger'>刪除</button>
 				            </span>
-                  <span v-else>
+                    <span v-else>
 											<button type='button' class='btn btn-info' @click='save()'>儲存</button>
 				              <button type='button' class='btn btn-danger' @click='cancel(item)'>取消</button>
 				            </span>
-                </td>
-              </tr>
-              </tbody>
-            </table>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
 
-            <div class='col-3 offset-9 text-right my-3'>
-              <button type='button' @click='add' class='btn btn-success'>新增</button>
+              <div class='col-3 offset-9 text-right my-3'>
+                <button type='button' @click='add' class='btn btn-success'>新增</button>
+              </div>
+
             </div>
-
+          </div>
+        </div>
+        <div class='form-group' v-if='bonus_beyond_setting_sale_group_ids.includes(parseInt(this.sale_group_id))'>
+          <div class='box box-info'>
+            <div class='text-center'>
+              <h5 class='box-title'>領導獎金</h5>
+            </div>
+            <div class='box-body'>
+              <table class='table table-bordered table-striped'>
+                <thead class='thead-light'>
+                <tr>
+                  <th width='1'>#</th>
+                  <th width='25%'>達成比例</th>
+                  <th width='25%'>額外獎金</th>
+                  <th width='25%'>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for='(item, index) in bonus_beyond_role["level"]' :key='index'>
+                  <td>{{ index + 1 }}</td>
+                  <td>{{ item.rate }}</td>
+                  <td>{{ item.bonus_direct }}</td>
+                  <td></td>
+                </tr>
+                <tr :key='4'>
+                  <td>4</td>
+                  <td>全員包含招集人100%</td>
+                  <td>{{ bonus_beyond_role.extra_bonus }}</td>
+                  <td></td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
         <simple-data-table-componet
@@ -162,6 +200,8 @@ export default {
       total_boundary: this.arg.total_boundary ? parseInt(this.arg.total_boundary) : 0,
       max_rate: this.arg.max_rate,
       bonus_rate: this.arg.bonus_rate,
+      bonus_beyond_role: this.arg.bonus_beyond_role ? JSON.parse(this.arg.bonus_beyond_role) : [],
+      bonus_beyond_setting_sale_group_ids : this.arg.bonus_beyond_setting_sale_group_ids ? JSON.parse(this.arg.bonus_beyond_setting_sale_group_ids) : [],
       count_rate: 0,
     }
   },

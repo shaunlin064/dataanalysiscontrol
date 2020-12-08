@@ -22,6 +22,7 @@
     use App\Http\Controllers\Financial\ProvideController;
     use App\Http\Controllers\FinancialController;
     use App\SaleGroups;
+    use App\SaleGroupsReach;
     use App\Service\SelectUserList;
     use App\User;
     use Auth;
@@ -139,6 +140,8 @@
                     'render' => '<span class="badge bg-${style}">${data}%</span>',
                     'parmas' => 'let style ="yellow"; if(data > 90){ style = "green"}else if(data < 0){ style = "red"}'
                 ],
+                [ 'data' => 'bonus_direct' ],
+                [ 'data' => 'bonus_members_beyond']
             ];
             $groupsProgressTotalColumns = [
                 [ 'data' => 'name' ],
@@ -173,24 +176,25 @@
                 [ 'data' => 'paymentStatus' ],
                 [ 'data' => 'bonusStatus' ],
             ];
-////
+//////
 //           if(auth()->user()->name === 'shaun'){
 //                /*ajax check debug*/
-//               $dateStart = $date->format('2020-11-01');
-//               $dateEnd = $date->format('2020-12-01');
+//	           $date = today();
+//               $dateStart = $date->format('2020-10-01');
+//               $dateEnd = $date->format('2020-10-01');
 //               $request = new Request([
 //                   'startDate'    => $dateStart,
 //                   'endDate'      => $dateEnd,
-//                   'saleGroupIds' => [ '1','2','3','4','5','6','7','8' ],
+//                   'saleGroupIds' => [ '6','7','8' ],
 //                   'userIds'      => [],
 //                   'agencyIdArrays' => [],
 //                   'clientIdArrays' => [],
 //                   'mediaCompaniesIdArrays' => [],
 //                   'mediasNameArrays' => [],
-//                   'selectPms' => [196]
+//                   'selectPms' => []
 //               ]);
 //               $return = $this->getAjaxData($request, 'return');
-//               dd($return);
+//               dd($return['group_progress_list'],'out');
 //           }
 
             return view('bonus.review.view', [
@@ -242,7 +246,9 @@
                 $bonusCharBarStack,
                 $group_progress_list_total
             ] = $this->getCacheDatas($request);
+//            dd('first out');
             /*$bonusCharBarStack*/
+	        
             $bonus_list = $bonus_list->map(function ( $v, $k ) {
                 $v['income'] = isset($v['income']) ? number_format($v['income']) : 0;
                 $v['cost'] = isset($v['cost']) ? number_format($v['cost']) : 0;
@@ -262,6 +268,8 @@
             });
             $group_progress_list = $tmpGroupProgressList->map(function ( $v, $k ) {
                 $v['profit'] = isset($v['profit']) ? number_format($v['profit']) : 0;
+                $v['bonus_direct'] = isset($v['bonus_direct']) ? number_format($v['bonus_direct']) : 0;
+	            $v['bonus_members_beyond'] = isset($v['bonus_members_beyond']) ? number_format($v['bonus_members_beyond']) : 0;
                 return $v;
             });
 
@@ -424,13 +432,13 @@
                 $groupDateStart->modify('+1Month');
             }
             /*calculation profit percentage*/
-            $groupProfitDatas = $this->getGroupProfitDates($tmpGroups, $erpReturnData);
+            $groupProfitDatas = $this->getGroupProfitDates($tmpGroups, $erpReturnData, $progressDatas);
 
             $erpReturnData = $erpReturnData->map(function ( $v, $k ) {
                 $v['set_date'] = substr($v['set_date'], 0, 7);
                 return $v;
             });
-
+            
             return [ $erpReturnData->toArray(), $progressDatas->toArray(), $groupProfitDatas->toArray() ];
         }
 
@@ -507,24 +515,24 @@
         /**
          * @param array $tmpGroups
          * @param Collection $erpReturnData
+         * @param $progressDatas
          * @return Collection
          */
-        private function getGroupProfitDates ( array $tmpGroups, Collection $erpReturnData ): Collection {
+        private function getGroupProfitDates ( array $tmpGroups, Collection $erpReturnData,  $progressDatas ): Collection {
             $groupProfitDatas = collect([]);
-
-            collect($tmpGroups)->map(function ( $items, $k ) use ( &$groupProfitDatas, $erpReturnData ) {
-                $items = collect($items)->map(function ( $item, $k ) use ( $erpReturnData ) {
-
-                    $item['profit'] = round($erpReturnData->where('sale_group_id', $item['id'])
-                                                          ->where('set_date', $item['set_date'])
-                                                          ->sum('profit'));
-                    $item['percentage'] = ( $item['profit'] == 0 || $item['boundary'] == 0 ) ? 0 : round($item['profit'] / $item['boundary'] * 100);
-                    //                    $item['profit'] = number_format($item['profit']);
+            
+            collect($tmpGroups)->map(function ( $items, $k ) use ( &$groupProfitDatas, $erpReturnData ,$progressDatas) {
+                $items = collect($items)->map(function ( $item, $k ) use ( $erpReturnData , $progressDatas) {
+                	$saleGroup = SaleGroups::find($item['id']);
+                	[ $item['profit'],$item['percentage'],$item['bonus_direct'], $item['bonus_members_beyond'] ] = $saleGroup->getGroupExtraBonus($item['set_date']);
+                	
                     $item['set_date'] = substr($item['set_date'], 0, 7);
+	                
                     return $item;
                 });
                 $groupProfitDatas = $groupProfitDatas->concat($items);
             });
+	        
             return $groupProfitDatas;
         }
 
@@ -743,6 +751,7 @@
                 //
                 [ $erpReturnData, $progressDatas, $groupProfitDatas ] = $this->getDataFromDataBase($allUserErpIds,
                     $allGroupIds, $date, $date);
+                
                 $this->cacheObj->put($this->cacheKey, $date, [
                     "bonus_list"          => $erpReturnData ?? [],
                     'progress_list'       => $progressDatas ?? [],
@@ -759,7 +768,7 @@
          * @throws Exception
          */
         private function getUserDateSelectData (
-            array $dateRange, $saleGroupIds, $userIds, $selectPms
+            array $dateRange, $saleGroupIds, $userIds, $selectPms = []
         ): array {
 
             $newdata = [
@@ -795,7 +804,7 @@
                             'group_progress_list' => []
                         ];
                 }
-	
+				
 	            
                 /*需要cache 資料*/ /*缺一層篩選後判斷人員要不要cache*/
                 foreach ( $needCacheDate as $objKey => $item ) {
@@ -829,7 +838,7 @@
 	                        $tmpBonus = [];
                         }
 	                    
-	                    
+	                   
 
                         $$objKey->subPut('finance.review.userDateFilter', json_encode($tmpCondition), [
                             'bonus_list'          => $tmpBonus,
@@ -892,6 +901,7 @@
         private function cacheEachDataBase (
             array $dateRange
         ) {
+        	
             $dateNow = new DateTime();
             /*cache all user erp Id*/
             $allUserErpIds = $this->cacheObj->remember('allUserErpId', ( 1 * 3600 ), function () {
@@ -1117,8 +1127,9 @@
             $clientIdArrays = collect($request->clientIdArrays)->filter()->toArray();
             $mediaCompaniesIdArrays = collect($request->mediaCompaniesIdArrays)->filter()->toArray();
             $mediasNameArrays = collect($request->mediasNameArrays)->filter()->toArray();
+	        $selectPms = $request->selectPms;
             $this->cacheObj = new Cachekey('file');
-
+			
             /*cache start*/
             if ( $starDate != $endDate ) {
                 $dateRange = date_range($starDate, $endDate);
@@ -1136,7 +1147,7 @@
                 $progress_list,
                 $tmpGroupProgressList,
                 $progress_list_total
-            ] = $this->getUserDateSelectData($dateRange, $saleGroupIds, $userIds);
+            ] = $this->getUserDateSelectData($dateRange, $saleGroupIds, $userIds,$selectPms);
 
             $bonus_list = $this->getFilterData($tmpBonus->toArray(), $agencyIdArrays, $clientIdArrays,
                 $mediaCompaniesIdArrays, $mediasNameArrays);

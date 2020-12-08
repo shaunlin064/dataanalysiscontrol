@@ -79,4 +79,40 @@ class SaleGroupsReach extends Model
 		
 		return $newData ?? [] ;
 	}
+	
+	static function getBonusMembersBeyondMoney($setDate,$erpUserId){
+		$percentage = BonusReach::getUserProfitPercentage($setDate, $erpUserId);
+		$result = [
+			'percentage' => $percentage,
+			'bonus_direct' => 0,
+			'reach_level_rate' => 0,
+		];
+		foreach(config('sale_group.bonusMembersBeyondLevel.level') as $level){
+			if($percentage > $level['rate']){
+				$result['bonus_direct'] = $level['bonus_direct'];
+				$result['reach_level_rate'] = $level['rate'];
+			}
+		}
+		return $result;
+	}
+	
+	static function getProfit( $saleGroupId, $setDate ){
+		$saleGroupErpUserId = SaleGroups::find($saleGroupId)->groupsUsers->where('set_date', $setDate)->pluck('erp_user_id');
+		return round(FinancialList::whereIn('erp_user_id', $saleGroupErpUserId)
+		                    ->where('set_date', $setDate)
+		                    ->sum('profit'));
+	}
+	
+	static function getBonusDirect($saleGroupId,$setDate,$percentage){
+		$bonus_direct = 0;
+		foreach ( SaleGroups::find($saleGroupId)->groupsBonus->where('set_date',$setDate)->sortBy('achieving_rate')->values() as $key => $items )
+		{
+			if (  $percentage > $items['achieving_rate']  )
+			{
+				$bonus_direct = $items['bonus_direct'];
+			}
+		}
+		
+		return $bonus_direct;
+	}
 }

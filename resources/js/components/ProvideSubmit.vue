@@ -30,6 +30,7 @@
                 //添加参数
                 let paramters = {
                     '_token' : this.csrf,
+                    'provide_bonus_beyond' : this.table_select.bonus_beyond_list,
                     'provide_bonus' : this.table_select.provide_bonus_list,
                     'provide_sale_groups_bonus' : this.table_select.provide_groups_list,
                 };

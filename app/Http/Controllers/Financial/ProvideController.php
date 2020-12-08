@@ -10,13 +10,13 @@
 	use App\Http\Controllers\FinancialController;
 	use App\Provide;
 	use App\SaleGroups;
+	use App\SaleGroupsBonusBeyond;
 	use App\SaleGroupsReach;
 	use App\SaleGroupsUsers;
 	use App\Service\SelectUserList;
 	use App\User;
 	use DateTime;
 	use Illuminate\Http\Request;
-	use Illuminate\Support\Facades\Auth;
 	use Illuminate\Support\Facades\Cache;
 	use Illuminate\Support\Facades\DB;
 	use Illuminate\Support\Facades\Input;
@@ -42,6 +42,26 @@
 			$this->authorize('viewSetting', $this->policyModel);
 			
 			[ $bonuslist, $saleGroupsReach, $allUserName ] = $this->getProvideListDatas();
+			$bonusBeyondList = SaleGroupsBonusBeyond::where('status', 0)->with('saleGroup')->get()->map(function (
+				$v
+			) {
+				$new = $v->toArray();
+				$new['user'] = $v->saleGroup->getConvenerUser($v['set_date'], $v['sale_groups_id'])->user->toArray();
+				$new['user_name'] = ucfirst($new['user']['name']);
+				return $new;
+			});
+			$bonusBeyondColumns = [
+				[ 'data' => 'id' ],
+				[ 'data' => 'set_date' ],
+				[ 'data' => 'user_name' ],
+				[
+					'data' => 'sale_group.name'
+				],
+				[
+					'data'   => 'provide_money',
+					'render' => '<div data-money="${data}">${data}</div>'
+				],
+			];
 			
 			$saleGroupsTableColumns = [
 				[ 'data' => 'id' ],
@@ -85,6 +105,8 @@
 				'saleGroupsReach'        => $saleGroupsReach,
 				'saleGroupsTableColumns' => $saleGroupsTableColumns,
 				'bonuslistColumns'       => $bonuslistColumns,
+				'bonusBeyondColumns'     => $bonusBeyondColumns,
+				'bonusBeyondList'        => $bonusBeyondList,
 				'bonuslist'              => $bonuslist,
 				'allUserName'            => $allUserName,
 				'autoSelectIds'          => [],
@@ -94,21 +116,34 @@
 		}
 		
 		public function view () {
-			$date = new DateTime(date('Ym01'));
-			$erpUserId = Auth::user()->erp_user_id;
-			//
-			//            $provideStart = '2020-09-01';
-			//            $provideEnd = '2020-09-01';
-			//            $saleGroupIds = [1, 2, 3, 4,5,6,7,8];
-			//            $userIds = [];
-			//            $request = new Request(['startDate' => $provideStart, 'endDate' => $provideEnd, 'saleGroupIds' => $saleGroupIds, 'userIds' => $userIds]);
-			//            $datas = $this->getAjaxProvideData($request, 'return');
-			//            dd($datas);
+			
+			
+//			            $provideStart = '2021-01-01';
+//			            $provideEnd = '2021-01-01';
+//			            $saleGroupIds = [1, 2, 3, 4,5,6,7,8];
+//			            $userIds = [];
+//			            $request = new Request(['startDate' => $provideStart, 'endDate' => $provideEnd, 'saleGroupIds' => $saleGroupIds, 'userIds' => $userIds]);
+//			            $datas = $this->getAjaxProvideData($request, 'return');
+//			            dd($datas);
 			
 			[
 				$saleGroups,
 				$userList
 			] = $this->getSelectLists('provide_view');
+			
+			
+			$bonusBeyondColumns = [
+				[ 'data' => 'provide_set_date' ],
+				[ 'data' => 'set_date' ],
+				[ 'data' => 'user.name' ],
+				[
+					'data' => 'sale_group.name'
+				],
+				[
+					'data'   => 'provide_money',
+					'render' => '<div data-money="${data}">${data}</div>'
+				],
+			];
 			
 			$provideBonusColumns = [
 				[ 'data' => 'provide_set_date' ],
@@ -144,6 +179,7 @@
 				'saleGroupsReachColumns' => $saleGroupsReachColumns,
 				'saleGroupsReach'        => [],
 				'saleGroups'             => $saleGroups,
+				'bonusBeyondColumns'   => $bonusBeyondColumns,
 				'userList'               => $userList
 			]);
 		}
@@ -198,6 +234,7 @@
 			try {
 				DB::beginTransaction();
 				//Dosomething...
+				
 				$selectSaleGroupsReachIds = explode(',', $request->provide_sale_groups_bonus);
 				
 				$this->setSaleGroupsReachProvide($selectSaleGroupsReachIds);
@@ -207,6 +244,18 @@
 				
 				$this->resetFinancialStatus();
 				$this->save($selectFincialIds);
+				
+				
+				$createdTime = new DateTime();
+				if ( $createdTime->format('d') >= $this->saveDateLine ) {
+					$createdTime->modify('+1Month');
+				}
+				
+				$selectSaleGroupsBonusBeyondIds = explode(',', $request->provide_bonus_beyond);
+				SaleGroupsBonusBeyond::whereIn('id', $selectSaleGroupsBonusBeyondIds)->update([
+					'status' => 1,
+					'updated_at' => $createdTime->format('Y-m-01')
+				]);
 				
 				$message['status_string'] = 'success';
 				$message['message'] = '更新成功';
@@ -322,6 +371,8 @@
 				return $items->sortByDesc('erp_user_id');
 			})->toArray();
 			
+			
+			
 			$saleGroupRowData->each(function ( $v, $k ) use ( &$provideCharBarStack ) {
 				if ( !isset($provideCharBarStack[ $v->provide_set_date ]) ) {
 					$provideCharBarStack[ $v->provide_set_date ] = [];
@@ -336,12 +387,38 @@
 				
 			});
 			
+			$bonusBeyondList = SaleGroupsBonusBeyond::where('status', 1)->where('provide_money','!=',0)->whereIn('updated_at',$dateRange)->with('saleGroup')->get()->map(function (
+				$v
+			) {
+				$new = $v;
+				$new['user'] = $v->saleGroup->getConvenerUser($v['set_date'], $v['sale_groups_id'])->user->toArray();
+				$new['user_name'] = ucfirst($new['user']['name']) ?? '';
+				$new['erp_user_id'] = $new['user']['erp_user_id'];
+				$new['provide_set_date'] = $v->updated_at->format('Y-m');
+				return $new;
+			});
+			
+			$bonusBeyondList->each(function($v) use(&$provideCharBarStack){
+				if ( !isset($provideCharBarStack[ $v->provide_set_date ]) ) {
+					$provideCharBarStack[ $v->provide_set_date ] = [];
+				}
+				if ( !isset($provideCharBarStack[ $v->provide_set_date ][ $v->user_name ]) ) {
+					$provideCharBarStack[ $v->provide_set_date ][ $v->user_name ] = [];
+				}
+				if ( !isset($provideCharBarStack[ $v->provide_set_date ][ $v->user_name ]['provide_money']) ) {
+					$provideCharBarStack[ $v->provide_set_date ][ $v->user_name ]['provide_money'] = 0;
+				}
+				$provideCharBarStack[ $v->provide_set_date ][ $v->user_name ]['erp_user_id'] = $v->erp_user_id;
+				$provideCharBarStack[ $v->provide_set_date ][ $v->user_name ]['provide_money'] += $v->provide_money;
+			});
+			
 			$provideCharBarStack = collect($provideCharBarStack)->map(function ( $v, $k ) use ( $userIds ) {
 				return collect($v)->whereIn('erp_user_id', $userIds);
 			});
 			
 			$provide_groups_list = $saleGroupRowData->whereIn('erp_user_id', $userIds);
 			$provide_bonus_list = $bonusRowData->whereIn('erp_user_id', $userIds);
+			$provide_bonus_beyond_list = $bonusBeyondList->whereIn('erp_user_id', $userIds);
 			
 			if ( $saleGroupIds ) {
 				$provide_groups_list = $provide_groups_list->whereIn('sale_groups_id', $saleGroupIds);
@@ -352,6 +429,7 @@
 				"provide_groups_list"    => $provide_groups_list->values()->toArray(),
 				"provide_bonus_list"     => $provide_bonus_list->values()->toArray(),
 				"provide_char_bar_stack" => $provideCharBarStack->toArray(),
+				'provide_bonus_beyond_list' => $provide_bonus_beyond_list->values()->toArray()
 			];
 			
 			if ( $outType == 'echo' ) {

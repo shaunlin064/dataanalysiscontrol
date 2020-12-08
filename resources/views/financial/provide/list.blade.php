@@ -110,11 +110,12 @@
             </div>
         </div>
     </div>
+
     <div class='row'>
         <div class='col-md-12'>
         <simple-data-table-componet
                 :table_id='"provide_groups_list"'
-                :table_head='"招集人獎金"'
+                :table_head='"招集人-團隊獎金"'
                 :table_title='["","月份","業務","團隊名稱","團隊毛利","比例","獎金"]'
                 :row = '{{ json_encode($saleGroupsReach) }}'
                 :columns = '{!!json_encode($saleGroupsTableColumns)!!}'
@@ -122,6 +123,19 @@
                 :all_user_name='{{json_encode($allUserName)}}'
                 data-step="2" data-intro="召集人獎金 每月16號後計算上月獎金..<a href='/info/scheduleList'>可參考系統排程表</a>"
         ></simple-data-table-componet>
+        </div>
+    </div>
+    <div class='row'>
+        <div class='col-md-12'>
+            <simple-data-table-componet
+                    :table_id='"provide_bonus_beyond_list"'
+                    :table_head='"招集人-領導獎金"'
+                    :table_title='["","月份","業務","團隊名稱","獎金"]'
+                    :row = '{{ json_encode($bonusBeyondList) }}'
+                    :columns = '{!!json_encode($bonusBeyondColumns)!!}'
+                    :type = '"select"'
+                    :all_user_name='{{json_encode($allUserName)}}'
+            ></simple-data-table-componet>
         </div>
     </div>
 

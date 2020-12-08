@@ -62,6 +62,24 @@ class UpdateConvenerReach extends Command
             DB::beginTransaction();
             $saleGroupsReach = new SaleGroupsReach();
             $saleGroupsReach->setAllConvenerReach($setDate);
+            
+            $saleGroups = \App\SaleGroups::all();
+	        $date = new DateTime(date('Ym01'));
+	        $setDate = $date->modify('-1Month')->format('Y-m-d');
+	        $saleGroups->each(function ( $saleGroup ) use ( $setDate ) {
+		        [
+			        $profit,
+			        $percentage,
+			        $bonusDirect,
+			        $bonusMembersBeyondMoney
+		        ] = $saleGroup->getGroupExtraBonus($setDate);
+		        /*獎金為0 狀態直接改為發放*/
+		        $status = $bonusMembersBeyondMoney == 0 ? 1 : 0;
+		        $saleGroup->saleGroupsBonusBeyond()
+		                  ->updateOrCreate([ 'set_date' => $setDate ],
+			                  [ 'provide_money' => $bonusMembersBeyondMoney, 'status' => $status ]);
+	        });
+	
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();

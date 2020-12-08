@@ -58,7 +58,6 @@
                 $cacheObj = Cachekey::where('type', 'financial.review')->get();
 
                 foreach ( $dateRange as $date ) {
-
                     if ( $cacheObj->where('set_date', $date)->count() == 0 ) {
                         $request = new Request([
                             'startDate'              => $date,
@@ -68,7 +67,8 @@
                             'agencyIdArrays'         => [],
                             'clientIdArrays'         => [],
                             'mediaCompaniesIdArrays' => [],
-                            'mediasNameArrays'       => []
+                            'mediasNameArrays'       => [],
+                            'selectPms' => []
                         ]);
                         $reviewObj->getCacheDatas($request);
                         $runTime = round(microtime(true) - $startTime, 2);
@@ -82,6 +82,7 @@
             } catch(\Exception $e) {
                 DB::rollback();
                 // Handle Error
+	            echo $e->getMessage();
                 \App\Jobs\SentMail::dispatch('crontab',['mail'=>env('NOTIFICATION_EMAIL'),'name'=>'admin', 'title' => "{$this->signature} error {$e->getMessage()}"]);
             }
 

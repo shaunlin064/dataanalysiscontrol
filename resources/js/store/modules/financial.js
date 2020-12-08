@@ -5,6 +5,7 @@ const state = {
     sale_group_total_money: 0,
     provide_bonus_list: [],
     provide_groups_list: [],
+    provide_bonus_beyond_list: [],
     provide_total_money: 0,
     provide_statistics_list: {
         'user': {},
@@ -33,6 +34,9 @@ const mutations = {
     [types.MUTATE_PROVIDE_GROUPS_LIST](state,payload){
         state.provide_groups_list = payload;
     },
+    [types.MUTATE_PROVIDE_BONUS_BEYOND_LIST](state,payload){
+        state.provide_bonus_beyond_list = payload;
+    },
     [types.MUTATE_PROVIDE_CHAR_BAR_STACK] : (state,payload) => {
         state.provide_char_bar_stack = payload;
     },
@@ -45,6 +49,7 @@ const mutations = {
     },
     [types.MUTATE_STATISTICS] : (state,payload) => {
             // /*user*/
+
             if (state.provide_statistics_list['user'][payload.user_name] === undefined) {
                 state.provide_statistics_list['user'][payload.user_name] = {};
                 state.provide_statistics_list['user'][payload.user_name].money = 0;
@@ -59,6 +64,7 @@ const mutations = {
                 state.provide_statistics_list['group'][groupName]['group_id'] = 0;
                 state.provide_statistics_list['group'][groupName]['groupName'] = groupName;
             }
+
             // /*區分獎金檢視與獎金發放 */
             let separateDate = payload.provide_set_date !== undefined ? payload.provide_set_date : payload.set_date;
             if (state.provide_char_bar_stack[separateDate] === undefined) {
@@ -131,6 +137,7 @@ const actions = {
 
         commit(types.MUTATE_PROVIDE_BONUS_LIST,payload.provideBonusList);
         commit(types.MUTATE_PROVIDE_GROUPS_LIST, payload.provideGroupsList);
+        commit(types.MUTATE_PROVIDE_BONUS_BEYOND_LIST, payload.provideBonusBeyondList);
         // commit(types.MUTATE_PROVIDE_CHAR_BAR_STACK,payload.provideCharBarStack);
 
     },
