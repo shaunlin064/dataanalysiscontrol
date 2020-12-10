@@ -53,7 +53,7 @@ class UpdateFinancialData extends Command
             $datetime = new DateTime(date('Ym01'));
             $nowdate = new DateTime();
             /*last month*/
-            if($nowdate->format('d') < 16){
+            if($nowdate->format('d') <= 16){
                 $datetime->modify('-1Month');
                 $finanicalList->saveCloseData($datetime->format('Ym01'));
             }
