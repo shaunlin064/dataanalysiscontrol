@@ -5,6 +5,7 @@
     use App\Console\Commands\CacheAll;
     use App\Console\Commands\CacheFinancialList;
     use App\Console\Commands\CacheReceiptTimes;
+    use App\Console\Commands\CheckAddNewFinancialUser;
     use App\Console\Commands\UpdateBonusReach;
     use App\Console\Commands\UpdateConvenerReach;
     use App\Console\Commands\UpdateExchangeRate;
@@ -31,6 +32,7 @@
             UpdateBonusReach::class,
             UpdateConvenerReach::class,
             UpdateExchangeRate::class,
+            CheckAddNewFinancialUser::class,
             CacheAll::class,
         ];
 
@@ -45,7 +47,9 @@
             if(env('APP_ENV') != 'local'){
                 $schedule->command('update_financial_data')->twiceDaily(12, 18);
                 $schedule->command('update_financial_data')->daily();
+                
                 $schedule->command('update_exchange_rate')->daily();
+                
 	            $schedule->command('check_add_new_financial_user')->daily();
 	            
                 $schedule->command('update_user_bonus')->monthlyOn('1', '00:00');
