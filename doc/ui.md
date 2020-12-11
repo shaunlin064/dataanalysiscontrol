@@ -2,7 +2,7 @@
 `責任額,招集人,menu,權限`
 
 ## 責任額
-![獎金責任額](https://drive.google.com/u/0/uc?id=1uyjjoU8-ucZ3dgnoze1PLrpeYyozKSU-&export=download)
+![獎金責任額](./src/bonus.png)
 
 * 責任額 設定主要是提供獎金計算達標依據 依照user每月業績毛利去計算百分比
 * 達成比例 達成比例 用來決定 獎金比例級距
@@ -12,23 +12,23 @@
 如果有新進業務, 需要手動設定新的條件, 每月資料系統自動更新沿用上用資料, 畫面上可設定資料為當月<br>
 
 ## 招集人(團隊獎金設定)
-![招集人-1](https://drive.google.com/u/0/uc?id=1Tt2fa5tNTmmHRIVSqR7wn0QavJ1km7oA&export=download)
+![招集人-1](./src/salegroup-1.png)
 
 * 獎金比例 自行手動輸入 原則上 一個招集人 開始為 5.25% 多加一個人減去 0.25 (目前只有業務5部 業務6部 採用這個機制 其他部門設定為0即可)
 * 責任額總計 系統自動帶入團隊內人員責任額
 * 英雄榜 同個人責任額相同 
 * 領導獎金 這部分暫時使用hardcode 的方式寫入 可參考 `dataanalysiscontrol/config/sale_group.php` 檔案內說明(僅設定業務 1 2 3 部)
 
-![招集人-2](https://drive.google.com/u/0/uc?id=1t_oi66g2mCnOVTCQbzgt_ySdyJxX3okA&export=download)
+![招集人-2](./src/salegroup-2.png)
 
 * 人員清單 勾選團隊成員 一個團隊只能有一個招集人
 
 ## 權限設定
-![權限設定-1](https://drive.google.com/u/0/uc?id=1wbRmVwXIXo-eJLwBWeBJIIXBI4hlpsbX&export=download)
+![權限設定-1](./src/permission-1.png)
 
 * 權限Class 目前僅用來做 權限分類使用
 
-![權限設定-2](https://drive.google.com/u/0/uc?id=1y5aix0cvje7KRKfwQn1vvDnwcx4VNKoQ&export=download)
+![權限設定-2](./src/permission-2.png)
 
 * 分類 對應class
 * 權限 設定的keyName 對應 系統內 確認權限使用 example： `auth()->user()->hasPermission('bonus.review.editor_all_pm')`
@@ -36,17 +36,17 @@
 這個頁面為全動態, 輸入新增刪除都是即時 謹慎刪除
 
 ## 角色權限設定
-![群組權限](https://drive.google.com/u/0/uc?id=1xoexN5K5t74VeyHI3pj4NPvG-xTvifgH&export=download)
+![群組權限](./src/role.png)
 
 * 名稱 keyName 對應系統內 確認是否有該角色 example: `auth()->user()->hasRole('admin');`
 
 ## user 角色權限
-![使用者群組](https://drive.google.com/u/0/uc?id=1Hbr91aMbUb2ndN4mnR6nFdNDrZgOg0DQ&export=download)
+![使用者群組](./src/user_role.png)
 
 * 角色 所有人都有預設權限, 其他就依照user屬性分配即可
 
 ## Menu 設定
-![Menu設定](https://drive.google.com/u/0/uc?id=1sYWDlLpGd25VId-phvMgDQX0db1OEM5L&export=download)
+![Menu設定](./src/menu.png)
 
 * 主選單 右上角新增, 為新增一個分類選單
     * priority ui顯示時的排序
