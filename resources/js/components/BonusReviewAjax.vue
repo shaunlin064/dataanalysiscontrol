@@ -98,6 +98,7 @@ export default {
         clientIdArrays: customerIdsData.type === 'client' ? [customerIdsData.id] : [],
         mediaCompaniesIdArrays: [],
         mediasNameArrays: [],
+        selectPms: this.select_pm
       };
       bus.$emit('customerEmptyPie');
       bus.$emit('openCustomerModal');
