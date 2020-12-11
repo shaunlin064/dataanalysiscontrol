@@ -176,25 +176,25 @@
                 [ 'data' => 'paymentStatus' ],
                 [ 'data' => 'bonusStatus' ],
             ];
-//////
+//////////
 //           if(auth()->user()->name === 'shaun'){
 //                /*ajax check debug*/
 //	           $date = today();
-//               $dateStart = $date->format('2020-10-01');
-//               $dateEnd = $date->format('2020-10-01');
+//               $dateStart = $date->format('2020-11-01');
+//               $dateEnd = $date->format('2020-11-01');
 //               $request = new Request([
 //                   'startDate'    => $dateStart,
 //                   'endDate'      => $dateEnd,
-//                   'saleGroupIds' => [ '6','7','8' ],
+//                   'saleGroupIds' => [ '1','2','3','4','5','6','7','8' ],
 //                   'userIds'      => [],
 //                   'agencyIdArrays' => [],
 //                   'clientIdArrays' => [],
 //                   'mediaCompaniesIdArrays' => [],
 //                   'mediasNameArrays' => [],
-//                   'selectPms' => []
+//                   'selectPms' => CampaignProjectManager::all()->pluck('erp_user_id')->toArray()
 //               ]);
 //               $return = $this->getAjaxData($request, 'return');
-//               dd($return['group_progress_list'],'out');
+//               dd($return);
 //           }
 
             return view('bonus.review.view', [
@@ -776,7 +776,6 @@
                 'dateBefore' => [],
             ];
 
-
             $erpUserId = User::whereIn('id', $userIds)->get()->pluck('erp_user_id');
 	        
             // user select
@@ -829,15 +828,18 @@
                                 ->whereIn('erp_user_id', $erpUserId)
                                 ->values();
                         }
+	                    $withOutPmCampaign = $tmpBonus->whereNotIn('campaign_id',CampaignProjectManager::all()->pluck('campaign_id')->toArray())->values();
                         
                         if(count($selectPms) > 0){
                         	
                         	$campaignIdsFormPm = CampaignProjectManager::whereIn('erp_user_id',$selectPms)->get()->pluck('campaign_id')->toArray();
-	                        $tmpBonus = $tmpBonus->whereIn('campaign_id',$campaignIdsFormPm)->values();
+	
+	                        
+	                        $tmpBonus = $tmpBonus->whereIn('campaign_id',$campaignIdsFormPm)->values()->merge($withOutPmCampaign);
+	                        
                         }else{
-	                        $tmpBonus = [];
+	                        $tmpBonus = $withOutPmCampaign;
                         }
-	                    
 	                   
 
                         $$objKey->subPut('finance.review.userDateFilter', json_encode($tmpCondition), [
